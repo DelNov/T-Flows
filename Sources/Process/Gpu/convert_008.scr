@@ -1,0 +1,28 @@
+# Enter the grid file name you are importing (with ext.):
+test_008_matrix.msh
+
+# Would you like to create a dual grid? (yes/no)
+no
+
+# Enter scaling factor for geometry: 
+skip
+
+# Type 1 for barycentric placement
+# Type 2 for orthogonal placement
+1
+
+# Enter the ordinal number(s) of periodic-boundary condition(s)
+1
+
+# Enter the ordinal number(s) of periodic-boundary condition(s)
+1
+
+# Enter the ordinal number(s) of periodic-boundary condition(s)
+skip
+
+# Calculating distance from the walls
+skip
+
+# Insert non-homogeneous direction 
+skip
+

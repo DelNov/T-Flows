@@ -1,5 +1,7 @@
 !==============================================================================!
-  subroutine Control_Mod_Preconditioner_For_System_Matrix(val, verbose)
+  subroutine Preconditioner_For_System_Matrix(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads which preconditioner to use from the file.
 !------------------------------------------------------------------------------!
 !   These are preconditioners for the T-Flows suite of solvers.  PETSc has     !
 !   many more, of course.  For compatibillity with PETSc, these keywords have  !
@@ -14,28 +16,27 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  character(SL)       :: val      !! preconditioner (diagonal, jacobi, icc, ...)
+  logical, optional   :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('PRECONDITIONER_FOR_SYSTEM_MATRIX',  &
-                                  'incomplete_cholesky',               &
-                                   val,                                &
-                                   verbose)
+  call Control % Read_Char_Item('PRECONDITIONER_FOR_SYSTEM_MATRIX',  &
+                                'incomplete_cholesky',               &
+                                 val,                                &
+                                 verbose)
   call String % To_Lower_Case(val)
 
   ! Check validity of the input
-  if( val.ne.'none'                .and.  &
-      val.ne.'diagonal'            .and.  &
-      val.ne.'jacobi'              .and.  &
-      val.ne.'incomplete_cholesky' .and.  &
-      val.ne.'icc') then
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown preconditioner for the system matrix: ',  &
-               trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
+  if( val .ne. 'none'                .and.  &
+      val .ne. 'diagonal'            .and.  &
+      val .ne. 'jacobi'              .and.  &
+      val .ne. 'incomplete_cholesky' .and.  &
+      val .ne. 'icc') then
+    call Message % Error(72,                                                &
+             'Unknown preconditioner for the system matrix: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',                      &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
 
   ! Use the same names as PETSc
   else

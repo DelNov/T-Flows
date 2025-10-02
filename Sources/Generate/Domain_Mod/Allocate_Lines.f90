@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Lines(dom, n)
+  subroutine Allocate_Lines(Dom, n)
+!------------------------------------------------------------------------------!
+!>  Sets the number of lines in the domain and allocates memory for them.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  integer           :: n
+  class(Domain_Type)  :: Dom  !! domain under consideration
+  integer, intent(in) :: n    !! number of lines in the .dom file
 !==============================================================================!
 
-  dom % n_lines = n
-  allocate(dom % lines(n))
+  Dom % n_lines = n
+  allocate(Dom % lines(n))
 
   end subroutine

@@ -1,0 +1,21 @@
+# Grid name
+cavity.msh
+
+# Dual grid?
+yes
+
+# Geometric scaling
+skip
+
+# Boundary cell centers
+2
+
+# Periodic boundaries
+skip
+
+# Distance from the wall
+skip
+
+# Creation of .1d file
+skip
+

@@ -1,14 +1,16 @@
 !==============================================================================!
-  subroutine To_Lower_Case(String, char_array)
+  pure subroutine To_Lower_Case(String, char_array)
 !------------------------------------------------------------------------------!
-!   Transforms String to lowercase.                                            !
+!>  Transforms the entire string to lowercase.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(String_Type) :: String
-  character(len=*)   :: char_array
+  class(String_Type), intent(in)    :: String      !! parent class
+  character(len=*),   intent(inout) :: char_array  !! string being manipulated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(String)
 !==============================================================================!
 
   do i = 1, len_trim(char_array)

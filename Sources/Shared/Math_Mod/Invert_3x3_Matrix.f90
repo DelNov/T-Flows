@@ -1,16 +1,18 @@
 !==============================================================================!
   pure subroutine Invert_3x3_Matrix(Math, a, det)
 !------------------------------------------------------------------------------!
-!   Inverts a 3x3 matrix                                                       !
+!>  Inverts a 3x3 matrix.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in)    :: Math
-  real,             intent(inout) :: a(3,3)
-  real,             intent(inout) :: det
+  class(Math_Type), intent(in)    :: Math    !! parent class
+  real,             intent(inout) :: a(3,3)  !! matrix to be inverted
+  real,             intent(inout) :: det     !! matrix' determinant
 !-----------------------------------[Locals]-----------------------------------!
   real    :: b(3,3)
   integer :: i
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Math)
 !==============================================================================!
 
   det = a(1,1)*(a(2,2)*a(3,3)-a(2,3)*a(3,2))  &

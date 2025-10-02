@@ -38,7 +38,7 @@
   !  Set source for temperature   !
   !-------------------------------!
   if( phi % name .eq. 'T' ) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain()
       b(c) = b(c) - u % n(c) / bulk % u          &
                   * Flow % heat / bulk % area_x  &
                   * Grid % vol(c) / Grid % per_x

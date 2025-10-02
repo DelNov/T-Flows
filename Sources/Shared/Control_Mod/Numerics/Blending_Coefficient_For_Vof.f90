@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Blending_Coefficient_For_Vof(val, verbose)
+  subroutine Blending_Coefficient_For_Vof(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads blending coefficient for VOF from control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! blending coefficient value
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('BLENDING_COEFFICIENT_FOR_VOF',  &
-                                  1.0, val, verbose)
+  call Control % Read_Real_Item('BLENDING_COEFFICIENT_FOR_VOF',  &
+                                1.0, val, verbose)
 
   end subroutine

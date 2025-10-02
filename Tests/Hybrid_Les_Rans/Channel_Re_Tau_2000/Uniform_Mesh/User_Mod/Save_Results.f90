@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -12,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts   ! time step
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -35,7 +34,7 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -44,30 +43,30 @@
   call Flow % Alias_Energy  (t)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file names for results
-  call File % Set_Name(res_name,         &
-                       time_step=ts,     &
-                       appendix='-res',  &
-                       extension='.dat')
-  call File % Set_Name(res_name_plus,         &
-                       time_step=ts,          &
-                       appendix='-res-plus',  &
-                       extension='.dat')
+  call File % Set_Name(res_name,                     &
+                       time_step = Time % Curr_Dt(), &
+                       appendix  = '-res',           &
+                       extension = '.dat')
+  call File % Set_Name(res_name_plus,                 &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res-plus',       &
+                       extension = '.dat')
 
   !------------------!
   !   Read 1d file   !
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -84,7 +83,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_x / (dens_const * bulk % area_x)
+  ubulk    = bulk % flux_x / bulk % area_x
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
@@ -131,7 +130,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -173,36 +172,36 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(uu_p    (pl))
-    call Comm_Mod_Global_Sum_Real(vv_p    (pl))
-    call Comm_Mod_Global_Sum_Real(ww_p    (pl))
-    call Comm_Mod_Global_Sum_Real(uw_p    (pl))
-    call Comm_Mod_Global_Sum_Real(uw_mod_p(pl))
-    call Comm_Mod_Global_Sum_Real(kin_p   (pl))
-    call Comm_Mod_Global_Sum_Real(eps_p   (pl))
-    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
-    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+    call Global % Sum_Real(uu_p    (pl))
+    call Global % Sum_Real(vv_p    (pl))
+    call Global % Sum_Real(ww_p    (pl))
+    call Global % Sum_Real(uw_p    (pl))
+    call Global % Sum_Real(uw_mod_p(pl))
+    call Global % Sum_Real(kin_p   (pl))
+    call Global % Sum_Real(eps_p   (pl))
+    call Global % Sum_Real(vis_t_p (pl))
+    call Global % Sum_Real(y_plus_p(pl))
 
     count =  count + n_count(pl)
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p (pl))
-      call Comm_Mod_Global_Sum_Real(t2_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(t_p (pl))
+      call Global % Sum_Real(t2_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
@@ -244,7 +243,7 @@
   end if
 
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
     return
@@ -252,19 +251,19 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = Turb % t_mean(c)
       end if
     end do
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     if(Flow % heat_flux > 0.0) then
-      call Comm_Mod_Global_Min_Real(t_inf)
+      call Global % Min_Real(t_inf)
     else
-      call Comm_Mod_Global_Max_Real(t_inf)
+      call Global % Max_Real(t_inf)
     end if
 
     do s = 1, Grid % n_faces
@@ -282,11 +281,11 @@
       end if
     end do
 
-    call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_mean)
-    call Comm_Mod_Global_Sum_Int(n_points)
+    call Global % Sum_Real(t_wall)
+    call Global % Sum_Real(nu_mean)
+    call Global % Sum_Int(n_points)
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
@@ -458,6 +457,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

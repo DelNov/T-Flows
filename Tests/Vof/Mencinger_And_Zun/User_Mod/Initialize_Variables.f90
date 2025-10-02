@@ -1,6 +1,12 @@
-include '../User_Mod/Check_Inside_Box.f90'
-include '../User_Mod/Vof_Initialization_Box.f90'
-include '../User_Mod/Vof_Interface_Box.f90'
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Check_Inside_Box.f90"
+#   include "User_Mod/Vof_Initialization_Box.f90"
+#   include "User_Mod/Vof_Interface_Box.f90"
+# else
+#   include "Check_Inside_Box.f90"
+#   include "Vof_Initialization_Box.f90"
+#   include "Vof_Interface_Box.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
@@ -55,7 +61,7 @@ include '../User_Mod/Vof_Interface_Box.f90'
   end if
 
   ! Initialize velocities (depends on phase definition)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Inside the water
     if(fun % n(c) .gt. 0.99) then

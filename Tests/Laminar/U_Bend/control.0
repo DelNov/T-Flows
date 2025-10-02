@@ -1,0 +1,14 @@
+  NUMBER_OF_DOMAINS         2
+
+  NUMBER_OF_TIME_STEPS        2400
+  RESULTS_SAVE_INTERVAL        300
+  BACKUP_SAVE_INTERVAL        1200
+  SAVE_RESULTS_AT_BOUNDARIES    no
+
+  TIME_STEP               0.002
+
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+  INTERFACE_CONDITION      precursor    u_bend
+    BOUNDARY_CONDITIONS    periodic_x   u_inlet
+

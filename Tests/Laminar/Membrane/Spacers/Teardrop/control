@@ -13,38 +13,38 @@
 #-----------------
 # Physical models
 #-----------------
- MASS_DENSITY           1.0e+3
- DYNAMIC_VISCOSITY      1.0e-3
- THERMAL_CONDUCTIVITY   0.6
- HEAT_CAPACITY          1.0
+  MASS_DENSITY           1.0e+3
+  DYNAMIC_VISCOSITY      1.0e-3
+  THERMAL_CONDUCTIVITY   0.6
+  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL       none
+  TURBULENCE_MODEL       none
 
- POINT_FOR_MONITORING_PLANES    0.0125  0.0125  0.075
- PRESSURE_DROPS                30.0    30.0     0.0
- MASS_FLOW_RATES                0.025   0.025   0.0
+  POINT_FOR_MONITORING_PLANES    0.0125  0.0125  0.075
+  PRESSURE_DROPS                30.0    30.0     0.0
+  VOLUME_FLOW_RATES              0.025   0.025   0.0
 
 #------------------
 # Numerical models
 #------------------
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER  240
- MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   20
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  240
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   20
 
 #---------------------
 # Boundary conditions
 #---------------------
- BOUNDARY_CONDITION    bottom
-   TYPE                wall
-   VARIABLES           u     v     w     t
-   VALUES              0.0   0.0   0.0   10
+  BOUNDARY_CONDITION    bottom
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   10
 
- BOUNDARY_CONDITION    top
-   TYPE                wall
-   VARIABLES           u     v     w     t
-   VALUES              0.0   0.0   0.0   20
+  BOUNDARY_CONDITION    top
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   20
 
- BOUNDARY_CONDITION    spacer_walls
-   TYPE                wall
-   VARIABLES           u     v     w     q
-   VALUES              0.0   0.0   0.0   0.0
+  BOUNDARY_CONDITION    spacer_walls
+    TYPE                wall
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.0
 

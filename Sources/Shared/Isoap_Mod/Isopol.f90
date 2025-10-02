@@ -1,6 +1,16 @@
 !---------------------------------------------------------------------!
 !                              ISOPOL                                 !
 !---------------------------------------------------------------------!
+!>  Original Isoap's subroutine to insert and arrange the iso-vertices,
+!>  called from main Isoap function.
+!>  No modifications have been made to the original code from the
+!>  authors to align with T-Flows coding conventions. This decision is
+!>  to maintain compatibility with potential future updates or
+!>  corrections from the original authors. Given the complex nature of
+!>  these algorithms, which are not entirely within our current domain
+!>  of expertise, preserving the original structure and logic is deemed
+!>  the most prudent approach.
+!---------------------------------------------------------------------!
 ! On entry:                                                           !
 !==========                                                           !
 ! IA       = tag value of each vertex of the polyhedron (0 or 1)      !
@@ -36,8 +46,6 @@
 !---------------------------------------------------------------------!
   IMPLICIT NONE
 !---------------------------------------------------------------------!
-  INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
-!---------------------------------------------------------------------!
   CLASS(ISOAP_TYPE)    :: ISOAP
   INTEGER, INTENT(IN)  :: IA(NV)
   INTEGER, INTENT(OUT) :: IPIA0(NV)
@@ -57,6 +65,8 @@
        IPINI,IPISE(NV,2),IPMARK(NV),IPNEW,IS,IS1,ISCUT(NS),          &
        ISE(NS,NV),ISNEW,ITYPE,IV,IV1,IVISE(NS,NV),IVNEW,IVNEWT,      &
        NEDGE(NS),NINT,NIPNEW,NISCUT,NIV,NIVNEW
+!* Avoid unused warning
+  ASSOCIATE(ISOAP => ISOAP); END ASSOCIATE
 !* Determination of the faces intersected by the isosurface      
   NISCUT=0
 !* NEDGE(IS) = Number of intersected edges of the face IS

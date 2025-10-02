@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_Domains(val, verbose)
+  subroutine Number_Of_Domains(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads number of domains involved in simulation from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! number of domains in simulation
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_DOMAINS', 1, &
-                                  val, verbose)
+  call Control % Read_Int_Item('NUMBER_OF_DOMAINS', 1, val, verbose)
 
   end subroutine

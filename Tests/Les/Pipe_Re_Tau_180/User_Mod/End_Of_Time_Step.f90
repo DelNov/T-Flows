@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t  ! 1st step for turbulence statist.
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics
-  real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
@@ -30,13 +28,13 @@
   t    => Flow % t
 
   ! If not time for disturbing the velocity field, return
-  if(mod(n, 100) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 100) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(n > 3000) return
+  if(Time % Curr_Dt() > 3000) return
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 
@@ -84,7 +82,7 @@
     if( sqrt(xo**2 + yo**2) < (rp-ro) ) then
 
       do dir = 1, 2
-        do c = 1, Grid % n_cells
+        do c = Cells_In_Domain_And_Buffers()
           xc = Grid % xc(c)
           yc = Grid % yc(c)
           zc = Grid % zc(c)
@@ -115,12 +113,12 @@
   end do  ! next eddy
 
   vmax = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     vmax = max(vmax, abs(u % n(c)))
     vmax = max(vmax, abs(v % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, Grid % n_cells
+  call Global % Max_Real(vmax)
+  do c = Cells_In_Domain_And_Buffers()
     u % n(c) = u % n(c) / vmax / 10.0
     v % n(c) = v % n(c) / vmax / 10.0
   end do

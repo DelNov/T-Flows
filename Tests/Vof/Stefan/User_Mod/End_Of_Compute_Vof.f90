@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Compute_Vof(Vof, Sol, curr_dt)
+  subroutine User_Mod_End_Of_Compute_Vof(Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Compute_Vof function.                !
 !------------------------------------------------------------------------------!
@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   type(Vof_Type),      target :: Vof
   type(Solver_Type),   target :: Sol
-  integer, intent(in)         :: curr_dt  ! current time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Field_Type),  pointer :: Flow
@@ -22,7 +21,7 @@
   Grid => Flow % pnt_grid
   fun  => Vof % fun
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Find relevant cell
     if( Math % Approx_Real(Grid % yc(c), 0.0) .and.  &

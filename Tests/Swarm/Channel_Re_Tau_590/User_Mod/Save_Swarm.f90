@@ -1,5 +1,5 @@
 !==============================================================================!
-   subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, curr_dt, domain)
+   subroutine User_Mod_Save_Swarm(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -7,22 +7,12 @@
 !   The results are then writen in files swarm_name_res.dat and                !
 !   swarm_name_res_plus.dat                                                    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
-  use Swarm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),      target :: Flow
   type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Swarm_Type),      target :: Swarm
-  integer,           intent(in) :: curr_dt   ! current time step
   integer, optional, intent(in) :: domain    ! current domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -62,7 +52,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -124,7 +114,7 @@
   !   Swarm statistics   !
   !----------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
 
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
@@ -156,7 +146,7 @@
   !   Flowfield statistics   !
   !--------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
 
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
@@ -181,27 +171,27 @@
   do pl = 1, n_prob-1
 
     ! Carrier Flow
-    call Comm_Mod_Global_Sum_Int(n_count2(pl))
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Int(n_count2(pl))
+    call Global % Sum_Real(wall_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
-    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+    call Global % Sum_Real(vis_t_p (pl))
+    call Global % Sum_Real(y_plus_p(pl))
 
     ! Swarm
-    call Comm_Mod_Global_Sum_Int(n_states(pl))
-    call Comm_Mod_Global_Sum_Real(u_pp(pl))
-    call Comm_Mod_Global_Sum_Real(v_pp(pl))
-    call Comm_Mod_Global_Sum_Real(w_pp(pl))
-    call Comm_Mod_Global_Sum_Real(uu_pp(pl))
-    call Comm_Mod_Global_Sum_Real(vv_pp(pl))
-    call Comm_Mod_Global_Sum_Real(ww_pp(pl))
-    call Comm_Mod_Global_Sum_Real(uw_pp(pl))
+    call Global % Sum_Int(n_states(pl))
+    call Global % Sum_Real(u_pp(pl))
+    call Global % Sum_Real(v_pp(pl))
+    call Global % Sum_Real(w_pp(pl))
+    call Global % Sum_Real(uu_pp(pl))
+    call Global % Sum_Real(vv_pp(pl))
+    call Global % Sum_Real(ww_pp(pl))
+    call Global % Sum_Real(uw_pp(pl))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
 
@@ -231,10 +221,10 @@
 
   ! Creating files for swarm statistics
   call File % Set_Name(swarm_result_name, appendix='-swarm-res',            &
-                       time_step=curr_dt, extension='.dat')
+                       time_step=Time % Curr_Dt(), extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name, fu1)
   call File % Set_Name(swarm_result_name_plus, appendix='-swarm-res-plus',  &
-                       time_step=curr_dt, extension='.dat')
+                       time_step=Time % Curr_Dt(), extension='.dat')
   call File % Open_For_Writing_Ascii(swarm_result_name_plus, fu2)
 
   ! Calculating friction velocity and friction temperature (for the flow!)
@@ -243,7 +233,7 @@
                                    w_p(1)**2) / wall_p(1)))
 
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Swarm.f90!'
     end if
     return
@@ -329,6 +319,6 @@
   close(fu1)
   close(fu2)
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Swarm.f90.'
 
   end subroutine

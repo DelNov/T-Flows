@@ -29,8 +29,9 @@
     1. [Inflows](#demo_inflows)
         1. [Flat velocity profile](#demo_inflows_flat)
         2. [Prescribed velocity profile](#demo_inflows_parabolic)
-        3. [Synthetic eddies](#demo_inflows_eddies)
-        4. [Turbulent precursor domain](#demo_inflows_turbulent)
+        3. [Through user functions](#demo_inflows_user_functions)
+        4. [Synthetic eddies](#demo_inflows_eddies)
+        5. [Turbulent precursor domain](#demo_inflows_turbulent)
     2. [Outflows](#demo_outflows)
 8. [PETSc solvers](#link_petsc)
     1. [Compiling PETSc](#link_petsc_compiling)
@@ -117,20 +118,22 @@ practical use of T-Flows, it is highly desirable that you also have the followin
 
 - [GMSH](https://gmsh.info)
 - any other free or commercial mesh generator exporting ANSYS' ```.msh``` or
-  ```.cas``` format (**double-check** for .cas)
+  ```.cas``` format.
 - visualization software which can read ```.vtu``` file format such as
   [ParaView](https://www.paraview.org/) or [VisIt](https://wci.llnl.gov/simulation/computer-codes/visit),
   or any tool which can read ```.vtu``` file format
 - [OpenMPI](https://www.open-mpi.org/) installation (mpif90 for compilation and
   mpirun for parallel processing)
+- [Blender](https://www.blender.org/) could prove to be useful when prescribing
+  STL files as initial conditions for multiphase simulations with VOF.
 
 T-Flows is, in essence, a fluid flow solver without any graphical user interface (GUI).
 Although it comes with its own grid generator, it is very rudimentary, and an
 external grid generation software would be highly desirable for meshing complex
 computational domains.  We regularly use GMSH and would highly recommend it for
 its inherent scripting ability, but if you have access to any commercial grid
-generator which can export meshes in ANSYS' ```.msh``` (and ```.cas```, **this should
-be checked**) format, that would just fine.
+generator which can export meshes in ANSYS' ```.msh``` (and ```.cas```) format,
+that would just fine.
 
 Having no GUI, T-Flows relies on
 external tools for visualization of results.  The results are saved in ```.vtu```,
@@ -346,28 +349,29 @@ of them.  When compiling _Convert_, for example, command ```make``` in its
 directory prints the following lines on the terminal:
 ```
 #=======================================================================
-# Compiling Convert with compiler gnu
+# Compiling Convert with gnu compiler
 #-----------------------------------------------------------------------
 # Usage:
-#   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> OPENMP=<no/yes>
-#        <REAL=double/single>
+#   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>
+#        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>
+#        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>
 #
 # Note: The first item, for each of the options above, is the default.
 #
 # Examples:
-#   make              - compile with gnu compiler
-#   make FORTAN=intel - compile with intel compiler
-#   make DEBUG=yes    - compile with gnu compiler in debug mode
-#   make OPENMP=yes   - compile with gnu compiler for parallel Convert
+#   make               - compile with gnu compiler
+#   make FORTRAN=intel - compile with intel compiler
+#   make DEBUG=yes     - compile with gnu compiler in debug mode
+#   make ASSERT=no     - compile without assert with gnu compiler
+#   make OMP=yes       - compile with gnu compiler for parallel Convert
 #-----------------------------------------------------------------------
 gfortran ../Shared/Const_Mod.f90
-gfortran ../Shared/Comm_Mod_Seq.f90
-gfortran ../Shared/Math_Mod.f90
-gfortran ../Shared/File_Mod.f90
-...
-...
-gfortran Load_Fluent.f90
-gfortran Load_Gmsh.f90
+gfortran ../Shared/Region_Mod.f90
+gfortran ../Shared/String_Mod.f90
+gfortran ../Shared/Comm_Mod.f90
+gfortran ../Shared/Assert_Mod.f90
+gfortran ../Shared/Tokenizer_Mod.f90
+gfortran ../Shared/Message_Mod.f90
 ...
 ...
 gfortran Main_Con.f90
@@ -1880,7 +1884,7 @@ The source ```Beginning_Of_Simulation``` is, clearly enough, called at the
 beginning of simulation, and we wrote it in a way to read physical properties:
 ```
   1 !==============================================================================!
-  2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm, n, time)
+  2   subroutine User_Mod_Beginning_Of_Simulation(Flow, Turb, Vof, Swarm)
   3 !------------------------------------------------------------------------------!
   4 !   This function is called at the beginning of simulation.                    !
   5 !------------------------------------------------------------------------------!
@@ -1890,98 +1894,92 @@ beginning of simulation, and we wrote it in a way to read physical properties:
   9   type(Turb_Type),     target :: Turb
  10   type(Vof_Type),      target :: Vof
  11   type(Swarm_Type),    target :: Swarm
- 12   integer, intent(in)         :: n     ! time step
- 13   real,    intent(in)         :: time  ! physical time
- 14 !-----------------------------------[Locals]-----------------------------------!
- 15   type(Grid_Type), pointer :: Grid
- 16   integer                  :: i, fu
- 17 !==============================================================================!
- 18
- 19   ! Take aliases
- 20   Grid => Flow % pnt_grid
- 21
+ 12 !-----------------------------------[Locals]-----------------------------------!
+ 13   type(Grid_Type), pointer :: Grid
+ 14   integer                  :: i, fu
+ 15 !==============================================================================!
+ 16
+ 17   ! Take aliases
+ 18   Grid => Flow % pnt_grid
+ 19
+ 20   !----------------------------------------!
+ 21   !   Open file with physical properties   !
  22   !----------------------------------------!
- 23   !   Open file with physical properties   !
- 24   !----------------------------------------!
- 25   call File % Open_For_Reading_Ascii("air_properties_at_1_bar.dat", fu)
- 26
+ 23   call File % Open_For_Reading_Ascii("air_properties_at_1_bar.dat", fu)
+ 24
+ 25   !-----------------------------!
+ 26   !   Read all the properties   !
  27   !-----------------------------!
- 28   !   Read all the properties   !
- 29   !-----------------------------!
- 30   do i = 1, N_ITEMS
- 31     call File % Read_Line(fu)
- 32
- 33     ! Read desired properties
- 34     read(line % tokens(1), *) air_t(i)
- 35     read(line % tokens(2), *) air_rho(i)
- 36     read(line % tokens(3), *) air_mu(i)
- 37     read(line % tokens(5), *) air_cp(i)
- 38     read(line % tokens(6), *) air_lambda(i)
- 39
- 40     ! Fix units where needed (check the values in the table)
- 41     air_cp(i) = air_cp(i) * 1.0e3
- 42     air_mu(i) = air_mu(i) / 1.0e5
- 43   end do
+ 28   do i = 1, N_ITEMS
+ 29     call File % Read_Line(fu)
+ 30
+ 31     ! Read desired properties
+ 32     read(line % tokens(1), *) air_t(i)
+ 33     read(line % tokens(2), *) air_rho(i)
+ 34     read(line % tokens(3), *) air_mu(i)
+ 35     read(line % tokens(5), *) air_cp(i)
+ 36     read(line % tokens(6), *) air_lambda(i)
+ 37
+ 38     ! Fix units where needed (check the values in the table)
+ 39     air_cp(i) = air_cp(i) * 1.0e3
+ 40     air_mu(i) = air_mu(i) / 1.0e5
+ 41   end do
+ 42
+ 43   close(fu)
  44
- 45   close(fu)
- 46
- 47   if(this_proc < 2) then
- 48     print '(a)',        ' #============================================'
- 49     print '(a)',        ' # Output from user function, read properties!'
- 50     print '(a)',        ' #--------------------------------------------'
- 51   end if
+ 45   if(First_Proc()) then
+ 46     print '(a)',        ' #============================================'
+ 47     print '(a)',        ' # Output from user function, read properties!'
+ 48     print '(a)',        ' #--------------------------------------------'
+ 49   end if
+ 50
+ 51   end subroutine
 ```
 
-This probalby needs some explanation.  As arguments to this function, _Process_
+This probably needs some explanations.  As arguments to this function, _Process_
 sends a number of its classes which are used to model different aspects of numerical
 simulation.  Class ```Field_Type``` holds velocities, temperatures and other variables
 describing a flow _field_.  Class ```Turb_Type``` holds variables describing the state
 of turbulence; turbulent kinetic energy (k), its dissipation (ε), individial
-Reynolds stresses for second moment closures or turbulent statistics.  Multiphase
+Reynolds stresses for algebraic heat flux model or turbulent statistics.  Multiphase
 flows with interface tracking are described by class ```Vof_Type``` and Lagrangian
-particle tracking with ```Swarm_Type```.  In addition to these classes, _Process_
-also sends current time step (```n```) and physical time of simulation (```time```)
-
-> **_Note:_** It may sound counter-intuitive to send the last two variables to a
-procedure called at the beginning of simulation, but think of a restart.  This
-procedure is also called after a restart, but time step and time of simulation
-are not zero in such a case.
+particle tracking with ```Swarm_Type```.
 
 All the classes outlined above hold a pointer to a grid (```pnt_grid```) for which
 are they defined. The grid and its entities could be accessed as ```Flow % pnt_grid```,
 but we make sytnax shorter by introducing local pointer:
 ```
- 15   type(Grid_Type), pointer :: Grid
+ 13   type(Grid_Type), pointer :: Grid
 ```
 and assingning it a value:
 ```
- 20   Grid => Flow % pnt_grid
+ 18   Grid => Flow % pnt_grid
 ```
 
-Line 20 calls T-Flows's class ```File_Type``` member function
+Line 23 calls T-Flows's class ```File_Type``` member function
 ```Open_For_Reading_Ascii``` whose purpose is clear from the name.
 The function returns a handle to file it openned called ```fu```.
 
-From lines 30 to 43 we read the look-up table from the file, and store it into
-memory defined in ```Types.f90```.  Note that in lines 41 and 42 we convert
+From lines 28 to 41 we read the look-up table from the file, and store it into
+memory defined in ```Types.f90```.  Note that in lines 39 and 40 we convert
 units from the table to plain SI units for compatibility with T-Flows.
 While reading the files we use another procedure from ```File_Type``` called
 ```Read_Line``` which reads a line from ASCII file and splits it into individual
-tokens.  Tokens are stored in the fields ```line % token(:)```.
+tokens.  Tokens are stored in the fields ```Line % token(:)```.
 
 > **_Note:_** The procedure ```Read_Line``` not only tokenizes a line from
 input, it also skips all the lines beginning with ```#```, ```!``` and ```%```,
 considering such lines as comments.
 
-Finally, in the lines 47 to 51 we print a message that physical properties
-have been read.  Here we use global variable ```this_proc``` to make sure we
-print the message only from first processor in parallel runs.
+Finally, in the lines 45 to 49 we print a message that physical properties
+have been read.  Here we use the global function ```First_Proc()``` to make sure
+we print the message only from first processor in parallel runs.
 
 Once the look-up table is properly read into memory, we can use it at the
 beginning of each time step with procedure ```Beginning_Of_Time_Step``` which reads:
 ```
   1 !==============================================================================!
-  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
   3 !------------------------------------------------------------------------------!
   4 !   This function is called at the beginning of time step.                     !
   5 !------------------------------------------------------------------------------!
@@ -1991,45 +1989,43 @@ beginning of each time step with procedure ```Beginning_Of_Time_Step``` which re
   9   type(Turb_Type),     target :: Turb
  10   type(Vof_Type),      target :: Vof
  11   type(Swarm_Type),    target :: Swarm
- 12   integer, intent(in)         :: n     ! time step
- 13   real,    intent(in)         :: time  ! physical time
- 14 !-----------------------------------[Locals]-----------------------------------!
- 15   type(Grid_Type), pointer :: Grid
- 16   type(Var_Type),  pointer :: u, v, w, t, phi
- 17   integer                  :: c, i
- 18   real                     :: wi, wip
- 19 !==============================================================================!
- 20
- 21   ! Take aliases
- 22   Grid => Flow % pnt_grid
- 23
+ 12 !-----------------------------------[Locals]-----------------------------------!
+ 13   type(Grid_Type), pointer :: Grid
+ 14   type(Var_Type),  pointer :: u, v, w, t, phi
+ 15   integer                  :: c, i
+ 16   real                     :: wi, wip
+ 17 !==============================================================================!
+ 18
+ 19   ! Take aliases
+ 20   Grid => Flow % pnt_grid
+ 21
+ 22   !------------------------------!
+ 23   !   Browse through all cells   !
  24   !------------------------------!
- 25   !   Browse through all cells   !
- 26   !------------------------------!
- 27   do c = -Grid % n_bnd_cells, Grid % n_cells
- 28
- 29     ! Browse through all table entries
- 30     do i = 1, N_ITEMS - 1
- 31
- 32       ! Did you find the right interval
- 33       if(Flow % t % n(c) >= air_t(i) .and.  &
- 34          Flow % t % n(c) <  air_t(i+1)) then
- 35
- 36         ! If so, calculate interpolation factors ...
- 37         wi  = (air_t(i+1) - Flow % t % n(c)) / (air_t(i+1) - air_t(i))
- 38         wip = 1.0 - wi
- 39
- 40         ! ... and interpolate physical properties
- 41         Flow % density(c)      = wi * air_rho   (i)  + wip * air_rho   (i+1)
- 42         Flow % viscosity(c)    = wi * air_mu    (i)  + wip * air_mu    (i+1)
- 43         Flow % conductivity(c) = wi * air_lambda(i)  + wip * air_lambda(i+1)
- 44         Flow % capacity(c)     = wi * air_cp    (i)  + wip * air_cp    (i+1)
- 45       end if
- 46
- 47     end do
- 48   end do
- 49
- 50   end subroutine
+ 25   do c = -Grid % n_bnd_cells, Grid % n_cells
+ 26
+ 27     ! Browse through all table entries
+ 28     do i = 1, N_ITEMS - 1
+ 29
+ 30       ! Did you find the right interval
+ 31       if(Flow % t % n(c) >= air_t(i) .and.  &
+ 32          Flow % t % n(c) <  air_t(i+1)) then
+ 33
+ 34         ! If so, calculate interpolation factors ...
+ 35         wi  = (air_t(i+1) - Flow % t % n(c)) / (air_t(i+1) - air_t(i))
+ 36         wip = 1.0 - wi
+ 37
+ 38         ! ... and interpolate physical properties
+ 39         Flow % density(c)      = wi * air_rho   (i)  + wip * air_rho   (i+1)
+ 40         Flow % viscosity(c)    = wi * air_mu    (i)  + wip * air_mu    (i+1)
+ 41         Flow % conductivity(c) = wi * air_lambda(i)  + wip * air_lambda(i+1)
+ 42         Flow % capacity(c)     = wi * air_cp    (i)  + wip * air_cp    (i+1)
+ 43       end if
+ 44
+ 45     end do
+ 46   end do
+ 47
+ 48   end subroutine
 ```
 Arguments are the same as in the call to previous procedure and don't need explanation.
 What is new here are the fields ```n_bnd_cells``` and ```n_cells``` from class
@@ -2038,10 +2034,10 @@ respectivelly.  As you can see from the beginning of the loop in line 27,
 boundary cells are stored with negative indices.
 
 Anyhow, for each of the cells in the grid, the entire look-up table is browsed
-through in lines 30 - 47, and for temperature in that cell (```Flow % t % n(c)```)
-the interval for interpolation is searched in lines 33 and 34.  Once found,
-the interpolation factors are calculated in lines 37 and 38, and physical
-properties interpolated in lines 41 - 44.
+through in lines 28 - 45, and for temperature in that cell (```Flow % t % n(c)```)
+the interval for interpolation is searched in lines 31 and 32.  Once found,
+the interpolation factors are calculated in lines 35 and 36, and physical
+properties interpolated in lines 39 - 42.
 
 The only novelty in the present ```control``` file is that we set the time step
 and the total number of time steps as:
@@ -2105,8 +2101,8 @@ In this chapter, we will teach you:
 - how to conduct a parallel simulation
 
 and, irrespective of parallel run or not:
-- how to set up periodic cases with prescribed mass flux and pressure drops in
-  periodic direction
+- how to set up periodic cases with prescribed volume flow rate and pressure
+  drops in periodic direction
 - how to request from _Process_ to save results unplanned
 - how to instruct _Process_ to exit prematurely.
 
@@ -2231,34 +2227,35 @@ only new files, looks like this:
 ├── ...
 ├── rod_tet_dual.pvtu
 ├── ...
-├── Sub-00001
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00002
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00003
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00004
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-├── Sub-00005
-│   ├── rod_tet_dual.cfn
-│   ├── rod_tet_dual.dim
-│   └── rod_tet_dual.vtu
-└── Sub-00006
-    ├── rod_tet_dual.cfn
-    ├── rod_tet_dual.dim
-    └── rod_tet_dual.vtu
+└── Sub
+    ├── 00001
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00002
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00003
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00004
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    ├── 00005
+    │   ├── rod_tet_dual.cfn
+    │   ├── rod_tet_dual.dim
+    │   └── rod_tet_dual.vtu
+    └── 00006
+        ├── rod_tet_dual.cfn
+        ├── rod_tet_dual.dim
+        └── rod_tet_dual.vtu
 ```
-_Divide_ has created a number of sub-directory in the working directory called:
-```Sub-00001``` to ```Sub-0000N```, where N is the number of processors (here
-6 because that's what we requested.  Each of this sub-directory contains its
+_Divide_ has created the sub-directory ```Sub``` with a number of sub-sub-directories
+called: ```00001``` to ```0000N```, where N is the number of processors (here
+6 because that's what we requested.  Each of this sub-sub-directory contains its
 portion of the grid in T-Flows' format (the ```.cfn``` and ```.dim``` files)
 and its portion of the ```.vtu``` file for visualization with ParaView.
 
@@ -2281,25 +2278,25 @@ mpirun  -np 6  ./Process > out_6_proc  &
 where ```-np 6``` tells ```mpirun``` how many processors you want to use.  And
 that is it, the code should be running now.
 
-#### Setting the mass fluxes and pressure drops <a name="demo_parallel_proc_setting_mass_fluxes"> </a>
+#### Setting the volume flow rates and pressure drops <a name="demo_parallel_proc_setting_volume_flow_ratees"> </a>
 
 While the process is running, we should spare a few words on a couple of new
 concepts introduced in the ```control``` file.  The flow across these rod
 bundle is driven by a pressure drop in _x_ direction, which is re-computed
-by T-Flows at every time step to give the desired mass flux in _x_ direction.
+by T-Flows at every time step to give the desired volume flow rates in _x_ direction.
 This is achieved with following two lines:
 ```
  PRESSURE_DROPS         3.6  0.0  0.0
- MASS_FLOW_RATES        0.5  0.0  0.0
+ VOLUME_FLOW_RATES      0.5  0.0  0.0
 ```
 If only first (```PRESSURE_DROPS```) was applied, T-Flows would keep it constant.
-With second line (```MASS_FLOW_RATES```) it re-adjusts the pressure drop to
-keep mass flux at the desired rate.
+With second line (```VOLUME_FLOW_RATES```) it re-adjusts the pressure drop to
+keep volume flow rates at the desired rate.
 
 > **_Note:_** The first option only tends to lead to a rather slow flow
 development.
 
-The mass flow rates and the pressure drops are printed by _Process_ at the end
+The volume flow rates and the pressure drops are printed by _Process_ at the end
 of each time step, see the excerpt from the log file ```out_6_proc``` with
 focus on the fields ```Flux x``` and ```Pdrop x```:
 ```
@@ -2318,12 +2315,12 @@ focus on the fields ```Flux x``` and ```Pdrop x```:
                        #    Pdrop x:  3.601E-02    |    Pdrop y:   0.00E+00    |    Pdrop z:   0.00E+00    #
                        #---------------------------+---------------------------+---------------------------#
 ```
-The mass fluxes in question are computed in three characteristic planes (orthogonal
+The volume flow rates in question are computed in three characteristic planes (orthogonal
 to _x_, _y_ and _z_ axis at the point defined in the control file as:
 ```
 POINT_FOR_MONITORING_PLANES    0.007  0.00  0.002
 ```
-For flows with prescribed mass fluxes in periodic direction such as this one,
+For flows with prescribed volume flow rates in periodic direction such as this one,
 it is a good practice to define this point.
 
 #### Saving and/or exiting prematurely.
@@ -2380,10 +2377,10 @@ Parallel runs, almost invariantly, create a huge amount of data on the file
 system.  If you want to clear a certain directory in which a parallel simulation
 was running in order to free some disk space, deleting ```.pvtu``` files
 alone will be of much benefit.  The sub-directories holding sub-domains
-(```Sub-00001``` - ```Sub-0000N```) are the biggest in volume.  So, in order
+(```Sub/00001``` - ```Sub/0000N```) are the biggest in volume.  So, in order
 to get rid of ```.vtu``` files, you should delete like this:
 ```
-rm -f Sub-0*/*.vtu
+rm -f Sub/*/*.vtu
 ```
 
 #### Thing to try next
@@ -2406,7 +2403,7 @@ dealt with.
 
 The information on prescribing inflows and outflows in T-Flows might end up
 somewhat scattereed over this manual, and we believe that a dedicated section
-is needed to outline all the option you have to prescribe them.  Like the section
+is needed to outline all the options you have to prescribe them.  Like the section
 [Demonstration cases](#demo_cases), what we present here is neither a benchmark,
 nor is it rigorously following best practices in fluid flow modeling, it is a
 mere demonstration of options you have to prescribe inflow and, to a lesser
@@ -2435,8 +2432,12 @@ go there and check the contensts.  It should read:
 ├── Option_2
 │   └── control
 ├── Option_3
+│   ├── control
+│   └── User_Mod
+│       └── End_Of_Time_Step.f90
+├── Option_4
 │   └── control
-└── Option_4
+└── Option_5
     ├── control
     ├── control.1
     ├── control.2
@@ -2474,8 +2475,8 @@ would recommend, you should also decompose the grid with:
 
 > **_Note:_**  Don't go overboard with number of processors as you will end up
 communicating between processors more than computing.  A useful rule of thumb
-is to have around a hundred thousand cells per processor.  This grid has approximatelly
-300'000 cells, so four is a reasonable choice.
+is to have around a hundred thousand cells per processor.  This grid has
+approximatelly 300'000 cells, so four is a reasonable choice.
 
 ### Flat velocity profile <a name="demo_inflows_flat"> </a>
 
@@ -2612,27 +2613,16 @@ desired bulk velocity is one, we can invoke _Parabolic_ with:
 ```
 ./Parabolic  0  4.1  1  31
 ```
-to get:
+to get (some lines are ommitted):
 ```
- #==================
- # Number of points
- #==================
-          31
- #=================================
- #   Coordinate      Velocity
- #=================================
+#    Number of points:
+    31
+#    Coordinate:     Velocity:
      0.00000E+00     0.00000E+00
      1.36667E-01     1.93333E-01
      2.73333E-01     3.73333E-01
-     4.10000E-01     5.40000E-01
-     5.46667E-01     6.93333E-01
-     6.83333E-01     8.33333E-01
-     8.20000E-01     9.60000E-01
-     9.56667E-01     1.07333E+00
-     1.09333E+00     1.17333E+00
-     1.23000E+00     1.26000E+00
-     1.36667E+00     1.33333E+00
-     1.50333E+00     1.39333E+00
+     ...
+     ...
      1.64000E+00     1.44000E+00
      1.77667E+00     1.47333E+00
      1.91333E+00     1.49333E+00
@@ -2640,15 +2630,8 @@ to get:
      2.18667E+00     1.49333E+00
      2.32333E+00     1.47333E+00
      2.46000E+00     1.44000E+00
-     2.59667E+00     1.39333E+00
-     2.73333E+00     1.33333E+00
-     2.87000E+00     1.26000E+00
-     3.00667E+00     1.17333E+00
-     3.14333E+00     1.07333E+00
-     3.28000E+00     9.60000E-01
-     3.41667E+00     8.33333E-01
-     3.55333E+00     6.93333E-01
-     3.69000E+00     5.40000E-01
+     ...
+     ...
      3.82667E+00     3.73333E-01
      3.96333E+00     1.93333E-01
      4.10000E+00     0.00000E+00
@@ -2692,6 +2675,157 @@ For both cases we computed roughly three flow through times and ```convective```
 outflow seems to be handling the eddies which are leaving the domain pretty
 well.
 
+### Through user functions <a name="demo_inflows_user_functions"> </a>
+
+Another possibility to prescribe an inlet profile would be through a proper
+user function.  For this particular case, we chose the ```Beginning_Of_Time_Step```,
+which was already introduced in section showing how to implement
+[variable physical properties](#demo_thermally_driven_variable), given here
+in full:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of time step.                     !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type), target :: Flow
+  9   type(Turb_Type),  target :: Turb
+ 10   type(Vof_Type),   target :: Vof
+ 11   type(Swarm_Type), target :: Swarm
+ 12 !------------------------------[Local parameters]------------------------------!
+ 13   real, parameter :: U_BULK = 1.0           ! bulk velocity
+ 14   real, parameter :: U_MAX  = 1.5 * U_BULK  ! max velocity
+ 15   real, parameter :: HALF_W = 2.05          ! half channel width
+ 16 !-----------------------------------[Locals]-----------------------------------!
+ 17   type(Grid_Type), pointer :: Grid
+ 18   type(Var_Type),  pointer :: u, v, w, t, phi
+ 19   integer                  :: reg, c2
+ 20   real                     :: y
+ 21 !==============================================================================!
+ 22
+ 23   ! Take aliases
+ 24   Grid => Flow % pnt_grid
+ 25   u    => Flow % u
+ 26
+ 27   do reg = Boundary_Regions()
+ 28     if(Grid % region % type(reg) .eq. INFLOW) then
+ 29       do c2 = Cells_In_Region(reg)
+ 30         y = Grid % yc(c2)
+ 31         u % n(c2) = U_MAX * (1.0 - ( (y-HALF_W)/HALF_W )**2)
+ 32       end do  ! through boundary cells of the region
+ 33     end if    ! if at inflow region
+ 34   end do      ! through all boundary regions
+ 35
+ 36   end subroutine
+```
+
+First 11 lines have already been described in the section describing the
+[variable physical properties](#demo_thermally_driven_variable), and don't
+need to be repeated here.  Lines 13 - 15 introduce parameters which define a
+parabolic inlet velocity profile, spanning over a channel with half-width of
+2.05, with bulk velocity equal to 1 [m/s].  Lines 24 and 25 take aliases to
+grid on which the simulation is performed and the variable ```u``` for velocity
+component in _x_ direction.  In line 27, we use macro ```Boundary_Regions()```
+which will, as its name implies, give the range of all boundary regions.  In
+line 28, we pick the region with type ```INFLOW```.
+
+> **_Note 1:_** The ```Boundary_Regions()``` macro is defined in
+```[root]/Sources/Shared/Browse.h90```, you are most than welcome to have a
+look at it.
+
+> **_Note 2:_** ```INFLOW``` is a constant in T-Flows, denoting boundary
+condition type.  It is defined in file ```[root]/Sources/Shared/Regions.f90```,
+together with other constants for describing boundary conditions.
+
+In line 29, we start browsing through boundary cells in region ```reg```,
+taking the _y_ coordinate in line 30 and prescribing the velocity in _x_
+direction at line 31.
+
+The control file for this case is in sub-directory ```Option_3```.  Like
+before, you should make a soft link to it with the command:
+```
+ln -i -s Option_3/control .
+```
+
+The control file for this case is exactly the same as for ```Option_1```, so
+nothing new is introduced with it.   The only thing worth saying might be that
+the values prescribed a the boundary conditions called ```IN``` will be
+over-written by the user function.
+
+With the control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
+you can launch the simulation with:
+```
+mpirun -np 4 ./Process > out_03  &
+```
+
+Since the inlet profile is effectivelly the same as for ```Option_2```, results
+are the same and don't have to be shown again.
+
+#### Thing to try next
+
+You might be thinking why did we use the ```Beginning_Of_Time_Step``` to define
+boundary condition when we also have ```Beginning_Of_Simulation```, with
+exactly the same arguments.  Well, using the ```Beginning_Of_Time_Step```
+allows us to prescribe time-dependent inflow.  For example, if you wanted an
+inlet velocity which grows exponentially, you could have written the function
+like this:
+```
+  1 !==============================================================================!
+  2   subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
+  3 !------------------------------------------------------------------------------!
+  4 !   This function is called at the beginning of time step.                     !
+  5 !------------------------------------------------------------------------------!
+  6   implicit none
+  7 !---------------------------------[Arguments]----------------------------------!
+  8   type(Field_Type), target :: Flow
+  9   type(Turb_Type),  target :: Turb
+ 10   type(Vof_Type),   target :: Vof
+ 11   type(Swarm_Type), target :: Swarm
+ 12 !------------------------------[Local parameters]------------------------------!
+ 13   real, parameter :: U_BULK = 1.0           ! bulk velocity
+ 14   real, parameter :: U_MAX  = 1.5 * U_BULK  ! max velocity
+ 15   real, parameter :: HALF_W = 2.05          ! half channel width
+ 16   real, parameter :: TAU    = 1.0           ! characteristic time period
+ 17 !-----------------------------------[Locals]-----------------------------------!
+ 18   type(Grid_Type), pointer :: Grid
+ 19   type(Var_Type),  pointer :: u, v, w, t, phi
+ 20   integer                  :: reg, c2
+ 21   real                     :: y
+ 22 !==============================================================================!
+ 23
+ 24   ! Take aliases
+ 25   Grid => Flow % pnt_grid
+ 26   u    => Flow % u
+ 27
+ 28   do reg = Boundary_Regions()
+ 29     if(Grid % region % type(reg) .eq. INFLOW) then
+ 30       do c2 = Cells_In_Region(reg)
+ 31         y = Grid % yc(c2)
+ 32         u % n(c2) = U_MAX * (1.0 - ( (y-HALF_W)/HALF_W )**2)  &
+ 33                   * (1.0 - exp(-Time % Get_Time() / TAU))
+ 34       end do  ! through boundary cells of the region
+ 35     end if    ! if at inflow region
+ 36   end do      ! through all boundary regions
+ 37
+ 38   end subroutine
+```
+
+There are only two new lines in the _unsteady_ subroutine above. Line 16, in
+which a characteristic time scale is introduced, and line 33, which adds an
+exponential increase in velocity at the inlet.  The time in T-Flows is defined
+in the module ```Time_Mod```, defined in ```[root]/Sources/Process/Time_Mod.f90```,
+which creats a global, _singleton_ type of object called ```Time```, used
+above.  We believe that time is a global parameter and it is the same to all
+the fields which are considered, as well as their models.
+
+> **_Note:_** ```Time``` is not the only singleton type of object in T-Flows.
+There are other examples of objects which should be accessible everywhere, some
+examples are ```File``` (for manipulation with I/O and files), ```Global``` (for
+global MPI communication, ```Math``` (for global mathematical functions),
+```Sort``` (for sorting routines), to mention just a few.
+
 ### Synthetic eddies <a name="demo_inflows_eddies"> </a>
 
 As we said in [](#), we departed from the benchmark in increasing the Re
@@ -2702,11 +2836,11 @@ _Process_'s class ```Eddies_Mod``` which has the functionality to impose unstead
 eddies at the inflow.  The method is heavily based on the work from
 [Jarin et al.](https://www.sciencedirect.com/science/article/pii/S0142727X06000282)
 
-The control file for the case of synthetic eddies is in sub-directory ```Option_3```.
+The control file for the case of synthetic eddies is in sub-directory ```Option_4```.
 To use it, do the same as for previous cases, link the ```control``` file from
 that sub-directory to the current:
 ```
-ln -i -s Option_3/control .
+ln -i -s Option_4/control .
 ```
 
 The only difference in that control file, compared to the one given in
@@ -2736,7 +2870,7 @@ be superimposed over the flat velocity profile.
 Once the new control file is in the working directory (```[root]/Tests/Manual/Inflows/```)
 you can launch it with:
 ```
-mpirun -np 4 ./Process > out_03  &
+mpirun -np 4 ./Process > out_04  &
 ```
 
 After a minute of simulation time, results look like this:
@@ -2805,8 +2939,8 @@ of processors as principal domain was:
 
 > **_Note 1:_** Precursor domain is, in this case, just a channel with two
 periodic directions, _x_ and _z_.  It doesn't have inflows or outflows, it will
-be driven by a pressure drop to achieve the desired mass flux like, for example
-[Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
+be driven by a pressure drop to achieve the desired volume flow rates like, for
+example [Large eddy simulation over a matrix of cubes](#bench_cases_matrix).
 
 > **_Note 2:_**  Since precursor domain is usually smaller and its grid is coarser
 this may seem like an overkill or limitation.  But it is not.  _Process_ solves
@@ -2827,12 +2961,12 @@ As explained in [Conjugate heat transfer](#bench_conjugate), the way _Process_
 goes about simulating in multiple domains, is to have a control file for each
 of the domains called ```control.1```, ```control.2``` and so forth, and one
 central ```control``` file with information about coupling.  For this particular
-case, all control files are in sub-directory ```Option_4```.  To use them,
+case, all control files are in sub-directory ```Option_5```.  To use them,
 feel free to remove any existing control files currently residing in the
 working directory and make the links:
 ```
 rm -f control
-ln -i -s Option_4/control* .
+ln -i -s Option_5/control* .
 ```
 
 At this point it might be worth nothing that ```control.2``` is the same as
@@ -2847,14 +2981,13 @@ precursor domain
 ```
  ADVECTION_SCHEME    central
 ```
-and desired mass flux is prescribed in _x_ direction:
+and desired volume flow rate is prescribed in _x_ direction:
 ```
- MASS_FLOW_RATES              16.4  0.0  0.0
+ VOLUME_FLOW_RATES            16.4  0.0  0.0
 ```
 
 > **_Note:_** Desired bulk velocity is 1.0, cross sectional area is
-4 x 4.1 = 16.4.  Density is not prescribed hence _Process_ will set it to 1.0,
-which makes the desired mass flow rate of 16.4.
+4 x 4.1 = 16.4, which makes the desired volume flow rate of 16.4.
 
 Furthermore, the point for monitoring plane has been shifted to be inside the
 precursor domain:
@@ -2893,7 +3026,7 @@ simulation are infinite, they are dealt with through a user function.  In
 [Conjugate heat transfer](#bench_conjugate) we used the one provided with
 _Process_ by default, which couples temperatures, as presumably the most basic
 case for coupled simulations.  For velocity coupling we need a special version
-which is in sub-directory ```Option_4/User_Mod/Interface_Exchange.f90```.
+which is in sub-directory ```Option_5/User_Mod/Interface_Exchange.f90```.
 It would take us too far to explain this function in detail, but let's just say
 that it works in two steps; in the first one it gathers information from all
 domains involved and stores them in a special buffer, and in the second step
@@ -2950,102 +3083,102 @@ which is achiveve with this line:
 In order to place the eddies inside the domain, we must find its extents over
 nodes.  This is done in these lines:
 ```
- 57   !--------------------------------------!
- 58   !   Size of the computational domain   !
- 59   !                                      !
- 60   !   This algorithm is not silly. We    !
- 61   !   could have browsed through nodes   !
- 62   !   only, but then we might have en-   !
- 63   !   countered some hanging from GMSH   !
- 64   !--------------------------------------!
- 65   xmin = HUGE;  xmax = -HUGE
- 66   ymin = HUGE;  ymax = -HUGE
- 67   zmin = HUGE;  zmax = -HUGE
- 68   do c = 1, Grid % n_cells
- 69     do i_nod = 1, Grid % cells_n_nodes(c)
- 70       n = Grid % cells_n(i_nod, c)
- 71       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
- 72       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
- 73       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
- 74     end do
- 75   end do
- 76   call Comm_Mod_Global_Min_Real(xmin)
- 77   call Comm_Mod_Global_Min_Real(ymin)
- 78   call Comm_Mod_Global_Min_Real(zmin)
- 79   call Comm_Mod_Global_Max_Real(xmax)
- 80   call Comm_Mod_Global_Max_Real(ymax)
- 81   call Comm_Mod_Global_Max_Real(zmax)
- 82   lx = xmax - xmin
- 83   ly = ymax - ymin
- 84   lz = zmax - zmin
+ 46   !--------------------------------------!
+ 47   !   Size of the computational domain   !
+ 48   !                                      !
+ 49   !   This algorithm is not silly. We    !
+ 50   !   could have browsed through nodes   !
+ 51   !   only, but then we might have en-   !
+ 52   !   countered some hanging from GMSH   !
+ 53   !--------------------------------------!
+ 54   xmin = HUGE;  xmax = -HUGE
+ 55   ymin = HUGE;  ymax = -HUGE
+ 56   zmin = HUGE;  zmax = -HUGE
+ 57   do c = 1, Grid % n_cells
+ 58     do i_nod = 1, Grid % cells_n_nodes(c)
+ 59       n = Grid % cells_n(i_nod, c)
+ 60       xmin = min(xmin, Grid % xn(n));  xmax = max(xmax, Grid % xn(n))
+ 61       ymin = min(ymin, Grid % yn(n));  ymax = max(ymax, Grid % yn(n))
+ 62       zmin = min(zmin, Grid % zn(n));  zmax = max(zmax, Grid % zn(n))
+ 63     end do
+ 64   end do
+ 65   call Global % Min_Real(xmin)
+ 66   call Global % Min_Real(ymin)
+ 67   call Global % Min_Real(zmin)
+ 68   call Global % Max_Real(xmax)
+ 69   call Global % Max_Real(ymax)
+ 70   call Global % Max_Real(zmax)
+ 71   lx = xmax - xmin
+ 72   ly = ymax - ymin
+ 73   lz = zmax - zmin
 ```
-In lines 68 - 75, we browse through all the cells, and through individual nodes
-of each cell in line 69.  Field ```Grid % cells_n_nodes(c)``` holds the number
-of nodes for each cell.  In line 70, we take the grid node index (```i_nod```
-is just to browse locally through cell) and in lines 71 - 73, we are seeking
-for minimum and maximum coordinates in each direction.  Lines 76 - 81 ensure
+In lines 57 - 64, we browse through all the cells, and through individual nodes
+of each cell in line 58.  Field ```Grid % cells_n_nodes(c)``` holds the number
+of nodes for each cell.  In line 59, we take the grid node index (```i_nod```
+is just to browse locally through cell) and in lines 60 - 62, we are seeking
+for minimum and maximum coordinates in each direction.  Lines 65 - 70 ensure
 we work with extrema over all processors.  Variables ```lx```, ```ly``` and
 ```lz``` hold global domain dimensions.
 
 Once the domain dimensions are know, we can also set minimum and maximum size
 of the eddies:
 ```
- 86   ! Minimum and maximum size of eddies
- 87   rmin = min(ly, lz) / 10.0
- 88   rmax = min(ly, lz) /  5.0
+ 75   ! Minimum and maximum size of eddies
+ 76   rmin = min(ly, lz) / 10.0
+ 77   rmax = min(ly, lz) /  5.0
 ```
 We only compare eddy radius in plane orthogonal to the streamwise direction
 (assumed to be _x_ here) and that is why we only use dimension in _y_ and
 _z_ to correlate eddy sizes.
 
-This function introduces 48 eddies (hard-coded) in line 90:
+This function introduces 48 eddies (hard-coded) in line 93:
 ```
- 90   !-------------------------------!
- 91   !   Browse through all eddies   !
- 92   !-------------------------------!
- 93   do eddy = 1, 48
- 94
- 95     ! Random direction of the vortex
- 96     call random_number(sg);
- 97     if(sg < 0.5) then
- 98       sg = -1.0
- 99     else
-100       sg = +1.0
-101     end if
-102
-103     ! Determine random position of a vortex
-104     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
-105     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
-106     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
-107     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
-108
-109     ! Handle periodicity; that is: copy eddie in periodic directions
-110     xo(2:4) = xo(1)
-111     zo(2:4) = zo(1)
-112     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
-113     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
-114     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
-115     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
-116     xo(4) = xo(3)
-117     zo(4) = zo(2)
+ 79   !-------------------------------!
+ 80   !   Browse through all eddies   !
+ 81   !-------------------------------!
+ 82   do eddy = 1, 48
+ 83
+ 84     ! Random direction of the vortex
+ 85     call random_number(sg);
+ 86     if(sg < 0.5) then
+ 87       sg = -1.0
+ 88     else
+ 89       sg = +1.0
+ 90     end if
+ 91
+ 92     ! Determine random position of a vortex
+ 93     call random_number(ro);     ro    = rmin + (rmax-rmin)*ro  ! rmin -> rmax
+ 94     call random_number(xo(1));  xo(1) = xmin + xo(1) * lx
+ 95     call random_number(zo(1));  zo(1) = zmin + zo(1) * lz
+ 96     call random_number(yo);     yo = ro + (ly - 2.0*ro) * yo
+ 97
+ 98     ! Handle periodicity; that is: copy eddie in periodic directions
+ 99     xo(2:4) = xo(1)
+100     zo(2:4) = zo(1)
+101     if(xo(1) > lx/2.0) xo(3) = xo(1) - lx
+102     if(xo(1) < lx/2.0) xo(3) = xo(1) + lx
+103     if(zo(1) > lz/2.0) zo(2) = zo(1) - lz
+104     if(zo(1) < lz/2.0) zo(2) = zo(1) + lz
+105     xo(4) = xo(3)
+106     zo(4) = zo(2)
 ...
 ```
-Their sense of rotation is assigned randomly in lines 96 - 101, and their random
-positions (inside the domain) in lines 104 - 107.  Lines 110 - 117 take care of
+Their sense of rotation is assigned randomly in lines 85 - 90, and their random
+positions (inside the domain) in lines 93 - 96.  Lines 99 - 106 take care of
 periodicity, that is, make coppies of eddies in periodic directions (here _x_
 and _z_) depending on their relative position inside the domain.
 
 We set the lenght of each eddy to be six times its radius:
 ```
-119     ! Length of the eddy is six times the diameter
-120     lo = ro * 6.0
+108     ! Length of the eddy is six times the diameter
+109     lo = ro * 6.0
 ```
 We limit eddy extents with Gaussian distribution.  The sigma coefficients
 for Gaussian distribution in direction orthogonal to the flow (_y_ and _z_) and
-parallel to the flow (_x_) is set in lines 119 and 120:
+parallel to the flow (_x_) is set in lines 111 and 112:
 ```
-122     sig_yz = ro / 2.0
-123     sig_x  = lo / 2.0
+111     sig_yz = ro / 2.0
+112     sig_x  = lo / 2.0
 ```
 
 > **_Note:_** The ```sigma_yz``` would be the red functions in the figure
@@ -3060,65 +3193,64 @@ and ```wc```)
 figure introduced above.
 
 ```
-125     ! Superimpose eddies on the velocity field
-126     do dir = 1, 4
-127       do c = 1, Grid % n_cells
-128         xc = Grid % xc(c)
-129         yc = Grid % yc(c)
-130         zc = Grid % zc(c)
-131         vc = sg * ( (zc-zo(dir))/ro )
-132         wc = sg * ( (yo-yc     )/ro )
-133
-134         !--------------------------------------------+
-135         !   Gaussian distribution:                   !
-136         !                                - (x-a)^2   !
-137         !                  1           ^ ---------   !
-138         !   f(x) = ------------------ e  2 sigma^2   !
-139         !          sqrt(2 PI sigma^2)                !
-140         !                                            !
-141         !                                            !
-142         !          exp[-(x-a)^2 / (2 sigma^2)]       !
-143         !   f(x) = ---------------------------       !
-144         !              sqrt(2 PI sigma^2)            !
-145         !                                            !
-146         !          exp[-0.5 ((x-a) / sigma)^2]       !
-147         !   f(x) = ---------------------------       !
-148         !               sigma sqrt(2 PI)             !
-149         !--------------------------------------------!
-150         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-151         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-152
-153         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
-154         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
-155
-156         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-157         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
-158
-159         ! Superimposed those fluctuations on spanwise and normal velocity comp.
-160         v % n(c) = v % n(c) + vc
-161         v % o(c) = v % o(c) + vc
-162         w % n(c) = w % n(c) + wc
-163         w % o(c) = w % o(c) + wc
-164       end do
-165     end do
-166   end do
+114     ! Superimpose eddies on the velocity field
+115     do dir = 1, 4
+116       do c = 1, Grid % n_cells
+117         xc = Grid % xc(c)
+118         yc = Grid % yc(c)
+119         zc = Grid % zc(c)
+120         vc = sg * ( (zc-zo(dir))/ro )
+121         wc = sg * ( (yo-yc     )/ro )
+122
+123         !--------------------------------------------+
+124         !   Gaussian distribution:                   !
+125         !                                - (x-a)^2   !
+126         !                  1           ^ ---------   !
+127         !   f(x) = ------------------ e  2 sigma^2   !
+128         !          sqrt(2 PI sigma^2)                !
+129         !                                            !
+130         !                                            !
+131         !          exp[-(x-a)^2 / (2 sigma^2)]       !
+132         !   f(x) = ---------------------------       !
+133         !              sqrt(2 PI sigma^2)            !
+134         !                                            !
+135         !          exp[-0.5 ((x-a) / sigma)^2]       !
+136         !   f(x) = ---------------------------       !
+137         !               sigma sqrt(2 PI)             !
+138         !--------------------------------------------!
+139         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+140         vc = vc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+141
+142         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((zc-zo(dir))/sig_yz)**2)
+143         wc = wc / (sig_yz*sqrt(PI+PI))*exp(-0.5*((yc-yo)     /sig_yz)**2)
+144
+145         vc = vc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+146         wc = wc / (sig_x *sqrt(PI+PI))*exp(-0.5*((xc-xo(dir))/sig_x)**2)
+147
+148         ! Superimposed those fluctuations on spanwise and normal velocity comp.
+149         v % n(c) = v % n(c) + vc
+150         v % o(c) = v % o(c) + vc
+151         w % n(c) = w % n(c) + wc
+152         w % o(c) = w % o(c) + wc
+153       end do
+154     end do
 ```
 
 If all this seems a bit complicated to you, don't worry, this same function
 works for any turbulent channel flow, so you won't be modifying it a lot.
 
-Both of these function reside in sub-directory ```Option_4/User_Mod/```.  To
+Both of these function reside in sub-directory ```Option_5/User_Mod/```.  To
 use them, you will have to re-compile _Process_ by specifying the path to that
 directory.  More specifically, from ```[root]/Sources/Process/``` run the
 command:
 ```
 make clean
-make DIR_CASE=../../Tests/Manual/Inflows/Option_4/ MPI=yes
+make DIR_CASE=../../Tests/Manual/Inflows/Option_5/ MPI=yes
 ```
 and then go back to the case directory (```[root]/Tests/Manual/Inflows/```)
 and run:
 ```
-mpirun -np 4 ./Process > out_04 &
+mpirun -np 4 ./Process > out_05 &
 ```
 
 After a minute of simulation time, the results in the precursor and in the
@@ -3319,7 +3451,7 @@ for pressure reads:
    PREC_OPTS·····
    TOLERANCE     1.0e-3
 ```
-Here we set ```cg``` to be the solver pressure, we direct preconditier to
+Here we set ```cg``` to be the solver for pressure, we direct preconditier to
 algebraic multigrid from [HYPRE](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
 and we set the tolerance to 1.0e-3.  The line with ```PREC_OPTS``` is empty, we
 are not sending any options to preconditioner.
@@ -3548,7 +3680,7 @@ What you can also see in the ```out``` log file is the output from the user
 function which reads:
 ```
  #===========================================
- # Output from user function, Nusslet number!
+ # Output from user function, Nusselt number!
  #-------------------------------------------
  # Toral  area    :    5.000E-01
  # Nusselt number :    2.221E+00
@@ -3556,67 +3688,77 @@ function which reads:
 
 An exceprt from the user function ```End_Of_Time_Step``` is given here:
 ```
+ 27   !------------------------------------!
+ 28   !   Compute average Nusselt number   !
  29   !------------------------------------!
- 30   !   Compute average Nusselt number   !
- 31   !------------------------------------!
- 32   if(Grid % name(1:6) .eq. 'FLUID') then
- 33
- 34     ! Initialize variables for computing average Nusselt number
- 35     nu   = 0.0
- 36     area = 0.0
- 37
- 38     do s = 1, Grid % n_faces
- 39       c1 = Grid % faces_c(1,s)
- 40       c2 = Grid % faces_c(2,s)
+ 30   if(Grid % name(1:6) .eq. 'FLUID') then
+ 31
+ 32     ! Initialize variables for computing average Nusselt number
+ 33     nu   = 0.0
+ 34     area = 0.0
+ 35
+ 36     do reg = Boundary_Regions()
+ 37       if(Grid % region % type(reg) .eq. WALL) then
+ 38         do s = Faces_In_Region(reg)
+ 39           c1 = Grid % faces_c(1,s)
+ 40           c2 = Grid % faces_c(2,s)
  41
- 42       if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
- 43
- 44         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
- 45           area = area + Grid % s(s)
- 46           nu   = nu + Grid % s(s)                 &
- 47                     * abs(t % n(c2) - t % n(c1))  &
- 48                     / Grid % d(s)
- 49         end if  ! if wall
- 50       end if    ! c2 < 0
- 51     end do      ! through s
- 52
- 53     !-----------------------------------------------!
- 54     !   Integrate (summ) heated area, and heat up   !
- 55     !-----------------------------------------------!
- 56     call Comm_Mod_Global_Sum_Real(area)
- 57     call Comm_Mod_Global_Sum_Real(nu)
- 58
- 59     !-------------------------------------------------!
- 60     !   Compute averaged Nussel number and print it   !
- 61     !-------------------------------------------------!
- 62     nu = nu / area
- 63
- 64     if(this_proc < 2) then
- 65       print '(a)',        ' #==========================================='
- 66       print '(a)',        ' # Output from user function, Nusslet number!'
- 67       print '(a)',        ' #-------------------------------------------'
- 68       print '(a,es12.3)', ' # Toral  area    : ', area
- 69       print '(a,es12.3)', ' # Nusselt number : ', nu
- 70     end if
- 71
- 72   end if  ! domain is middle
+ 42           area = area + Grid % s(s)
+ 43           nu   = nu + Grid % s(s)                 &
+ 44                     * abs(t % n(c2) - t % n(c1))  &
+ 45                     / Grid % d(s)
+ 46         end do
+ 47       end if  ! region is at the wall; it is a wall region
+ 48     end do    ! through regions
+ 49
+ 50     !-----------------------------------------------!
+ 51     !   Integrate (summ) heated area, and heat up   !
+ 52     !-----------------------------------------------!
+ 53     call Global % Sum_Real(area)
+ 54     call Global % Sum_Real(nu)
+ 55
+ 56     !-------------------------------------------------!
+ 57     !   Compute averaged Nussel number and print it   !
+ 58     !-------------------------------------------------!
+ 59     nu = nu / area
+ 60
+ 61     if(First_Proc()) then
+ 62       print '(a)',        ' #==========================================='
+ 63       print '(a)',        ' # Output from user function, Nusselt number!'
+ 64       print '(a)',        ' #-------------------------------------------'
+ 65       print '(a,es12.4)', ' # Toral  area    : ', area
+ 66       print '(a,es12.4)', ' # Nusselt number : ', nu
+ 67     end if
+ 68
+ 69   end if  ! domain is middle
 ```
-Line 32 ensures that the code which follows is only executed in the fluid domain.
-At line 38 you can see an example of the face-based data structure which is one
-of the main features of finite volume based unstructured solvers.  We browse
-through all faces (```Grid % n_faces```) and for each one of them fetch the
-cells surrounding it from structure ```Grid % faces_c(:,s)```.  Once both cells
-surrounding the face are known and stored in variables ```c1``` and ```c2```,
-we check if ```c2``` is a boundary face in line 42.
+Line 30 ensures that the code which follows is only executed in the fluid domain.
+Line 36 is a loop which starts to browse through all boundary regions defined in
+the computational domain, and line 37 makes sure that you stop only at the
+regions of the type ```WALL```.  Once at the wall, start browsing (with a do
+loop) through all the faces in the selected region, as it is done in line 38.
+At thie lines 39 and 40 you can see an example of the face-based data structure
+which is one of the main features of finite volume based unstructured solvers.
+We browse through all the faces in the region and for each one of them fetch the
+cells surrounding it from structure ```Grid % faces_c(:,s)```.
 
-> **_Note:_** In T-Flows, boundary faces have negative indices.
+> **_Note 1:_** ```Boundary_Regions()``` and ```Faces_In_Region(reg)``` are not
+regular Fortran expressions.  Rather, they are macros defined in the file
+```[root]/Sources/Shared/Browse.h90```, which make the syntax in T-Flows shorter
+and easier to understad.  For example, instead of typing:
+```do s = Grid % region % f_face(reg), Grid % region % l_face(reg)```, we type:
+```do s = Faces_In_Region(reg)```
 
-What we also check in the same line is that ```c1``` is in the current processor,
-_i.e._ it is not in the buffer cells, because otherwise global summs of area
-and accumulated Nusselt number in lines 56 and 57, wouldn't be correct for
-parallel runs.  In line 62 all processors have the same values of ```nu```
-and ```area``` and we can compute the average Nusselt number.  Lines 64 - 70
-print the value of Nuseelt number only from one processor.
+> **_Note 2:_** In T-Flows, boundary cells have negative indices.  In the loops
+shown above, ```c2``` would only hold negative numbers.
+
+The macros ```Boundary_Regions``` and ```Faces_In_Region(reg)``` also ensure
+that ```c1``` is in the current processor, _i.e._ it is not in the buffer cells,
+because otherwise global summs of area and accumulated Nusselt number in lines
+53 and 54, wouldn't be correct for parallel runs.  In line 59 all processors have
+the same values of ```nu``` and ```area``` and we can compute the average
+Nusselt number.  Lines 61 - 67 print the value of Nuseelt number only from one
+processor, using the logical function ```First_Proc()```.
 
 ### Comparison with benchmark solution <a name="bench_conjugate_compare"> </a>
 
@@ -3798,13 +3940,13 @@ In the control file, a turbulence model is defined by using a key word
 
 As mentioned above, the case is homogeneous in streamwise and spanwise direction
 and driven by a pressure drop.  A way to prescribe the point for monitoring
-plane, pressure drops and mass fluxes in characteristic planes was already
-described [above](#demo_parallel_proc_setting_mass_fluxes).  For this case, we
+plane, pressure drops and volume flow rates in characteristic planes was already
+described [above](#demo_parallel_proc_setting_volume_flow_ratees).  For this case, we
 define monitoring planes in the geometrical center of the computational domain
-and set the mass flux to 0.2, which gives Re number of roughly 13'000.
+and set the volume flow rate to 0.2, which gives Re number of roughly 13'000.
 ```
  POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
- MASS_FLOW_RATES                0.2  0.0  0.0
+ VOLUME_FLOW_RATES              0.2  0.0  0.0
 ```
 
 Since we seek a steady solution for this case, we do not care about the accuracy
@@ -3908,8 +4050,9 @@ hence the extension ```.neu```.
 
 > **_Note:_** Grids in neutral file format were created by Fluent's legacy
 mesh generator called Gambit.  Since Fluent got acquired by ANSYS, Gambit was
-dropped from the package and neutral file format became obsolete.  Since, we
-keep this file here for reproducibility of results.
+dropped from the package and neutral file format became obsolete.  However,
+since the impinging jet is one our standard test case, we keep this file here
+for reproducibility of results.
 
 In addition to these, you can find the file ```rad_coordinate.dat``` which will
 be used by user functions, residing in sub-directory ```User_Mod``` during the
@@ -3933,7 +4076,7 @@ to compile the _Process_ for this case.
 
 To run this case, in a Linux terminal go to directory ```[root]/Tests/Manual/Impinging_Jet_2d_Distant_Re_23000```
 A very practical thing to do is to create links to executables in the working
-directory as it was explained [here](#seek_binaries). 
+directory as it was explained [here](#seek_binaries).
 
 Since the grid for this case comes in the gzipped format, you should first
 decompress it with:
@@ -3971,91 +4114,96 @@ We call the first one _standard_ becuase it is a part of T-Flows and always
 called when T-Flows saves results.  In this case, it is a mere interface to
 two other functions:
 ```
-  1 include '../User_Mod/Save_Impinging_Jet_Nu.f90'
-  2 include '../User_Mod/Save_Impinging_Jet_Profiles.f90'
-  3
-  4 !==============================================================================!
-  5   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
-  6 !------------------------------------------------------------------------------!
-  7 !   Calls Save_Impinging_Jet_Nu and Save_Impinging_Jet_Profile functions.      !
-  8 !------------------------------------------------------------------------------!
-  9   implicit none
- 10 !---------------------------------[Arguments]----------------------------------!
- 11   type(Field_Type)    :: Flow
- 12   type(Turb_Type)     :: Turb
- 13   type(Vof_Type)      :: Vof
- 14   type(Swarm_Type)    :: Swarm
- 15   integer, intent(in) :: ts     ! time step
- 16   integer, optional   :: domain
- 17 !==============================================================================!
- 18
- 19   ! Don't save if this is intial condition, nothing is developed yet
- 20   if(ts .eq. 0) return
- 21
- 22   call Save_Impinging_Jet_Nu      (Turb, ts)
- 23   call Save_Impinging_Jet_Profiles(Turb, ts)
- 24
- 25   end subroutine
+  1 # ifdef __INTEL_COMPILER
+  2 #   include "User_Mod/Save_Impinging_Jet_Nu.f90"
+  3 #   include "User_Mod/Save_Impinging_Jet_Profiles.f90"
+  4 # else
+  5 #   include "Save_Impinging_Jet_Nu.f90"
+  6 #   include "Save_Impinging_Jet_Profiles.f90"
+  7 # endif
+  8
+  9 !==============================================================================!
+ 10   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
+ 11 !------------------------------------------------------------------------------!
+ 12 !   Calls Save_Impinging_Jet_Nu and Save_Impinging_Jet_Profile functions.      !
+ 13 !------------------------------------------------------------------------------!
+ 14   implicit none
+ 15 !---------------------------------[Arguments]----------------------------------!
+ 16   type(Field_Type)  :: Flow
+ 17   type(Turb_Type)   :: Turb
+ 18   type(Vof_Type)    :: Vof
+ 19   type(Swarm_Type)  :: Swarm
+ 20   integer, optional :: domain
+ 21 !==============================================================================!
+ 22
+ 23   ! Don't save if this is intial condition, nothing is developed yet
+ 24   if(Time % Curr_Dt() .eq. 0) return
+ 25
+ 26   call Save_Impinging_Jet_Nu      (Turb)
+ 27   call Save_Impinging_Jet_Profiles(Turb)
+ 28
+ 29   end subroutine
 ```
-The first of the called functions, reads the radial segments from the file
-```rad_coordinates.dat```, averages results over those segments and writes
-them in a special file called ```jet-nu-tsXXXXXX.dat```, where `XXXXXX` is
-the time step.  Withough going through each and every line of the code, let's
-just briefly explain a few sections.  
+The first of the called functions, ```Save_Impinging_Jet_Nu```, reads the radial
+segments from the file ```rad_coordinates.dat```, averages results over those
+segments and writes them in a special file called ```jet-nu-tsXXXXXX.dat```,
+where `XXXXXX` is the time step.  Without going through each and every line of
+the code, let's just briefly explain a few sections.
 
 Declaration of local variables which will be used for averaging results in the
 radial segments, is in lines 18-20:
 ```
- 18   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
- 19   real,    allocatable      :: z_s(:), r_s(:), rad(:)
- 20   integer, allocatable      :: n_count(:)
+ 17   real,    allocatable      :: u_s(:), v_s(:), w_s(:), t_s(:), tau_s(:), q_s(:)
+ 18   real,    allocatable      :: z_s(:), r_s(:), rad(:)
+ 19   integer, allocatable      :: n_count(:)
 ```
 Here beginning of names ```u```, ```v```, ... stand for velocity components,
 temperature, wall friction, heat flux, wall distance, radii and extension
 ```_s``` stands for segment.
 
-The function reads the ```rad_coordinate.dat``` in lines 40-68, checking if
-file exists (line 40) and issuing a warning message if it doesn't (lines 42-55).
+The function reads the ```rad_coordinate.dat``` in lines 39-67, checking if
+file exists (line 39) and issuing a warning message if it doesn't (lines 41-54).
 ```
- 40   inquire(file='rad_coordinate.dat', exist=there)
- 41   if(.not.there) then
- 42     if(this_proc < 2) then
- 43       print *, "#=========================================================="
- 44       print *, "# In order to extract Nusselt number profile               "
+ 39   inquire(file='rad_coordinate.dat', exist=there)
+ 40   if(.not.there) then
+ 41     if(First_Proc()) then
+ 42       print *, "#=========================================================="
+ 43       print *, "# In order to extract Nusselt number profile               "
  ...
  ...
- 54     end if
- 55     return
- 56   end if
- 57
- 58   call File % Open_For_Reading_Ascii('rad_coordinate.dat', fu)
- 59
- 60   ! Read the number of searching intervals·
- 61   read(fu,*) n_prob
- 62   allocate(rad(n_prob))
- 63
- 64   ! Read the intervals positions
- 65   do i = 1, n_prob
- 66     read(fu, *) rad(i)
- 67   end do
- 68   close(fu)
+ 53     end if
+ 54     return
+ 55   end if
+ 56
+ 57   call File % Open_For_Reading_Ascii('rad_coordinate.dat', fu)
+ 58
+ 59   ! Read the number of searching intervals
+ 60   read(fu,*) n_prob
+ 61   allocate(rad(n_prob))
+ 62
+ 63   ! Read the intervals positions
+ 64   do i = 1, n_prob
+ 65     read(fu, *) rad(i)
+ 66   end do
+ 67   close(fu)
 ```
-Line 58 is the standard way to open files in T-Flows.  One could use plain
+Line 57 is the standard way to open files in T-Flows.  One could use plain
 standard Fortran for that, but T-Flows' functions are encouraged because they
 come with additional checks and customizations.
 
-Lines 60-68 reveal the format and contents of file ```rad_coordinate.dat```,
+Lines 59-67 reveal the format and contents of file ```rad_coordinate.dat```,
 it reads number of readial cooridantes over which to perform averaging, and
 actual radial coordinate.
 
 With this data read, we perform averaging in lines 83-107:
 ```
- 83   do i = 1, n_prob - 1
- 84     do s = 1, Grid % n_faces
- 85       c1 = Grid % faces_c(1,s)
- 86       c2 = Grid % faces_c(2,s)
- 87       if(c2 < 0) then
- 88         if(Grid % Bnd_Cond_Name(c2) .eq. 'LOWER_WALL') then
+ 82   do i = 1, n_prob - 1
+ 83     do reg = Boundary_Regions()
+ 84       if(Grid % region % name(reg) .eq. 'LOWER_WALL') then
+ 85         do s = Faces_In_Region(reg)
+ 86           c1 = Grid % faces_c(1,s)
+ 87           c2 = Grid % faces_c(2,s)
+ 88
  89           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
  90                    Grid % yc(c1)*Grid % yc(c1)) + TINY
  91           if(r < rad(i+1) .and. r > rad(i)) then
@@ -4067,61 +4215,126 @@ With this data read, we perform averaging in lines 83-107:
 ...
 103             n_count(i) = n_count(i) + 1
 104           end if
-105         end if
-106       end if
-107     end do
+105         end do  ! faces in this region
+106       end if    ! region is called 'LOWER_WALL'
+107     end do      ! through regions
+108   end do        ! through probes
 ```
-We browse through segments (line 83), then faces (line 85), take the cells
-which surround each face (lines 85 and 86), check if the face is on a boundary
-called `LOWER_WALL` (lines 87 and 88), and then eventually if that face is
-also within the segment we want to average (line 91).  If this is all satisfied,
-the accumulation of values is performed in lines 92-102, and line 103 counting
-the number of faces in the segment.
+We browse through segments (line 82), then boundary regions (line 83), take the
+region which is called 'LOWER_WALL' (line 84), then browse through the faces
+at that region (line 85).  Once in that region, we fetch the cells ```c1``` and
+```c2``` which surround the face ```s``` and in line 91 check if the faces fall
+in the current segment.  If this is all satisfied, the accumulation of values
+is performed in lines 92-102, and line 103 counting the number of faces in the
+segment.
+
+> **_Note:_** It was written above, but it's probably worth repeating that, in
+T-Flows, boundary cells have negative indices.  In the loops over faces at the
+boundaries, such as the one above, ```c1``` will be the inside cell with a
+positive index, whereas ```c2``` will be a boundary cell with negative index.
 
 Since we intend to run this code in parallel, we should also make sure that
 the accumulation of sums is extended to all processors involved, ensured by
 lines 113-126:
 ```
 113   do i = 1, n_prob
-114     call Comm_Mod_Global_Sum_Int(n_count(i))
+114     call Global % Sum_Int(n_count(i))
 115
-116     call Comm_Mod_Global_Sum_Real(u_s(i))
-...
-...
-125     call Comm_Mod_Global_Sum_Real(t_s(i))
+116     call Global % Sum_Real(u_s(i))
+117     call Global % Sum_Real(v_s(i))
+118     call Global % Sum_Real(w_s(i))
+119
+120     call Global % Sum_Real(z_s(i))
+121     call Global % Sum_Real(tau_s(i))
+122     call Global % Sum_Real(q_s(i))
+123
+124     call Global % Sum_Real(r_s(i))
+125     call Global % Sum_Real(t_s(i))
 126   end do
-
 ```
 Once the sums are extend over all processors, averaged values are computed in
 lines 128-139 (not shown here) and results are eventually save to a file with
-desired file name in lines 145-167:
+desired file name in lines 145-172:
 ```
-145   if(this_proc < 2) then
+145   if(First_Proc()) then
 146
 147     ! Set the file name
-148     call File % Set_Name(res_name, time_step=ts, &
+148     call File % Set_Name(res_name, time_step=Time % Curr_Dt(), &
 149                          appendix='-nu-utau', extension='.dat')
 150     call File % Open_For_Writing_Ascii(res_name, fu)
 151
 152     ! Write the file out
-153     write(fu, *) '# 1:Xrad, 2:Nu, 3:Utau, 4:Yplus, 5:Temp, 6:Numb of points '
-...
-...
-166     close(fu)
-167   end if
+153     write(fu, '(a66)')  '# 1:Xrad,  ' //  &
+154                         '  2:Nu,    ' //  &
+155                         '  3:Utau,  ' //  &
+156                         '  4:Yplus, ' //  &
+157                         '  5:Temp,  ' //  &
+158                         '  6:Points '
+159     do i = 1, n_prob
+160       if(n_count(i) .ne. 0) then
+161         write(fu, '(5e11.3,i11)')                                 &
+162           r_s(i) / 2.0,                                           &  !  1
+163           2.0 * q_s(i) / (Flow % conductivity(1)*(t_s(i)-20.0)),  &  !  2
+164           tau_s(i),                                               &  !  3
+165           tau_s(i) * z_s(i) / Flow % viscosity(1),                &  !  4
+166           t_s(i),                                                 &  !  5
+167           n_count(i)                                                 !  6
+168       end if
+169     end do
+170
+171     close(fu)
+172   end if
 ```
 Line 145 ensures that the file is written only from one processor, lines
 148 and 149 set the file name in standard T-Flows' format.  Line 150 shows
-how to use T-Flows' standar way to open files and the rest is just plain
+how to use T-Flows' standard way to open files and the rest is just plain
 Fortran which doesn't need furhter explanation.
 
 The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
-similar structure as the ```Save_Impinging_Jet_Nu```, but a few differences.
+similar structure to the ```Save_Impinging_Jet_Nu```, but a few differences.
 Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
-reads a file with coordinates in $z$ direction, created during the grid
-conversion process (file ```jet.1d```).  Just like its sister it declares local
+reads a file with coordinates in _z_ direction, created during the grid
+conversion process (file ```jet.1d```).  Just like its sister, it declares local
 variables for averaging the results, performs global summs over all processor
 for parallel runs, and eventually saves data for post-processing.
+
+There is one section in the ```Save_Impinging_Jet_Profiles``` which might
+deserve a bit of attention.  It is a section which calculates average inlet
+velocity, and is given here in full:
+```
+ 36   area_in = 0.0
+ 37   velo_in = 0.0
+ 38   do reg = Boundary_Regions()
+ 39     if(Grid % region % name(reg) .eq. 'PIPE_INLET') then
+ 40       do s = Faces_In_Region(reg)
+ 41         c2 = Grid % faces_c(2,s)  ! fetch the boundary cell
+ 42         velo_in = velo_in - w % n(c2) * Grid % sz(s)
+ 43         area_in = area_in + Grid % s(s)
+ 44       end do  ! through faces in the region
+ 45     end if    ! region is called 'PIPE_INLET'
+ 46   end do      ! through all boundary regions
+ 47   call Global % Sum_Real(area_in)
+ 48   call Global % Sum_Real(velo_in)
+ 49   Assert(area_in > 0.0)
+ 50   velo_in = velo_in / area_in
+```
+Variables ```area_in``` and ```velo_in``` are surface area at the inlet and
+velocity at the inlet, and are initialized in lines 36 and 37.  A loop
+through bundary regions begins in line 38, and line 39 picks only the region
+which is called ```PIPE_INLET```, since that is how inlet was called in the
+original grid file definition (```jet.neu```).  Once that region is found,
+we browse through its faces (line 40), take the faces' boundary cell ```c2```
+in line 41, and update velocity (line 42) and area (line 43) inside that
+loop.  The negative sign in line 42 is because the faces' surface vectors,
+such as ```Grid % sz(s)``` always point outwards of computational domain so
+for a velocity which pointed towards the inlet, their product would have a
+negative value.  In case of a parallel run, we can't be sure that the
+entire inllet are is covered by one sub-domain, and we therefore have to
+perform a global sum, as it is done in lines 47 and 48 above.  Line 49 is
+an _assertion_, not part of the standard Fortran, but it is introduced in
+T-Flows for its usefulness.  (In this case, the assertion might fail if
+there is no region called ```PIPE_INLET``` in the grid.)  Finally, line 50
+computes the bulk velocity at the inlet.
 
 As far as the ```control``` file is concerned, there is nothing very special
 about this case.  By trying different values of time steps and times of time
@@ -4164,7 +4377,7 @@ The line beginning with the keyword ```VARIABLES``` tells T-Flows which
 variables are specified in the file.  The name of the file is specified in the
 line which follows beginning with the keyword ```FILE```.  We believe that
 all variable names are self-explanatory, except maybe ```rz``` which stands
-for radial coordinate (```r```) orthogonal to the $z$ plane (```z```).  More
+for radial coordinate (```r```) orthogonal to the _z_ plane (```z```).  More
 details on prescribing inlet profiles from files can be found in section
 [Prescribed velocity profile](#demo_inflows_parabolic).
 
@@ -4371,10 +4584,10 @@ new, old and time step older than old:
 ```
 
 Since the all streamwise and spanwise boundary conditions are periodic, we
-prescribe the desired mass flux through the computational domain with:
+prescribe the desired volume flow rate through the computational domain with:
 ```
 #-------------------------------------------------
-# Prescribed mass flow
+# Prescribed volume flow rate
 #
 # Re = 13000
 # nu = 1.5112e-5
@@ -4383,7 +4596,7 @@ prescribe the desired mass flux through the computational domain with:
 # Ub = Re * nu / h = 3.852  [m/s]
 # m* = Ub * 1.2047 * 0.051 * 0.06 = 0.0142 [kg/s]
 #-------------------------------------------------
-  MASS_FLOW_RATES    0.0142  0.0  0.0
+  VOLUME_FLOW_RATES  0.0142  0.0  0.0
 ```
 
 With this explained, you can launch a simulation with:
@@ -4578,10 +4791,10 @@ there and check the contents.  They include the following:
 ├── bubble.geo
 ├── control
 ├── convert.scr
-├── ellipsoid_parameters.ini
+├── sphere.py
+├── sphere.stl
 └── User_Mod/
-    ├── End_Of_Time_Step.f90
-    └── Initialize_Variables.f90
+    └── End_Of_Time_Step.f90
 ```
 
 The usage of ```control```, ```convert.scr``` and ```bubble.geo``` files should
@@ -4591,200 +4804,38 @@ be clear to you by now.  If not, revisit the section on
 ### Initialization of VOF function <a name="bench_cases_buble_init"> </a>
 
 An _important characteristic_ of simulating multiphase flows with VOF, is that
-initial conditions can _only_ be defined through user functions.  At the time
-of writing this manual, we believe that the initial conditions for VOF are very
-case dependent, and expanding the ```control``` file, as well as all the
-procedures to read them, would be overwhelming.
+prescribing initial condition practically means prescribing morphology of the
+multiphase situation.  One possibility to achieve this might be through user
+functions which would prescribe the value of VOF function in three-dimensional
+domain of interest.  In T-Flows, however, we have an additional option which is
+to read an STL file describing the interface between the phases.  Surface normals
+of the STL file define which phase will be zero and which one.
+are used to prescribe the values (0 and 1) of the VOF function: surface always
+points from 0 to 1.  As an example, if a morphology of the multiphase situation
+is a single bubble described by a sphere in STL format, and if sphere's normals
+point outwards, T-Flows will set the cells inside the bubble to 0 and outside
+of the bubble to 1.
 
-Because of this, with each case using VOF, you will have a ```User_Mod``` directory
-with function to initialize VOF.  In this particular case, the subroutine
-```Initialize_Variables.f90``` reads:
+Different CAD software packages can be used to prescribe STL surfaces, but when
+it comes to prescribing spherical bubbles, the quality of STL files generated
+by Blender, using its ico-sphere algorithm, is unsurpassed.  Check, for example
+how the included ```sphere.stl``` looks:
+
+<img src="Documentation/Manual/Figures/bubble_sphere.png" width="256"/>
+
+The python script to create this ico-sphere in Blender is in the file
+```sphere.py```. which is also included in this case's directroy for reader's
+convenience.  The STL file is used in the ```control``` file, in a manner
+very similar to the presciption of initial conditions in the section on
+(thermally driven cavity)[#demo_thermally_driven] flows.  Here, the section
+for prescribing initial conditions looks like this:
 ```
-  1 !==============================================================================!
-  2   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
-  3 !------------------------------------------------------------------------------!
-  4 !   Case-dependent initialization of VOF variable.                             !
-  5 !------------------------------------------------------------------------------!
-  6 !----------------------------------[Modules]-----------------------------------!
-  7   use Work_Mod, only: prelim_vof => r_cell_01,  &
-  8                       min_dist   => r_cell_02,  &
-  9                       max_dist   => r_cell_03,  &
- 10                       dist_node  => r_node_01
- 11 !------------------------------------------------------------------------------!
- 12   implicit none
- 13 !---------------------------------[Arguments]----------------------------------!
- 14   type(Field_Type),  target :: Flow
- 15   type(Turb_Type),   target :: Turb
- 16   type(Vof_Type),    target :: Vof
- 17   type(Swarm_Type),  target :: Swarm
- 18   type(Solver_Type), target :: Sol
- 19 !-----------------------------------[Locals]-----------------------------------!
- 20   type(Grid_Type), pointer :: Grid
- 21   type(Var_Type),  pointer :: fun
- 22   real,            pointer :: dt
- 23   integer                  :: c, n, i_nod, e, n_ellipses, fu
- 24   real                     :: radius_x, radius_y, radius_z
- 25   real                     :: cent_x, cent_y, cent_z, dist_norm
- 26 !==============================================================================!
- 27
- 28   ! Take aliases
- 29   Grid => Flow % pnt_grid
- 30   fun  => Vof % fun
- 31   dt   => Flow % dt
- 32
- 33   !---------------------------------!
- 34   !   Initialize the VOF function   !
- 35   !---------------------------------!
- 36
- 37   ! Initialize the whole domain as 0.0
- 38   fun % n(:) = 0.0
- 39
- 40   ! Open file to read Ellipsoid parameters:
- 41   call File % Open_For_Reading_Ascii('ellipsoid_parameters.ini', fu)
- 42
- 43   call File % Read_Line(fu)
- 44   read(line % tokens(1), *) n_ellipses
- 45
- 46   do e = 1, n_ellipses
- 47
- 48     ! Initialize working arrays
- 49     prelim_vof(:) = 0.0
- 50
- 51     ! Read line with radii
- 52     call File % Read_Line(fu)
- 53     read(line % tokens(1), *) radius_x
- 54     read(line % tokens(2), *) radius_y
- 55     read(line % tokens(3), *) radius_z
- 56
- 57     ! Read line with coordinates of the elliposoid's center
- 58     call File % Read_Line(fu)
- 59     read(line % tokens(1), *) cent_x
- 60     read(line % tokens(2), *) cent_y
- 61     read(line % tokens(3), *) cent_z
- 62
- 63     ! Normalized distance from ellipsoid center in nodes
- 64     dist_node (:) = 0.0
- 65     do n = 1, Grid % n_nodes
- 66       dist_node(n) = sqrt(  ((Grid % xn(n) - cent_x) / radius_x)**2   &
- 67                           + ((Grid % yn(n) - cent_y) / radius_y)**2   &
- 68                           + ((Grid % zn(n) - cent_z) / radius_z)**2)
- 69     end do
- 70
- 71     ! Minimum and maximum normalized distance in cells
- 72     min_dist(:) = +HUGE
- 73     max_dist(:) = -HUGE
- 74     do c = 1, Grid % n_cells
- 75       do i_nod = 1, Grid % cells_n_nodes(c)
- 76         n = Grid % cells_n(i_nod, c)
- 77
- 78         min_dist(c)= min(dist_node(n), min_dist(c))
- 79         max_dist(c)= max(dist_node(n), max_dist(c))
- 80       end do
- 81     end do
- 82
- 83     ! Simply interpolate linearly
- 84     do c = 1, Grid % n_cells
- 85
- 86       ! Since surface is at 1.0 this checks if cell crosses the surface
- 87       if (min_dist(c) < 1.0 .and. max_dist(c) > 1.0) then
- 88         prelim_vof(c) = (1.0 - min_dist(c))  &
- 89                       / (max_dist(c)-min_dist(c))
- 90
- 91       else if (max_dist(c) <= 1.0) then
- 92         prelim_vof(c) = 1.0
- 93       end if
- 94
- 95     end do
- 96
- 97     ! This is useful if more elliposoids are
- 98     ! defined and they intersect each other
- 99     do c = 1, Grid % n_cells
-100       Vof % fun % n(c) = max(prelim_vof(c), Vof % fun % n(c))
-101     end do
-102
-103   end do
-104
-105   close(fu)
-106
-107   ! Update buffer values
-108   call Grid % Exchange_Cells_Real(fun % n)
-109
-110   ! Set old values to be the same as new ones
-111   fun % o(:) = fun % n(:)
-112
-113   end subroutine
-
+  INITIAL_CONDITION
+    VARIABLES           u    v    w    vof
+    VALUES              0.0  0.0  0.0  sphere.stl
 ```
-In the argument list, you can see a number of _Process'_ classes which were
-described [above](#demo_thermally_driven_variable).  The only class you didn't
-see before is ```Sol_Type``` which is an _abstraction_ of two other classes
-```Nat_Type``` for T-Flows' native linear solvers and ```Pet_Type``` for
-PETSc solver.  None of them will be used in this function, and we will not
-describe them further.
-
-An interesting novelty here is in between lines 7 and 10, the usage of ```Work_Mod```.
-This module has no functionality, but holds a number of pre-allocated fields of
-different types (```r_cell_..```, ```r_node_```, ```i_cell_```, ...) with sizes
-which span over cells, faces or nodes.  These pre-allocated memory locations
-are used inside _Process'_ functions to avoid frequent allocations and
-de-allocations of memory.  In this case, we will use three real fields (```r_```
-in the name) spanning over cells (```cell_``` in the name) and one real field
-spanning over nodes (```r_node_01```).
-
-Lines 28 to 31 take different _aliases_ to shorten the syntax in the rest of
-this subroutine.  It is probably worth noting that VOF's phase indicator function
-is stored in ```Vof % fun```, and the value of VOF function in the new time
-step is in the field ```Vof % fun % n```.
-
-Line 41 opens the file ```ellipsoid_parameters.ini``` which holds the definition
-of ellipsoids we want to define.  It reads:
-```
-# Number of ellipsoids
- 1
-
-# Ellipsoids' characteristic radii in x, y and z direction
- 0.25 0.25 0.25
-
-# Ellipsoid's center
- 0.0  0.0  0.0
-```
-which, we believe, is self-explanatory.  This file will be read by user function
-in lines 51 - 61.
-
-> **_Note:_** Remember that procedure ```Read_Line``` not only tokenizes a line
-from input, but also skips all the lines beginning with ```#```, ```!``` and
-```%```, which it considers comments.  That is why we can have comments inside
-```ellipsoid_parameters.dat```
-
-Lines 63 - 69 calculate normalized distance from the ellipsoid in the nodes.  It
-is worth reminding you at this point that T-Flows is cell-centered, _nodes are
-not_ computational points, _cell centers are_.  Once we have all normalized
-distances in nodes, we can define them for cells in lines 71 - 81.  These lines show
-how can you access cells' nodes.
-```
-  74     do c = 1, Grid % n_cells
-```
-will start browsing through all the cells,
-```
- 75       do i_nod = 1, Grid % cells_n_nodes(c)
-```
-will browse through local nodes of each cell and
-```
- 76         n = Grid % cells_n(i_nod, c)
-```
-gives you a global number of the cell's node.  Lines 78 and 79 compute minimum
-and maximuim normalized distance for each cell, which is used in lines 83 to 95
-to calculate preliminary VOF in cell centers.  We don't put these values straight
-into VOF function (```Vof % n```) to prevent that, in case we have more than
-one ellipsoid defined, they over-write each other, which is achieved in lines
-97 - 101.
-
-Line 108 is important for parallel runs since it echanges the values
-of VOF functions in buffer cells.
-
-Finally, once VOF is set in the entire domain, we also make sure that the
-values in the old time step (```fun % o```) are the same as new ones in
-line 110.
+Under the variable ```vof```, we don't just put a value, but rather an STL file
+which prescribes the initial surface shape and position.
 
 ### Compilation <a name="bench_cases_buble_compiling"> </a>
 
@@ -4796,8 +4847,10 @@ directory, hence from ```[root]/Sources/Process``` run:
 make clean
 make DIR_CASE=../../Tests/Manual/Rising_Bubble/
 ```
+Only one user function is used in this case, ```End_Of_The_Time_Step```, which
+will calculate some data for comparing results with benchmark solutions.
 
-> **_Note 1:_** Every time you run ```make clean``` for the _Processs_ it will
+> **_Note:_** Every time you run ```make clean``` for the _Processs_ it will
 replace the existing links in its ```User_Mod``` with _empty hooks_ as explained
 [above](#demo_thermally_driven_variable).  Running make with ```DIR_CASE```
 option will establish new links to user's case.
@@ -4882,10 +4935,9 @@ we also set Gu's and Choi's correction in the control file:
 One of the most serious source of inaccuracies of surface phenomena in VOF is
 the calculation of curvature and, associated with that, surface normals.  In
 _Process_, we use a smoothing procedure which is controlled with following
-parameters:
+parameter:
 ```
- MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
- MAX_SMOOTHING_CYCLES_NORMAL_VOF      0
+ MAX_SMOOTH_CYCLES_CURVATURE_VOF  12
 ```
 
 ### Final solution and benchmarking <a name="bench_cases_buble_final"> </a>
@@ -4904,7 +4956,7 @@ function ```End_Of_Time_Step```, given here in full:
 ```
   1 !==============================================================================!
   2   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-  3                                        n, n_stat_t, n_stat_p, time)
+  3                                        n_stat_t, n_stat_p)
   4 !------------------------------------------------------------------------------!
   5 !   This function is computing benchmark for rising bubble.                    !
   6 !------------------------------------------------------------------------------!
@@ -4914,65 +4966,76 @@ function ```End_Of_Time_Step```, given here in full:
  10   type(Turb_Type),  target :: Turb
  11   type(Vof_Type),   target :: Vof
  12   type(Swarm_Type), target :: Swarm
- 13   integer                  :: n         ! current time step
- 14   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
- 15   integer                  :: n_stat_p  ! 1st t.s. statistics particles
- 16   real                     :: time      ! physical time
- 17 !-----------------------------------[Locals]-----------------------------------!
- 18   type(Grid_Type), pointer :: Grid
- 19   type(Var_Type),  pointer :: fun
- 20   integer                  :: c, fu
- 21   real                     :: b_volume, rise_velocity, c_position
- 22 !==============================================================================!
- 23
- 24   ! Take aliases
- 25   Grid => Flow % pnt_Grid
- 26   fun  => Vof % fun
- 27
- 28   ! Integrate bubble volume, current position and rise velocity over cells
- 29   b_volume      = 0.0
- 30   c_position    = 0.0
- 31   rise_velocity = 0.0
- 32
- 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
- 34     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
- 35     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
- 36     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
- 37   end do
- 38
- 39   call Comm_Mod_Global_Sum_Real(b_volume)
- 40   call Comm_Mod_Global_Sum_Real(c_position)
- 41   call Comm_Mod_Global_Sum_Real(rise_velocity)
- 42
- 43   ! Write to file
- 44   if (this_proc < 2) then
- 45     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
- 46
- 47     write(fu,'(4(2x,e16.10e2))') time,                   &
- 48                                  b_volume,               &
- 49                                  c_position/b_volume,    &
- 50                                  rise_velocity/b_volume
- 51     close(fu)
- 52   end if
- 53
- 54   end subroutine
+ 13   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
+ 14   integer                  :: n_stat_p  ! 1st t.s. statistics particles
+ 15 !-----------------------------------[Locals]-----------------------------------!
+ 16   type(Grid_Type), pointer :: Grid
+ 17   type(Var_Type),  pointer :: fun
+ 18   integer                  :: c, fu
+ 19   real                     :: b_volume, rise_velocity, c_position
+ 20 !==============================================================================!
+ 21
+ 22   ! Take aliases
+ 23   Grid => Flow % pnt_Grid
+ 24   fun  => Vof % fun
+ 25
+ 26   ! Integrate bubble volume, current position and rise velocity over cells
+ 27   b_volume      = 0.0
+ 28   c_position    = 0.0
+ 29   rise_velocity = 0.0
+ 30
+ 31   do c = Cells_In_Domain()
+ 32     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
+ 33     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
+ 34     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
+ 35   end do
+ 36
+ 37   call Global % Sum_Real(b_volume)
+ 38   call Global % Sum_Real(c_position)
+ 39   call Global % Sum_Real(rise_velocity)
+ 40
+ 41   ! Write to file
+ 42   if (First_Proc()) then
+ 43     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
+ 44
+ 45     write(fu,'(4(2x,e16.10e2))') Time % Get_Time(),      &
+ 46                                  b_volume,               &
+ 47                                  c_position/b_volume,    &
+ 48                                  rise_velocity/b_volume
+ 49     close(fu)
+ 50   end if
+ 51
+ 52   end subroutine
 ```
 Arguments in lines 9 - 11 have been described above, as well as local aliases
-in lines 18 and 19. Arguments which haven't beel explained before are the
+in lines 16 and 17. Arguments which haven't beel explained before are the
 staring time step for turbulent and particle statistics, ```n_stat_t``` and
-```n_stat_p``` in lines 14 and 15.  These are irrelevant for this case and not
+```n_stat_p``` in lines 13 and 14.  These are irrelevant for this case and not
 used.  Their importance and use is explained in sections describing LES and
 simulations of particle-laden flows.
 
-The function integrates bubble position, velocity and volume in lines 33 - 37.
+The function integrates bubble position, velocity and volume in lines 31 - 35.
 One thing worth emphasising here is that we are not browsing over _all_ cells,
-but rather restrict the loop in line 33 to cells inside the domain, which
-_do not_ include _buffer cells_:
+but rather restrict the loop in line 31 to cells inside the domain, which
+_do not_ include _buffer cells_.  We achieved that by using the macro
 ```
- 33   do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
+      ...
+      ...
+    end do
 ```
-Buffer cells are passive cells added to each sub-domain for communication with
-other processsors and are illustrated here:
+which is a handy replacement for a lengthier and arguably less readable version:
+```
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+      ...
+      ...
+    end do
+```
+These two ways of browsing through cells are analogous and equally valid, though
+the code will probably be more robust and easier to mantain if the former (the
+version with the macro) is used.  In any case, the buffer cells are passive
+cells added to each sub-domain for communication with other processsors and are
+illustrated here:
 
 ![!](Documentation/Manual/Figures/bubble_buffers.png "")
 
@@ -4981,12 +5044,27 @@ to processor 1 and are active for that processor, meaning processor 1 is doing
 computations for them. Light blue, pink and red cells are activelly
 computed in processors 2 - 4 and processor 1 uses them only to properly
 compute gradients, fluxes through cell faces and matrix-vector products in
-its active cells.  If we integrated over these buffer cells, that is looping
-from ```1``` to ```Grid % n_cells```, buffer cells would be counted twice
-in lines 39 - 41, which perform global sums.
+its active cells.  If we integrated over these buffer cells, that is looping:
+```
+    do c = 1, Grid % n_cells
+      ...
+      ...
+    end do
+```
+or:
+```
+    do c = Cells_In_Domain_And_Buffers()
+      ...
+      ...
+    end do
+```
+with the macro, buffer cells would be counted twice in lines 37 - 39, which
+perform global sums.
 
-Anyway, lines 43 - 52 update file ```benchmark.dat``` with bubble position and
-rise velocity at the end of each time step.  We use tool Grace to plot the
-results and compare them with benchmark solutions.
+To leave the buffer cells aside and come back to the user function;
+lines 43 - 49 update file ```benchmark.dat``` with bubble position and rise
+velocity at the end of each time step.  We use tool Grace to plot the results
+and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
+

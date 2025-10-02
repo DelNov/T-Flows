@@ -1,111 +1,99 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME         sucking
- HEAT_TRANSFER        yes
- INTERFACE_TRACKING   yes
- TRACK_FRONT          yes
+  PROBLEM_NAME         sucking
+  HEAT_TRANSFER        yes
+  INTERFACE_TRACKING   yes
+  TRACK_FRONT          yes
 
-# TIME_STEP                2.5e-3
-# NUMBER_OF_TIME_STEPS     3600
+  TIME_STEP                2.5e-3
+  NUMBER_OF_TIME_STEPS     3600
 
- TIME_STEP                2.5e-3
- NUMBER_OF_TIME_STEPS    12
+  MAX_SIMPLE_ITERATIONS      12
+  MIN_SIMPLE_ITERATIONS       6
 
-# TIME_STEP                1.0e-2
-# NUMBER_OF_TIME_STEPS      900
-
- MAX_SIMPLE_ITERATIONS      12
- MIN_SIMPLE_ITERATIONS       6
-
- RESULTS_SAVE_INTERVAL           1
- SAVE_INITIAL_CONDITION        yes
- SAVE_RESULTS_AT_BOUNDARIES     no
- BACKUP_SAVE_INTERVAL         1200
+  RESULTS_SAVE_INTERVAL         100
+  SAVE_INITIAL_CONDITION        yes
+  SAVE_RESULTS_AT_BOUNDARIES     no
+  BACKUP_SAVE_INTERVAL         1200
 
 #-------------------
 # Monitoring points
 #-------------------
- NUMBER_OF_MONITORING_POINTS    0
-   MONITORING_POINT_001         0.6  0.05  0.05
+  NUMBER_OF_MONITORING_POINTS    0
+    MONITORING_POINT_001         0.6  0.05  0.05
 
- POINT_FOR_MONITORING_PLANES    0.6  0.05  0.05
+  POINT_FOR_MONITORING_PLANES    0.6  0.05  0.05
 
 #-----------------
 # Physical models
 #-----------------
 
 # Phase 0 is vapor, phase 1 is liquid
- PHASE_DENSITIES          0.597     958.4
- PHASE_VISCOSITIES        1.0e-3      1.0e-3
- PHASE_CONDUCTIVITIES     0.025       0.679
- PHASE_CAPACITIES      2030.0      4216.0
- SURFACE_TENSION        0.0
- MASS_TRANSFER          yes
- SATURATION_TEMPERATURE   10.0
+  PHASE_DENSITIES          0.597     958.4
+  PHASE_VISCOSITIES        1.0e-3      1.0e-3
+  PHASE_CONDUCTIVITIES     0.025       0.679
+  PHASE_CAPACITIES      2030.0      4216.0
+  SURFACE_TENSION        0.0
+  MASS_TRANSFER          yes
+  SATURATION_TEMPERATURE   10.0
 
- TURBULENCE_MODEL       none
- GRAVITATIONAL_VECTOR   0.0   0.0   0.0
+  TURBULENCE_MODEL       none
+  GRAVITATIONAL_VECTOR   0.0   0.0   0.0
 
- REFERENCE_DENSITY      1.0
+  REFERENCE_DENSITY      1.0
 
 #----------------------
 # Numerical parameters
 #----------------------
 
- PRESSURE_MOMENTUM_COUPLING    simple
+  PRESSURE_MOMENTUM_COUPLING    simple
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
- SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.95
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.95
 
- TIME_INTEGRATION_SCHEME  linear
+  TIME_INTEGRATION_SCHEME  linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
- ADVECTION_SCHEME_FOR_VOF         cicsam
+  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+  ADVECTION_SCHEME_FOR_VOF         cicsam
 
- GU_CORRECTION               yes
- CHOI_CORRECTION             yes
+  GU_CORRECTION               yes
+  CHOI_CORRECTION             yes
 
- GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
- GRADIENT_METHOD_FOR_VOF             gauss_theorem
- TOLERANCE_FOR_VOF GRADIENTS         1.0e-4
- TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
- MAX_ITERATIONS_FOR_GAUSS_GRADIENTS  200
+  GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
+  GRADIENT_METHOD_FOR_VOF             gauss_theorem
+  TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-4
+  MAX_GAUSS_GRADIENTS_ITERATIONS    200
 
 #------------------------
 # Linear solver settings
 #------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX      incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-05
- TOLERANCE_FOR_ENERGY_SOLVER           1.e-05
- TOLERANCE_FOR_PRESSURE_SOLVER         1.e-12
- TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-03
- TOLERANCE_FOR_VOF_SOLVER              1.e-05
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER  256
- MAX_ITERATIONS_FOR_ENERGY_SOLVER      8
- MAX_SMOOTHING_CYCLES_CURVATURE_VOF    8
- MAX_SMOOTHING_CYCLES_NORMAL_VOF       0
- TEMPORAL_PRESSURE_CORRECTION          yes
- COMPRESION_VOF                        no
- COMPRESION_FACTOR_VOF                 1.0
- #DUAL_TIME_STEP_VOF                 yes
+  PRECONDITIONER_FOR_SYSTEM_MATRIX      incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-05
+  TOLERANCE_FOR_ENERGY_SOLVER           1.e-05
+  TOLERANCE_FOR_PRESSURE_SOLVER         1.e-12
+  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-03
+  TOLERANCE_FOR_VOF_SOLVER              1.e-05
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  256
+  MAX_ITERATIONS_FOR_ENERGY_SOLVER      8
+  MAX_SMOOTH_CYCLES_CURVATURE_VOF       8
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    wall
     TYPE                inflow
-    VARIABLES           u      v     w     vof     vof_c_ang   t
-    VALUES              0.00  0.0   0.0   0.0     90.0         10.0
+    VARIABLES           u     v     w     vof     vof_c_ang   t
+    VALUES              0.0   0.0   0.0   0.0     90.0       10.0
 
   BOUNDARY_CONDITION    outlet
     TYPE                outflow
-    VARIABLES           u      v     w     vof     vof_c_ang   q
-    VALUES              0.00  0.0   0.0   0.0     90.0         0.0
+    VARIABLES           u     v     w     vof     vof_c_ang   q
+    VALUES              0.0   0.0   0.0   0.0     90.0        0.0
 
   BOUNDARY_CONDITION    symmetry
     TYPE                symmetry
-    VARIABLES           u      v     w     vof     vof_c_ang   q
-    VALUES              0.00  0.0   0.0   0.0     90.0         0.0
+    VARIABLES           u     v     w     vof     vof_c_ang   q
+    VALUES              0.0   0.0   0.0   0.0     90.0        0.0
 

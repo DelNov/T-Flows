@@ -1,8 +1,21 @@
+# Full mesh name (with extension)
 pipe.neu
+
+# Create dual mesh?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers' position
 1
+
+# Periodicity
 2
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 skip

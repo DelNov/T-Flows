@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Gauss_Gradients_Iterations(val, verbose)
+  subroutine Max_Gauss_Gradients_Iterations(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads maximum number of iterations for Gaussian gradient method.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! max Gauss-gradient iterations
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MAX_GAUSS_GRADIENTS_ITERATIONS', 12,  &
-                                  val, verbose)
+  call Control % Read_Int_Item('MAX_GAUSS_GRADIENTS_ITERATIONS', 12,  &
+                                val, verbose)
 
   end subroutine

@@ -1,0 +1,124 @@
+!==============================================================================!
+!   Definition of browsing macros in T-Flows.                                  !
+!------------------------------------------------------------------------------!
+
+!------------------------------!
+!                              !
+!   Browsing through regions   !
+!                              !
+!------------------------------!
+
+!--------------------------------------------!
+!   To browse through all boundary regions   !
+!--------------------------------------------!
+# define Boundary_Regions()  \
+    1, Grid % n_bnd_regions
+
+!---------------------------------------------!
+!   Inside regions are at n_bnd_regions + 1   !
+!---------------------------------------------!
+# define Boundary_And_Inside_Regions()  \
+    1, Grid % n_regions
+
+!--------------------------------------------------------------------!
+!   To get this, remember that boundary cells are in n_bnd_regions   !
+!   inside cells are in n_bnd_regions+1 (equal to n_regions) and     !
+!   buffer cells are at n_regions + 1 (would be n_bnd_regions + 2)   !
+!--------------------------------------------------------------------!
+# define Boundary_Inside_And_Buffer_Regions()  \
+    1, Grid % n_regions + 1
+
+!---------------------------------------!
+!   Number 5 is here because:           !
+!   n_bnd_regions + 1 =--> INSIDE       !
+!   n_bnd_regions + 2 =--> BUFFER       !
+!   n_bnd_regions + 3 =--> PERIODIC_X   !
+!   n_bnd_regions + 4 =--> PERIODIC_Y   !
+!   n_bnd_regions + 5 =--> PERIODIC_Z   !
+!---------------------------------------!
+# define All_Regions()  \
+    1, Grid % n_bnd_regions + 5
+
+!----------------------------!
+!                            !
+!   Browsing through faces   !
+!                            !
+!----------------------------!
+
+!------------------------------------------------------!
+!   These are boundary faces in all boundary regions   !
+!------------------------------------------------------!
+# define Faces_At_Boundaries()  \
+    Grid % region % f_face(1),  \
+    Grid % region % l_face(Grid % n_bnd_regions)
+
+!----------------------------------------------------------!
+!   These are boundary faces for a given boundary region   !
+!----------------------------------------------------------!
+# define Faces_In_Region(reg)     \
+    Grid % region % f_face(reg),  \
+    Grid % region % l_face(reg)
+
+!---------------------------------------------------------!
+!   These are faces in the domain, and in buffers ...     !
+!   ... where at least one cell (c1) is the inside cell   !
+!---------------------------------------------------------!
+# define Faces_In_Domain_And_At_Buffers()      \
+    Grid % region % f_face(Grid % n_regions),  \
+    Grid % region % l_face(Grid % n_regions)
+
+!----------------------------!
+!                            !
+!   Browsing through cells   !
+!                            !
+!----------------------------!
+
+!-------------------------------------------------------!
+!   These are boundary cells for all boundary regions   !
+!-------------------------------------------------------!
+# define Cells_At_Boundaries()  \
+    Grid % region % f_cell(1),  \
+    Grid % region % l_cell(Grid % n_bnd_regions)
+
+!----------------------------------------------------------!
+!   These are boundary cells for a given boundary region   !
+!----------------------------------------------------------!
+# define Cells_In_Region(reg)     \
+    Grid % region % f_cell(reg),  \
+    Grid % region % l_cell(reg)
+
+!---------------------------------------------------!
+!   Cells inside the domain, without buffer cells   !
+!---------------------------------------------------!
+# define Cells_In_Domain()                       \
+      Grid % region % f_cell(Grid % n_regions),  \
+      Grid % region % l_cell(Grid % n_regions)
+
+!--------------------------------------------------------------------------!
+!   Entails cells in the domain (without buffers), plus the buffer cells   !
+!--------------------------------------------------------------------------!
+# define Cells_In_Domain_And_Buffers()             \
+    Grid % region % f_cell(Grid % n_regions),      \
+    Grid % region % l_cell(Grid % n_regions + 1)
+
+!-----------------------!
+!   Buffer cells only   !
+!-----------------------!
+# define Cells_In_Buffers()                        \
+    Grid % region % f_cell(Grid % n_regions + 1),  \
+    Grid % region % l_cell(Grid % n_regions + 1)
+
+!-----------------------------------------------!
+!   Cells at boundaries and inside the domain   !
+!-----------------------------------------------!
+# define Cells_At_Boundaries_And_In_Domain()  \
+    Grid % region % f_cell(1),                \
+    Grid % region % l_cell(Grid % n_regions)
+
+!---------------------------------------------------------------!
+!   Cells at boundaries, inside the domain and in the buffers   !
+!---------------------------------------------------------------!
+# define Cells_At_Boundaries_In_Domain_And_Buffers()  \
+    Grid % region % f_cell(1),                        \
+    Grid % region % l_cell(Grid % n_regions + 1)
+

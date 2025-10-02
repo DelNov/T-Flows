@@ -5,6 +5,10 @@
                                   x1, y1,   &  ! prescribed
                                   x2, y2)      ! prescribed
 !------------------------------------------------------------------------------!
+!>  This subroutine fits exponential curve of the form:
+!>  y = a * exp(b*x) + c
+!>  through three specified points.
+!------------------------------------------------------------------------------!
 !   This subroutine fits exponential curve of the form:                        !
 !                                                                              !
 !   y = a * exp(b*x) + c                                                   (1) !
@@ -51,10 +55,10 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Math_Type)  :: Math
-  real, intent(out) :: dy_dx_0  ! unknown
-  real, intent(in)  :: x0, y0   ! x0 is zero, y0 prescribed
-  real, intent(in)  :: x1, y1   ! prescribed
-  real, intent(in)  :: x2, y2   ! prescribed
+  real, intent(out) :: dy_dx_0  !! unknown derivative dy/dx at 0
+  real, intent(in)  :: x0, y0   !! x0 is zero, y0 prescribed
+  real, intent(in)  :: x1, y1   !! prescribed point 1
+  real, intent(in)  :: x2, y2   !! prescribed point 2
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_ITER  = 64
   integer, parameter :: N_SAMPLES =  8
@@ -63,6 +67,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: a, b, c, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(x0)  ! x0 is kept for symmetry with sister procedure
 !==============================================================================!
 
   !-----------------------------!

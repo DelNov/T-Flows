@@ -26,7 +26,7 @@
   print *, '# Looking for non-homogeneous directions '
   print *, '# Insert non-homogeneous direction (x,y,z or skip)'
   print *, '#-------------------------------------------------'
-  read(*,*) answer
+  answer = File % Single_Word_From_Keyboard()
   call To_Upper_Case(answer)
   if(answer .eq. 'SKIP') then
     call Profiler % Stop('Probe_1d_Cells')

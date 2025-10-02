@@ -1,15 +1,15 @@
- NUMBER_OF_DOMAINS         3
+  NUMBER_OF_DOMAINS         3
 
- NUMBER_OF_TIME_STEPS     600
- RESULTS_SAVE_INTERVAL     60
- BACKUP_SAVE_INTERVAL     120
+  NUMBER_OF_TIME_STEPS     600
+  RESULTS_SAVE_INTERVAL     60
+  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.01
+  TIME_STEP               0.01
 
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- INTERFACE_CONDITION      upper        membrane
-   BOUNDARY_CONDITIONS    bottom       top
+  INTERFACE_CONDITION      upper        membrane
+    BOUNDARY_CONDITIONS    bottom       top
 
- INTERFACE_CONDITION      membrane     lower
-   BOUNDARY_CONDITIONS    bottom       top
+  INTERFACE_CONDITION      membrane     lower
+    BOUNDARY_CONDITIONS    bottom       top

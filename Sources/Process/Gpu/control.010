@@ -1,0 +1,72 @@
+#--------------
+# Problem name
+#--------------
+  PROBLEM_NAME  test_010_rb_conv
+
+  HEAT_TRANSFER   yes
+
+#---------------
+# Time stepping
+#---------------
+  TIME_STEP                                   0.05
+  NUMBER_OF_TIME_STEPS                     2400
+  RESULTS_SAVE_INTERVAL                     600
+  BACKUP_SAVE_INTERVAL                      300
+
+  USE_ONE_MATRIX                             yes
+
+! LOAD_BACKUP_NAME  test_010_rb_conv-ts000300.backup
+
+#-----------------
+# Physical models
+#-----------------
+  BUOYANCY                       thermal
+  GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
+  REFERENCE_TEMPERATURE         10.0
+
+#---------------------
+# Physical properties
+#---------------------
+  MASS_DENSITY           1.0
+  THERMAL_CONDUCTIVITY   2.128e-6
+  DYNAMIC_VISCOSITY      1.511e-6
+  HEAT_CAPACITY          1.0
+
+  TURBULENCE_MODEL    les_smagorinsky
+
+#----------------------
+# Numerical parameters
+#----------------------
+  BLENDING_COEFFICIENT_FOR_MOMENTUM  0.95
+  MAX_SIMPLE_ITERATIONS              6
+  MIN_SIMPLE_ITERATIONS              3
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+  TOLERANCE_FOR_ENERGY_SOLVER        1.e-5
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.8
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
+
+  MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   10.0
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    lower_wall
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   15.0
+
+  BOUNDARY_CONDITION    upper_wall
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   5.0

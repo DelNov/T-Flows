@@ -1,5 +1,8 @@
+# Domain file name (without extension)
 backstep_nonorthogonal
+
+# Distance from the walls
 1 2
-1 2
-skip
+
+# 1d probe
 skip

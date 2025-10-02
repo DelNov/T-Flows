@@ -1,7 +1,11 @@
-include '../User_Mod/T_Sat.f90'
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/T_Sat.f90"
+# else
+#   include "T_Sat.f90"
+# endif
 
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Iteration(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Iteration(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
@@ -11,8 +15,6 @@ include '../User_Mod/T_Sat.f90'
   type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Swarm_Type),      target :: Swarm
-  integer                       :: n     ! time step
-  real                          :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, t, scalar
@@ -40,7 +42,7 @@ include '../User_Mod/T_Sat.f90'
   !--------------------------------!
   if(Grid % name .eq. 'UPPER_DOM') then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(t % n(c) .gt. 90.0 .or. t % n(c) .lt. 10.0) then
          error stop "temperature out of density interpolation range [10 - 90C]"
       endif
@@ -94,7 +96,7 @@ include '../User_Mod/T_Sat.f90'
   !--------------------------------!
   if(Grid % name .eq. 'LOWER_DOM') then
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(t % n(c) .gt. 90.0 .or. t % n(c) .lt. 10.0) then
          error stop 'Temperature out of density interpolation range [10 - 90C]'
       endif
@@ -142,7 +144,7 @@ include '../User_Mod/T_Sat.f90'
                  + k_film / d_film * (t_film - t_int)) / h_d
 
           ! If not in a buffer, update accumulated variables
-          if(Grid % Comm % cell_proc(c1) .eq. this_proc) then
+          if(Cell_In_This_Proc(c1)) then
             t_int_acc  = t_int_acc  + t_int  * Grid % s(s)
             m_evap_acc = m_evap_acc + m_evap * Grid % s(s)
             area_acc   = area_acc   + Grid % s(s)
@@ -154,12 +156,12 @@ include '../User_Mod/T_Sat.f90'
     end do
 
     ! Positive for evaporation, negative for condensation
-    call Comm_Mod_Global_Sum_Real(t_int_acc)
-    call Comm_Mod_Global_Sum_Real(m_evap_acc)
-    call Comm_Mod_Global_Sum_Real(area_acc)
+    call Global % Sum_Real(t_int_acc)
+    call Global % Sum_Real(m_evap_acc)
+    call Global % Sum_Real(area_acc)
     m_evap_avg = m_evap_acc / area_acc
     t_int_avg  = t_int_acc  / area_acc
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print * , 'm_evap =', m_evap_avg * 3600, ' kg/m²h '
       print * , 't_int = ', t_int_avg, 'Celsius'
     end if

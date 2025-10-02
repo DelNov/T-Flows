@@ -1,12 +1,17 @@
 !==============================================================================!
   subroutine Create_From_File(Stl, file_name)
 !------------------------------------------------------------------------------!
-!   Creates an Stl object from a file                                          !
+!>  This subroutine constructs an STL object from a given file. It reads the
+!>  contents of the STL file specified by 'file_name' and populates the Stl
+!>  object with its data. The routine handles both binary and ASCII STL formats.
+!>  It also merges duplicate vertices to streamline the object's structure.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type) :: Stl
-  character(*)    :: file_name
+  class(Stl_Type)          :: Stl        !! parent Stl_Type object
+  character(*), intent(in) :: file_name  !! file name
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer :: v, f, i_ver, n
   integer :: body = 0
@@ -84,16 +89,17 @@
   end do
 
   Stl % n_boddies = maxval(Stl % body_c)
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print '(a,i3)', ' # Number of boddies in the STL file: ', Stl % n_boddies
   end if
 
-  call Stl % Save_Debug_Vtu(append="body",                   &
-                            scalar_name="body",              &
-                            scalar_cell=real(Stl % body_c),  &
-                            scalar_node=real(Stl % body_n),  &
-                            plot_inside=.false.)
-
+  if(DEBUG) then
+    call Stl % Save_Debug_Vtu(append=file_name,                &
+                              scalar_name=file_name,           &
+                              scalar_cell=real(Stl % body_c),  &
+                              scalar_node=real(Stl % body_n),  &
+                              plot_inside=.false.)
+  end if
 
   end subroutine
 

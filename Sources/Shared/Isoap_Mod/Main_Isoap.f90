@@ -2,6 +2,15 @@
 !                               ISOAP                                 !
 !... Isosurface extraction on a general polyhedron                    !
 !---------------------------------------------------------------------!
+!>  Original main Isoap function. Calls Isopol to arrange iso-vertices.
+!>  No modifications have been made to the original code from the
+!>  authors to align with T-Flows coding conventions. This decision is
+!>  to maintain compatibility with potential future updates or
+!>  corrections from the original authors. Given the complex nature of
+!>  these algorithms, which are not entirely within our current domain
+!>  of expertise, preserving the original structure and logic is deemed
+!>  the most prudent approach.
+!---------------------------------------------------------------------!
 ! On entry:                                                           !
 !==========                                                           !
 ! IPV      = array containing the indices of the vertices of each     !
@@ -25,8 +34,6 @@
   SUBROUTINE MAIN_ISOAP(ISOAP, POLYHEDRON, ISO_POLYGONS)
 !---------------------------------------------------------------------!
   IMPLICIT NONE
-!---------------------------------------------------------------------!
-  INCLUDE "Isoap_Mod/Dim_Polyhedron.h"  ! holds NS and NV
 !---------------------------------------------------------------------!
   CLASS(ISOAP_TYPE)               :: ISOAP
   TYPE(POLYHEDRON_TYPE),   TARGET :: POLYHEDRON

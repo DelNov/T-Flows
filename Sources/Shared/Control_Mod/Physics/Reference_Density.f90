@@ -1,16 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Density(d_ref, verbose)
+  subroutine Reference_Density(Control, d_ref, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the value of reference density from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: d_ref
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: d_ref    !! value of reference density
+  logical,   optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!
 
   def = 0.0
 
-  call Control_Mod_Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
+  call Control % Read_Real_Item('REFERENCE_DENSITY', def, d_ref, verbose)
 
   end subroutine

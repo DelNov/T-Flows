@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Swarm_Save_Interval(val, verbose)
+  subroutine Swarm_Save_Interval(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads results save interval for swarm (particles) from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  integer             :: val      !! swarm (particles) save interval
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('SWARM_SAVE_INTERVAL', 60, &
-                                  val, verbose)
+  call Control % Read_Int_Item('SWARM_SAVE_INTERVAL', 60, val, verbose)
 
   end subroutine

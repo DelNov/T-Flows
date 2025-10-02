@@ -1,18 +1,20 @@
 !==============================================================================!
   pure logical function Smaller_Real(Math, a, b, tol)
 !------------------------------------------------------------------------------!
-!   Returns .true. if a is approximatelly smaller than "b", .false. otherwise. !
-!                                                                              !
+!>  Returns .true. if a is approximatelly smaller than b, .false. otherwise.
+!------------------------------------------------------------------------------!
 !   The approximation is controlled by optional parameter "tol".  If it is     !
 !   not given, the function will use DEFAULT_TOLERANCE specified in Math_Mod   !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Math_Type), intent(in) :: Math
-  real,             intent(in) :: a, b
-  real, optional,   intent(in) :: tol
+  class(Math_Type), intent(in) :: Math  !! parent class
+  real,             intent(in) :: a, b  !! operands
+  real, optional,   intent(in) :: tol   !! tolerance
 !-----------------------------------[Locals]-----------------------------------!
   real :: tolerance
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Math)
 !==============================================================================!
 
   if( .not. present(tol) ) then

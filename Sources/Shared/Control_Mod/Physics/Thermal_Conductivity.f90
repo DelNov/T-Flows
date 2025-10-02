@@ -1,12 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Thermal_Conductivity(val, verbose)
+  subroutine Thermal_Conductivity(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the value of thermal conductivity from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! value of thermal conductivity
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('THERMAL_CONDUCTIVITY', 1.0, val, verbose)
+  call Control % Read_Real_Item('THERMAL_CONDUCTIVITY', 1.0, val, verbose)
 
   end subroutine

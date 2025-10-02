@@ -24,23 +24,23 @@
 #---------------------
 # Boundary conditions
 #---------------------
-  BOUNDARY_CONDITION top_wall
-    TYPE             inflow
-    VARIABLES        u     v     w
-    VALUES           1.0   0.0   0.0
+  BOUNDARY_CONDITION  top_wall
+    TYPE              inflow
+    VARIABLES         u     v     w
+    VALUES            1.0   0.0   0.0
 
-  BOUNDARY_CONDITION bottom_wall
-    TYPE             wall
-    VARIABLES        u     v     w
-    VALUES           0.0   0.0   0.0
+  BOUNDARY_CONDITION  bottom_wall
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
 
-  BOUNDARY_CONDITION west_wall
-    TYPE             wall
-    VARIABLES        u     v     w
-    VALUES           0.0   0.0   0.0
+  BOUNDARY_CONDITION  west_wall
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
 
-  BOUNDARY_CONDITION east_wall
-    TYPE             wall
-    VARIABLES        u     v     w
-    VALUES           0.0   0.0   0.0
+  BOUNDARY_CONDITION  east_wall
+    TYPE              wall
+    VARIABLES         u     v     w
+    VALUES            0.0   0.0   0.0
 

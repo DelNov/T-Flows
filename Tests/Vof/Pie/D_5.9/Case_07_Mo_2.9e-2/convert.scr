@@ -1,9 +1,22 @@
+# Full file name
 pie.msh
+
+# Create dual grid
 no
+
+# Geometrical scaling
 0.65555555555
+
+# Boundary cell centers
 2
+
+# Periodicity
 1
 skip
+
+# Distance from the walls
 1
+
+# Probe 1d
 skip
 

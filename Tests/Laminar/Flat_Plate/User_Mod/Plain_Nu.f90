@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Plain_Nu(Flow, Turb, ts)
+  subroutine User_Mod_Plain_Nu(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: u, v, w, t
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
-  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu, ts
+  integer                  :: n_prob, pl, c, dummy, i, count, k, c1, c2, s, fu
   character(SL)            :: result_name
   real, allocatable        :: r1_p(:), r2_p(:), z_p(:),  &
                               um_p(:), vm_p(:), wm_p(:), & 
@@ -38,10 +38,10 @@
   t    => Flow % t
 
   ! Get constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
@@ -49,7 +49,7 @@
   inquire(file='x_coordinate.dat', exist=there)
 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "File x_coordinate.dat does not exist. Exit Plain_Nu.f90 !"
     end if
     return
@@ -131,34 +131,37 @@
 
   ! Average over all processors
   do pl=1, n_prob
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
-    call Comm_Mod_Global_Sum_Real(um_p(pl))
-    call Comm_Mod_Global_Sum_Real(vm_p(pl))
-    call Comm_Mod_Global_Sum_Real(wm_p(pl))
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uv_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
-    call Comm_Mod_Global_Sum_Real(vw_p(pl))
-    call Comm_Mod_Global_Sum_Real(v1_p(pl))
-    call Comm_Mod_Global_Sum_Real(v2_p(pl))
-    call Comm_Mod_Global_Sum_Real(v3_p(pl))
-    call Comm_Mod_Global_Sum_Real(v4_p(pl))
-    call Comm_Mod_Global_Sum_Real(v5_p(pl))
+    call Global % Sum_Int(n_count(pl))
+    call Global % Sum_Real(um_p(pl))
+    call Global % Sum_Real(vm_p(pl))
+    call Global % Sum_Real(wm_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uv_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+    call Global % Sum_Real(vw_p(pl))
+    call Global % Sum_Real(v1_p(pl))
+    call Global % Sum_Real(v2_p(pl))
+    call Global % Sum_Real(v3_p(pl))
+    call Global % Sum_Real(v4_p(pl))
+    call Global % Sum_Real(v5_p(pl))
 
     count =  count + n_count(pl) 
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(tm_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(tm_p(pl))
+      call Global % Sum_Real(tt_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
-  call File % Set_Name(result_name, time_step=ts, appendix='-Nu', extension='.dat')
+  call File % Set_Name(result_name,                   &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-Nu',             &
+                       extension = '.dat')
   call File % Open_For_Writing_Ascii(result_name, fu)
 
   write(fu,*) '# x, Cf, Cf_corr, Nu, Nu_corr, q'
@@ -215,6 +218,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) write(*,*) '# Finished with User_Plain_Nu'
+  if(First_Proc()) write(*,*) '# Finished with User_Plain_Nu'
 
   end subroutine

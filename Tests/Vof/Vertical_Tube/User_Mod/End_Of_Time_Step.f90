@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n         ! time step
   integer                  :: n_stat_t  ! 1st step for turbulence statist.
   integer                  :: n_stat_p  ! 1st step for particle statistics
-  real                     :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -34,7 +32,7 @@
   c_position = 0.0
   rise_velocity = 0.0
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
     surface = surface + sqrt(fun % x(c) ** 2                                  &
                            + fun % y(c) ** 2                                  &
@@ -43,12 +41,12 @@
     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)  
-  call Comm_Mod_Global_Sum_Real(surface)  
-  call Comm_Mod_Global_Sum_Real(c_position)  
-  call Comm_Mod_Global_Sum_Real(rise_velocity)  
+  call Global % Sum_Real(b_volume)
+  call Global % Sum_Real(surface)
+  call Global % Sum_Real(c_position)
+  call Global % Sum_Real(rise_velocity)
 
-  if (this_proc < 2) then
+  if (First_Proc()) then
 !    !with circularity:
 !    open(unit = 70359, file='Bench-data.dat',position='APPEND')
 !      write(70359,*) b_volume, 2.0*PI/surface*sqrt(b_volume/PI),              &

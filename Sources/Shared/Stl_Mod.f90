@@ -3,7 +3,10 @@
 !==============================================================================!
   module Stl_Mod
 !------------------------------------------------------------------------------!
-!   Module to describe geometry in STL format                                  !
+!>  Stl_Mod is a specialized module in T-Flows for handling Stereolithography
+!>  (STL) file formats. It extends Grid_Mod to include as much functionalities
+!>  This module is crucial for defining porous regions and interfaces in VOF
+!>  simulations, or any other processing which starts from an STL file.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Grid_Mod
@@ -12,11 +15,14 @@
   !--------------!
   !   Stl type   !
   !--------------!
+  !> Encapsulates data and functionality to manipulate and process STL files.
   type, extends(Grid_Type) :: Stl_Type
-    real,    allocatable, private :: nx(:), ny(:), nz(:)  ! facet normal
-    integer                       :: n_boddies            ! number of boddies
-    integer, allocatable          :: body_c(:)            ! body at facets
-    integer, allocatable          :: body_n(:)            ! body at verticesl
+    real,    allocatable, private :: nx(:)      !! facet normal's x component
+    real,    allocatable, private :: ny(:)      !! facet normal's y component
+    real,    allocatable, private :: nz(:)      !! facet normal's z component
+    integer                       :: n_boddies  !! number of independent boddies
+    integer, allocatable          :: body_c(:)  !! body at facets
+    integer, allocatable          :: body_n(:)  !! body at vertices
 
     contains
       procedure, private :: Allocate_Stl

@@ -1,11 +1,9 @@
 Problem name (this line is a comment)
 
- PROBLEM_NAME    backstep
+  PROBLEM_NAME    backstep
 
- BACKUP_SAVE_INTERVAL 600
- RESULTS_SAVE_INTERVAL 600
-
-# LOAD_BACKUP_NAME   backstep-ts000001.backup 
+  BACKUP_SAVE_INTERVAL   600
+  RESULTS_SAVE_INTERVAL  600
 
   This line is a comment too, just like any which doesn't start with a keyword.
   Keywords are written all in upper case and ARE case sensitive!
@@ -14,42 +12,40 @@ Problem name (this line is a comment)
 
 Time resolution
 
- TIME_STEP                            0.01
- NUMBER_OF_TIME_STEPS              1800
+  TIME_STEP                            0.01
+  NUMBER_OF_TIME_STEPS              1800
 
 Monitoring
 
- NUMBER_OF_MONITORING_POINTS          1
- MONITORING_POINT_001                 0.314  0.1  -0.038
- POINT_FOR_MONITORING_PLANES          0.1  0.1  0.1
- PRESSURE_DROPS                       0.0  0.0  0.0
- MASS_FLOW_RATES                      0.0  0.0  0.0
-
+  NUMBER_OF_MONITORING_POINTS          1
+    MONITORING_POINT_001               0.314  0.1  -0.038
+  POINT_FOR_MONITORING_PLANES          0.1  0.1  0.1
+  PRESSURE_DROPS                       0.0  0.0  0.0
+  VOLUME_FLOW_RATES                    0.0  0.0  0.0
 
 Physical part
 
- MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.43e-5
+  MASS_DENSITY           1.0
+  DYNAMIC_VISCOSITY      1.43e-5
 
- TURBULENCE_MODEL            rsm_manceau_hanjalic
- TURBULENCE_MODEL_VARIANT    stabilized
-
+  TURBULENCE_MODEL            rsm_manceau_hanjalic
+  TURBULENCE_MODEL_VARIANT    stabilized
 
 Numerical part
 
- PRESSURE_MOMENTUM_COUPLING              simple
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM     0.4
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE     0.4
- SIMPLE_UNDERRELAXATION_FOR_TURBULENCE   0.3
- TIME_INTEGRATION_SCHEME                 linear
+  PRESSURE_MOMENTUM_COUPLING              simple
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM     0.4
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE     0.4
+  SIMPLE_UNDERRELAXATION_FOR_TURBULENCE   0.3
+  TIME_INTEGRATION_SCHEME                 linear
 
- ADVECTION_SCHEME_FOR_MOMENTUM       smart
- ADVECTION_SCHEME_FOR_TURBULENCE     smart
- PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER       1.e-4
- TOLERANCE_FOR_PRESSURE_SOLVER       1.e-4
- TOLERANCE_FOR_TURBULENCE_SOLVER     1.e-4
- TOLERANCE_FOR_SIMPLE_ALGORITHM      5.e-3
+  ADVECTION_SCHEME_FOR_MOMENTUM       smart
+  ADVECTION_SCHEME_FOR_TURBULENCE     smart
+  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER       1.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER       1.e-4
+  TOLERANCE_FOR_TURBULENCE_SOLVER     1.e-4
+  TOLERANCE_FOR_SIMPLE_ALGORITHM      5.e-3
 
 Initial values
 

@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Min_Simple_Iterations(val, verbose)
+  subroutine Min_Simple_Iterations(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads minimum number of SIMPLE iterations.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! max SIMPLE iterations
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('MIN_SIMPLE_ITERATIONS', 3,  &
-                                  val, verbose)
+  call Control % Read_Int_Item('MIN_SIMPLE_ITERATIONS', 3,  &
+                                val, verbose)
 
   end subroutine

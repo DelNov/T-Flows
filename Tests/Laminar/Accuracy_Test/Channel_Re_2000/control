@@ -1,55 +1,49 @@
- PROBLEM_NAME    chan
+  PROBLEM_NAME    chan
 
- TIME_STEP                    5.e-2
- NUMBER_OF_TIME_STEPS         14000
- RESULTS_SAVE_INTERVAL        9999999 # no saves   during this test
- BACKUP_SAVE_INTERVAL         9999999 # no backups during this test
+  TIME_STEP                    5.e-2
+  NUMBER_OF_TIME_STEPS         14000
+  RESULTS_SAVE_INTERVAL        9999999 # no saves   during this test
+  BACKUP_SAVE_INTERVAL         9999999 # no backups during this test
 
- POINT_FOR_MONITORING_PLANES  6.0       0.5  3.0
- MASS_FLOW_RATES              3.1415926 0.0  0.0
- 
- MASS_DENSITY                 1.0
- DYNAMIC_VISCOSITY            5.e-4
- TURBULENCE_MODEL             none
+  POINT_FOR_MONITORING_PLANES  6.0       0.5  3.0
+  VOLUME_FLOW_RATES            3.1415926 0.0  0.0
 
- PRECONDITIONER_FOR_SYSTEM_MATRIX       incomplete_cholesky
+  MASS_DENSITY                 1.0
+  DYNAMIC_VISCOSITY            5.e-4
+  TURBULENCE_MODEL             none
 
- TIME_INTEGRATION_SCHEME                parabolic
- TIME_INTEGRATION_FOR_ADVECTION         fully_implicit
- TIME_INTEGRATION_FOR_DIFFUSION         fully_implicit
- TIME_INTEGRATION_FOR_CROSS_DIFFUSION   fully_implicit
+  PRECONDITIONER_FOR_SYSTEM_MATRIX       incomplete_cholesky
 
- PRESSURE_MOMENTUM_COUPLING             simple
- TOLERANCE_FOR_SIMPLE_ALGORITHM         1.e-8
- MAX_SIMPLE_ITERATIONS                  999
- MIN_SIMPLE_ITERATIONS                  2
+  TIME_INTEGRATION_SCHEME                parabolic
 
- ADVECTION_SCHEME_FOR_MOMENTUM          central
- TOLERANCE_FOR_MOMENTUM_SOLVER          1.e-8
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
- MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     999
- #NORMALIZATION_FOR_PRESSURE_SOLVER     1e-6  # IS NOT USED ANYWHERE
+  PRESSURE_MOMENTUM_COUPLING             simple
+  TOLERANCE_FOR_SIMPLE_ALGORITHM         1.e-8
+  MAX_SIMPLE_ITERATIONS                999
+  MIN_SIMPLE_ITERATIONS                  2
 
- TOLERANCE_FOR_PRESSURE_SOLVER          1.e-8
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER     999
- #NORMALIZATION_FOR_PRESSURE_SOLVER     1e-6
+  ADVECTION_SCHEME_FOR_MOMENTUM          central
+  TOLERANCE_FOR_MOMENTUM_SOLVER          1.e-8
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER   999
+
+  TOLERANCE_FOR_PRESSURE_SOLVER          1.e-8
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER   999
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v    w
-    VALUES              1.16  0.   0.
+    VARIABLES           u      v     w
+    VALUES              1.16   0.0   0.0
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    wall
-
     TYPE                wall
-    VARIABLES           u   v   w
-    VALUES              0.  0.  0.
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
 
- NUMBER_OF_MONITORING_POINTS    1
- MONITORING_POINT_001           0.5  0.5  1.0
+  NUMBER_OF_MONITORING_POINTS    1
+  MONITORING_POINT_001           0.5  0.5  1.0

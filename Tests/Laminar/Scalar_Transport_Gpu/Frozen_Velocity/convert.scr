@@ -1,0 +1,42 @@
+ #========================================================
+ # Enter the grid file name you are importing (with ext.):
+ #--------------------------------------------------------
+pipe.msh
+
+ #=================================================
+ # Would you like to create a dual grid? (yes/no)
+ #-------------------------------------------------
+no
+
+ #=========================================
+ # Enter scaling factor for geometry: 
+ # (or skip to keep as is): 
+ #-----------------------------------------
+skip
+
+ #====================================
+ # Position the boundary cell centres:
+ #------------------------------------
+ # Type 1 for barycentric placement
+ # Type 2 for orthogonal placement
+ #------------------------------------
+2
+
+ #==============================================================
+ # Enter the ordinal number(s) of periodic-boundary condition(s)
+ # from the boundary condition list (see above)                 
+ # Type skip if there is none !                                 
+ #--------------------------------------------------------------
+skip
+
+ #===========================================================
+ # Calculating distance from the walls
+ #-----------------------------------------------------------
+1
+
+ #===========================================
+ # Creating 1d file with the node 
+ # coordinates in non-homogeneous directions 
+ #-------------------------------------------
+skip
+

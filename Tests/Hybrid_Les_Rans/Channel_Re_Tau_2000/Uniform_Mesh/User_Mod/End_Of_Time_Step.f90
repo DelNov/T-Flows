@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t  ! 1st step for turbulence statist.
   integer, intent(in)      :: n_stat_p  ! 1st step for particle statistics
-  real,    intent(in)      :: time      ! physical time
 !----------------------------------[Locals]------------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w
@@ -30,10 +28,10 @@
   w    => Flow % w
 
   ! If not time for disturbing the velocity field, return
-  if(mod(n,100) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 100) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(n > 1000) return
+  if(Time % Curr_Dt() > 1000) return
 
   ! Minimum and maximum size of eddies
   rmin = 0.2
@@ -79,7 +77,7 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         xc = Grid % xc(c)
         yc = Grid % yc(c)
         zc = Grid % zc(c)
@@ -102,12 +100,12 @@
   end do
 
   vmax = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, Grid % n_cells
+  call Global % Max_Real(vmax)
+  do c = Cells_In_Domain_And_Buffers()
     v % n(c) = v % n(c) / vmax / 10.0
     w % n(c) = w % n(c) / vmax / 10.0
   end do

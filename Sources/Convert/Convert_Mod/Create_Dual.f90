@@ -1,12 +1,38 @@
 !==============================================================================!
   subroutine Create_Dual(Convert, Prim, Dual)
 !------------------------------------------------------------------------------!
-!   Creates a Dual mesh from an existing                                       !
+!>  Creates a dual grid based on the given primal grid.  The dual grid concept
+!>  is used here to create a polyhedral grid out of a tetrahedral.
+!------------------------------------------------------------------------------!
+!   Functionality                                                              !
+!                                                                              !
+!   * Initial setup: Sets up the problem name for the dual grid and marks it   !
+!     as polyhedral.                                                           !
+!   * Edge processing: Looks for edges in the primal grid and stores their     !
+!     information.                                                             !
+!   * Edge sorting and compression: Sorts all primal edges by their node       !
+!     numbers and compresses them to eliminate duplicates.                     !
+!   * Allocate mappings and arrays: Allocates memory for various arrays and    !
+!     mappings, such as those relating edges to nodes and cells to nodes.      !
+!   * Boundary conditions processing: Processes boundary conditions, including !
+!     updating the number of boundary cells and faces in the dual grid.        !
+!   * Inside mapping: Maps nodes of the primal grid to cells of the dual grid, !
+!     edges of the primal to faces of the dual, and cells of the primal to     !
+!     nodes of the dual.                                                       !
+!   * Memory allocation for dual grid: Allocates memory for the dual grid      !
+!     based on the calculated sizes of various components.                     !
+!   * Handling sharp edges and corners: Processes sharp edges and corners in   !
+!     the primal grid and reflects these in the dual grid structure.           !
+!   * Face and cell assembly in dual grid: Assembles faces and cells in the    !
+!     dual grid based on the primal-to-dual mappings.                          !
+!   * Final Adjustments: Makes final adjustments to the structure of the dual  !
+!     grid, ensuring that it accurately represents the topology of the primal  !
+!     grid.                                                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert
-  type(Grid_Type)     :: Prim, Dual
+  class(Convert_Type) :: Convert     !! parent class
+  type(Grid_Type)     :: Prim, Dual  !! primal and dual grid
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: bc, e, c, c1, c2, s, n, n1, n2
   integer              :: i, i_nod, j_nod, i_edg
@@ -14,7 +40,7 @@
   integer              :: n_p, n_d, f_d, b_d, f_p, c_p, cnt
   integer, allocatable :: full_edge_n (:,:)   ! edges, nodes
   integer, allocatable :: full_edge_fb(:)     ! edges' faces at boundary
-  integer, allocatable :: full_edge_bc(:)     ! edges' faces boundary colors
+  integer, allocatable :: full_edge_bc(:)     ! edges' faces boundary regions
   integer, allocatable :: comp_edge_f(:)      ! compressed edge first
   integer, allocatable :: comp_edge_l(:)      ! compressed edge last
   integer, allocatable :: cell_to_node(:)
@@ -33,7 +59,7 @@
 !==============================================================================!
 
   ! Alias(es)
-  n_bc = Prim % n_bnd_cond
+  n_bc = Prim % n_bnd_regions
 
   !-----------------------------!
   !                             !
@@ -87,7 +113,7 @@
       if(c2 > 0) then
         full_edge_bc(Prim % n_edges) = 0  ! not a boundary face
       else
-        full_edge_bc(Prim % n_edges) = Prim % bnd_cond % color(c2)  ! store color
+        full_edge_bc(Prim % n_edges) = Prim % region % at_cell(c2)  ! store reg
       end if
     end do
   end do
@@ -191,11 +217,10 @@
   !    numbers and names    !
   !                         !
   !-------------------------!
-  Dual % n_bnd_cond = Prim % n_bnd_cond
-  allocate(Dual % bnd_cond % name(Dual % n_bnd_cond))
-  do bc = 1, Prim % n_bnd_cond
-    Dual % bnd_cond % name(bc) = Prim % bnd_cond % name(bc)
-    call String % To_Upper_Case(Dual % bnd_cond % name(bc))
+  call Dual % Allocate_Regions(Prim % n_bnd_regions)
+  do bc = 1, Prim % n_bnd_regions
+    Dual % region % name(bc) = Prim % region % name(bc)
+    call String % To_Upper_Case(Dual % region % name(bc))
   end do
 
   !----------------------------------!
@@ -217,9 +242,9 @@
   ! Count boundary cells (and boundary faces) for the Dual grid
   ! (Remember that nodes in Prim correspond to cells in Dual)
   Dual % n_bnd_cells = 0
-  do bc = 1, Prim % n_bnd_cond
+  do bc = 1, Prim % n_bnd_regions
     Dual % n_bnd_cells = Dual % n_bnd_cells  &
-                       + Convert % N_Nodes_In_Bnd_Color(Prim, bc, node_data)
+                       + Convert % N_Nodes_In_Region(Prim, bc, node_data)
   end do
   Dual % n_faces = Prim % n_edges  &   ! for faces inside
                  + Dual % n_bnd_cells  ! for faces on the boundary
@@ -274,7 +299,7 @@
 
     ! Form Dual's faces' nodes
     Dual % faces_n_nodes(f_d) = cnt
-    call Adjust_First_Dim(cnt, Dual % faces_n)
+    call Enlarge % Matrix_Int(Dual % faces_n, i=(/1,cnt/))
     Dual % faces_n(1:cnt,f_d) = n_d_list(1:cnt)
 
     ! Copy node coordinates
@@ -303,7 +328,7 @@
 
       ! Add extra node to Dual's faces' nodes
       Dual % faces_n_nodes(f_d) = cnt + 1
-      call Adjust_First_Dim(cnt + 1, Dual % faces_n)
+      call Enlarge % Matrix_Int(Dual % faces_n, i=(/1,cnt+1/))
       Dual % faces_n(cnt + 1:cnt + 1, f_d) = d_nn
 
       ! Copy extra node coordinates
@@ -361,14 +386,14 @@
   curr_f_d = Prim % n_edges
   curr_b_d = 0
 
-  do bc = 1, Prim % n_bnd_cond
+  do bc = 1, Prim % n_bnd_regions
 
-    !----------------------------------------------------!
-    !   Call this to mark boundary cells in this color   !
-    !----------------------------------------------------!
-    dual_f_here = Convert % N_Nodes_In_Bnd_Color(Prim, bc, node_data)
-    unused      = Convert % N_Bnd_Cells_In_Color(Prim, bc, cell_data)
-    unused      = Convert % N_Edges_In_Bnd_Color(Prim, bc, edge_data)
+    !-----------------------------------------------------!
+    !   Call this to mark boundary cells in this region   !
+    !-----------------------------------------------------!
+    dual_f_here = Convert % N_Nodes_In_Region(Prim, bc, node_data)
+    unused      = Convert % N_Bnd_Cells_In_Region(Prim, bc, cell_data)
+    unused      = Convert % N_Edges_In_Region(Prim, bc, edge_data)
 
     !-----------------------------------------!
     !   Find Dual's boundary face, and Dual   !
@@ -389,9 +414,10 @@
           ! Additional boundary cell in the Dual grid
           b_d  = curr_b_d - node_data(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+          call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                    i=(/1,Dual % cells_n_nodes(b_d)/))
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = cell_to_node(c)
-          Dual % bnd_cond % color(b_d) = bc
+          Dual % region % at_cell(b_d) = bc
 
           ! Store node_to_face (for the next step, adding edges)
           node_to_face(n_p) = f_d
@@ -424,13 +450,15 @@
           ! This node_to_face was stored in the previous step
           f_d = node_to_face(n_p)
           Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
-          call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
+          call Enlarge % Matrix_Int(Dual % faces_n,  &
+                                    i=(/1,Dual % faces_n_nodes(f_d)/))
           Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = edge_to_node(e)
 
           ! This node_to_cell was stored in the previous step
           b_d = node_to_cell(n_p)
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-          call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+          call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                    i=(/1,Dual % cells_n_nodes(b_d)/))
           Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = edge_to_node(e)
         end do  ! i_nod for edge, goes from 1 to 2
 
@@ -461,11 +489,13 @@
               Dual % zn(n_d) = Prim % zn(n_p)
 
               Dual % faces_n_nodes(f_d) = Dual % faces_n_nodes(f_d) + 1
-              call Adjust_First_Dim(Dual % faces_n_nodes(f_d), Dual % faces_n)
+              call Enlarge % Matrix_Int(Dual % faces_n,  &
+                                        i=(/1,Dual % faces_n_nodes(f_d)/))
               Dual % faces_n(Dual % faces_n_nodes(f_d), f_d) = n_d
 
               Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
-              call Adjust_First_Dim(Dual % cells_n_nodes(b_d), Dual % cells_n)
+              call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                        i=(/1,Dual % cells_n_nodes(b_d)/))
               Dual % cells_n(Dual % cells_n_nodes(b_d), b_d) = n_d
 
               ! Mark that the face has been injected a sharp corner
@@ -531,8 +561,8 @@
     !----------------------------------------------------!
     Dual % cells_n_faces(c1) = Dual % cells_n_faces(c1) + 1
     Dual % cells_n_faces(c2) = Dual % cells_n_faces(c2) + 1
-    call Adjust_First_Dim(Dual % cells_n_faces(c1), Dual % cells_f)
-    call Adjust_First_Dim(Dual % cells_n_faces(c2), Dual % cells_f)
+    call Enlarge % Matrix_int(Dual % cells_f, i=(/1,Dual % cells_n_faces(c1)/))
+    call Enlarge % Matrix_int(Dual % cells_f, i=(/1,Dual % cells_n_faces(c2)/))
     Dual % cells_f(Dual % cells_n_faces(c1), c1) = s
     Dual % cells_f(Dual % cells_n_faces(c2), c2) = s
 
@@ -548,7 +578,8 @@
         if(n1 .eq. n) goto 1
       end do  ! j_nod
       Dual % cells_n_nodes(c1) = Dual % cells_n_nodes(c1) + 1
-      call Adjust_First_Dim(Dual % cells_n_nodes(c1), Dual % cells_n)
+      call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                i=(/1,Dual % cells_n_nodes(c1)/))
       Dual % cells_n(Dual % cells_n_nodes(c1), c1) = n
 1     continue
 
@@ -558,7 +589,8 @@
         if(n2 .eq. n) goto 2
       end do  ! j_nod
       Dual % cells_n_nodes(c2) = Dual % cells_n_nodes(c2) + 1
-      call Adjust_First_Dim(Dual % cells_n_nodes(c2), Dual % cells_n)
+      call Enlarge % Matrix_Int(Dual % cells_n,  &
+                                i=(/1,Dual % cells_n_nodes(c2)/))
       Dual % cells_n(Dual % cells_n_nodes(c2), c2) = n
 2     continue
 

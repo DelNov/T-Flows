@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Control_Mod_Hybrid_Les_Rans_Switch(val, verbose)
+  subroutine Hybrid_Les_Rans_Switch(Control, val, verbose)
 !------------------------------------------------------------------------------!
-!   Reading switch for hybrid LES/RANS model.                                  !
+!>  Reads switch for hybrid LES/RANS model from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL), intent(out) :: val
-  logical,       optional    :: verbose
+  class(Control_Type)        :: Control  !! parent class
+  character(SL), intent(out) :: val      !! hybrid LES/RANS switch
+  logical,       optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('HYBRID_LES_RANS_SWITCH',   &
-                                  'SWITCH_DISTANCE',          &
-                                   val, verbose)
+  call Control % Read_Char_Item('HYBRID_LES_RANS_SWITCH',   &
+                                'SWITCH_DISTANCE',          &
+                                 val, verbose)
   call String % To_Upper_Case(val)
 
   end subroutine

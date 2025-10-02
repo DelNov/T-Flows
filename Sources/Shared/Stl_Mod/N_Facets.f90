@@ -1,12 +1,11 @@
 !==============================================================================!
-  function N_Facets(Stl)
+  integer function N_Facets(Stl)
 !------------------------------------------------------------------------------!
-!   Returns number of facets                                                   !
+!>  Returns number of facets in an Stl_Type object
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type) :: Stl
-  integer         :: N_Facets
+  class(Stl_Type) :: Stl  !! parent Stl_Type object
 !==============================================================================!
 
   N_Facets = Stl % n_bnd_cells

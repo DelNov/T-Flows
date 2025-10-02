@@ -1,8 +1,19 @@
+# Full mesh name
 left.msh
+
+# Create dual mesh?
 no
+
+# Geometrical scaling
 skip
+
+# Periodicity
 2
 skip
+
+# Disatnce from the walls
 1 2
+
+# Probe 1d
 skip
 

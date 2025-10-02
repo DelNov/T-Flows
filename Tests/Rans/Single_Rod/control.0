@@ -1,20 +1,20 @@
- NUMBER_OF_DOMAINS         3
+  NUMBER_OF_DOMAINS         3
 
- NUMBER_OF_TIME_STEPS     600
- RESULTS_SAVE_INTERVAL    120
- BACKUP_SAVE_INTERVAL     120
+  NUMBER_OF_TIME_STEPS     600
+  RESULTS_SAVE_INTERVAL    120
+  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.0001
+  TIME_STEP               0.0001
 
- TOLERANCE_FOR_SIMPLE_ALGORITHM     5.e-3
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     5.e-3
 
- MIN_SIMPLE_ITERATIONS                6
- MAX_SIMPLE_ITERATIONS               12
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER 256
+  MIN_SIMPLE_ITERATIONS                6
+  MAX_SIMPLE_ITERATIONS               12
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER 256
 
- INTERFACE_CONDITION      fuel        cladding
-   BOUNDARY_CONDITIONS    fuel_wall   cladding_inner_wall
+  INTERFACE_CONDITION      fuel        cladding
+    BOUNDARY_CONDITIONS    fuel_wall   cladding_inner_wall
 
- INTERFACE_CONDITION      cladding              water
-   BOUNDARY_CONDITIONS    cladding_outer_wall   cylinder_wall
+  INTERFACE_CONDITION      cladding              water
+    BOUNDARY_CONDITIONS    cladding_outer_wall   cylinder_wall
 

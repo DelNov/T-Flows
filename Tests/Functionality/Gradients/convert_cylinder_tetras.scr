@@ -1,8 +1,21 @@
+# Full mesh name
 cylinder_tetras.msh
+
+# Create dual
 no
+
+# Geometric scaling
 skip
+
+# Boundary cell placement (why 1?)
 1
+
+# Periodicity
 skip
+
+# Distance to the walls
 skip
+
+# Probe 1d
 skip
 

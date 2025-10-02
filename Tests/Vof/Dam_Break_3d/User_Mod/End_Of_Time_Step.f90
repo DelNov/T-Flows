@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm, n, n_stat_t,   &
-                                       n_stat_p, time)
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for dam break                         !
 !------------------------------------------------------------------------------!
@@ -10,9 +10,7 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n     ! time step
   integer                  :: n_stat_t, n_stat_p
-  real                     :: time  ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer     :: Grid
   type(Var_Type),  pointer     :: fun
@@ -78,7 +76,7 @@
   end do
 
   do i_probe = 1, N_PROBE
-    call Comm_Mod_Global_Max_Real(h_probe(i_probe))
+    call Global % Max_Real(h_probe(i_probe))
   end do
 
   ! Pressure probes:
@@ -95,7 +93,7 @@
   end do
 
   do i_probe = 1, size(nod_probe)
-    call Comm_Mod_Global_Max_Real(p_probe(i_probe))
+    call Global % Max_Real(p_probe(i_probe))
   end do
 
   !---------------------!
@@ -103,17 +101,17 @@
   !---------------------!
   b_volume = 0.0
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
+  call Global % Sum_Real(b_volume)
 
   ! Write to file
-  if (this_proc < 2) then
+  if (First_Proc()) then
     call File % Append_For_Writing_Ascii('probe-data.dat', fu)
-    write(fu,'((e16.10e2),9(2x,e16.10e2),4(2x,e16.10e2))')            &
-          time, b_volume, p_probe(1:size(nod_probe)),   &
+    write(fu,'((e16.10e2),9(2x,e16.10e2),4(2x,e16.10e2))')          &
+          Time % Get_Time(), b_volume, p_probe(1:size(nod_probe)),  &
           h_probe(1:N_PROBE)
     close(fu)
   end if

@@ -1,14 +1,16 @@
 !==============================================================================!
   subroutine To_Upper_Case(String, char_array)
 !------------------------------------------------------------------------------!
-!   Transforms String to uppercase.                                            !
+!>  Transforms the entire string to upper case.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(String_Type) :: String
-  character(len=*)   :: char_array
+  class(String_Type), intent(in)    :: String      !! parent class
+  character(len=*),   intent(inout) :: char_array  !! string being manipulated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, value
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(String)
 !==============================================================================!
 
   do i = 1, len_trim(char_array)

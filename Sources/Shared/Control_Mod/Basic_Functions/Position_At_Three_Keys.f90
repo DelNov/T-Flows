@@ -1,33 +1,34 @@
 !==============================================================================!
-  subroutine Control_Mod_Position_At_Three_Keys(keyword_1,  &
-                                                keyword_2,  &
-                                                keyword_3,  &
-                                                found, verbose)
+  subroutine Position_At_Three_Keys(Control,    &
+                                    keyword_1,  &
+                                    keyword_2,  &
+                                    keyword_3,  &
+                                    found, verbose)
 !------------------------------------------------------------------------------!
-!   Position yourself within the file at the line specified with three keys.   !
-!   It is intended to be used to find the interface condition specifications.  !
-!                                                                              !
-!   This function is case sensitive!                                           !
+!>  Position yourself within the control file at the line specified with three
+!>  keys. It is intended to be used to find the interface condition
+!>  specifications. (This function is case sensitive!)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword_1
-  character(len=*)  :: keyword_2
-  character(len=*)  :: keyword_3
-  logical           :: found
-  logical, optional :: verbose
+  class(Control_Type)              :: Control    !! parent class
+  character(len=*),    intent(in)  :: keyword_1  !! keyword 1
+  character(len=*),    intent(in)  :: keyword_2  !! keyword 2
+  character(len=*),    intent(in)  :: keyword_3  !! keyword 3
+  logical,             intent(out) :: found      !! true if three keys are found
+  logical, optional,   intent(in)  :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   logical :: reached_end
 !==============================================================================!
 
-  rewind(control_file_unit)
+  rewind(Control % file_unit)
 
   !------------------------------------------------------------------!
   !   Browse through command file to find two keywords in one file   !
   !------------------------------------------------------------------!
   found = .false.
   do
-    call File % Read_Line(control_file_unit, reached_end)
+    call File % Read_Line(Control % file_unit, reached_end)
     if(reached_end) goto 1
 
     ! First keyword is "INTERFACE_CONDITION", ...
@@ -37,8 +38,8 @@
        Line % tokens(3) .eq. trim(keyword_3)) then
       found = .true.
       return
-
     end if
+
   end do
 
   !--------------------------------------------!
@@ -46,9 +47,9 @@
   !--------------------------------------------!
 1 if(.not. found) then
     if(present(verbose)) then
-      if(verbose .and. this_proc < 2) then
+      if(verbose .and. First_Proc()) then
         print '(5a)', ' # NOTE! Could not find the line with keywords: ',  &
-                      keyword_1, ', ', trim(keyword_2), ', ', trim(keyword_3), '!'
+            keyword_1, ', ', trim(keyword_2), ', ', trim(keyword_3), '!'
       end if
     end if
   end if

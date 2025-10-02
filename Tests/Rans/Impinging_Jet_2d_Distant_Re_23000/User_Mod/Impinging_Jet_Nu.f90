@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Nu(Turb, ts)
+  subroutine User_Mod_Impinging_Jet_Nu(Turb)
 !------------------------------------------------------------------------------!
 !   The subroutine creates ASCII file with Nusselt number averaged             !
 !   in azimuthal direction.                                                    !
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
-  integer,     intent(in) :: ts     ! time step
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Field_Type), pointer :: Flow
@@ -39,7 +38,7 @@
   !-----------------------------------!
   inquire(file='rad_coordinate.dat', exist=there)
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "#=========================================================="
       print *, "# In order to extract Nusselt number profile               "
       print *, "# an ascii file with cell-faces coordinates has to be read."
@@ -85,7 +84,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
       if(c2 < 0) then
-        if(Grid % Bnd_Cond_Name(c2) .eq. 'LOWER_WALL') then
+        if(Grid % Bnd_Cond_Name_At_Cell(c2) .eq. 'LOWER_WALL') then
           r = sqrt(Grid % xc(c1)*Grid % xc(c1)  + &
                    Grid % yc(c1)*Grid % yc(c1)) + TINY
           if(r < rad_1(i+1) .and.  &
@@ -112,20 +111,20 @@
   !   Average over all processors   !
   !---------------------------------!
   do i = 1, n_prob
-    call Comm_Mod_Global_Sum_Int(n_count(i))
+    call Global % Sum_Int(n_count(i))
 
-    call Comm_Mod_Global_Sum_Real(u_p(i))
-    call Comm_Mod_Global_Sum_Real(v_p(i))
-    call Comm_Mod_Global_Sum_Real(w_p(i))
+    call Global % Sum_Real(u_p(i))
+    call Global % Sum_Real(v_p(i))
+    call Global % Sum_Real(w_p(i))
 
-    call Comm_Mod_Global_Sum_Real(z_p(i))
-    call Comm_Mod_Global_Sum_Real(tau_p(i))
-    call Comm_Mod_Global_Sum_Real(q_p(i))
+    call Global % Sum_Real(z_p(i))
+    call Global % Sum_Real(tau_p(i))
+    call Global % Sum_Real(q_p(i))
 
-    call Comm_Mod_Global_Sum_Real(r_p(i))
-    call Comm_Mod_Global_Sum_Real(t_p(i))
+    call Global % Sum_Real(r_p(i))
+    call Global % Sum_Real(t_p(i))
 
-!    call Comm_Mod_Global_Sum_Real_Array(8, (/u_p  (i),  &
+!    call Global % Sum_Real_Array(8, (/u_p  (i),  &
 !                                             v_p  (i),  &
 !                                             w_p  (i),  &
 !                                             z_p  (i),  &
@@ -147,16 +146,18 @@
       r_p(i)   = r_p(i)   / n_count(i)
     end if
   end do
-  call Comm_Mod_Wait
+  call Global % Wait
 
   !-----------------------------------!
   !   Write from one processor only   !
   !-----------------------------------!
-  if(this_proc < 2) then
+  if(First_Proc()) then
 
     ! Set the file name
-    call File % Set_Name(res_name, time_step=ts, &
-                         appendix='-nu-utau', extension='.dat')
+    call File % Set_Name(res_name,                      &
+                         time_step = Time % Curr_Dt(),  &
+                         appendix  = '-nu-utau',        &
+                         extension = '.dat')
     call File % Open_For_Writing_Ascii(res_name, fu)
 
     ! Write the file out
@@ -176,6 +177,6 @@
     close(fu)
   end if
 
-  if(this_proc < 2) print *, '# Finished with Impinging_Jet_Nu'
+  if(First_Proc()) print *, '# Finished with Impinging_Jet_Nu'
 
   end subroutine

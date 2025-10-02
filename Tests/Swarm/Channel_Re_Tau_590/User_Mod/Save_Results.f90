@@ -1,18 +1,10 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, curr_dt, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
-!------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -20,7 +12,6 @@
   type(Turb_Type),       target :: Turb
   type(Vof_Type),        target :: Vof
   type(Swarm_Type),      target :: Swarm
-  integer,           intent(in) :: curr_dt   ! current time step
   integer, optional, intent(in) :: domain    ! current domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -47,8 +38,8 @@
   call Flow % Alias_Energy  (t)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density     (dens_const)
-  call Control_Mod_Dynamic_Viscosity(visc_const)
+  call Control % Mass_Density     (dens_const)
+  call Control % Dynamic_Viscosity(visc_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
@@ -58,7 +49,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -75,9 +66,9 @@
     return
   end if
 
-  do c = 1, Grid % n_cells
-    ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
-  end do 
+  do c = Cells_In_Domain_And_Buffers()
+    ubulk    = bulk % flux_x / bulk % area_x
+  end do
 
   open(9, file=coord_name)
 
@@ -113,25 +104,11 @@
 
   allocate(n_count(n_prob)); n_count = 0
 
-  !!=========================================================
-  !! DEBUGGING 
-  !do c = 1, Grid % n_cells - Grid % comm % n_buff_cells
-  !  ww_mod_p(c) =  Turb % kin_mean(c) * Turb % zeta_mean(c)
-  !end do 
-  !if(this_proc < 2) then 
-  ! print *, "w_mod(503) = ", ww_mod_p(503)
-  ! print *, "min_val_wmod = ", minval(ww_mod_p(:))
-  ! print *, "max_val_wmod = ", maxval(ww_mod_p(:))
-  ! stop  
-  !end if
-  !!=========================================================
-
-
   !-------------------------!
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -157,7 +134,7 @@
         uw_mod_p(i) = uw_mod_p(i) + Turb % vis_t_eff(c)*(u % y(c) + v % x(c))
         ww_mod_p(i) = ww_mod_p(i) + Turb % kin_mean(c) * Turb % zeta_mean(c)
         vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
-        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c) 
+        y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c)
         n_count(i) = n_count(i) + 1
       end if
     end do
@@ -166,30 +143,30 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
- 
-    call Comm_Mod_Global_Sum_Real(uw_mod_p(pl))
-    call Comm_Mod_Global_Sum_Real(kin_p   (pl))
-    call Comm_Mod_Global_Sum_Real(eps_p   (pl))
-    call Comm_Mod_Global_Sum_Real(zeta_p  (pl))
-    call Comm_Mod_Global_Sum_Real(f22_p   (pl))
-    call Comm_Mod_Global_Sum_Real(vis_t_p (pl))
-    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_mod_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+
+    call Global % Sum_Real(uw_mod_p(pl))
+    call Global % Sum_Real(kin_p   (pl))
+    call Global % Sum_Real(eps_p   (pl))
+    call Global % Sum_Real(zeta_p  (pl))
+    call Global % Sum_Real(f22_p   (pl))
+    call Global % Sum_Real(vis_t_p (pl))
+    call Global % Sum_Real(y_plus_p(pl))
+    call Global % Sum_Real(ww_mod_p(pl))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
@@ -230,16 +207,16 @@
   end if
 
   if(u_tau_p < TINY) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
     return
   end if
 
-  call File % Set_Name(result_name, time_step = curr_dt,              &
+  call File % Set_Name(result_name, time_step = Time % Curr_Dt(),  &
        appendix='-res', extension='.dat')
   call File % Open_For_Writing_Ascii(result_name, fu1)
-  call File % Set_Name(result_name_plus, time_step = curr_dt,         &
+  call File % Set_Name(result_name_plus, time_step = Time % Curr_Dt(),  &
        appendix='-res-plus', extension='.dat')
   call File % Open_For_Writing_Ascii(result_name_plus, fu2)
 
@@ -252,7 +229,7 @@
   err     = abs(cf_dean - cf)/cf_dean * 100.0
 
   write(fu1,'(a1,(a12,e12.6))')  &
-  '#', 'Ubulk    = ', ubulk 
+  '#', 'Ubulk    = ', ubulk
   write(fu1,'(a1,(a12,e12.6))')  &
   '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
   write(fu1,'(a1,(a12,e12.6))')  &
@@ -260,13 +237,13 @@
   write(fu1,'(a1,(a12,e12.6))')  &
   '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
   write(fu1,'(a1,(a12,f12.6))')  &
-  '#', 'Utau     = ', u_tau_p 
-  write(fu1,'(a1,(a12,f12.6,a2,a22))') & 
+  '#', 'Utau     = ', u_tau_p
+  write(fu1,'(a1,(a12,f12.6,a2,a22))') &
   '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
 
   write(fu2,'(a1,(a12,e12.6))')  &
-  '#', 'Ubulk    = ', ubulk 
+  '#', 'Ubulk    = ', ubulk
   write(fu2,'(a1,(a12,e12.6))')  &
   '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
   write(fu2,'(a1,(a12,e12.6))')  &
@@ -274,8 +251,8 @@
   write(fu2,'(a1,(a12,e12.6))')  &
   '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
   write(fu2,'(a1,(a12,f12.6))')  &
-  '#', 'Utau     = ', u_tau_p 
-  write(fu2,'(a1,(a12,f12.6,a2,a22))') & 
+  '#', 'Utau     = ', u_tau_p
+  write(fu2,'(a1,(a12,f12.6,a2,a22))') &
   '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
 
   write(fu1,'(a1,2x,a105)') '#',  ' 1) z,'                                //  &
@@ -344,6 +321,6 @@
   close(fu1)
   close(fu2)
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

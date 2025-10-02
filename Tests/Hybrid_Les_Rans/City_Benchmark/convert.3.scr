@@ -1,9 +1,25 @@
+# The grid file name you are importing (with ext.):
 3.city.msh
+
+# The name of the ground file (with ext.):
 ground.stl
+
+# Would you like to create a dual grid? (yes/no)
 no
-skip
+
+# Geometric scaling (this will give meters)
+0.001
+
+# Position the boundary cell centres:
+# Type 1 for barycentric placement
+# Type 2 for orthogonal placement
 2
-skip
-1 2
+
+# Enter the ordinal number(s) of periodic-boundary condition(s)
 skip
 
+# Calculating distance from the walls
+1 2
+
+# Insert non-homogeneous direction 
+skip

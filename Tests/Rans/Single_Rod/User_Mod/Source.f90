@@ -39,7 +39,7 @@
   !-------------------------------!
   if( Grid % name .eq. 'FUEL') then
     if( phi % name .eq. 'T' ) then
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         b_vector(c) = b_vector(c) + 1.0e9 * Grid % vol(c)
       end do
     end if

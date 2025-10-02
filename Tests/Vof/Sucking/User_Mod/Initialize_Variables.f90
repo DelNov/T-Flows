@@ -37,7 +37,7 @@
   read(fu, *) hash, nc
   do l = 1, nc
     read(fu, *) xc, tc
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(Math % Approx_Real(Grid % xc(c), xc)) then
         Flow % t % n(c) = tc
         Flow % t % o(c) = tc
@@ -69,7 +69,7 @@
 
   ! Initialize front
   if(Vof % track_front) then
-    call Vof % Smooth_For_Curvature_Csf()
+    call Vof % Smooth_Vof_And_Compute_Surface_Normals()
     call Vof % Front % Place_Front_At_Value(Vof % fun,     &
                                             .true.)  ! don't print messages
     call Vof % Front % Print_Front_Statistics()

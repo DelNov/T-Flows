@@ -1,0 +1,50 @@
+ #=======================================================================
+ #
+ #    ______________________ ____    ________  __      __  _________
+ #    \__    ___/\_   _____/|    |   \_____  \/  \    /  \/   _____/
+ #      |    |    |    __)  |    |    /   |   \   \/\/   /\_____  \
+ #      |    |    |     \   |    |___/    |    \        / /        \
+ #      |____|    \___  /   |_______ \_______  /\__/\  / /_______  /
+ #                    \/            \/       \/      \/          \/
+ #                      ___
+ #                     / _ \_______  _______ ___ ___
+ #                    / ___/ __/ _ \/ __/ -_|_-<(_-<
+ #                   /_/  /_/  \___/\__/\__/___/___/
+ #
+ #                          Compiled for GPUs
+ #                        Double precision mode
+ #                    Only native solvers available
+ #-----------------------------------------------------------------------
+ # Opening the control file control
+ # Reading the ASCII file: control
+ # NOTE! Could not find the keyword: WALL_TIME_MAX_HOURS. Using the default:  1.680E+02
+ # Creating a grid
+ # Reading the binary file: pipe_section.cfn
+ # Expanding memory for nodes to size:     17435
+ # Expanding memory for cells to size:     15480      720
+ # Expanding memory for faces to size:     46800     1548
+ # Reading the binary file: pipe_section.dim
+ # Checking the integrity of cell faces ...
+ # All integrity tests passed
+ # Minimum distance stored in shadow faces:     0.010
+ # Maximum distance stored in shadow faces:     0.010
+ # Minimum corrected distance at shadows:       0.010
+ # Maximum corrected distance at shadows:       0.010
+ # Reading physical models
+ # Reading about physical models
+ # NOTE! Could not find the keyword: HEAT_TRANSFER. Using the default: no
+ # NOTE! Could not find the keyword: GRAVITATIONAL_VECTOR. Using the default:  0.000E+00
+ # NOTE! Could not find the keyword: BUOYANCY. Using the default: none
+ # NOTE! Could not find the keyword: REFERENCE_DENSITY. Using the default:  0.000E+00
+ # NOTE! Could not find the keyword: REFERENCE_TEMPERATURE. Using the default:  0.000E+00
+ # NOTE! Could not find the keyword: VOLUME_EXPANSION_COEFFICIENT. Using the default:  1.000E+00
+ #=======================================================================================
+ # ERROR in file: ./Read_Controls_Mod/Physical_Models.f90 at line: 115
+ #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ # You specified volume flow rates using the keyword "VOLUME_FLOW_RATES" in the control
+ # file, which was common practice in the CPU version of the code. However, this feature
+ # has been superseded by bulk velocities in the GPU version of the code, and should be
+ # defined using the keyword "BULK_VELOCITIES".
+ #
+ # Please update the control file accordingly and try running the simulation again.
+ #---------------------------------------------------------------------------------------

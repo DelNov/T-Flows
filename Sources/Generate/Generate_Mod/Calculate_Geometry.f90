@@ -1,28 +1,30 @@
 !==============================================================================!
   subroutine Calculate_Geometry(Generate, Grid, real_run)
 !------------------------------------------------------------------------------!
-!   Calculates geometrical quantities of the grid.                             !
-!                                                                              !
+!>  Calculates geometrical quantities (such as cell centers, face surface
+!>  areas, ...) and handles periodicity of the grid.
+!------------------------------------------------------------------------------!
 !   This subroutine has a sibling in Convert_Mod, with the same name.  They    !
 !   can never be quite the same, unfortunatelly, because the data they start   !
-!   with is different.                                                         !
+!   with is different.  One of the most distinct differences is the treatment  !
+!   of periodicity.  Here, periodic faces are added to the existing (internal) !
+!   ones, while in Convert_Mod existing faces are turned into periodic ones.   !
 !                                                                              !
-!   One of the most distinct differences is the treatment of periodicity.      !
-!   Here, periodic faces are added to the existing (internal) ones, whereas    !
-!   in Convert_Mod, existing faces are turned into periodic ones.              !
+!   Functionality overview:                                                    !
+!   * Geometry calculations: It computes geometric quantities such as cell     !
+!     centers, face surface areas, face centers, and volumes of cells in grid. !
+!   * Periodicity handling: The subroutine uniquely addresses the aspect of    !
+!     periodicity in the grid. It adds periodic faces to the existing internal !
+!     ones or adjusts existing faces to account for periodic boundaries.       !
+!   * Boundary cell centers: It calculates the centers of boundary cells based !
+!     on the geometry of the internal cells and their faces.                   !
+!   * Cell volume calculation: It computes the volume of each cell             !
+!   * Cell inertia tensor calculation: Calculates the inertia tensor for each  !
+!     cell, providing information about the cell's resistance to rotation.     !
+!   * Face interpolation factors: Determines interpolation factors for the     !
+!     cell faces, facilitating the estimation of properties at face centers    !
+!     from cell center values.                                                 !
 !------------------------------------------------------------------------------!
-  implicit none
-!---------------------------------[Arguments]----------------------------------!
-  class(Generate_Type) :: Generate
-  type(Grid_Type)      :: Grid
-  logical, intent(in)  :: real_run
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, m, s, n_per, nn, nf
-  real    :: xs2, ys2, zs2, t, tot_surf
-  integer :: fn(6,4)
-!------------------------------------------------------------------------------!
-  include 'Block_Numbering.f90'
-!==============================================================================!
 !                                                                              !
 !                                n3                                            !
 !                 +---------------!---------------+                            !
@@ -100,6 +102,21 @@
 !     t = -----------------------------------------------------------          !
 !                           rx*sx + ry*sy + rz*sz                              !
 !                                                                              !
+!------------------------------------------------------------------------------!
+  implicit none
+!---------------------------------[Arguments]----------------------------------!
+  class(Generate_Type) :: Generate  !! parent class
+  type(Grid_Type)      :: Grid      !! grid being generated
+  logical, intent(in)  :: real_run  !! logical variable, false for trial run,
+                                    !! true for real run
+!-----------------------------------[Locals]-----------------------------------!
+  integer :: c, c1, c2, m, s, n_per, nn, nf
+  real    :: xs2, ys2, zs2, t, tot_surf
+  integer :: fn(6,4)
+!------------------------------------------------------------------------------!
+  include 'Block_Numbering.h90'
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Generate)
 !==============================================================================!
 
   call Profiler % Start('Calculate_Geometry')
@@ -212,7 +229,7 @@
           n_per = n_per + 1
 
           ! Find the coordinates of ...
-          m = face_c_to_c(s,2)
+          m = Grid % face_c_to_c(s,2)
 
           if(Grid % faces_n_nodes(s) .eq. 4) then
 
@@ -232,9 +249,13 @@
                      + Grid % zn(Grid % cells_n(fn(m,3), c2))  &
                      + Grid % zn(Grid % cells_n(fn(m,4), c2)))
 
+            ! What counts in this expansion, is the number of shadows
+            call Grid % Allocate_Faces(Grid % n_faces, n_per, GROWTH_MARGIN)
+
             ! Store the shadow face nodes
             nn = Grid % faces_n_nodes(s)
             nf = Grid % n_faces + n_per   ! new face number
+
             Grid % faces_n_nodes(nf) = nn
             Grid % faces_n(1:nn, nf) = Grid % cells_n(fn(m,1:nn), c2)
 

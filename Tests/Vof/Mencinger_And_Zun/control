@@ -1,85 +1,80 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME        menc
- HEAT_TRANSFER       no
- INTERFACE_TRACKING  yes
+  PROBLEM_NAME        menc
+  HEAT_TRANSFER       no
+  INTERFACE_TRACKING  yes
 
- TIME_STEP                    100
- TIME_INTEGRATION_SCHEME      parabolic
+  TIME_STEP                    100
+  TIME_INTEGRATION_SCHEME      parabolic
 
- CHOI_CORRECTION    yes
- GU_CORRECTION      yes
+  CHOI_CORRECTION    yes
+  GU_CORRECTION      yes
+
 # 6000 time steps seems to be enough to reach a steady state with dt=  0.1
 #  600 time steps seems to be enough to reach a steady state with dt=  1
 #  200 time steps seems to be enough to reach a steady state with dt= 10
 #   60 time steps seems to be enough to reach a steady state with dt=100
 #   10 time steps seems to be enough to reach a steady state with dt=1e+5
- NUMBER_OF_TIME_STEPS          600
- MAX_SIMPLE_ITERATIONS           6
- MIN_SIMPLE_ITERATIONS           6
+  NUMBER_OF_TIME_STEPS          600
+  MAX_SIMPLE_ITERATIONS           6
+  MIN_SIMPLE_ITERATIONS           6
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
 
- MAX_GAUSS_GRADIENTS_ITERATIONS      2000
- TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-15
- GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
+  MAX_GAUSS_GRADIENTS_ITERATIONS      2000
+  TOLERANCE_FOR_GAUSS_GRADIENTS       1.0e-15
+  GRADIENT_METHOD_FOR_PRESSURE        gauss_theorem
 
- RESULTS_SAVE_INTERVAL          10
- BACKUP_SAVE_INTERVAL        10000
- SAVE_INITIAL_CONDITION        yes
- SAVE_RESULTS_AT_BOUNDARIES     no
+  RESULTS_SAVE_INTERVAL          10
+  BACKUP_SAVE_INTERVAL        10000
+  SAVE_INITIAL_CONDITION        yes
+  SAVE_RESULTS_AT_BOUNDARIES     no
 
 #-------------------
 # Monitoring points
 #-------------------
- NUMBER_OF_MONITORING_POINTS    0
-   MONITORING_POINT_001         0.6  0.05  0.05
+  NUMBER_OF_MONITORING_POINTS    0
+    MONITORING_POINT_001         0.6  0.05  0.05
 
- POINT_FOR_MONITORING_PLANES    0.6  0.05  0.05
+  POINT_FOR_MONITORING_PLANES    0.6  0.05  0.05
 
 #-----------------
 # Physical models
 #-----------------
 
 # Phase 1 is liquid
- PHASE_DENSITIES          1.00        1.0e+3
- PHASE_VISCOSITIES        1.0e-3      1.0e-3
- SURFACE_TENSION        0.0
- MASS_TRANSFER           no
- TRACK_FRONT             no
- SATURATION_TEMPERATURE   100.0
+  PHASE_DENSITIES          1.00        1.0e+3
+  PHASE_VISCOSITIES        1.0e-3      1.0e-3
+  SURFACE_TENSION        0.0
+  MASS_TRANSFER           no
+  TRACK_FRONT             no
+  SATURATION_TEMPERATURE   100.0
 
- TURBULENCE_MODEL       none
- GRAVITATIONAL_VECTOR   10.0   0.0   0.0
+  TURBULENCE_MODEL       none
+  GRAVITATIONAL_VECTOR   10.0   0.0   0.0
 
- REFERENCE_DENSITY      0.0
+  REFERENCE_DENSITY      0.0
 
 #----------------------
 # Numerical parameters
 #----------------------
+  PRESSURE_MOMENTUM_COUPLING    simple
 
- PRESSURE_MOMENTUM_COUPLING    simple
-
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
- ADVECTION_SCHEME_FOR_VOF         cicsam
+  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+  ADVECTION_SCHEME_FOR_VOF         cicsam
 
 #------------------------
 # Linear solver settings
 #------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX      incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-12
- TOLERANCE_FOR_PRESSURE_SOLVER         1.e-16
- TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-04
- TOLERANCE_FOR_VOF_SOLVER              1.e-06
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER  900
- MAX_SMOOTHING_CYCLES_CURVATURE_VOF    8
- MAX_SMOOTHING_CYCLES_NORMAL_VOF       0
- TEMPORAL_PRESSURE_CORRECTION          no
- COMPRESION_VOF                        no
- COMPRESION_FACTOR_VOF                 1.0
- #DUAL_TIME_STEP_VOF                 yes
+  PRECONDITIONER_FOR_SYSTEM_MATRIX      incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER         1.e-12
+  TOLERANCE_FOR_PRESSURE_SOLVER         1.e-16
+  TOLERANCE_FOR_SIMPLE_ALGORITHM        1.e-04
+  TOLERANCE_FOR_VOF_SOLVER              1.e-06
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER  900
+  MAX_SMOOTH_CYCLES_CURVATURE_VOF       8
 
 #--------------------
 # Initial conditions  velocity was 0.05 for nice transport of vof

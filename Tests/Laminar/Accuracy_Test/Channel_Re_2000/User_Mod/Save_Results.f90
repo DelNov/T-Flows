@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -12,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -27,7 +26,7 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -38,17 +37,17 @@
   call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file name for results
-  call File % Set_Name(res_name,          &
-                         time_step=ts,      &
-                         appendix='-res',   &
-                         extension='.dat')
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res',            &
+                       extension = '.dat')
 
   !------------------!
   !   Read 1d file   !
   !------------------!
   inquire(file=coord_name, exist=exist)
   if(.not. exist) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '# Critial error: chan.1d file does not exist'
     end if
     stop
@@ -78,7 +77,7 @@
   !   Summarize the results   !
   !---------------------------!
   do i = 1, n - 1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % yc(c) > y_f(i) .and. Grid % yc(c) < y_f(i+1)) then
 
         n_count(i) = n_count(i) + 1
@@ -92,12 +91,12 @@
 
   ! Average over all processors
   do i = 1, n-1
-    call Comm_Mod_Global_Sum_Int (n_count(i))
-    call Comm_Mod_Global_Sum_Real(y_p(i))
-    call Comm_Mod_Global_Sum_Real(u_p(i))
+    call Global % Sum_Int (n_count(i))
+    call Global % Sum_Real(y_p(i))
+    call Global % Sum_Real(u_p(i))
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n-1
     if(n_count(i) .ne. 0) then
@@ -125,6 +124,6 @@
   deallocate(ind)
   deallocate(y_f)
 
-  if(this_proc < 2)  write(*,*) '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  write(*,*) '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

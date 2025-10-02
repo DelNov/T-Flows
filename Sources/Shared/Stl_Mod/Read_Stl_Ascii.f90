@@ -1,13 +1,15 @@
 !==============================================================================!
   subroutine Read_Stl_Ascii(Stl)
 !------------------------------------------------------------------------------!
-!   Reads an STL file in ASCII format                                          !
+!>  This subroutine reads an STL (Stereolithography) file in ASCII format and
+!>  populates an Stl_Type object with its contents. It parses facet normals and
+!>  vertex coordinates to reconstruct the geometry defined in the STL file.
 !------------------------------------------------------------------------------!
-! implicit none
+  implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type) :: Stl
+  class(Stl_Type) :: Stl  !! parent Stl_Type object
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: fu, v, f, i_ver, n
+  integer :: fu, v, f, i_ver
 !==============================================================================!
 
   call File % Open_For_Reading_Ascii(Stl % name, fu)
@@ -22,7 +24,7 @@
     if(Line % tokens(1) .eq. 'endsolid') exit
     if(Line % tokens(1) .eq. 'facet') f = f + 1
   end do
-  if(this_proc < 2) print '(a,i9)', ' # Number of facets on the STL: ', f
+  if(First_Proc()) print '(a,i9)', ' # Number of facets on the STL: ', f
   call Stl % Allocate_Stl(f)
 
   !------------------------------------------------!
@@ -51,7 +53,7 @@
       call File % Read_Line(fu)                ! 'endloop'
     end if
   end do
-  if(this_proc < 2) print '(a)', ' # Read all STL facets!'
+  if(First_Proc()) print '(a)', ' # Read all STL facets!'
 
   close(fu)
 

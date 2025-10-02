@@ -1,7 +1,20 @@
+# Grid name with extension
 jet.neu
+
+# Create dual mesh
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell center coordinates
 2
+
+# Periodicity
 skip
+
+# Wall distance
 1 2
+
+# Probe 1d
 z

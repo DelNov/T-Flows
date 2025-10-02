@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Normalization_For_Pressure_Solver(val, verbose)
+  subroutine Normalization_For_Pressure_Solver(Control, val, verbose)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real              :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real                :: val
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('NORMALIZATION_FOR_PRESSURE_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control % Read_Real_Item('NORMALIZATION_FOR_PRESSURE_SOLVER',  &
+                                 1.0e-6, val, verbose)
 
   end subroutine

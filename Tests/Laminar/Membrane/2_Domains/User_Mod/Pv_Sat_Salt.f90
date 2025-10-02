@@ -1,4 +1,8 @@
-include '../User_Mod/Pv_Sat.f90'
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Pv_Sat.f90"
+# else
+#   include "Pv_Sat.f90"
+# endif
 
 !==============================================================================!
   subroutine Pv_Sat_Salt(t, m_h2o, m_salt, sc1, p_v_h2o)

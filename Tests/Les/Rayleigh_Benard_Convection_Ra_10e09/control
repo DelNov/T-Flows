@@ -1,69 +1,72 @@
 #-----------
 # Prologue
 #-----------
+  PROBLEM_NAME    rb_conv
 
- PROBLEM_NAME    rb_conv
+  HEAT_TRANSFER   yes
 
- HEAT_TRANSFER   yes
+#---------------
+# Time stepping
+#---------------
+  TIME_STEP                                    0.05
+  NUMBER_OF_TIME_STEPS                      4230
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS    4222
 
- TIME_STEP                                    0.05
- NUMBER_OF_TIME_STEPS                      4230
- STARTING_TIME_STEP_FOR_TURB_STATISTICS    4222
-
-# LOAD_BACKUP_NAME   rb_conv-ts004220.backup
- RESULTS_SAVE_INTERVAL     1200
- BACKUP_SAVE_INTERVAL      1200
+  RESULTS_SAVE_INTERVAL     1200
+  BACKUP_SAVE_INTERVAL      1200
 
 #-------------------
 # Monitoring points 
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
- MONITORING_POINT_001           0.5  0.5  1.0
- POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
+  NUMBER_OF_MONITORING_POINTS    1
+  MONITORING_POINT_001           0.5  0.5  1.0
+  POINT_FOR_MONITORING_PLANES    0.5  0.5  0.5
 
 #-----------------
 # Physical models
 #-----------------
- BUOYANCY                       thermal
- GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
- REFERENCE_TEMPERATURE          10.0 
+  BUOYANCY                       thermal
+  GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
+  REFERENCE_TEMPERATURE          10.0 
 
- MASS_DENSITY           1.0
- THERMAL_CONDUCTIVITY   21.28e-6 
- DYNAMIC_VISCOSITY      15.11e-6  
- HEAT_CAPACITY          1.0
+#---------------------
+# Physical properties
+#---------------------
+  MASS_DENSITY           1.0
+  THERMAL_CONDUCTIVITY   21.28e-6 
+  DYNAMIC_VISCOSITY      15.11e-6  
+  HEAT_CAPACITY          1.0
 
- TURBULENCE_MODEL    les_dynamic
+  TURBULENCE_MODEL    les_dynamic
 
 #----------------------
 # Numerical parameters
 #----------------------
- PRESSURE_MOMENTUM_COUPLING    simple
+  PRESSURE_MOMENTUM_COUPLING    simple
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.8
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
- SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.8
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.8
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
 
- TIME_INTEGRATION_SCHEME  parabolic
+  TIME_INTEGRATION_SCHEME  parabolic
 
- ADVECTION_SCHEME_FOR_MOMENTUM     blended
- BLENDING_COEFFICIENT_FOR_MOMENTUM 0.99
- ADVECTION_SCHEME_FOR_ENERGY      smart
+  ADVECTION_SCHEME_FOR_MOMENTUM     blended
+  BLENDING_COEFFICIENT_FOR_MOMENTUM 0.99
+  ADVECTION_SCHEME_FOR_ENERGY      smart
 
- PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 
- TOLERANCE_FOR_MOMENTUM_SOLVER     5.e-4
- TOLERANCE_FOR_PRESSURE_SOLVER     5.e-4
- TOLERANCE_FOR_ENERGY_SOLVER       5.e-4
- TOLERANCE_FOR_SIMPLE_ALGORITHM    5.e-3
+  TOLERANCE_FOR_MOMENTUM_SOLVER     5.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER     5.e-4
+  TOLERANCE_FOR_ENERGY_SOLVER       5.e-4
+  TOLERANCE_FOR_SIMPLE_ALGORITHM    5.e-3
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t 
+    VARIABLES           u     v     w     t
     VALUES              0.0   0.0   0.0   10.0
-
 
 #---------------------
 # Boundary conditions

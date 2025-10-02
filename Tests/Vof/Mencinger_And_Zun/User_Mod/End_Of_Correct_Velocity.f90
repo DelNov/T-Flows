@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol, curr_dt, ini)
+  subroutine User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of Correct_Velocity function.           !
 !------------------------------------------------------------------------------!
@@ -8,8 +8,6 @@
   type(Field_Type),  target :: Flow
   type(Vof_Type),    target :: Vof
   type(Solver_Type), target :: Sol
-  integer, intent(in)       :: curr_dt
-  integer, intent(in)       :: ini
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u
@@ -29,13 +27,13 @@
   !---------------------------------------------------!
   !   Write down corrected cell-centered velocities   !
   !---------------------------------------------------!
-  write(fil1_name(27:31), '(i5.5)') curr_dt
-  write(fil1_name(33:35), '(i3.3)') ini
+  write(fil1_name(27:31), '(i5.5)') Time % Curr_Dt()
+  write(fil1_name(33:35), '(i3.3)') Iter % Current()
 
   open(99, file=fil1_name)
   write(99, '(a)') '# User_Mod_End_Of_Correct_Velocity: 1:x  2:u  3:rho'
 
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if(Math % Approx_Real(Grid % yc(c), 0.0) .and.  &
        Math % Approx_Real(Grid % zc(c), 0.0)) then
       write(99, '(99es15.5)')  &
@@ -48,8 +46,8 @@
   !---------------------------------------------------!
   !   Write down corrected face-centered velocities   !
   !---------------------------------------------------!
-  write(fil2_name(27:31), '(i5.5)') curr_dt
-  write(fil2_name(33:35), '(i3.3)') ini
+  write(fil2_name(27:31), '(i5.5)') Time % Curr_Dt()
+  write(fil2_name(33:35), '(i3.3)') Iter % Current()
 
   open(99, file=fil2_name)
   write(99, '(a)') '# User_Mod_End_Of_Correct_Velocity: '  //  &  

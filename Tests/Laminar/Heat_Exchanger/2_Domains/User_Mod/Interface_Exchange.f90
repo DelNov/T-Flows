@@ -25,18 +25,18 @@
   !-------------------------------------------!
   do d1 = 1, n_dom
     do d2 = 1, n_dom
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % t % n,     &
-                                   Flow(d2) % t % n,     &
-                                   T)
-      call Interface_Mod_To_Buffer(inter(d1, d2),            &
-                                   Flow(d1) % conductivity,  &
-                                   Flow(d2) % conductivity,  &
-                                   K)
-      call Interface_Mod_To_Buffer(inter(d1, d2),                    &
-                                   Flow(d1) % pnt_grid % wall_dist,  &
-                                   Flow(d2) % pnt_grid % wall_dist,  &
-                                   WD)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % t % n,  &
+                                  Flow(d2) % t % n,  &
+                                  T)
+      call Interface_Mod_Exchange(inter(d1, d2),            &
+                                  Flow(d1) % conductivity,  &
+                                  Flow(d2) % conductivity,  &
+                                  K)
+      call Interface_Mod_Exchange(inter(d1, d2),                    &
+                                  Flow(d1) % pnt_grid % wall_dist,  &
+                                  Flow(d2) % pnt_grid % wall_dist,  &
+                                  WD)
     end do
   end do
 

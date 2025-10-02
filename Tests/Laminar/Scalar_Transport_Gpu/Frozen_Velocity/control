@@ -1,0 +1,99 @@
+#===============================================================================
+#
+#  Control file for Pipe problem to test single scalar implementation
+#
+#-------------------------------------------------------------------------------
+  PROBLEM_NAME            pipe
+
+  TURBULENCE_MODEL        none
+  HEAT_TRANSFER           yes
+
+  TIME_STEP                 0.001
+  NUMBER_OF_TIME_STEPS    120
+  MIN_SIMPLE_ITERATIONS     3
+  MAX_SIMPLE_ITERATIONS     6
+  RESULTS_SAVE_INTERVAL     1
+  BACKUP_SAVE_INTERVAL   3600
+
+#-------------------------------------------------------------------------------
+# Physical properties 
+#-------------------------------------------------------------------------------
+
+  MASS_DENSITY              1.0      # kg/m^3
+  DYNAMIC_VISCOSITY         1.00e-5  # kg/ms
+  SCALARS_DIFFUSIVITY       1.43e-5  # m^2/s
+  THERMAL_CONDUCTIVITY      1.43e-5
+
+  NUMBER_OF_SCALARS         6
+
+#-------------------------------------------------------------------------------
+# Numerical parameters 
+#-------------------------------------------------------------------------------
+
+  PRESSURE_MOMENTUM_COUPLING    simple
+
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.7
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.3
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.5
+  SIMPLE_UNDERRELAXATION_FOR_SCALARS     0.5
+
+  TIME_INTEGRATION_SCHEME  linear
+
+  ADVECTION_SCHEME_FOR_MOMENTUM    blended
+  ADVECTION_SCHEME_FOR_ENERGY      blended
+  ADVECTION_SCHEME_FOR_SCALARS     blended
+
+  BLENDING_COEFFICIENT_FOR_MOMENTUM  0.5
+  BLENDING_COEFFICIENT_FOR_ENERGY    0.5
+  BLENDING_COEFFICIENT_FOR_SCALARS   0.5
+
+  BLEND_SYSTEM_MATRICES              yes
+
+  GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
+  MAX_GAUSS_GRADIENTS_ITERATIONS   4
+
+#-------------------------------------------------------------------------------
+# Linear solver settings
+#-------------------------------------------------------------------------------
+
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+  TOLERANCE_FOR_ENERGY_SOLVER        1.e-3
+  TOLERANCE_FOR_SCALARS_SOLVER       1.e-3
+
+  MAX_ITERATIONS_FOR_MOMENTUM_SOLVER     6
+  MAX_ITERATIONS_FOR_ENERGY_SOLVER      18
+  MAX_ITERATIONS_FOR_SCALARS_SOLVER     18
+
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+  MIN_SIMPLE_ITERATIONS                   6
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER    666
+
+#--------------------------------------------------------------------------------
+# Initial condition
+#--------------------------------------------------------------------------------
+  INITIAL_CONDITION
+    VARIABLES        u     v     w    t     c_01
+    VALUES           0.0   0.0   0.0  0.0   0.0
+
+#-------------------------------------------------------------------------------
+# Boundary condition (inflow and outflow seem not to work, so I used wall)
+#-------------------------------------------------------------------------------
+
+  BOUNDARY_CONDITION internal_wall
+    TYPE             wall
+    VARIABLES        u    v    w    q    c_01  q_02  c_03  q_04  c_05  q_06
+    VALUES           0.0  0.0  0.0  0.0  0.0   0.0   0.0   0.0   0.0   0.0
+
+  BOUNDARY_CONDITION inlet
+    TYPE             inflow
+    VARIABLES        u    v    w    t    c_01   c_02  c_03  c_04  c_05  c_06
+    VALUES           0.0  0.0  0.0  1.0  0.1    0.2   0.3   0.4   0.5   0.6
+
+  BOUNDARY_CONDITION outlet
+    TYPE             outflow
+    VARIABLES        u    v    w    t    c_01  c_02  c_03  c_04  c_05  c_06
+    VALUES           0.0  0.0  0.0  0.0  0.0   0.0   0.0   0.0   0.0   0.0
+#-------------------------------------------------------------------------------

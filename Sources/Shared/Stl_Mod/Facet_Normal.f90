@@ -1,13 +1,13 @@
 !==============================================================================!
   function Facet_Normal(Stl, fac)
 !------------------------------------------------------------------------------!
-!   Returns facet cooridnates                                                  !
+!>  This function, belonging to the Stl_Mod module, returns the facet's normal.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type)     :: Stl
-  real, dimension(3)  :: Facet_Normal
-  integer, intent(in) :: fac
+  class(Stl_Type)     :: Stl           !! parent Stl_Type object
+  real, dimension(3)  :: Facet_Normal  !! output, facet's normal vector
+  integer, intent(in) :: fac           !! facet number
 !==============================================================================!
 
   Facet_Normal(1) = Stl % nx(-fac)

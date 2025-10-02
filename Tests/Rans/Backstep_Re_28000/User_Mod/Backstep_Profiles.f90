@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Profiles(Flow, Turb, ts)
+  subroutine User_Mod_Backstep_Profiles(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Description
 !------------------------------------------------------------------------------!
@@ -12,7 +12,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Grid_Type), pointer :: Grid
   integer                  :: n_prob, pl, c, idumm, i, count,  &
-                              k, c1, c2, s, n_hor, fu, ts
+                              k, c1, c2, s, n_hor, fu
   character(SL)            :: coord_name, result_name
   real, parameter          :: u_b = 11.3, h = 0.038
   real, allocatable        :: x1_p(:), x2_p(:), lnum(:), z_p(:), &
@@ -40,7 +40,7 @@
   inquire(file='horizontal_positions.dat', exist=there)
 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "#============================================================"
       print *, "# In order to extract profiles and write them in ascii files "
       print *, "# the code has to read ascii file in which positions of the  "
@@ -71,11 +71,11 @@
   !------------------!
   !   Read 1d file   !
   !------------------!
-  if(this_proc < 2) print *, '# Now reading the file:', coord_name
+  if(First_Proc()) print *, '# Now reading the file:', coord_name
 
   inquire( file=coord_name, exist=there ) 
   if(.not.there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, "==========================================================="
       print *, "In order to extract profiles and write them in ascii files "
       print *, "the code has to read cell-faces coordinates                "
@@ -134,7 +134,7 @@
   !-------------------------!
   do k = 1, n_hor
     do i = 1, n_prob-1
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         z_coor = Grid % zc(c)
         if(Grid % xc(c) < x1_p(k) .and. Grid % xc(c) > x2_p(k)) then
           if(z_coor > z_p(i) .and. z_coor < z_p(i+1)) then
@@ -159,65 +159,65 @@
 
     ! Average over all processors
     do pl=1, n_prob
-      call Comm_Mod_Global_Sum_Int(n_count(pl))
-      call Comm_Mod_Global_Sum_Real(um_p(pl))
-      call Comm_Mod_Global_Sum_Real(vm_p(pl))
-      call Comm_Mod_Global_Sum_Real(wm_p(pl))
-      call Comm_Mod_Global_Sum_Real(uu_p(pl))
-      call Comm_Mod_Global_Sum_Real(vv_p(pl))
-      call Comm_Mod_Global_Sum_Real(ww_p(pl))
-      call Comm_Mod_Global_Sum_Real(uv_p(pl))
-      call Comm_Mod_Global_Sum_Real(uw_p(pl))
-      call Comm_Mod_Global_Sum_Real(vw_p(pl))
-      call Comm_Mod_Global_Sum_Real(v1_p(pl))
-      call Comm_Mod_Global_Sum_Real(v2_p(pl))
-      call Comm_Mod_Global_Sum_Real(v3_p(pl))
-      call Comm_Mod_Global_Sum_Real(v4_p(pl))
-      call Comm_Mod_Global_Sum_Real(v5_p(pl))
+      call Global % Sum_Int(n_count(pl))
+      call Global % Sum_Real(um_p(pl))
+      call Global % Sum_Real(vm_p(pl))
+      call Global % Sum_Real(wm_p(pl))
+      call Global % Sum_Real(uu_p(pl))
+      call Global % Sum_Real(vv_p(pl))
+      call Global % Sum_Real(ww_p(pl))
+      call Global % Sum_Real(uv_p(pl))
+      call Global % Sum_Real(uw_p(pl))
+      call Global % Sum_Real(vw_p(pl))
+      call Global % Sum_Real(v1_p(pl))
+      call Global % Sum_Real(v2_p(pl))
+      call Global % Sum_Real(v3_p(pl))
+      call Global % Sum_Real(v4_p(pl))
+      call Global % Sum_Real(v5_p(pl))
 
       count =  count + n_count(pl) 
 
       if(Flow % heat_transfer) then
-        call Comm_Mod_Global_Sum_Real(tm_p(pl))
-        call Comm_Mod_Global_Sum_Real(tt_p(pl))
-        call Comm_Mod_Global_Sum_Real(ut_p(pl))
-        call Comm_Mod_Global_Sum_Real(vt_p(pl))
-        call Comm_Mod_Global_Sum_Real(wt_p(pl))
+        call Global % Sum_Real(tm_p(pl))
+        call Global % Sum_Real(tt_p(pl))
+        call Global % Sum_Real(ut_p(pl))
+        call Global % Sum_Real(vt_p(pl))
+        call Global % Sum_Real(wt_p(pl))
       end if
     end do
 
     if(k == 1) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-0.35h', extension='.h.dat')
     else if(k == 2) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-1.68h', extension='.h.dat')
     else if(k == 3) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-2.30h', extension='.h.dat')
     else if(k == 4) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-3.15h', extension='.h.dat')
     else if(k == 5) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-3.92h', extension='.h.dat')
     else if(k == 6) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-4.70h', extension='.h.dat')
     else if(k == 7) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-5.20h', extension='.h.dat')
     else if(k == 8) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-6.50h', extension='.h.dat')
     else if(k == 9) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-8.90h', extension='.h.dat')
     else if(k == 10) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-26.0h', extension='.h.dat')
     else if(k == 11) then
-      call File % Set_Name(result_name, time_step=ts,  &
+      call File % Set_Name(result_name, time_step=Time % Curr_Dt(),  &
                            appendix='-52.0h', extension='.h.dat')
     end if  
 
@@ -304,6 +304,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) print *, '# Finished with User_Backstep_Profiles'
+  if(First_Proc()) print *, '# Finished with User_Backstep_Profiles'
 
   end subroutine

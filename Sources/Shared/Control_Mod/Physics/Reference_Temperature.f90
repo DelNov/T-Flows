@@ -1,16 +1,19 @@
 !==============================================================================!
-  subroutine Control_Mod_Reference_Temperature(t_ref, verbose)
+  subroutine Reference_Temperature(Control, t_ref, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the value of reference temperature from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: t_ref
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: t_ref    !! value of reference temperature
+  logical,   optional :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   real :: def
 !==============================================================================!
 
   def = 0.0
 
-  call Control_Mod_Read_Real_Item('REFERENCE_TEMPERATURE', def, t_ref, verbose)
+  call Control % Read_Real_Item('REFERENCE_TEMPERATURE', def, t_ref, verbose)
 
   end subroutine

@@ -1,35 +1,33 @@
 #----------
 # Prologue
 #----------
- PROBLEM_NAME    domain
- HEAT_TRANSFER   no
+  PROBLEM_NAME    domain
+  HEAT_TRANSFER   no
 
- TIME_STEP                                   0.5
- NUMBER_OF_TIME_STEPS                      14400   (this is two hours)
- STARTING_TIME_STEP_FOR_TURB_STATISTICS     7200   (this is one hour)
- RESULTS_SAVE_INTERVAL                       600   (five minutes)
- BACKUP_SAVE_INTERVAL                        600
-
-#  LOAD_BACKUP_NAME   domain-ts003600.backup
+  TIME_STEP                                     0.5
+  NUMBER_OF_TIME_STEPS                      14400   (this is two hours)
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS     7200   (this is one hour)
+  RESULTS_SAVE_INTERVAL                       600   (five minutes)
+  BACKUP_SAVE_INTERVAL                        600
 
 #-------------------
 # Monitoring points
 #-------------------
- NUMBER_OF_MONITORING_POINTS    2
- MONITORING_POINT_001           10.5  10.5  11.0
- MONITORING_POINT_002           10.5  10.5  59.0
- POINT_FOR_MONITORING_PLANES    10.5  10.5  10.5
+  NUMBER_OF_MONITORING_POINTS    2
+  MONITORING_POINT_001           10.5  10.5  11.0
+  MONITORING_POINT_002           10.5  10.5  59.0
+  POINT_FOR_MONITORING_PLANES    10.5  10.5  10.5
 
 #-----------------
 # Physical models
 #-----------------
- MASS_DENSITY           1.2
- DYNAMIC_VISCOSITY      1.8e-5
- HEAT_CAPACITY          1006.0
+  MASS_DENSITY           1.2
+  DYNAMIC_VISCOSITY      1.8e-5
+  HEAT_CAPACITY          1006.0
 
- TURBULENCE_MODEL       les_dynamic
+  TURBULENCE_MODEL       les_dynamic
 
- MASS_FLOW_RATES     13824.0  0.0   0.0
+  VOLUME_FLOW_RATES   13824.0  0.0   0.0
 
 #----------------
 # Porous regions
@@ -41,22 +39,22 @@
 #----------------------
 # Numerical parameters
 #----------------------
- PRESSURE_MOMENTUM_COUPLING    piso
+  PRESSURE_MOMENTUM_COUPLING    piso
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.95
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    1.0
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.95
 
- MIN_SIMPLE_ITERATIONS         1
+  MIN_SIMPLE_ITERATIONS         1
 
- TIME_INTEGRATION_SCHEME  parabolic
+  TIME_INTEGRATION_SCHEME  parabolic
 
- ADVECTION_SCHEME_FOR_MOMENTUM    superbee
+  ADVECTION_SCHEME_FOR_MOMENTUM    superbee
 
- PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
+  PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 
- TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
- TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
- TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-3
+  TOLERANCE_FOR_MOMENTUM_SOLVER     1.e-4
+  TOLERANCE_FOR_PRESSURE_SOLVER     1.e-4
+  TOLERANCE_FOR_SIMPLE_ALGORITHM    1.e-3
 
 #--------------------
 # Initial conditions

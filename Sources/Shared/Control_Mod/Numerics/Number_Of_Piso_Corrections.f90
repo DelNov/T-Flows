@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_Piso_Corrections(val, verbose)
+  subroutine Number_Of_Piso_Corrections(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads number of PISO corrections.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! number of PISO corrections
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_PISO_CORRECTIONS', 3, &
-                                  val, verbose)
+  call Control % Read_Int_Item('NUMBER_OF_PISO_CORRECTIONS', 3, &
+                                val, verbose)
 
   end subroutine

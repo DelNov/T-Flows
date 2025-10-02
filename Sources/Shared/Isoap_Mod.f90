@@ -1,38 +1,45 @@
 !==============================================================================!
   module Isoap_Mod
 !------------------------------------------------------------------------------!
-!   Procedures which embed Isoap algorithm                                     !
-!                                                                              !
-!   I made no attempts to change the code authors have written to comply with  !
-!   T-Flows coding standards.  This is in case they release new versions or    !
-!   fixes, or what have you.  I don't fully understand how these algorithms    !
-!   work, so it is probably better to leave them as they are.                  !
-!                                                                              !
-!   More details here: https://data.mendeley.com/datasets/4rcf98s74c           !
+!>  The Isoap_Mod module in T-Flows serves as an interface to the Isoap
+!>  library, facilitating the extraction of iso-surfaces from CFD simulations.
+!>  (In most cases these surfaces are the interfaces between two phases in VOF
+!>  simulations.)  The module defines the Isoap_Type and the singleton object
+!>  Isoap for easy access to its functions.
+!------------------------------------------------------------------------------!
+!   Note: Isoap library is here: https://data.mendeley.com/datasets/4rcf98s74c !
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
-  use Polyhedron_Mod
-  use Iso_Polygons_Mod
+  use Polyhedron_Mod    ! Polyhedron is sent to Isoap as input
+  use Iso_Polygons_Mod  ! Iso_Polygons is the result of a call to Isoap
 !------------------------------------------------------------------------------!
   implicit none
 !==============================================================================!
 
+  ! Parameters used inside the module
+  integer, parameter :: NS=200, NV=240
+
   !----------------!
   !   Isoap type   !
   !----------------!
+  !> A placeholder for two original Isoap functions (Main_Isoap and Isopol)
+  !> and Extract_Iso_Polygons, the heart of interfacing between Isoap and
+  !> T-Flows.
   type Isoap_Type
 
     contains
-      procedure :: Main_Isoap
-      procedure :: Isopol
+      procedure :: Main_Isoap  !! main Isoap function
+      procedure :: Isopol      !! utility from Isoap to arrange iso-vertices
 #     if T_FLOWS_COMPILATION == 1
-      procedure :: Extract_Iso_Polygons
+      procedure :: Extract_Iso_Polygons  !! the heart of T-Flows
+                                         !! and Isoap interaction
 #     endif
 
   end type
 
   ! Singleton object
-  type(Isoap_Type) :: Isoap
+  type(Isoap_Type) :: Isoap !! singleton object for
+              !! easier access to Isoap's functions
 
   contains
 

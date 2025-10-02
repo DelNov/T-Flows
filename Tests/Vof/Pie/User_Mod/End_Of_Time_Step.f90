@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! current time step
   integer, intent(in)      :: n_stat_t  ! 1st t.s. statistics turbulence
   integer, intent(in)      :: n_stat_p  ! 1st t.s. statistics particles
-  real,    intent(in)      :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -36,7 +34,7 @@
   rise_vel_int = 0.0
   call Flow % Grad_Variable(fun)
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume = b_volume + Grid % vol(c) * fun % n(c)
     if (norm2((/fun % x(c),fun % y(c),fun % z(c)/)) > 1.0) then
 
@@ -48,16 +46,16 @@
     rise_vel_int = rise_vel_int + Flow % v % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
-  call Comm_Mod_Global_Sum_Real(surface)
-  call Comm_Mod_Global_Sum_Real(y_pos_cen)
-  call Comm_Mod_Global_Sum_Real(rise_vel_int)
+  call Global % Sum_Real(b_volume)
+  call Global % Sum_Real(surface)
+  call Global % Sum_Real(y_pos_cen)
+  call Global % Sum_Real(rise_vel_int)
   y_pos_cen    = y_pos_cen    / b_volume
   rise_vel_int = rise_vel_int / b_volume
   rise_vel_cen = (y_pos_cen - y_pos_cen_old) / Flow % dt
 
   ! Just open the file benchmark.dat
-  if(n .eq. 1) then
+  if(Time % Curr_Dt() .eq. 1) then
     call File % Open_For_Writing_Ascii('benchmark.dat', fu)
     close(fu)
   end if
@@ -65,9 +63,9 @@
   !-------------------!
   !   Write results   !
   !-------------------!
-  if(n > 1) then
+  if(Time % Curr_Dt() > 1) then
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, 'y_pos_cen        = ', y_pos_cen
       print *, 'y_pos_cen_old    = ', y_pos_cen_old
       print *, 'rise_vel_int (1) = ', rise_vel_int
@@ -76,15 +74,8 @@
       ! Write to file
       call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
-      ! With circularity 2D:
-      ! write(fu,'(6(2x,es16.10e2))') time, b_volume,                    &
-      !                               2.0*PI/surface*sqrt(b_volume/PI),  &
-      !                               y_pos_cen,                         &
-      !                               rise_vel_int,                      &
-      !                               rise_vel_cen
-
       ! With sphericity 3D:
-      write(fu,'(6(2x,es16.10e2))') time, b_volume,                          &
+      write(fu,'(6(2x,es16.10e2))') Time % Get_Time(), b_volume,             &
                                     PI**(1.0/3.0)*(6.0*b_volume)**(2.0/3.0)  &
                                     /surface,                                &
                                     y_pos_cen,                               &
@@ -92,7 +83,7 @@
                                     rise_vel_cen
       close(fu)
 
-    end if  ! this_proc < 2
+    end if  ! First_Proc()
 
   end if  ! n > 1
 

@@ -1,3 +1,35 @@
+#==============================================================================#
+#   Script for extracting module hierarchy from T-Flows sources
+#------------------------------------------------------------------------------#
+#   Overview of its functionality and structure:
+#
+#   * Color Definitions: The script begins by defining a series of color
+#     variables for output formatting.
+#
+#   * Global Settings: These include the root source directory, output
+#     formatting settings (like tab width and indentation), and color schemes
+#     for different types of modules.
+#
+#   * Utility Functions: Functions like print_separator, print_line, and
+#     print_usage are defined for handling output formatting and providing usage
+#     information.
+#
+#   * Main Functionality - extract_hierarchy:
+#
+#     This function recursively explores module dependencies.
+#     It takes a module name as input and analyses its dependencies by reading
+#     .f90 files.  It handles various cases, like modules using other modules,
+#     modules not using any others, and excluded or ignored modules.
+#     The script uses grep and awk for text processing within Fortran source
+#     files.
+#     Command-Line Argument Parsing: The script processes command-line arguments
+#     for various options like expanding all modules (-a), excluding certain
+#     directories (-e), and ignoring specific modules (-i).
+#
+#     Execution Logic: The script executes the extract_hierarchy function based
+#     on the input parameters and command-line arguments.
+#------------------------------------------------------------------------------#
+
 #!/bin/bash
 
 BLACK='\U001B[30m'
@@ -24,6 +56,10 @@ RESET='\U001B[0m'
 #   Settings and global variables affecting the looks of the output
 #------------------------------------------------------------------------------#
 
+# Find the "root" of all sources
+cur=$(pwd)
+src=$(echo "$cur" | awk -F'/Sources/' '{print ($2 == "" ? $0 : $1 "/Sources")}')
+
 # The following four affect the width of the output
 tabs 60
 glo_indent="    "      # four characters wide
@@ -34,7 +70,7 @@ glo_out_width=72       # should be multiple of indent and separator widhts
 glo_color_mu=$LIGHT_CYAN       # module users other
 glo_color_mn=$GREEN            # module not using others
 
-glo_exclude_dir=""   # directory to be excluded from the search
+glo_exclude_dir=""   # global list of directories to be excluded from the search
 glo_expand_all="no"  # are you expanding them all?
 glo_ignore_mod=""    # global list of modules to ignore
 
@@ -86,32 +122,35 @@ print_usage() {
   echo "#----------------------------------------------------------------------"
   echo "# Proper usage: "
   echo "#"
-  echo "# ./Utilities/extract_module_hierarchy.sh <Target_Mod> [options]"
+  echo "# "$0" <Target_Mod> [options]"
   echo "#"
   echo "# where Target_Mod is the module name for which you want to perform"
   echo "# the analysis, such as: Grid_Mod, Convert_Mod, Generate_Mod, hence"
   echo -e "# case sensitive, ${RED}with${RESET} the _Mod suffix,"\
-          "${RED}without${RESET} the .f90 extension."
+          "with or without the .f90"
+  echo "# extension."
   echo "#"
   echo "# Valid options are:"
   echo "#"
   echo "# -a"
-  echo "#"
   echo "#    Expand all. Don't contract units which have been expanded above."
   echo "#"
-  echo "# -e <directory to exclude>"
-  echo "#"
+  echo "# -e <list of directories to exclude>"
   echo "#    In cases where the same module name is used in more than one"
   echo "#    directory, use this option to exclude one from the search."
   echo "#"
   echo "# -i <list of modules to ignore>"
-  echo "#"
   echo "#    You may want to exclude some of the smaller modules, such as"
   echo "#    Comm_Mod, Message_Mod, Work_Mod, Profiler_Mod, String_Mod,"
   echo "#    Tokenizer_Mod to reduce the amoun of information printed."
   echo "#"
-  echo -e "# NOTE: ${LIGHT_RED} The script is supposed to be executed from:" \
-          "T-Flows/Sources!" ${RESET}
+  echo "# Note that:"
+  echo -e "#   ${LIGHT_RED} The script is supposed to be executed from:" \
+          "T-Flows/Sources,"${RESET}
+  echo -e "#   ${LIGHT_RED} or any of its sub-directories. The <Target_Mod>" \
+          "doesnot have"${RESET}
+  echo -e "#   ${LIGHT_RED} to reside in the directory from which you launch" \
+          "the script!"${RESET}
   echo "#----------------------------------------------------------------------"
   exit
 
@@ -155,11 +194,22 @@ extract_hierarchy() {
     #----------------------------------------------
     #   Get the full path of the module you seek
     #----------------------------------------------
+
+    # Start building the find command as a string
+    find_command="find $src -name $module_file_you_seek"
+
+    # Convert glo_exclude_dir to an array and add a grep -v for each directory
     if [[ $glo_exclude_dir ]]; then
-      local full_path_you_seek=$(find . -name $module_file_you_seek | grep -v $glo_exclude_dir)
-    else
-      local full_path_you_seek=$(find . -name $module_file_you_seek)
+      read -r -a exclude_dirs <<< "$glo_exclude_dir"
+      for exclude_dir in "${exclude_dirs[@]}"; do
+        if [[ $exclude_dir ]]; then
+          find_command+=" | grep -v $exclude_dir"
+        fi
+      done
     fi
+
+    # Execute the find command
+    local full_path_you_seek=$(eval $find_command)
 
     #--------------------------------
     #   If there is anything to do
@@ -182,7 +232,7 @@ extract_hierarchy() {
       #-----------------------------------------------------
       #   Storing results of the grep command in an array
       #-----------------------------------------------------
-      local used_modules=($(grep '\ \ use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
+      local used_modules=($(grep '  use' $full_path_you_seek | awk '{print $2}' | tr -d ,))
 
       #------------------------------------------------------------------
       #   Print out the name of the module you are currently analysing
@@ -259,8 +309,13 @@ fi
 #   Parse command line options like a pro :-)
 #-----------------------------------------------
 
-# Fetch the name and shift on
+# Fetch the name
 name=$1
+
+# Remove the .f90 extension if it exists
+name="${name%.f90}"
+
+# Shift on
 shift
 
 current_opt=""
@@ -274,10 +329,10 @@ while [[ $# > 0 ]]; do
       shift  # past argument
       ;;     # part of the case construct
 
-    # Exclude - takes only one argument
+    # Exclude - accumulate arguments
     -e)
       current_opt=$1
-      glo_exclude_dir=$2
+      glo_exclude_dir=$glo_exclude_dir" $2"
       shift  # past argument
       shift  # past value
       ;;     # part of the case construct
@@ -304,7 +359,9 @@ while [[ $# > 0 ]]; do
 
     # Accumulates additonal strings to glo_ignore
     *)
-      if [[ $current_opt == -i ]]; then
+      if [[ $current_opt == -e ]]; then
+        glo_exclude_dir=$glo_exclude_dir" $1"
+      elif [[ $current_opt == -i ]]; then
         glo_ignore_mod=$glo_ignore_mod" $1"
       else
         echo "Unknown option $1"
@@ -316,5 +373,3 @@ while [[ $# > 0 ]]; do
 done
 
 extract_hierarchy $name
-# echo $analyzed_units
-# echo "default = ${default}"

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Backstep_Cf_St(Flow, Turb, ts)
+  subroutine User_Mod_Backstep_Cf_St(Flow, Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine extracts skin friction coefficient and Stanton number for       !
 !   backstep case.                                                             !
@@ -25,7 +25,6 @@
   real                     :: kin_vis, u_tan, u_tau, tau_wall
   real                     :: dens_const, visc_const
   real                     :: capa_const, cond_const
-  integer                  :: ts
 !==============================================================================!
 
   ! Take aliases
@@ -36,15 +35,15 @@
   t    => Flow % t
 
   ! Get constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   !----------------------------------!
   !   Read "x_coordinate.dat" file   !
   !----------------------------------!
-  if(this_proc < 2) print *, '# Now reading the file: x_coordinate.dat ' 
+  if(First_Proc()) print *, '# Now reading the file: x_coordinate.dat ' 
   open(9, file='x_coordinate.dat')
 
   ! Read the number of probes 
@@ -82,7 +81,7 @@
     allocate(ut_p(n_prob));  ut_p = 0.0
     allocate(vt_p(n_prob));  vt_p = 0.0
     allocate(wt_p(n_prob));  wt_p = 0.0
-  end if  
+  end if
 
   !-------------------------!
   !   Average the results   !
@@ -105,14 +104,14 @@
             else
               kin_vis = visc_const / dens_const
               u_tan = Flow % U_Tan(s)
-              u_tau = c_mu25 * sqrt(Turb % kin % n(c1))
+              u_tau = Turb % c_mu25 * sqrt(Turb % kin % n(c1))
               Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(           &
                                                 u_tau,                 &
                                                 Grid % wall_dist(c1),  &
                                                 kin_vis,               &
                                                 0.0)
-              tau_wall = dens_const * kappa * u_tau * u_tan    &
-                       / log(e_log*max(Turb % y_plus(c1), 1.05))
+              tau_wall = dens_const * Turb % kappa * u_tau * u_tan    &
+                       / log(Turb % e_log * max(Turb % y_plus(c1), 1.05))
 
               v1_p(i) = v1_p(i)  &
                       + 0.015663 * tau_wall * u % n(c1) / abs(u % n(c1))
@@ -131,34 +130,37 @@
 
   ! Average over all processors
   do pl=1, n_prob
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
-    call Comm_Mod_Global_Sum_Real(um_p(pl))
-    call Comm_Mod_Global_Sum_Real(vm_p(pl))
-    call Comm_Mod_Global_Sum_Real(wm_p(pl))
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uv_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
-    call Comm_Mod_Global_Sum_Real(vw_p(pl))
-    call Comm_Mod_Global_Sum_Real(v1_p(pl))
-    call Comm_Mod_Global_Sum_Real(v2_p(pl))
-    call Comm_Mod_Global_Sum_Real(v3_p(pl))
-    call Comm_Mod_Global_Sum_Real(v4_p(pl))
-    call Comm_Mod_Global_Sum_Real(v5_p(pl))
+    call Global % Sum_Int(n_count(pl))
+    call Global % Sum_Real(um_p(pl))
+    call Global % Sum_Real(vm_p(pl))
+    call Global % Sum_Real(wm_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uv_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+    call Global % Sum_Real(vw_p(pl))
+    call Global % Sum_Real(v1_p(pl))
+    call Global % Sum_Real(v2_p(pl))
+    call Global % Sum_Real(v3_p(pl))
+    call Global % Sum_Real(v4_p(pl))
+    call Global % Sum_Real(v5_p(pl))
 
     count =  count + n_count(pl) 
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(tm_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(tm_p(pl))
+      call Global % Sum_Real(tt_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
-  call File % Set_Name(result_name, time_step=ts, appendix='-cf-st', extension='.dat')
+  call File % Set_Name(result_name,                   &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-cf-st',          &
+                       extension = '.dat')
   call File % Open_For_Writing_Ascii(result_name, fu)
 
   write(fu,*) '# x, Cf, St, U, T, yPlus'
@@ -214,6 +216,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2) write(*,*) '# Finished with User_Backstep_Cf_St'
+  if(First_Proc()) write(*,*) '# Finished with User_Backstep_Cf_St'
 
   end subroutine

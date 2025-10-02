@@ -1,9 +1,22 @@
+# Full grid name
 pipe_full.neu
+
+# Create dual grid?
 no
+
+# Geometric scaling
 1.000000000000
+
+# Boundary cell centers' positions
 2
+
+# Periodicity
 2
 skip
+
+# Wall distance
 1
+
+# Probe 1d
 skip
 

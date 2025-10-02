@@ -1,12 +1,28 @@
+# Full mesh name
 rod_tet.msh
+
+# Create dual
 yes
+
+# Geometric extents
 1.000000
+
+# Enforce uniform
+yes
+
+# Boundary cell center positions
 2
+
+# Perioic boundaries
 1
 2
 2
 2
 skip
+
+# Distance from the walls
 1
+
+# Probe 1D
 skip
 

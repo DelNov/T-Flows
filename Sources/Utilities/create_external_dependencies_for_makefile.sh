@@ -10,8 +10,17 @@
 # This script does it for you.
 
 # folder structure
-CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Process/
-SHAR_DIR=$PWD/../Shared            # Process  src folder
+CURR_DIR=$PWD                      # Generate/, Convert/, Divide/, Cpu/, Gpu/
+if [[ "${CURR_DIR##*/}" == "Generate" ||  \
+      "${CURR_DIR##*/}" == "Convert" ||  \
+      "${CURR_DIR##*/}" == "Divide" ]]; then
+  SHAR_DIR=$PWD/../Shared
+elif [[ "${CURR_DIR##*/}" == "Cpu" || "${CURR_DIR##*/}" == "Gpu" ]]; then
+  SHAR_DIR=$PWD/../../Shared
+else
+  echo "Error: Invalid directory structure. Cannot determine Shared folder path."
+  return 4
+fi
 
 # tmp file name and location
 tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
@@ -28,7 +37,7 @@ tmp_file=$CURR_DIR/tmp_makefile_explicit_dependencies
 # keep track of the last executed command
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
+trap 'if [ $? -ne 0 ]; then echo "\"${last_command}\" command failed with exit code $?."; fi' EXIT
 
 #---------------------------------------#
 #   Produces correct module structure   #
@@ -37,7 +46,7 @@ function module_list() {
   # $1 - dir
 
   cd $1
-  # find file
+  # find file including soft links
   # with _Mod
   # remove ^./
   # not ^.
@@ -51,7 +60,7 @@ function module_list() {
   # turn ? to _Mod/*/
   # sort reverse unique
   # delete empty line
-  local result=$(find . -type f -print \
+  local result=$(find -L . -type f -print \
                | grep -i '_Mod' \
                | sed  -e 's%^\.\/%%' \
                | grep -v '^\.' \
@@ -98,7 +107,7 @@ function search_string_in_list() {
 #   Make file explicit dependencies constructor   #
 #-------------------------------------------------#
 function make_file_explicit_dependencies() {
-  # $1 - folder to create makefile list (Generate, Divide, Process, ..)
+  # $1 - folder to create makefile list (Generate, Divide, Process_?pu, ..)
 
   # create empty file or remove all content
   cd $1; cp /dev/null $tmp_file
@@ -253,24 +262,40 @@ function make_file_explicit_dependencies() {
 function check_if_lauched_in_correct_folder() {
   stop_execution=false
 
-  case "${CURR_DIR##*/}" in
-    "Process"|"Divide"|"Convert"|"Generate")
-    parent_dir="$(dirname "$CURR_DIR")"
-    if [ ! "${parent_dir##*/}" == "Sources" ]; then
-      echo "$parent_dir"
+  # Extract the current, parent, and grandparent folder names
+  current_folder="${CURR_DIR##*/}"
+  parent_folder="$(basename "$(dirname "$CURR_DIR")")"
+  grandparent_folder="$(basename "$(dirname "$(dirname "$CURR_DIR")")")"
+
+  # Check if the current folder is valid
+  if [[ "$current_folder" != "Cpu" && "$current_folder" != "Gpu" && \
+        "$current_folder" != "Divide" && "$current_folder" != "Convert" && \
+        "$current_folder" != "Generate" ]]; then
+    stop_execution=true
+  fi
+
+  # Check if the parent folder is Process (only for Cpu/Gpu)
+  if [[ "$current_folder" == "Cpu" || "$current_folder" == "Gpu" ]]; then
+    if [[ "$parent_folder" != "Process" ]]; then
       stop_execution=true
     fi
-    ;;
-    *)
-      stop_execution=true
-    ;;
-  esac
-
-  if [ $stop_execution == true ]; then
-    echo This script can only be launched from Generate/, Convert/, Divide/, Process/ folders of T-Flows
-    echo Launch it this way: bash ../Utilities/create_makefile_dependencies.sh
-    exit 3
   fi
+
+  # Check if the grandparent folder is Sources (only for Process/Cpu and Process/Gpu)
+  if [[ "$parent_folder" == "Process" ]]; then
+    if [[ "$grandparent_folder" != "Sources" ]]; then
+      stop_execution=true
+    fi
+  fi
+
+  # Exit if any checks fail
+  if [ $stop_execution == true ]; then
+    echo "This script can only be launched from the following folders:"
+    echo "Sources/Process/Cpu, Sources/Process/Gpu, Divide/, Convert/, or Generate/"
+    echo "Launch it this way: bash ../Utilities/create_makefile_dependencies.sh"
+    return 3
+  fi
+
 }
 #-------------------#
 #   Actual script   #

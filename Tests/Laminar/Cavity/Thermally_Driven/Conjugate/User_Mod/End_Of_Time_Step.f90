@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),     target :: Turb
   type(Vof_Type),      target :: Vof
   type(Swarm_Type),    target :: Swarm
-  integer, intent(in)         :: n         ! time step
   integer, intent(in)         :: n_stat_t  ! start time step for Turb. stat.
   integer, intent(in)         :: n_stat_p  ! start time step for Swarm. stat.
-  real,    intent(in)         :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: t
@@ -39,7 +37,7 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
-      if(c2 < 0 .and. Grid % Comm % cell_proc(c1) .eq. this_proc) then
+      if(c2 < 0 .and. Cell_In_This_Proc(c1)) then
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL ) then
           area = area + Grid % s(s)
@@ -53,15 +51,15 @@
     !-----------------------------------------------!
     !   Integrate (summ) heated area, and heat up   !
     !-----------------------------------------------!
-    call Comm_Mod_Global_Sum_Real(area)
-    call Comm_Mod_Global_Sum_Real(nu)
+    call Global % Sum_Real(area)
+    call Global % Sum_Real(nu)
 
     !-------------------------------------------------!
     !   Compute averaged Nussel number and print it   !
     !-------------------------------------------------!
     nu = nu / area
 
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print '(a)',        ' #==========================================='
       print '(a)',        ' # Output from user function, Nusslet number!'
       print '(a)',        ' #-------------------------------------------'

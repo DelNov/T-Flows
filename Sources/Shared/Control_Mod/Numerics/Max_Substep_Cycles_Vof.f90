@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Max_Substep_Cycles_Vof(val, verbose)
+  subroutine Max_Substep_Cycles_Vof(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads maximum number of sub-step cycles in VOF.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! max sub-step cycles in VOF
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_int_Item('MAX_SUBSTEP_CYCLES_VOF',  &
-                                   100, val, verbose)
+  call Control % Read_Int_Item('MAX_SUBSTEP_CYCLES_VOF',  &
+                                100, val, verbose)
 
   end subroutine

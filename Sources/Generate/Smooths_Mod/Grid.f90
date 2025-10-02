@@ -1,12 +1,34 @@
 !==============================================================================!
   subroutine Smooths_Mod_Grid(smr, Grid)
 !------------------------------------------------------------------------------!
-!   Smooths the grid lines by a Laplacian-like algorithm.                      !
+!>  Smooths the grid lines by a Laplacian-like algorithm inside Generate.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Memory allocation: Allocates memory for temporary arrays used in the     !
+!     smoothing process.                                                       !
+!   * Node connectivity: Establishes the connectivity between nodes by         !
+!     identifying neighboring nodes for each grid node.                        !
+!   * Exclusion of nodes: Identifies nodes that should not be moved during the !
+!     smoothing process, based on criteria specified in smr.                   !
+!   * Boundary handling: Ensures that nodes on the boundary faces are not      !
+!     altered during the smoothing process.                                    !
+!   * Smoothing iterations: Performs a specified number of smoothing           !
+!     iterations (smr % iters(reg)). In each iteration, the new coordinates    !
+!     of each node are calculated as the average of its neighboring nodes'     !
+!     coordinates.                                                             !
+!   * Relaxation factor: Applies a relaxation factor (smr % relax(reg)) to     !
+!     blend the new and old positions, controlling the node movement.          !
+!   * Region-specific smoothing: The smoothing can be applied selectively in   !
+!     different regions and along different axes (x,y,z), as specified in smr. !
+!   * Updating coordinates: Updates the coordinates of the grid nodes based    !
+!     on the new calculated positions, ensuring that the changes are within    !
+!     the defined limits.                                                      !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Smooths_Type) :: smr
-  type(Grid_Type)    :: Grid
+  type(Smooths_Type) :: smr   !! smoothing regions
+  type(Grid_Type)    :: Grid  !! grid being smoothed
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: c, n, s, c2, i, j, k, m
   real                 :: x_new_tmp, y_new_tmp, z_new_tmp
@@ -18,10 +40,10 @@
 !==============================================================================!
 
   ! Allocate memory for additional arrays
-  allocate(x_node_new(Grid % max_n_nodes));         x_node_new    = 0
-  allocate(y_node_new(Grid % max_n_nodes));         y_node_new    = 0
-  allocate(z_node_new(Grid % max_n_nodes));         z_node_new    = 0
-  allocate(node_to_nodes(Grid % max_n_nodes,0:40)); node_to_nodes = 0
+  call Enlarge % Array_Real(x_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Array_Real(y_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Array_Real(z_node_new,    i=(/1,Grid % n_nodes/))
+  call Enlarge % Matrix_Int(node_to_nodes, i=(/1,Grid % n_nodes/), j=(/0,40/))
 
   print *, '# Now smoothing the cells. This may take a while !'
 
@@ -173,10 +195,5 @@
       end do      ! through nodes
     end do
   end do
-
-  deallocate(x_node_new)
-  deallocate(y_node_new)
-  deallocate(z_node_new)
-  deallocate(node_to_nodes)
 
   end subroutine

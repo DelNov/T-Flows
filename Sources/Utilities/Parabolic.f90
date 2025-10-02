@@ -24,20 +24,16 @@
 
   ! Wrong invocation
   else
-    print *, '# You failed to invoke the program properly.'
-    print *, '# Correct invocation:'
-    print *, './Parabolic  x_start  x_end  bulk_velocity  n_points'
+    print '(a)', '# You failed to invoke the program properly.'
+    print '(a)', '# Correct invocation:'
+    print '(a)', './Parabolic  x_start  x_end  bulk_velocity  n_points'
     stop
   end if
 
-  print *, '#=================='
-  print *, '# Number of points '
-  print *, '#------------------'
-  print *, n
+  print '(a)', '#    Number of points:'
+  print '(i6)', n
 
-  print *, '#================================='
-  print *, '#   Coordinate      Velocity'
-  print *, '#---------------------------------'
+  print '(a)', '#    Coordinate:     Velocity:'
 
   ! distance between two nodes
   lx = (x_e - x_s)
@@ -63,6 +59,6 @@
   end do
 
   ! Print integral
-  print *, '# Bulk velocity is: ', integral / area
+  print '(a,es13.3)', '# Bulk velocity: ', integral / area
 
   end program

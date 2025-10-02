@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Tolerance_For_Vof_Solver(val, verbose)
+  subroutine Tolerance_For_Vof_Solver(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads linear solver tolerance for VOF function from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! tolerance
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TOLERANCE_FOR_VOF_SOLVER',  &
-                                   1.0e-6, val, verbose)
+  call Control % Read_Real_Item('TOLERANCE_FOR_VOF_SOLVER',  &
+                                 1.0e-6, val, verbose)
 
   end subroutine

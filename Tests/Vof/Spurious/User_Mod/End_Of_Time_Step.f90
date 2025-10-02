@@ -1,6 +1,6 @@
 !==============================================================================!
-  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm, n,    &
-                                       n_stat_t, n_stat_p, time)
+  subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,    &
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function computes position of contact line and high of droplet        !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: n         ! time step
   integer, intent(in)      :: n_stat_t
   integer, intent(in)      :: n_stat_p
-  real,    intent(in)      :: time      ! physical time
 !--------------------------------[Locals]--------------------------------------!
   type(Grid_Type),     pointer :: Grid
   type(Var_Type),      pointer :: fun
@@ -53,12 +51,12 @@
   min_vfrac = minval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   max_vfrac = maxval(fun % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
 
-  call Comm_Mod_Global_Min_Real(min_vfrac)
-  call Comm_Mod_Global_Max_Real(max_vfrac)
+  call Global % Min_Real(min_vfrac)
+  call Global % Max_Real(max_vfrac)
 
   n_tot_cells = Grid % n_cells - Grid % Comm % n_buff_cells
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     u_res = sqrt( Flow % u % n(c) ** 2       &
                 + Flow % v % n(c) ** 2       &
                 + Flow % w % n(c) ** 2)
@@ -79,44 +77,44 @@
 
   end do
 
-  call Comm_Mod_Global_Sum_Real(a_vof)
+  call Global % Sum_Real(a_vof)
 
-  call Comm_Mod_Global_Sum_Int(n_tot_cells)
-  call Comm_Mod_Global_Sum_Real(u_rms)
+  call Global % Sum_Int(n_tot_cells)
+  call Global % Sum_Real(u_rms)
   u_rms = sqrt(1.0 / real(n_tot_cells) * u_rms)
 
   u_max = maxval(sum_v1(1:Grid % n_cells - Grid % Comm % n_buff_cells))
-  call Comm_Mod_Global_Max_Real(u_max)
+  call Global % Max_Real(u_max)
 
   p_max = maxval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
   p_min = minval(Flow % p % n(1:Grid % n_cells - Grid % Comm % n_buff_cells))
-  call Comm_Mod_Global_Max_Real(p_max)
-  call Comm_Mod_Global_Min_Real(p_min)
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
 
-  call Comm_Mod_Global_Sum_Real(p_in)
-  call Comm_Mod_Global_Sum_Real(p_out)
-  call Comm_Mod_Global_Sum_Real(a_in)
-  call Comm_Mod_Global_Sum_Real(a_out)
+  call Global % Sum_Real(p_in)
+  call Global % Sum_Real(p_out)
+  call Global % Sum_Real(a_in)
+  call Global % Sum_Real(a_out)
 
   p_in = p_in / a_in
   p_out = p_out / a_out
 
   ! Write Results
-  if (this_proc < 2) then
-    if(n .eq. 1) then
+  if (First_Proc()) then
+    if(Time % Curr_Dt() .eq. 1) then
       call File % Delete('spurious.dat')
     end if
     call File % Append_For_Writing_Ascii('spurious.dat', fu)
-    write(fu,'(6(2X,E16.10E2))')  time, a_vof, u_rms, u_max, &
+    write(fu,'(6(2X,E16.10E2))')  Time % Get_Time(), a_vof, u_rms, u_max, &
                                   p_max-p_min, p_in-p_out
     close(fu)
   end if
 
   !! Calculate distance to center of cylinder
   !! For normals for curvature
-  !if(this_proc <= 2) then
+  !if(This_Proc() <= 2) then
   !  dist_n = 0
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, Grid % yc(c), 1.0/)
@@ -134,7 +132,7 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centk.dat', fu)
 
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    if(dist_n(c) == 1) then
   !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_ck(c)
@@ -146,7 +144,7 @@
   !! Calculate distance to center of cylinder
   !! For normals for normals
   !  dist_n = 0
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    norm_res = norm2((/fun % x(c), fun % y(c), fun % z(c)/))
   !    if(norm_res > epsloc) then
   !      x0 = (/1.0, Grid % yc(c), 1.0/)
@@ -165,7 +163,7 @@
 
   !  call File % Open_For_Writing_Ascii('dist_centn.dat', fu)
 
-  !  do c = 1, Grid % n_cells
+  !  do c = Cells_In_Domain_And_Buffers()
   !    if(dist_n(c) == 1) then
   !      write(fu,'(4(2X,E16.10E2))') Grid % xc(c), Grid % yc(c), Grid % zc(c), &
   !                                   dist_cn(c)

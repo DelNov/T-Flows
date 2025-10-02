@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Interface_Mod_To_Buffer(inter, var1, var2, v, boundary)
+  subroutine Interface_Mod_Exchange(inter, var1, var2, v, boundary)
 !------------------------------------------------------------------------------!
 !   Copy values of specified variables to buffer.                              !
 !------------------------------------------------------------------------------!
@@ -62,8 +62,8 @@
     end do
 
     ! Here we exchange (global sum) of phi_1 and phi_2
-    call Comm_Mod_Global_Sum_Real_Array(n_tot, inter % phi_1(1:n_tot,v))
-    call Comm_Mod_Global_Sum_Real_Array(n_tot, inter % phi_2(1:n_tot,v))
+    call Global % Sum_Real_Array(n_tot, inter % phi_1(1:n_tot,v))
+    call Global % Sum_Real_Array(n_tot, inter % phi_2(1:n_tot,v))
 
   end if
 

@@ -1,7 +1,20 @@
+# Full grid file name
 membrane.msh
+
+# Create dual mesh
 no
+
+# Geometric scaling
 skip
+
+# Boundary cell centers
 1
+
+# Periodicity
 skip
+
+# Distance from the walls
 1 2
+
+# Probe 1d
 skip

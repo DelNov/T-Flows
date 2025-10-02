@@ -1,18 +1,19 @@
 !==============================================================================!
   pure subroutine Swap_Int(a, b)
 !------------------------------------------------------------------------------!
-!   Swaps two integers.                                                        !
+!>  Swap_Int is a subroutine in Swap_Mod for swapping two integer values. It
+!>  takes two integer numbers as input and exchanges their values.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   integer, intent(inout) :: a, b
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: t
+  integer :: c
 !==============================================================================!
 
-  t = a
+  c = a
   a = b
-  b = t
+  b = c
 
   end subroutine
 

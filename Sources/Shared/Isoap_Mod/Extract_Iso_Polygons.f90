@@ -1,19 +1,24 @@
 !==============================================================================!
   subroutine Extract_Iso_Polygons(Isoap, Grid, cell, phi_n)
 !------------------------------------------------------------------------------!
+!>  The Extract_Iso_Polygons subroutine is pivotal in T-Flows' interaction with
+!>  Isoap. It extracts a polyhedron from the computational grid using the
+!>  Polyhedron % Extract_From_Grid function and stores it in the singleton
+!>  object Polyhedron.  After that, it processes it through Isoap's algorithm
+!>  via Isoap % Main_Isoap, resulting in iso-polygons stored in singleton
+!>  object Iso_Polygones.
+!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Isoap_Type)   :: Isoap
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: cell
-  real                :: phi_n(:)
+  class(Isoap_Type),       intent(out) :: Isoap     !! parent class
+  type(Grid_Type), target, intent(in)  :: Grid      !! computational grid
+  integer,                 intent(in)  :: cell      !! cell being analyze
+  real,          optional, intent(in)  :: phi_n(:)  !! variable interpolated
+                                                    !! at the nodes
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.  ! if true, a lot of files are created
 !-----------------------------------[Locals]-----------------------------------!
   integer, pointer, contiguous :: glo(:)
-  integer                      :: local_face_nodes(MAX_ISOAP_VERTS)
-  integer                      :: i_nod, i_fac, i_ver, i_iso, l_nod
-  integer                      :: s, n, faces_n_nodes
 !==============================================================================!
 
   ! Take alias for global cell numbers

@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Number_Of_Swarm_Sub_Steps(val, verbose)
+  subroutine Number_Of_Swarm_Sub_Steps(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the number of swarm (particle tracking) sub (time) steps.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer, intent(out) :: val
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  integer, intent(out) :: val      !! number of swarm sub (time) steps
+  logical, optional    :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('NUMBER_OF_SWARM_SUB_STEPS', 60, &
-                                  val, verbose)
+  call Control % Read_Int_Item('NUMBER_OF_SWARM_SUB_STEPS', 60, val, verbose)
 
   end subroutine

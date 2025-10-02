@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Results_Save_Interval(val, verbose)
+  subroutine Results_Save_Interval(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads results save interval from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer           :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  integer             :: val      !! results save interval
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Int_Item('RESULTS_SAVE_INTERVAL', 12, &
-                                  val, verbose)
+  call Control % Read_Int_Item('RESULTS_SAVE_INTERVAL', 12, val, verbose)
 
   end subroutine

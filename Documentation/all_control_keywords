@@ -14,8 +14,10 @@
   SAVE_BACKUP_NAME                         |         skip                  |   name of backup file you want to create
   SAVE_INITIAL_CONDITION                   |         yes                   |   no
   SAVE_RESULTS_AT_BOUNDARIES               |         yes                   |   no
+  SAVE_RESULTS_UNITS                       |         yes                   |   no
   SWARM_SAVE_INTERVAL                      |        60                     |   any integer > 0
   WALL_TIME_MAX_HOURS                      |       168.0                   |   any number
+  PROFILER_INFO                            |         percents              |   seconds
 ========================================================================================================================
   Numerics
 ------------------------------------------------------------------------------------------------------------------------
@@ -31,6 +33,7 @@
   BLENDING_COEFFICIENT_FOR_SCALARS         |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_TURBULENCE      |         1.0                   |   from 0.0 to 1.0
   BLENDING_COEFFICIENT_FOR_VOF             |         1.0                   |   from 0.0 to 1.0
+  BLEND_SYSTEM_MATRICES                    |         yes                   |   no
   CHOI_CORRECTION                          |         no                    |   yes
   GRADIENT_METHOD_FOR_ENERGY               |         least_squares         |   gauss_theorem
   GRADIENT_METHOD_FOR_MOMENTUM             |         least_squares         |   gauss_theorem
@@ -57,6 +60,7 @@
   MAX_SMOOTHING_CYCLES_CURVATURE_VOF       |         2                     |   an integer up to 5 makes sense
   MAX_SMOOTHING_CYCLES_NORMAL_VOF          |         0                     |   an integer up to 5 should be fine
   MAX_SUBSTEP_CYCLES_VOF                   |       100                     |   any integer
+  MAX_THREADS                              |         2                     |   integers, up to number of cores
   MIN_SIMPLE_ITERATIONS                    |         3                     |   any integer, but better > 2
   NORMALIZATION_FOR_ENERGY_SOLVER          |         1.0                   |   any real number, but mostly it is 1.0
   NORMALIZATION_FOR_MOMENTUM_SOLVER        |         1.0                   |   any real number, but mostly it is 1.0
@@ -66,6 +70,7 @@
   NORMALIZATION_FOR_TURBULENCE_SOLVER      |         1.0                   |   any real number, but mostly it is 1.0
   NUMBER_OF_PISO_CORRECTIONS               |         3                     |   any integer up to 10 is reasonable
   NUMBER_OF_TIME_STEPS                     |      1200                     |   any integer, multiples of 30 make sense
+  NUMBER_OF_SWARM_SUB_STEPS                |        12                     |   any integer, but I would say up to 20
   PRECONDITIONER_FOR_SYSTEM_MATRIX         |         incomplete_cholesky   |   diagonal, none
   PRESSURE_MOMENTUM_COUPLING               |         simple                |   piso
   REPORT_VOLUME_BALANCE                    |         no                    |   yes
@@ -76,14 +81,14 @@
   SIMPLE_UNDERRELAXATION_FOR_TURBULENCE    |         0.7                   |   from 0 to 1, more around 0.5
   SIMPLE_UNDERRELAXATION_FOR_VOF           |         0.5                   |   from 0 to 1, around 0.7 should be OK
   SKEWNESS_CORRECTION_VOF                  |         no                    |   yes
-  SOLVER_FOR_ENERGY                        |         bicg                  |   cg, cgs
-  SOLVER_FOR_MOMENTUM                      |         bicg                  |   cg, cgs
-  SOLVER_FOR_POTENTIAL                     |         cg                    |   bicg, cgs
-  SOLVER_FOR_PRESSURE                      |         cg                    |   bicg, cgs
-  SOLVER_FOR_SCALARS                       |         bicg                  |   cg, cgs
-  SOLVER_FOR_TURBULENCE                    |         bicg                  |   cg, cgs
-  SOLVER_FOR_VOF                           |         bicg                  |   cg, cgs
-  SOLVER_FOR_WALL_DISTANCE                 |         cg                    |   cgs, bicg
+  SOLVER_FOR_ENERGY                        |         bicg                  |   cg
+  SOLVER_FOR_MOMENTUM                      |         bicg                  |   cg
+  SOLVER_FOR_POTENTIAL                     |         cg                    |   bicg
+  SOLVER_FOR_PRESSURE                      |         cg                    |   bicg, rs_amg
+  SOLVER_FOR_SCALARS                       |         bicg                  |   cg
+  SOLVER_FOR_TURBULENCE                    |         bicg                  |   cg
+  SOLVER_FOR_VOF                           |         bicg                  |   cg
+  SOLVER_FOR_WALL_DISTANCE                 |         cg                    |   bicg
   TIME_INTEGRATION_SCHEME                  |         linear                |   parabolic
   TIME_STEP                                |         1.0e-2                |   any real number, usually < 0.1
   TOLERANCE_FOR_GAUSS_GRADIENTS            |         1.0e-3                |   any small number, but < 1.0e-3 is OK
@@ -112,8 +117,8 @@
   INTERFACE_TRACKING                       |         no                    |   yes
   LATENT_HEAT                              |         1.0                   |   physical property
   MASS_DENSITY                             |         1.0                   |   physical property
-  MASS_FLOW_RATES                          |         0.0,  0.0,  0.0       |   any triplet of real numbers
-  MASS_TRANSFER                            |         no                    |   yes
+  VOLUME_FLOW_RATES                        |         0.0,  0.0,  0.0       |   any triplet of real numbers
+  MASS_TRANSFER_MODEL                      |         none                  |   temperature_gradients, lee
   MAX_PARTICLES                            |         0                     |   any number >= 0
   NUMBER_OF_DOMAINS                        |         1                     |   from 1 to 4
   NUMBER_OF_PHASES                         |         1                     |   2
@@ -122,14 +127,14 @@
   PARTICLE_TRACKING                        |         no                    |   yes
   PHASE_DENSITIES                          |         1.0,  1.0             |   two physical properties - densities
   PHASE_VISCOSITIES                        |         1.0,  1.0             |   two viscosities for two phases
-  PHASE_CAPACITY                           |         1.0,  1.0             |   thermal capacities for two phases
+  PHASE_CAPACITIES                         |         1.0,  1.0             |   thermal capacities for two phases
   PHASE_CONDUCTIVITIES                     |         1.0,  1.0             |   thermal conductivities for two phases
   POINT_FOR_MONITORING_PLANES              |         0.0,  0.0,  0.0       |   see MONITORING_POINT above
   POTENTIAL_INITIALIZATION                 |         no                    |   yes
   PRESSURE_DROPS                           |         0.0,  0.0,  0.0       |   any triplet of real numbers
   REFERENCE_DENSITY                        |         0.0                   |   real number > 0.0
   REFERENCE_TEMPERATURE                    |         0.0                   |   real number > 0.0
-  ROUGHNESS_COEFFICIENT                    |         0.0
+  ROUGHNESS_COEFFICIENT                    |         0.0                   |   real number >= 0.0
   ROUGH_WALLS                              |         no                    |   yes
   SATURATION_TEMPERATURE                   |       100.0                   |   depends on liquid and pressure
   SCALARS_DIFFUSIVITY                      |         1.0-6                 |   physical property, usually around 1.0e-9
@@ -148,8 +153,7 @@
   TURBULENCE_MODEL                         |         none                  |   k_eps, k_eps_zeta_f, les_smagorinsky,
                                            |                               |   hybrid_les_prandtl, les_dynamic,
                                            |                               |   les_wale, les_tvm, dns, des_spalart,
-                                           |                               |   spalart_allmaras, rsm_hanjalic_jakirlic,
-                                           |                               |   rsm_manceau_hanjalic, hybrid_les_rans
+                                           |                               |   spalart_allmaras, hybrid_les_rans
   TURBULENCE_MODEL_VARIANT                 |         high_re               |   low_re
   TURBULENT_HEAT_FLUX_MODEL                |         sgdh                  |   ggdh, afm
   TURBULENT_PRANDTL_NUMBER                 |         0.9                   |   from 0.7 to 1.1, leave as is

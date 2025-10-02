@@ -1,12 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Saturation_Temperature(val, verbose)
+  subroutine Saturation_Temperature(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the value of saturation temperature from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! saturation temperature value
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SATURATION_TEMPERATURE', 100., val, verbose)
+  call Control % Read_Real_Item('SATURATION_TEMPERATURE', 100., val, verbose)
 
   end subroutine

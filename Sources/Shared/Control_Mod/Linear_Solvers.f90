@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Control_Mod_Linear_Solvers(name, verbose)
+  subroutine Linear_Solvers(Control, name, verbose)
 !------------------------------------------------------------------------------!
-!   Reading linear solvers (native or PETSc) from the control file.            !
+!>  Reads which linear solvers to use (native or PETSc) from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL)     :: name  ! name of the pressure-momentum coupling algorithm
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  character(SL)       :: name     !! which solvers to use (native or petsc)
+  logical, optional   :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('LINEAR_SOLVERS',  &
-                                  'native', name, verbose = .true.)
+  call Control % Read_Char_Item('LINEAR_SOLVERS',  &
+                                'native', name, verbose=verbose)
   call String % To_Upper_Case(name)
 
   end subroutine

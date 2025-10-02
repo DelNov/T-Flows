@@ -1,13 +1,13 @@
- NUMBER_OF_DOMAINS         2
+  NUMBER_OF_DOMAINS         2
 
- NUMBER_OF_TIME_STEPS     120
- RESULTS_SAVE_INTERVAL     12
- BACKUP_SAVE_INTERVAL     120
+  NUMBER_OF_TIME_STEPS     120
+  RESULTS_SAVE_INTERVAL     12
+  BACKUP_SAVE_INTERVAL     120
 
- TIME_STEP               0.1
+  TIME_STEP               0.1
 
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- INTERFACE_CONDITION      spiral_cold  spiral_hot
-   BOUNDARY_CONDITIONS    membrane     membrane
+  INTERFACE_CONDITION      spiral_cold  spiral_hot
+    BOUNDARY_CONDITIONS    membrane     membrane
 

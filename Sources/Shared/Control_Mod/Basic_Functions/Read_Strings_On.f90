@@ -1,26 +1,29 @@
 !==============================================================================!
-  subroutine Control_Mod_Read_Strings_On(keyword, values, n, verbose)
+  subroutine Read_Strings_On(Control, keyword, values, n, verbose)
 !------------------------------------------------------------------------------!
-!   Used to read variable names in bnd. and initial condition specificaton     !
+!>  Working horse function to read strings (argument "values") behind a
+!>  keyword (argument "keyword") in control file, starting from the current
+!>  position. If not found, it sets them all to '', which is hard-coded.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(len=*)  :: keyword
-  character(SL)     :: values(MSI)   ! spefified value, if found
-  integer           :: n             ! number of items
-  logical, optional :: verbose
+  class(Control_Type)              :: Control  !! parent class
+  character(len=*),    intent(in)  :: keyword  !! keyword it searches
+  character(SL),       intent(out) :: values(MAX_STRING_ITEMS)  !! values
+  integer,             intent(out) :: n        !! number of items
+  logical,   optional, intent(in)  :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: i
   logical :: reached_end
+  integer :: i
 !==============================================================================!
 
   ! Set default values
-  values(1:MSI) = ''
+  values(1:MAX_STRING_ITEMS) = ''
 
   !---------------------------------------------------------!
   !   Read one line from command file to find the keyword   !
   !---------------------------------------------------------!
-  call File % Read_Line(control_file_unit, reached_end)
+  call File % Read_Line(Control % file_unit, reached_end)
   if(reached_end) goto 1
 
   ! Found the correct keyword
@@ -30,19 +33,14 @@
       read(Line % tokens(i), *) values(i-1)
     end do
     n = Line % n_tokens - 1
-    return 
-
-  ! Keyword not found, try to see if there is similar, maybe it was a typo
-  ! (Tokens 2 and on hold variable names, they are too short to be checked)
-  else
-    call Control_Mod_Similar_Warning( keyword, trim(Line % tokens(1)) )
+    return
   end if
 
   !--------------------------------------------!
   !   Keyword was not found; issue a warning   !
   !--------------------------------------------!
 1 if(present(verbose)) then
-    if(verbose .and. this_proc < 2) then
+    if(verbose .and. First_Proc()) then
       print '(a,a,a)', ' # NOTE! Could not find the keyword: ', keyword, '.'
     end if
   end if

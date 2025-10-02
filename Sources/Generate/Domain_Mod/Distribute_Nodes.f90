@@ -1,15 +1,41 @@
 !==============================================================================!
-  subroutine Domain_Mod_Distribute_Nodes(dom, Grid, b, w,   &
-                                         is, js, ks, ie, je, ke)
+  subroutine Distribute_Nodes(Dom, Grid, b, bw,   &
+                              is, js, ks, ie, je, ke)
 !------------------------------------------------------------------------------!
-!   Places the nodes on the line defined with local block position             !
+!>  This subroutine places nodes on a line defined by local block positions.
+!------------------------------------------------------------------------------!
+!   Functionality:                                                             !
+!                                                                              !
+!   * Initialization: Retrieves the resolution of the block (ni, nj, nk) and   !
+!     the starting coordinates (x0, y0, z0).                                   !
+!   * Calculating delta values: Determines the change in coordinates (delx,    !
+!     dely, delz) across the specified range within the block.                 !
+!   * Early exit condition: If the number of nodes to distribute is less       !
+!     than 2, the subroutine returns immediately, as no distribution is        !
+!     needed.                                                                  !
+!   * Node distribution logic:                                                 !
+!     - Linear distribution (positive weight): If the weight (bw) is positive, !
+!       it distributes the nodes linearly between the start and end points,    !
+!       adjusting the node positions based on a computed delta shift (dt).     !
+!     - Hyperbolic distribution (negative weight): For negative weights, it    !
+!       uses a hyperbolic tangent function (tanh) to distribute the nodes.     !
+!       This involves determining a case based on the weight value and         !
+!       adjusting the node positions accordingly.                              !
+!   * Iterating over block dimensions: The subroutine iterates over the range  !
+!     specified by is, js, ks to ie, je, ke within the block, placing the      !
+!     nodes according to the calculated distribution.                          !
+!   * Updating node coordinates: For each position in the range, it updates    !
+!     the node coordinates (xn, yn, zn) in the Grid based on the selected      !
+!     distribution method (linear or hyperbolic).                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type)   :: dom
-  type(Grid_Type)     :: Grid
-  integer, intent(in) :: b, is, js, ks, ie, je, ke
-  real,    intent(in) :: w
+  class(Domain_Type)  :: Dom         !! domain in which the grid is generated
+  type(Grid_Type)     :: Grid        !! grid being generated
+  integer, intent(in) :: b           !! current block
+  integer, intent(in) :: is, js, ks  !! starting index in a logical direction
+  integer, intent(in) :: ie, je, ke  !! ending index in a logical direction
+  real,    intent(in) :: bw          !! weight of the block
 !----------------------------------[Calling]-----------------------------------!
   real :: atanh
 !-----------------------------------[Locals]-----------------------------------!
@@ -17,9 +43,9 @@
   real    :: x0, y0, z0, delx, dely, delz, t, dt, ddt, pr, xi
 !==============================================================================!
 
-  ni = dom % blocks(b) % resolutions(1)
-  nj = dom % blocks(b) % resolutions(2)
-  nk = dom % blocks(b) % resolutions(3)
+  ni = Dom % blocks(b) % resolutions(1)
+  nj = Dom % blocks(b) % resolutions(2)
+  nk = Dom % blocks(b) % resolutions(3)
 
   x0   = Grid % xn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
   y0   = Grid % yn(Grid % n_nodes+(ks-1)*ni*nj+(js-1)*ni+is)
@@ -35,9 +61,11 @@
   !-------------------------!
   !   Linear distribution   !
   !-------------------------!
-  if(w > 0.0) then
-    ddt = ( 2.0*(1.0-w) ) / ( real(n)*(real(n)-1.0)*(1.0+w) )
+  if(bw > 0.0) then
+    ddt = ( 2.0*(1.0-bw) ) / ( real(n)*(real(n)-1.0)*(1.0+bw) )
     t=0.0
+    node = Grid % n_nodes + ni*nj*nk  ! estimated last node
+    call Grid % Allocate_Nodes(node)  ! expand nodes
     do i=is,ie
       do j=js,je
         do k=ks,ke
@@ -45,30 +73,36 @@
             dt=1.0/real(n)+(real(i)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
-            if( (i  < ie).and.(Grid % xn(node) .gt. TERA) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(i < ie) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
           if( je .ne. js ) then
             dt=1.0/real(n)+(real(j)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
-            if( (j  < je).and.(Grid % xn(node) .gt. TERA) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(j < je) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
           if( ke .ne. ks ) then
             dt=1.0/real(n)+(real(k)-0.5*(real(n)+1)) * ddt
             t=t+dt
             node = Grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
-            if( (k  < ke).and.(Grid % xn(node) .gt. TERA) ) then
-              Grid % xn(node) = x0 + t*delx
-              Grid % yn(node) = y0 + t*dely
-              Grid % zn(node) = z0 + t*delz
+            if(k < ke) then
+              if(.not. Grid % node_positioned(node)) then
+                Grid % xn(node) = x0 + t*delx
+                Grid % yn(node) = y0 + t*dely
+                Grid % zn(node) = z0 + t*delz
+              end if
             end if
           end if
         end do
@@ -80,14 +114,14 @@
   !-----------------------------!
   else
     case = 0
-    if     ((w  >  -0.5).and.(w <=  -0.25)) then
-      pr = 1.0 - abs(0.5 - abs(w))
+    if     ((bw  >  -0.5).and.(bw <=  -0.25)) then
+      pr = 1.0 - abs(0.5 - abs(bw))
       case = 1
-    else if((w >=  -0.75).and.(w  <  -0.5)) then
-      pr = 1.0 - abs(0.5 - abs(w))
+    else if((bw >=  -0.75).and.(bw  <  -0.5)) then
+      pr = 1.0 - abs(0.5 - abs(bw))
       case = 2
     else
-      pr = -w
+      pr = -bw
       case = 3
     end if
 
@@ -99,7 +133,7 @@
             if(case .eq. 2) xi =   1.0 - 1.0*real(i)/real(n)
             if(case .eq. 3) xi = - 1.0 + 2.0*real(i)/real(n)
             node = Grid % n_nodes + (k-1)*ni*nj + (j-1)*ni + i+1
-            if( (i  < ie).and.(Grid % xn(node) .gt. TERA) ) then
+            if( (i < ie).and.(.not. Grid % node_positioned(node)) ) then
               if    (case .eq. 1) then
                 Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
                 Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
@@ -126,7 +160,7 @@
             if(case .eq. 2) xi =    1.0 - 1.0*real(j)/real(n)
             if(case .eq. 3) xi = -  1.0 + 2.0*real(j)/real(n)
             node = Grid % n_nodes + (k-1)*ni*nj + (j-0)*ni + i
-            if( (j  < je).and.(Grid % xn(node) .gt. TERA) ) then
+            if( (j < je).and.(.not. Grid % node_positioned(node)) ) then
               if    (case .eq. 1) then
                 Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
                 Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely
@@ -153,7 +187,7 @@
             if(case .eq. 2) xi =   1.0 - 1.0*real(k)/real(n)
             if(case .eq. 3) xi = - 1.0 + 2.0*real(k)/real(n)
             node = Grid % n_nodes + (k-0)*ni*nj + (j-1)*ni + i
-            if( (k  < ke).and.(Grid % xn(node) .gt. TERA) ) then
+            if( (k < ke).and.(.not. Grid % node_positioned(node)) ) then
               if    (case .eq. 1) then
                 Grid % xn(node) = x0 - (tanh(xi*atanh(pr))/pr)*delx
                 Grid % yn(node) = y0 - (tanh(xi*atanh(pr))/pr)*dely

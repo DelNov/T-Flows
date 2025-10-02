@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -12,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts   ! time step
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -31,11 +30,11 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! This version of the Save_Results works only for sequential runs
-  if(n_proc > 1) then
-    if(this_proc < 2) then
+  if(Parallel_Run()) then
+    if(First_Proc()) then
       print *, '#==========================================================='
       print *, '# This version of User_Mod_Save_Results is not intended for '
       print *, '# parallel runs.  Skipped writing of profiles in .dat file! '
@@ -51,18 +50,18 @@
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
 
   ! Read constant physical properties from control file
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1d')
 
   ! Set file name for results
-  call File % Set_Name(res_name,              &
-                       time_step=ts,          &
-                       appendix='-res-plus',  &
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix='-res-plus',          &
                        extension='.dat')
 
   !------------------!
@@ -70,7 +69,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -87,7 +86,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_x / (dens_const*bulk % area_x)
+  ubulk    = bulk % flux_x / bulk % area_x
   n_points = 0
 
   ! Open ASCII file for writing in the first available unit (fu)
@@ -127,7 +126,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -227,6 +226,6 @@
 
   close(fu)
 
-  if(this_proc < 2)  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  write(6, *) '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

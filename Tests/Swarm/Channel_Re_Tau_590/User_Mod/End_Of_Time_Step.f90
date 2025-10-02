@@ -1,15 +1,8 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is called at the end of time step.                           !
-!------------------------------------------------------------------------------!
-!----------------------------------[Modules]-----------------------------------!
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod, only: Field_Type
-  use Var_Mod,   only: Var_Type
-  use Const_Mod, only: PI
-  use Comm_Mod,  only: Comm_Mod_Global_Max_Real, this_proc
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -17,10 +10,8 @@
   type(Turb_Type),  target     :: Turb
   type(Vof_Type),   target     :: Vof
   type(Swarm_Type), target     :: Swarm
-  integer,          intent(in) :: n         ! current time step
   integer                      :: n_stat_t  ! 1st t.s. for turb. stat.
   integer                      :: n_stat_p  ! 1st t.s. for swarm. stat.
-  real                         :: time      ! physical time
 !------------------------------[Local parameters]------------------------------!
   real, parameter :: LX = 6.28  ! streamwise
   real, parameter :: LY = 3.14  ! spanwise
@@ -50,8 +41,8 @@
   t    => Flow % t
 
   ! Reading starting time for Swarm statistics from control file
-  call Control_Mod_Starting_Time_Step_For_Swarm_Statistics &
-       (n_stat_p, verbose=.true.)
+  call Control % Starting_Time_Step_For_Swarm_Statistics &
+                                              (n_stat_p, verbose=.true.)
 
   ! Reynolds number should be passed from Save_Results and number of bins should
   ! be defined in control file, also same for n_bin... (it's okey for now!) 
@@ -79,7 +70,7 @@
 !!  nn =  n - 340000 - 1 ! since we started having particle distribution from...
 !                       ! ... n = 340001! 
 !!  if(mod(nn , 2500) .eq. 0 .or. n .eq. n_bin .and. n .le. 347500) then
-!    if(this_proc < 2) then
+!    if(First_Proc()) then
 !
 !      level = 0.0 
 !      temp  = 0 
@@ -158,13 +149,13 @@
   !------------------------!
 
   ! If not time for disturbing the velocity field, return
-  if(mod(n, 120) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 120) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(n > 1200) return
+  if(Time % Curr_Dt() > 1200) return
 
   ! Print a message
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '# Superimposing random eddies on top of velocity field!'
   end if
 
@@ -209,7 +200,7 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         xc = Grid % xc(c)
         yc = Grid % yc(c)
         zc = Grid % zc(c)
@@ -251,12 +242,12 @@
   end do
 
   vmax = 0
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
-  call Comm_Mod_Global_Max_Real(vmax)
-  do c = 1, Grid % n_cells
+  call Global % Max_Real(vmax)
+  do c = Cells_In_Domain_And_Buffers()
     v % n(c) = v % n(c) / vmax / 5.0
     v % o(c) = v % o(c) / vmax / 5.0
     w % n(c) = w % n(c) / vmax / 5.0

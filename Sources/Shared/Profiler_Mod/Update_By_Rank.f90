@@ -1,28 +1,30 @@
 !==============================================================================!
-  subroutine Update_By_Rank(Profiler, i_fun)
+  subroutine Update_By_Rank(Prof, i_fun)
 !------------------------------------------------------------------------------!
-!   Updates function's timer by her rank (number)                              !
+!>  Updates the accumulated time for a specified function. It calculates the
+!>  elapsed time since the last update and adds this to the total time spent
+!>  in the function.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Profiler_Type), target :: Profiler
-  integer, intent(in)          :: i_fun
+  class(Profiler_Type), target :: Prof   !! parent class
+  integer, intent(in)          :: i_fun  !! function rank
 !-----------------------------------[Locals]-----------------------------------!
   real(DP) :: wall_time
 !==============================================================================!
 
   ! Store the last time which was recorded
-  Profiler % i_time_prev = Profiler % i_time_curr
+  Prof % i_time_prev = Prof % i_time_curr
 
   ! Refresh the value of time_curr
-  call system_clock(Profiler % i_time_curr)
+  call system_clock(Prof % i_time_curr)
 
   ! Calculate how much wall time has passed
-  wall_time = real(Profiler % i_time_curr - Profiler % i_time_prev)  &
-            / real(Profiler % sys_count_rate)
+  wall_time = real(Prof % i_time_curr - Prof % i_time_prev)  &
+            / real(Prof % sys_count_rate)
 
   if(i_fun > 0) then
-    Profiler % funct_time(i_fun) = Profiler % funct_time(i_fun) + wall_time
+    Prof % funct_time(i_fun) = Prof % funct_time(i_fun) + wall_time
   end if
 
   end subroutine

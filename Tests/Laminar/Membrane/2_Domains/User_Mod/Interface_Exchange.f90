@@ -1,6 +1,12 @@
-include '../User_Mod/Pv_Sat_Salt.f90'
-include '../User_Mod/Jump_Cond.f90'
-include '../User_Mod/Brent_For_Jump_Cond.f90'
+# ifdef __INTEL_COMPILER
+#   include "User_Mod/Pv_Sat_Salt.f90"
+#   include "User_Mod/Jump_Cond.f90"
+#   include "User_Mod/Brent_For_Jump_Cond.f90"
+# else
+#   include "Pv_Sat_Salt.f90"
+#   include "Jump_Cond.f90"
+#   include "Brent_For_Jump_Cond.f90"
+# endif
 
 !==============================================================================!
   subroutine User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
@@ -61,41 +67,41 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
     do d2 = 1, n_dom
 
       ! Send temperature to interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),        &
-                                   Flow(d1) % t % n,     &
-                                   Flow(d2) % t % n,     &
-                                   T)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % t % n,  &
+                                  Flow(d2) % t % n,  &
+                                  T)
 
       ! Send conductivities as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),            &
-                                   Flow(d1) % conductivity,  &
-                                   Flow(d2) % conductivity,  &
-                                   K)
+      call Interface_Mod_Exchange(inter(d1, d2),            &
+                                  Flow(d1) % conductivity,  &
+                                  Flow(d2) % conductivity,  &
+                                  K)
 
       ! Send wall distance to the interface
-      call Interface_Mod_To_Buffer(inter(d1, d2),                    &
-                                   Flow(d1) % pnt_grid % wall_dist,  &
-                                   Flow(d2) % pnt_grid % wall_dist,  &
-                                   WD)
+      call Interface_Mod_Exchange(inter(d1, d2),                    &
+                                  Flow(d1) % pnt_grid % wall_dist,  &
+                                  Flow(d2) % pnt_grid % wall_dist,  &
+                                  WD)
 
       ! Send inside scalar 1 as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % scalar(1) % n,  &
-                                   Flow(d2) % scalar(1) % n,  &
-                                   C)
+      call Interface_Mod_Exchange(inter(d1, d2),             &
+                                  Flow(d1) % scalar(1) % n,  &
+                                  Flow(d2) % scalar(1) % n,  &
+                                  C)
 
       ! Send pressure as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % p % n,          &
-                                   Flow(d2) % p % n,          &
-                                   P)
+      call Interface_Mod_Exchange(inter(d1, d2),     &
+                                  Flow(d1) % p % n,  &
+                                  Flow(d2) % p % n,  &
+                                  P)
 
       ! Send boundary scalar 1 as well
-      call Interface_Mod_To_Buffer(inter(d1, d2),             &
-                                   Flow(d1) % scalar(1) % n,  &
-                                   Flow(d2) % scalar(1) % n,  &
-                                   CB,                        &
-                                   boundary = .true.)
+      call Interface_Mod_Exchange(inter(d1, d2),             &
+                                  Flow(d1) % scalar(1) % n,  &
+                                  Flow(d2) % scalar(1) % n,  &
+                                  CB,                        &
+                                  boundary = .true.)
 
     end do
   end do
@@ -232,7 +238,7 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
         Flow(d1) % t % n(bc1) = t_int
 
         ! If not in a buffer, update accumulated variables
-        if(Grid1 % Comm % cell_proc(ic1) .eq. this_proc) then
+        if(Grid1 % Comm % cell_proc(ic1) .eq. This_Proc()) then
           mem_j_heat_acc = mem_j_heat_acc  + mem_j_heat * Grid1 % s(n)
           mem_j_diff_acc = mem_j_diff_acc  + mem_j_diff * Grid1 % s(n)
           t_int_acc      = t_int_acc       + t_int      * Grid1 % s(n)
@@ -301,15 +307,15 @@ include '../User_Mod/Brent_For_Jump_Cond.f90'
     end do
   end do
 
-  call Comm_Mod_Global_Sum_Real(mem_j_diff_acc)
-  call Comm_Mod_Global_Sum_Real(mem_j_heat_acc)
-  call Comm_Mod_Global_Sum_Real(t_int_acc)
-  call Comm_Mod_Global_Sum_Real(area_acc)
+  call Global % Sum_Real(mem_j_diff_acc)
+  call Global % Sum_Real(mem_j_heat_acc)
+  call Global % Sum_Real(t_int_acc)
+  call Global % Sum_Real(area_acc)
   mem_j_diff_avg = mem_j_diff_acc / area_acc
   mem_j_heat_avg = mem_j_heat_acc / area_acc
   t_int_avg      = t_int_acc      / area_acc
   ! Control
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, 'mem_j_diff = ' , mem_j_diff_avg * 3600, ' kg/m²h'
     print *, 'mem_j_heat = ' , mem_j_heat_avg * 3600, ' kg/m²h'
     print *, 'jump condition coefficients: ', lhs_lin, lhs_fun, rhs

@@ -1,10 +1,23 @@
+# Full mesh name
 backstep_orthogonal.msh
+
+# Create dual mesh?
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell centers' positions
 1
+
+# Periodicity
 5
 skip
+
+# Wall distance
 3 4
 skip
+
+# Probe 1d
 skip
 

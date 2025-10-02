@@ -1,12 +1,12 @@
-PROBLEM_NAME   channel_dual
+  PROBLEM_NAME   channel_dual
 
-NUMBER_OF_TIME_STEPS   120
+  NUMBER_OF_TIME_STEPS   120
 
-MASS_FLOW_RATES    1.0   0.0   0.0
+  VOLUME_FLOW_RATES  1.0   0.0   0.0
 
 
-BOUNDARY_CONDITION    walls
-  TYPE                wall
-  VARIABLES           u     v     w
-  VALUES              0.0   0.0   0.0
+  BOUNDARY_CONDITION    walls
+    TYPE                wall
+    VARIABLES           u     v     w
+    VALUES              0.0   0.0   0.0
 

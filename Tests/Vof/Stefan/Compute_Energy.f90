@@ -87,7 +87,7 @@
 
   ! Old values (o and oo)
   if(ini .eq. 1) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       t % oo(c) = t % o(c)
       t % o (c) = t % n(c)
     end do
@@ -104,7 +104,7 @@
   end if
 
   ! Compute helping variable
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
 
@@ -225,7 +225,7 @@
   !   Explicitly treated diffusion heat fluxes   !
   !   cross diffusion, and heat from interface   !
   !----------------------------------------------!
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     if(cross(c) >= 0) then
       b(c)  = b(c) + cross(c)
     else
@@ -237,7 +237,7 @@
 
   ! Heat from the interface
   if(Flow % mass_transfer) then
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       if(q_int(c) >= 0) then
         b(c) = b(c) + q_int(c)
       else
@@ -252,7 +252,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
     if(Flow % mass_transfer) then
       if(Vof % fun % n(c) > 0.5) then

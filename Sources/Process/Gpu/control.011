@@ -1,0 +1,92 @@
+#--------------
+# Problem name
+#--------------
+  PROBLEM_NAME    test_011_thermal_cavity
+
+  HEAT_TRANSFER   yes
+
+#---------------
+# Time stepping
+#---------------
+  TIME_STEP                                   5.0
+  NUMBER_OF_TIME_STEPS                      120
+  RESULTS_SAVE_INTERVAL                     120
+  BACKUP_SAVE_INTERVAL                      300
+
+  USE_ONE_MATRIX                             yes
+
+
+#-------------------
+# Monitoring points
+#-------------------
+  NUMBER_OF_MONITORING_POINTS    1
+    MONITORING_POINT_001         0.5  0.1  0.95
+
+  POINT_FOR_MONITORING_PLANES    0.5  0.1  0.75
+
+#-----------------
+# Physical models
+#-----------------
+  BUOYANCY                       thermal
+  GRAVITATIONAL_VECTOR           0.0,  0.0,  -1.0
+  REFERENCE_TEMPERATURE          0.5
+
+#---------------------
+# Physical properties
+#---------------------
+  # Properties based on Pr and Ra numbers:
+  # Pr = 0.71
+  # Ra = 10e5
+  # mu     = sqrt(Pr / Ra)       = 0.00266458251
+  # lambda = 1.0 / sqrt(Pr * Ra) = 0.00375293312
+  MASS_DENSITY           1.0
+  HEAT_CAPACITY          1.0
+  DYNAMIC_VISCOSITY      0.00266458251
+  THERMAL_CONDUCTIVITY   0.00375293312
+
+  TURBULENCE_MODEL    none
+
+#----------------------
+# Numerical parameters
+#----------------------
+  BLENDING_COEFFICIENT_FOR_MOMENTUM  0.95
+  MAX_SIMPLE_ITERATIONS              6
+  MIN_SIMPLE_ITERATIONS              3
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+  TOLERANCE_FOR_ENERGY_SOLVER        1.e-5
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+  SIMPLE_UNDERRELAXATION_FOR_ENERGY      0.6
+
+  PRECONDITIONER_FOR_SYSTEM_MATRIX         jacobi
+
+  MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS   4
+  BLEND_SYSTEM_MATRICES                    yes
+
+#--------------------
+# Initial conditions
+#--------------------
+  INITIAL_CONDITION
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   0.5
+
+#---------------------
+# Boundary conditions
+#---------------------
+  BOUNDARY_CONDITION    adiabatic_wall
+    TYPE                wall
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   0.0
+
+  BOUNDARY_CONDITION    hot_wall
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   1.0
+
+  BOUNDARY_CONDITION    cold_wall
+    TYPE                wall
+    VARIABLES           u     v     w     t
+    VALUES              0.0   0.0   0.0   0.0

@@ -1,28 +1,20 @@
 !==============================================================================!
-  subroutine Allocate_Real_Cell(Work, Grid, n)
+  subroutine Allocate_Real_Cell(Work, r)
+!------------------------------------------------------------------------------!
+!>  Allocates memory for real-typed working arrays associated with cells
+!>  in the Work object.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Work_Type) :: Work
-  type(Grid_Type)  :: Grid(:)
-  integer          :: n     ! number of real cell arrays
-!-----------------------------------[Locals]-----------------------------------!
-  integer :: nc, nb, i
+  class(Work_Type) :: Work     !! parent; the singleton Work object
+  integer          :: r        !! number of real cell arrays
 !==============================================================================!
 
-  if(n .eq. 0) return
+  if(r .eq. 0) return
 
-  ! Get number of cells and boundary cells
-  nc = maxval(Grid(1:size(Grid)) % n_cells)
-  nb = maxval(Grid(1:size(Grid)) % n_bnd_cells)
+  allocate(Work % r_cell(r) % array(-Work % max_nb : Work % max_nc))
+  Work % r_cell(r) % array(:) = 0.0
 
-  allocate(Work % r_cell(n))
-
-  do i = 1, n
-    allocate(Work % r_cell(i) % ptr(-nb:nc))
-    Work % r_cell(i) % ptr(:) = 0.0
-  end do
-
-  Work % last_r_cell = 0
+  call Gpu % Vector_Real_Create_On_Device(Work % r_cell(r) % array)
 
   end subroutine

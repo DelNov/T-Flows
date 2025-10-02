@@ -64,10 +64,7 @@
 #-----------------------------
 # Surface tracking parameters
 #-----------------------------
- MAX_SMOOTHING_CYCLES_CURVATURE_VOF  12
- MAX_SMOOTHING_CYCLES_NORMAL_VOF      0
- COMPRESION_VOF                       no
- COMPRESION_FACTOR_VOF                1.0
+ MAX_SMOOTH_CYCLES_CURVATURE_VOF  12
 
 #--------------------
 # Initial conditions

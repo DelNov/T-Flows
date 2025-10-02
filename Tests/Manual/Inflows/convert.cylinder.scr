@@ -1,9 +1,22 @@
+# Grid name with extension
 cylinder.msh
+
+# Create dual mesh
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell center coordinates
 2
+
+# Periodicity
 5
 skip
+
+# Wall distance
 1 4
+
+# Probe 1d
 skip
 

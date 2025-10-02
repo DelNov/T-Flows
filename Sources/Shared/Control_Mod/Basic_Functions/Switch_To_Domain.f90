@@ -1,13 +1,14 @@
 !==============================================================================!
-  subroutine Control_Mod_Switch_To_Domain(dom)
+  subroutine Switch_To_Domain(Control, dom)
 !------------------------------------------------------------------------------!
-!   Switch the control file to the specified domain.                           !
+!>  Switch the control file to the specified domain.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  integer :: dom
+  class(Control_Type) :: Control  !! parent class
+  integer, intent(in) :: dom      !! domain to which you switch
 !==============================================================================!
 
-  control_file_unit = dom_control_file_unit(dom)
+  Control % file_unit = Control % dom_file_unit(dom)
 
   end subroutine

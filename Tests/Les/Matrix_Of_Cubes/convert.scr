@@ -1,10 +1,23 @@
+# Mesh name
 matrix.msh
+
+# Do you want dual grid?
 no
+
+# Scaled the geometry?
 skip
+
+# Placement of boundary cells (1 or 2)
 2
+
+# Periodic directions
 1
 1
 skip
+
+# Calculate distance from the walls
 skip
+
+# Create .1d file
 skip
 

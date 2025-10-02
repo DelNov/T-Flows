@@ -1,35 +1,34 @@
 !==============================================================================!
-  subroutine Control_Mod_Rough_Walls(rough_walls, verbose)
+  subroutine Rough_Walls(Control, rough, verbose)
 !------------------------------------------------------------------------------!
-!   Reading wall roughness from the control file.                              !
+!>  Reads wall roughness from the control file.  (This could be obsolete,
+!>  see also Roughness_Coefficient.)
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, intent(out) :: rough_walls
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control  !! parent class
+  logical, intent(out) :: rough    !! true if walls are rough
+  logical, optional    :: verbose  !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('ROUGH_WALLS', 'no',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('ROUGH_WALLS', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   select case(val)
 
     case('YES')
-      rough_walls = .true.
+      rough = .true.
 
     case('NO')
-      rough_walls = .false.
+      rough = .false.
 
     case default
-      if(this_proc < 2) then
-        print *, '# Unknown wall roughness state :', trim(val)
-        print *, '# Exiting!'
-      end if
-      call Comm_Mod_End
-
+      call Message % Error(60,                                            &
+                           'Unknown wall roughness state: '//trim(val)//  &
+                           '. \n This error is critical. Exiting.',       &
+                           file=__FILE__, line=__LINE__, one_proc=.true.)
   end select
 
   end subroutine

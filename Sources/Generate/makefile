@@ -8,13 +8,21 @@
 #   Default options for compilation
 #-------------------------------------
 FORTRAN ?= gnu
-DEBUG   ?= no
 ASSERT  ?= yes
+DEBUG   ?= no
+PROF    ?= no
 REAL    ?= double
-MPI     ?= no
-OPENMP  ?= yes
+OMP     ?= yes
+SORT    ?= heap
 
-# Directories for objects and modules. (No need to change.)
+#-------------------------------------
+#   Check values passed to makefile
+#-------------------------------------
+include makefile_check_arguments
+
+#---------------------------------------------------------------
+#   Directories for objects and modules. (No need to change.)
+#---------------------------------------------------------------
 DIR_BINARY = ../../Binaries
 DIR_SHARED = ../Shared
 DIR_MODULE = .Modules
@@ -29,32 +37,71 @@ PROGRAM_FILE = $(DIR_BINARY)/$(PROGRAM_NAME)
 #   Initialize variables to pass on to preprocessor with
 #   variable T_FLOWS_COMPILATION which, if set to one,
 #   means unit is compiled from T-Flow
-#   It later adds T_FLOWS_MPI and T_FLOWS_PETSC
 #----------------------------------------------------------
 PASS_ON = -DT_FLOWS_COMPILATION=1
+
+#----------------------------------------------------------
+#   Add T_FLOWS_PROGRAM, T_FLOWS_ASSERT and T_FLOWS_DEBUG
+#   and later on it add also T_FLOWS_MPI and T_FLOWS_PETSC
+#----------------------------------------------------------
+PASS_ON += -DT_FLOWS_PROGRAM=2
+
 ifeq ($(ASSERT), yes)
   PASS_ON += -DT_FLOWS_ASSERT=1
 else
   PASS_ON += -DT_FLOWS_ASSERT=0
 endif
 
+ifeq ($(DEBUG), yes)
+  PASS_ON += -DT_FLOWS_DEBUG=1
+else
+  PASS_ON += -DT_FLOWS_DEBUG=0
+endif
+
+ifeq ($(SORT), quick)
+  PASS_ON += -DT_FLOWS_QUICKSORT=1
+else
+  PASS_ON += -DT_FLOWS_QUICKSORT=0
+endif
+
 $(info #=======================================================================)
-$(info # Compiling $(PROGRAM_NAME) with compiler $(FORTRAN)                    )
+$(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
-$(info #        <REAL=double/single>                                           )
+$(info #        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>                )
+$(info #        <SORT=heap/quick> <clean>                                      )
 $(info #                                                                       )
-$(info # Note: The first item, for each of the options above, is the default.  )
+$(info # Notes:                                                                )
+$(info #   1. The first item, for each of the options above, is the default.   )
+$(info #   2. Target "clean" removes all compiled files and binaries.          )
 $(info #                                                                       )
 $(info # Examples:                                                             )
-$(info #   make              - compile with gnu compiler                       )
-$(info #   make FORTAN=intel - compile with intel compiler                     )
-$(info #   make DEBUG=yes    - compile with gnu compiler in debug mode         )
-$(info #   make ASSERT=no    - compile without assert with gnu compiler        )
-$(info #   make OPENMP=yes   - compile with gnu compiler for parallel Generate )
+$(info #   make               - compile with gnu compiler                      )
+$(info #   make FORTRAN=intel - compile with intel compiler                    )
+$(info #   make DEBUG=yes     - compile with gnu compiler in debug mode        )
+$(info #   make ASSERT=no     - compile without assert with gnu compiler       )
+$(info #   make OMP=yes       - compile with gnu compiler for parallel Generate)
+$(info #   make SORT=heap     - use heap-sort variant of sorting functions     )
+$(info #   make clean         - remove all compiled files and binaries         )
 $(info #-----------------------------------------------------------------------)
+
+#----------------------------------------------------
+# Error trap for unknow options passed to makefile
+#----------------------------------------------------
+KNOWN_VARIABLES := FORTRAN FCOMP ASSERT DEBUG PROF REAL OMP SORT
+COMMAND_LINE_VARIABLES = $(foreach v,$(.VARIABLES), \
+  $(if $(findstring command line,$(origin $(v))),$(v),))
+UNKNOWN_VARIABLES = $(filter-out $(KNOWN_VARIABLES),$(COMMAND_LINE_VARIABLES))
+ifneq ($(strip $(UNKNOWN_VARIABLES)),)
+$(info # Error:                                                                )
+$(info #   Some options you passed are misspelled or not known to makefile.    )
+$(info #   Check the list of valid options above, in the section "Usage".      )
+$(info #   Unknown options: $(UNKNOWN_VARIABLES)                               )
+$(info #-----------------------------------------------------------------------)
+$(error This error is critical, exiting!)
+endif
 
 #-------------------
 #   METIS library
@@ -65,10 +112,16 @@ ifeq ($(REAL), single)
 endif
 
 #-------------------------------------------------------------------------
+#
 #   Compiler and linker options
+#
 #-------------------------------------------------------------------------
 #   Note: Changes only when support to a new Fortran compiler is added.
 #-------------------------------------------------------------------------
+
+#-----------
+#   Intel
+#-----------
 
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
@@ -77,17 +130,29 @@ ifeq ($(FORTRAN), intel)
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g -traceback -cpp
+    OPT_F_COMP += -O0 -g -traceback -check bounds
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3 -cpp
+    OPT_F_COMP += -O3
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -g -O2 -shared-intel -debug inline-debug-info  \
+                  -D TBB_USE_THREADING_TOOLS
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -qopenmp
+    ifeq ($(PROF), yes)
+      OPT_F_COMP += -qopenmp-link dynamic -parallel-source-info=2
+    endif
   endif
+
+#------------
+#   Nvidia
+#------------
 
 # Fortran == nvidia
 else ifeq ($(FORTRAN), nvidia)
@@ -96,17 +161,22 @@ else ifeq ($(FORTRAN), nvidia)
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp -Mbackslash
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -module $(DIR_MODULE) -O0 -g
+    OPT_F_COMP += -O0 -g
   else
-    OPT_F_COMP = -module $(DIR_MODULE) -O3
+    OPT_F_COMP += -O3
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -r8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -mp
   endif
+
+#---------
+#   Gnu
+#---------
 
 # Fortran == gnu
 else
@@ -115,24 +185,20 @@ else
   else
     FC = $(FCOMP)
   endif
+  OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
   ifeq ($(DEBUG), yes)
-    OPT_F_COMP = -J $(DIR_MODULE) -O0 -g -cpp                                  \
-                 -ffree-line-length-none -fcheck=all -fwhole-file -fbacktrace  \
-                 -ffpe-trap=invalid,zero,overflow -fimplicit-none              \
-                 -Wall -Wextra -Waliasing -Wampersand -Warray-temporaries      \
-                 -Wc-binding-type -Wcharacter-truncation -Wline-truncation     \
-                 -Wconversion -finit-real=nan    -Wintrinsics-std              \
-                 -Wreal-q-constant -Wsurprising -Wtabs -Wunderflow             \
-                 -Wintrinsic-shadow -Wunused-parameter -Walign-commons         \
-                 -Wfunction-elimination -Wrealloc-lhs -Wrealloc-lhs-all        \
-                 -Wtarget-lifetime -Wpedantic -fstack-check
+    OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall  \
+                  -Wno-integer-division
   else
-    OPT_F_COMP = -J $(DIR_MODULE) -O3 -cpp -ffree-line-length-none
+    OPT_F_COMP += -O3
+  endif
+  ifeq ($(PROF), yes)
+    OPT_F_COMP += -pg -g
   endif
   ifeq ($(REAL), double)
     OPT_F_COMP += -fdefault-real-8
   endif
-  ifeq ($(OPENMP), yes)
+  ifeq ($(OMP), yes)
     OPT_F_COMP += -fopenmp
   endif
 endif
@@ -142,24 +208,16 @@ endif
 #-----------------------------------------------------------
 OPT_LINK = $(OPT_F_COMP)
 
-#-----------------------
-#   MPI related stuff
-#-----------------------
-
-# Variable T_FLOWS_MPI is passed on to compilers
-ifeq ($(MPI), yes)
-  PASS_ON += -DT_FLOWS_MPI=1
-else
-  PASS_ON += -DT_FLOWS_MPI=0
-endif
+#----------------------------------------------------------------
+#   MPI related stuff (Generate is not an MPI program, pass 0)
+#----------------------------------------------------------------
+PASS_ON += -DT_FLOWS_MPI=0
 
 #------------------------------------------------------
 #   List of sources for modules and functions
 #------------------------------------------------------
 #   Modules' order must obey their dependency
 #   This list should therefore be written "by hand".
-#   Note: Modules written in lower case
-#         letters are candidates for deletion.
 #------------------------------------------------------
 
 #-------------
@@ -167,28 +225,31 @@ endif
 #-------------
 
 # Modules in shared directories
-SRC_F_MOD = Const_Mod.f90      \
-            String_Mod.f90     \
-            Tokenizer_Mod.f90  \
-            Comm_Mod.f90       \
-            Assert_Mod.f90     \
-            Message_Mod.f90    \
-            Profiler_Mod.f90   \
-            Math_Mod.f90       \
-            File_Mod.f90       \
-            Gen_Mod.f90        \
-            Vtk_Mod.f90        \
-            Metis_Mod.f90      \
-            Boundary_Mod.f90   \
-            Swap_Mod.f90       \
-            Sort_Mod.f90       \
+SRC_F_MOD = Const_Mod.f90         \
+            Region_Mod.f90        \
+            String_Mod.f90        \
+            Comm_Mod.f90          \
+            Assert_Mod.f90        \
+            Tokenizer_Mod.f90     \
+            Message_Mod.f90       \
+            Memory_Mod.f90        \
+            Control_Mod.f90       \
+            Profiler_Mod.f90      \
+            Math_Mod.f90          \
+            File_Mod.f90          \
+            Vtk_Mod.f90           \
+            Metis_Mod.f90         \
+            Swap_Mod.f90          \
+            Sort_Mod.f90          \
+            Gpu_Pointers_Mod.f90  \
+            Gpu_Mod.f90           \
             Grid_Mod.f90
 
 # Modules in the local directory
 SRC_F_MOD += Point_Mod.f90     \
              Line_Mod.f90      \
              Block_Mod.f90     \
-             Region_Mod.f90    \
+             Range_Mod.f90     \
              Smooths_Mod.f90   \
              Refines_Mod.f90   \
              Domain_Mod.f90    \
@@ -199,10 +260,7 @@ SRC_F_MOD += Point_Mod.f90     \
 #---------------
 
 # Sources for all shared functions
-SRC_F_FUN = Adjust_Dim.f90        \
-            Adjust_First_Dim.f90  \
-            Probe_1d_Nodes.f90    \
-            Probe_2d.f90
+SRC_F_FUN = Probe_1d_Nodes.f90
 
 # Local functions are added one by one ...
 SRC_F_FUN += Main_Gen.f90
@@ -216,26 +274,13 @@ OBJ_F_MOD = $(SRC_F_MOD:%.f90=$(DIR_OBJECT)/%.o)
 OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN)
 
-#-------------------------------------------------------
-#   List of modules currently used for target "clean"
-#-------------------------------------------------------
-#   Note: This doesn't need editing.
-#-------------------------------------------------------
-SRC_F_MOD_LOW = $(shell echo $(SRC_F_MOD) | tr A-Z a-z)
-MOD = $(SRC_F_MOD_LOW:%.f90=$(DIR_MODULE)/%.mod)
-
 #---------------------------------------------------------
 #   Default rule to build Fortran modules and functions
 #---------------------------------------------------------
 #   Note: This doesn't need editing.
 #---------------------------------------------------------
 
-# Fortran modules
-$(DIR_OBJECT)/%.o: %.f90 %/*.f90
-	@echo $(FC) $<
-	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
-
-# Fortran functions
+# Fortran sources
 $(DIR_OBJECT)/%.o: %.f90
 	@echo $(FC) $<
 	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<

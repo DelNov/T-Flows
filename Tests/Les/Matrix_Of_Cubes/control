@@ -14,7 +14,7 @@
   RESULTS_SAVE_INTERVAL                      200
   BACKUP_SAVE_INTERVAL                      3000
 
-  LOAD_BACKUP_NAME          matrix-ts060000.backup
+# LOAD_BACKUP_NAME          matrix-ts060000.backup
 
 #-------------------
 # Monitoring points
@@ -52,51 +52,51 @@
 # Ub = Re * nu / h = 3.852  [m/s]
 # m* = Ub * 1.2047 * 0.051 * 0.06 = 0.0142 [kg/s]
 #-------------------------------------------------
-  MASS_FLOW_RATES    0.0142,  0.0,  0.0
+  VOLUME_FLOW_RATES  0.0142,  0.0,  0.0
 
 #----------------------
 # Numerical parameters
 #----------------------
- PRESSURE_MOMENTUM_COUPLING           piso
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM  1.0
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE  1.0
- MIN_SIMPLE_ITERATIONS                2
+  PRESSURE_MOMENTUM_COUPLING           piso
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM  1.0
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE  1.0
+  MIN_SIMPLE_ITERATIONS                2
 
- TIME_INTEGRATION_SCHEME              parabolic
- ADVECTION_SCHEME_FOR_MOMENTUM        central
+  TIME_INTEGRATION_SCHEME              parabolic
+  ADVECTION_SCHEME_FOR_MOMENTUM        central
 
- GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
- MAX_GAUSS_GRADIENTS_ITERATIONS   3
+  GRADIENT_METHOD_FOR_PRESSURE     gauss_theorem
+  MAX_GAUSS_GRADIENTS_ITERATIONS   3
 
 #------------------------
 # Linear solver settings
 #------------------------
- LINEAR_SOLVERS                     native
- PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  LINEAR_SOLVERS                     native
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER       200
- MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER  100
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER       200
+  MAX_ITERATIONS_FOR_WALL_DISTANCE_SOLVER  100
 
- PETSC_OPTIONS_FOR_PRESSURE
-   SOLVER        cg
-   PREC          hypre       # asm or hypre
-   PREC_OPTS     
-   TOLERANCE     1.0e-3
+  PETSC_OPTIONS_FOR_PRESSURE
+    SOLVER        cg
+    PREC          hypre       # asm or hypre
+    PREC_OPTS     
+    TOLERANCE     1.0e-3
 
- PETSC_OPTIONS_FOR_WALL_DISTANCE
-   SOLVER        cg
-   PREC          hypre       # asm or hypre
-   PREC_OPTS     
-   TOLERANCE     1.0e-6
+  PETSC_OPTIONS_FOR_WALL_DISTANCE
+    SOLVER        cg
+    PREC          hypre       # asm or hypre
+    PREC_OPTS     
+    TOLERANCE     1.0e-6
 
- PETSC_OPTIONS_FOR_MOMENTUM
-   SOLVER        bicg
-   PREC          asm
-   PREC_OPTS     
-   TOLERANCE     1.0e-7
+  PETSC_OPTIONS_FOR_MOMENTUM
+    SOLVER        bicg
+    PREC          asm
+    PREC_OPTS     
+    TOLERANCE     1.0e-7
 
 #---------------------
 # Boundary conditions

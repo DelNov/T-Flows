@@ -1,10 +1,22 @@
+# Full file name
 skewed.msh
+
+# Dual mesh
 no
+
+# Geometrical scaling
 skip
+
+# Boundary cell placement
 2
+
+# Periodicity
 4
 skip
-skip
+
+# Distance from the walls
 1 2 3
+
+# Probe 1d
 skip
 

@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Blocks(dom, n)
+  subroutine Allocate_Blocks(Dom, n)
+!------------------------------------------------------------------------------!
+!>  Sets the number of blocks in the domain and allocates memory for them.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  integer           :: n
+  class(Domain_Type)  :: Dom  !! domain under consideration
+  integer, intent(in) :: n    !! number of blocks
 !==============================================================================!
 
-  dom % n_blocks = n
-  allocate(dom % blocks(n))
+  Dom % n_blocks = n
+  allocate(Dom % blocks(n))
 
   end subroutine

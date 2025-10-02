@@ -1,16 +1,14 @@
 !==============================================================================!
-  subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm, n, time)
+  subroutine User_Mod_Beginning_Of_Time_Step(Flow, Turb, Vof, Swarm)
 !------------------------------------------------------------------------------!
 !   This function is called at the beginning of time step.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Field_Type),    target :: Flow
-  type(Turb_Type),     target :: Turb
-  type(Vof_Type),      target :: Vof
-  type(Swarm_Type),    target :: Swarm
-  integer, intent(in)         :: n     ! time step
-  real,    intent(in)         :: time  ! physical time
+  type(Field_Type), target :: Flow
+  type(Turb_Type),  target :: Turb
+  type(Vof_Type),   target :: Vof
+  type(Swarm_Type), target :: Swarm
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi
@@ -24,7 +22,7 @@
   !------------------------------!
   !   Browse through all cells   !
   !------------------------------!
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
 
     ! Browse through all table entries
     do i = 1, N_ITEMS - 1

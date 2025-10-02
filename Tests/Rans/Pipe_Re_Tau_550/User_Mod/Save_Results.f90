@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1r file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
@@ -12,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts   ! time step
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
@@ -21,7 +20,7 @@
   type(Var_Type),  pointer :: kin, eps, zeta, f22
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: ut, vt, wt
-  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points
+  integer                  :: n_prob, pl, c, i, count, s, c1, c2, n_points, reg
   character(SL)            :: coord_name, res_name, res_name_plus
   real, allocatable        :: z_p(:), u_p(:), v_p(:), w_p(:), y_plus_p(:),  &
                               kin_p(:), eps_p(:), f22_p(:),                 &
@@ -38,7 +37,7 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! Take aliases
   Grid   => Flow % pnt_grid
@@ -51,30 +50,30 @@
   call Turb % Alias_Heat_Fluxes (ut, vt, wt)
 
   ! Take constant physical properties
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   ! Set the name for coordinate file
   call File % Set_Name(coord_name, extension='.1r')
 
   ! Set file name for results
-  call File % Set_Name(res_name,         &
-                       time_step=ts,     &
-                       appendix='-res',  &
-                       extension='.dat')
-  call File % Set_Name(res_name_plus,         &
-                       time_step=ts,          &
-                       appendix='-res-plus',  &
-                       extension='.dat')
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res',            &
+                       extension = '.dat')
+  call File % Set_Name(res_name_plus,                 &
+                       time_step = Time % Curr_Dt(),  &
+                       appendix  = '-res-plus',       &
+                       extension = '.dat')
 
   !------------------!
   !   Read 1r file   !
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -91,7 +90,7 @@
     return
   end if
 
-  ubulk    = bulk % flux_z / (dens_const*bulk % area_z)
+  ubulk    = bulk % flux_z / bulk % area_z
   t_wall   = 0.0
   nu_mean  = 0.0
   n_points = 0
@@ -104,7 +103,7 @@
   allocate(ind(n_prob*2))
 
   ! Read the intervals positions
-  do pl=1,n_prob
+  do pl = 1, n_prob
     read(9,*) ind(pl), z_p(pl)
   end do
   close(9)
@@ -136,7 +135,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       rad = 1.0 - Grid % wall_dist(c)
       if( rad < (z_p(i)) .and.  &
           rad > (z_p(i+1))) then
@@ -175,36 +174,36 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(kin_p(pl))
-    call Comm_Mod_Global_Sum_Real(eps_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
-    call Comm_Mod_Global_Sum_Real(vis_t_p(pl))
-    call Comm_Mod_Global_Sum_Real(y_plus_p(pl))
+    call Global % Sum_Real(kin_p(pl))
+    call Global % Sum_Real(eps_p(pl))
+    call Global % Sum_Real(uw_p(pl))
+    call Global % Sum_Real(vis_t_p(pl))
+    call Global % Sum_Real(y_plus_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(f22_p(pl))
-    call Comm_Mod_Global_Sum_Real(zeta_p(pl))
+    call Global % Sum_Real(f22_p(pl))
+    call Global % Sum_Real(zeta_p(pl))
 
     count =  count + n_count(pl)
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p(pl))
-      call Comm_Mod_Global_Sum_Real(tt_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(t_p(pl))
+      call Global % Sum_Real(tt_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
@@ -245,7 +244,7 @@
   end if
 
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
 
@@ -254,40 +253,40 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = t % n(c)
       end if
     end do
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     if(Flow % heat_flux > 0.0) then
-      call Comm_Mod_Global_Min_Real(t_inf)
+      call Global % Min_Real(t_inf)
     else
-      call Comm_Mod_Global_Max_Real(t_inf)
+      call Global % Max_Real(t_inf)
     end if
 
-    do s = 1, Grid % n_faces
-      c1 = Grid % faces_c(1,s)
-      c2 = Grid % faces_c(2,s)
-      if(c2  < 0) then
-        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. WALL .or.  &
+         Grid % region % type(reg) .eq. WALLFL) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
           t_wall   = t_wall + t % n(c2)
           nu_mean  = nu_mean + t % q(c2) / (cond_const*(t % n(c2) - t_inf))
           n_points = n_points + 1
-        end if
-      end if
-    end do
+        end do  ! faces
+      end if    ! boundary condition type
+    end do      ! regions
 
-    call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_mean)
-    call Comm_Mod_Global_Sum_Int(n_points)
+    call Global % Sum_Real(t_wall)
+    call Global % Sum_Real(nu_mean)
+    call Global % Sum_Int(n_points)
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
@@ -303,17 +302,17 @@
     cf_dean = 0.0791*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     error   = abs(cf_dean - cf)/cf_dean * 100.0
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'ubulk    = ', ubulk 
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re       = ', dens_const * ubulk * 2.0/visc_const
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Re_tau   = ', dens_const*u_tau_p/visc_const
-    write(i,'(a1,(a12,E12.6))')  &
+    write(i,'(a1,(a12,e12.6))')  &
     '#', 'Cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,F12.6))')  &
     '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,F12.6,a2,a22))') & 
+    write(i,'(a1,(a12,f12.6,a2,a22))') & 
     '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
       write(i,'(a1,(a12, F12.6))')'#', 'Nu number =', nu_mean 
@@ -325,30 +324,30 @@
 
     if(Turb % model .eq. K_EPS) then
       if(Flow % heat_transfer) then
-        write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
-                                     ' w,'                    //  &  !  2
-                                     ' kin, eps, uw,'         //  &  !  3, 4, 5
-                                     ' vis_t/visc_const,'   //  &  !  6
-                                     ' t, ut, vt, wt,'               !  7 - 10
+        write(i,'(a1,2x,a60)') '#',  ' r,'                    //  &    !  1
+                                     ' w,'                    //  &    !  2
+                                     ' kin, eps, uw,'         //  &    !  3, 4, 5
+                                     ' vis_t/visc_const,'     //  &    !  6
+                                     ' t, ut, vt, wt,'                 !  7 - 10
       else
-        write(i,'(a1,2X,A60)') '#', ' r,'                    //  &       !  1
-                                    ' w,'                    //  &       !  2
+        write(i,'(a1,2X,a60)') '#', ' r,'                     //  &    !  1
+                                    ' w,'                     //  &    !  2
                                     ' kin, eps, uw, vis_t/visc_const'  !  3-6
       end if
     else if(Turb % model .eq. K_EPS_ZETA_F) then
       if(Flow % heat_transfer) then
-        write(i,'(a1,2X,A60)') '#',  ' r,'                    //  &  !  1
+        write(i,'(a1,2x,a60)') '#',  ' r,'                    //  &  !  1
                                      ' w,'                    //  &  !  2
                                      ' kin, eps, uw,'         //  &  !  3, 4, 5
                                      ' f22, zeta,'            //  &  !  6, 7
-                                     ' vis_t/visc_const,'   //  &  !  8 - 11
+                                     ' vis_t/visc_const,'     //  &  !  8 - 11
                                      ' t, ut, vt, wt'
       else
-        write(i,'(a1,2X,A50)') '#', ' r,'                     //  &  !  1
+        write(i,'(a1,2x,a50)') '#', ' r,'                     //  &  !  1
                                     ' w,'                     //  &  !  2
                                     ' kin, eps, uw,'          //  &  !  3, 4, 5
                                     ' f22, zeta'              //  &  !  6, 7
-                                    ' vis_t/visc_const,'           !  8
+                                    ' vis_t/visc_const,'             !  8
       end if
     end if
   end do
@@ -462,6 +461,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

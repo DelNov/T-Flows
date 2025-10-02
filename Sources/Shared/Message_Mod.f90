@@ -1,9 +1,13 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Message_Mod
 !------------------------------------------------------------------------------!
-!   Procedures for printing warning and error messages.                        !
+!>  This module is designed to provide a suite of procedures for handling and
+!>  displaying messages in a structured and formatted manner. It is focused on
+!>  printing warning and error messages, as well as creating framed messages
+!>  with different line styles.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Tokenizer_Mod
@@ -15,6 +19,8 @@
   !------------------!
   !   Message type   !
   !------------------!
+  !> Message_Type includes several procedures for different
+  !> aspects of message handling and formatting.
   type Message_Type
 
     contains
@@ -28,7 +34,7 @@
 
   end type
 
-  type(Message_Type) :: Message
+  type(Message_Type) :: Message  !! A global object of the type Message_Type
 
   contains
 

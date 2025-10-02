@@ -1,0 +1,19 @@
+#-----------------------------------------------------------
+# Problem name must be specified and corresponds to the
+# base name (without extensions) of the grid file used.
+#-----------------------------------------------------------
+  PROBLEM_NAME        test_006_disc
+
+#-----------------------------------------------------------
+# Boundary conditions also must be specified and are
+# listed here, for this grid, with some dummy values
+#-----------------------------------------------------------
+  BOUNDARY_CONDITION top_and_bottom
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0
+
+  BOUNDARY_CONDITION perimeter
+    TYPE             wall
+    VARIABLES        u     v     w
+    VALUES           0.0   0.0   0.0

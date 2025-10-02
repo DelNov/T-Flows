@@ -1,13 +1,16 @@
 !==============================================================================!
-  subroutine Control_Mod_Turbulent_Schmidt_Number(val, verbose)
+  subroutine Turbulent_Schmidt_Number(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads turbulent Schmidt number from the control file.  If not specified
+!>  in the control file, it takes the defualt value of 0.9.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! value of the turbulent Schmidt number
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('TURBULENT_SCHMIDT_NUMBER', 0.9,  &
-                                   val, verbose)
+  call Control % Read_Real_Item('TURBULENT_SCHMIDT_NUMBER', 0.9, val, verbose)
 
   end subroutine

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Impinging_Jet_Profiles(Turb, ts)
+  subroutine User_Mod_Impinging_Jet_Profiles(Turb)
 !------------------------------------------------------------------------------!
 !   Subroutine reads the .1d file with wall normal coordinates and extracts    !
 !   solutions for comparison with corresponding experimental measurements.     !
@@ -7,7 +7,6 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Turb_Type), target :: Turb
-  integer,     intent(in) :: ts     ! time step
 !------------------------------[Local parameters]------------------------------!
   real, parameter :: U_AVER = 1.14
 !-----------------------------------[Locals]-----------------------------------!
@@ -74,48 +73,48 @@
       r1 = 0.0
       r2 = 0.04
       lnum = 0.0
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-0.0D', extension='.dat')
     else if(k .eq. 1) then
       r1 = 0.992
       r2 = 1.0
       lnum = 0.5
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-0.5D', extension='.dat')
     else if(k .eq. 2) then
       r1 = 2.0
       r2 = 2.1500
       lnum = 1.0
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-1.0D', extension='.dat')
     else if(k .eq. 3) then
       r1 = 2.9744
       r2 = 3.0684
       lnum = 1.5
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-1.5D', extension='.dat')
     else if(k .eq. 4) then
       r1 = 3.9098
       r2 = 4.1433
       lnum = 2.0
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-2.0D', extension='.dat')
     else if(k .eq. 5) then
       r1 = 0.4803200E+01
       r2 = 0.5347000E+01
       lnum = 2.5
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-2.5D', extension='.dat')
     else if(k .eq. 6) then
       r1 = 0.5876600E+01
       r2 = 0.6000000E+01
       lnum = 3.0
-      call File % Set_Name(res_name, time_step=ts,  &
+      call File % Set_Name(res_name, time_step=Time % Curr_Dt(),  &
                            appendix='-3.0D', extension='.dat')
     end if
 
     do i = 1, n_prob-1
-      do c = 1, Grid % n_cells
+      do c = Cells_In_Domain_And_Buffers()
         r = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) + TINY
         if(r > r1 .and. r < r2) then
           if(Grid % zc(c) > z_p(i) .and.  &
@@ -149,19 +148,19 @@
     !   Average over all processors   !
     !---------------------------------!
     do i = 1, n_prob
-      call Comm_Mod_Global_Sum_Int(n_count(i))
+      call Global % Sum_Int(n_count(i))
 
-      call Comm_Mod_Global_Sum_Real(u_p(i))
-      call Comm_Mod_Global_Sum_Real(v_p(i))
-      call Comm_Mod_Global_Sum_Real(w_p(i))
-      call Comm_Mod_Global_Sum_Real(zm_p(i))
+      call Global % Sum_Real(u_p(i))
+      call Global % Sum_Real(v_p(i))
+      call Global % Sum_Real(w_p(i))
+      call Global % Sum_Real(zm_p(i))
 
-      call Comm_Mod_Global_Sum_Real(kin_p(i))
-      call Comm_Mod_Global_Sum_Real(eps_p(i))
-      call Comm_Mod_Global_Sum_Real(vis_p(i))
-      call Comm_Mod_Global_Sum_Real(zet_p(i))
-      call Comm_Mod_Global_Sum_Real(f22_p(i))
-      call Comm_Mod_Global_Sum_Real(t_p(i))
+      call Global % Sum_Real(kin_p(i))
+      call Global % Sum_Real(eps_p(i))
+      call Global % Sum_Real(vis_p(i))
+      call Global % Sum_Real(zet_p(i))
+      call Global % Sum_Real(f22_p(i))
+      call Global % Sum_Real(t_p(i))
     end do
 
     do i = 1, n_prob
@@ -182,7 +181,7 @@
     !-----------------------------------!
     !   Write from one processor only   !
     !-----------------------------------!
-    if(this_proc < 2) then
+    if(First_Proc()) then
 
       call File % Open_For_Writing_Ascii(res_name, fu)
 
@@ -226,10 +225,10 @@
     t_p(:)     = 0.0
     zm_p(:)    = 0.0
 
-    if(this_proc < 2) print *, 'Finished with profile r/D =  ', lnum
+    if(First_Proc()) print *, 'Finished with profile r/D =  ', lnum
 
   end do   ! end number of radius
 
-  if(this_proc < 2) write(*,*) 'Finished with User_Impinging_Jet_Profiles'
+  if(First_Proc()) write(*,*) 'Finished with User_Impinging_Jet_Profiles'
 
   end subroutine

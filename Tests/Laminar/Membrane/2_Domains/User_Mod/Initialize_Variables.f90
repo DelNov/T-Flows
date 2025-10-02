@@ -1,4 +1,4 @@
-!include '../User_Mod/Pv_Sat.f90'
+!#include "Pv_Sat.f90"
 
 !==============================================================================!
   subroutine User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
@@ -38,7 +38,7 @@
     allocate (t_int_mem_prev(-Grid % n_bnd_cells:Grid % n_cells))
     allocate (mem_j(-Grid % n_bnd_cells:Grid % n_cells))
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       ! initialize membrane interface temperature
       t_int_mem_prev(c) = Flow % t % n(c)
       ! Salt concentration
@@ -79,7 +79,7 @@
     z_ext  = maxval(Grid % zc(:))  &
            - minval(Grid % zc(:))  ! average height of the air-gap in m
 
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       t_int_prev(c) = t_cold
 
       ! Temperature (linear profile between hot and cold T)

@@ -1,16 +1,20 @@
 !==============================================================================!
   subroutine Read_Binary_Int8_Array(File, un, n, reached_end)
 !------------------------------------------------------------------------------!
-!   Reads an array of long integers from a file in binary format.              !
+!>  Reads a specified number of double precision (8-byte) integers from a
+!>  binary file into the File % int8_array.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)  :: File
-  integer           :: un  ! unit
-  integer           :: n   ! number of items to read
-  logical, optional :: reached_end
+  class(File_Type)  :: File         !! parent class
+  integer           :: un           !! file unit
+  integer           :: n            !! number of items to read
+  logical, optional :: reached_end  !! flag to indicate if the end of the file
+                                    !! was reached during the reading process
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(File)
 !==============================================================================!
 
   ! If present, assumed the end of file has not been reached

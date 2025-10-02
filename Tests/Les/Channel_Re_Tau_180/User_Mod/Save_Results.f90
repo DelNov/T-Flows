@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results for paerticles in homogeneous directions.             !
@@ -7,22 +7,12 @@
 !   The results are then writen in files swarm_name_res.dat and                !
 !   swarm_name_res_plus.dat                                                    !
 !------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod 
-  use Swarm_Mod
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type),    target  :: Flow
   type(Turb_Type),     target  :: Turb
   type(Vof_Type),      target  :: Vof
   type(Swarm_Type),    target  :: Swarm
-  integer, intent(in)          :: ts     ! time step
   integer, optional            :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -45,7 +35,7 @@
   integer, allocatable     :: n_states(:)
   real                     :: t_wall, t_tau, d_wall, nu_mean, t_inf
   real                     :: ubulk, re, cf_dean, cf, pr, u_tau_p, temp
-  real                     :: temp_p1, temp_pp, temp_p2, slice, sslice_l 
+  real                     :: temp_p1, temp_pp, temp_p2, slice, sslice_l
   real                     :: sslice_u, sslice_diff, temp_kk
   real                     :: density_const, visc_const
   logical                  :: there, flag
@@ -74,7 +64,7 @@
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -153,7 +143,7 @@
   !   Swarm statistics   !
   !----------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -182,7 +172,7 @@
   !   Flowfield statistics   !
   !--------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -201,16 +191,16 @@
   ! Average over all processors
   do pl=1, n_prob-1
 
-    call Comm_Mod_Global_Sum_Int(n_count2(pl))
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Int(n_count2(pl))
+    call Global % Sum_Real(wall_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
     counter2 =  counter2 + n_count2(pl)
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     ! Background Flow
@@ -249,7 +239,7 @@
     cf_dean = 0.073*(re)**(-0.25)
     cf      = u_tau_p**2/(0.5*ubulk**2)
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'ubulk    = ', ubulk
     write(i,'(a1,(a12,e12.6))')  &
     '#', 're       = ', density_const * ubulk * 2.0/visc_const
     write(i,'(a1,(a12,e12.6))')  &
@@ -257,7 +247,7 @@
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
+    '#', 'Utau     = ', u_tau_p
 
     write(i,'(a1,2x,a50)') '#',  ' z,'                    //  &  !  1
                                  ' u,'                    //  &  !  2
@@ -337,6 +327,6 @@
   deallocate(store)
 
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Swarm.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Swarm.f90.'
 
   end subroutine

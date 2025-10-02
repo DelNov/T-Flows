@@ -1,7 +1,20 @@
+# Full mesh name
 cav_3d.msh
+
+# Dual grid
 no
+
+# Geometrical scaling?
 skip
+
+# Boundary cells placement
 2
+
+# Periodicity
 skip
+
+# Distance from the walls
 2 3
+
+# Probe 1d
 skip

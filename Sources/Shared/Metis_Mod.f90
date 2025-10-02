@@ -3,7 +3,10 @@
 !==============================================================================!
   module Metis_Mod
 !------------------------------------------------------------------------------!
-!   Holds parameters and a procedure for interaction with METIS library.       !
+!>  Managea interactions with the METIS library, facilitating graph and mesh
+!>  partitioning tasks within T-Flows.  The module provides a Fortran-friendly
+!>  interface to the METIS library, abstracting the complexity of direct
+!>  library calls and providing a more accessible way to utilize METIS.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Assert_Mod
@@ -14,6 +17,7 @@
   !----------------!
   !   Metis type   !
   !----------------!
+  !> Metis_Type includes data members and procedures for interacting with METIS.
   type Metis_Type
 
     ! Data members to prepare a call to METIS
@@ -36,12 +40,19 @@
                             imbalance(:)           ! allowed imbalance
 
     contains
+      procedure :: Call_Metis
       procedure :: Create_Metis
 
   end type
 
-  type(Metis_Type) :: Metis
+  ! Singleton Metis object
+  type(Metis_Type) :: Metis  !! Singleton Metis object; one instance of
+                             !! Metis_Type used across the module for
+                             !! conducting METIS-related operations
 
+  !----------------------------------------!
+  !   Handles for calls to METIS library   !
+  !----------------------------------------!
   integer, parameter :: METIS_OPTION_PTYPE     =  1
   integer, parameter :: METIS_OPTION_OBJTYPE   =  2
   integer, parameter :: METIS_OPTION_CTYPE     =  3
@@ -69,6 +80,7 @@
   integer, parameter :: METIS_OPTION_UBVEC     = 25
 
   contains
+#   include "Metis_Mod/Call_Metis.f90"
 #   include "Metis_Mod/Create_Metis.f90"
 
   end module

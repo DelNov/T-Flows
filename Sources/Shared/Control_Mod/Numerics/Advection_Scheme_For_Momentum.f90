@@ -1,16 +1,17 @@
 !==============================================================================!
-  subroutine Control_Mod_Advection_Scheme_For_Momentum(scheme_name, verbose)
+  subroutine Advection_Scheme_For_Momentum(Control, scheme_name, verbose)
 !------------------------------------------------------------------------------!
-!   Reading turbulence model from the control file.                            !
+!>  Reads advection scheme for momentum from control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL), intent(out) :: scheme_name
-  logical, optional          :: verbose
+  class(Control_Type)        :: Control      !! parent class
+  character(SL), intent(out) :: scheme_name  !! scheme name
+  logical, optional          :: verbose      !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('ADVECTION_SCHEME_FOR_MOMENTUM', 'smart',  &
-                                   scheme_name, verbose)
+  call Control % Read_Char_Item('ADVECTION_SCHEME_FOR_MOMENTUM', 'smart',  &
+                                 scheme_name, verbose)
   call String % To_Upper_Case(scheme_name)
 
   end subroutine

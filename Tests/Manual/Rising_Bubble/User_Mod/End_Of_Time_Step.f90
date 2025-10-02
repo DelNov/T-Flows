@@ -1,6 +1,6 @@
 !==============================================================================!
   subroutine User_Mod_End_Of_Time_Step(Flow, Turb, Vof, Swarm,  &
-                                       n, n_stat_t, n_stat_p, time)
+                                       n_stat_t, n_stat_p)
 !------------------------------------------------------------------------------!
 !   This function is computing benchmark for rising bubble.                    !
 !------------------------------------------------------------------------------!
@@ -10,10 +10,8 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer                  :: n         ! current time step
   integer                  :: n_stat_t  ! 1st t.s. statistics turbulence
   integer                  :: n_stat_p  ! 1st t.s. statistics particles
-  real                     :: time      ! physical time
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: fun
@@ -30,21 +28,21 @@
   c_position    = 0.0
   rise_velocity = 0.0
 
-  do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+  do c = Cells_In_Domain()
     b_volume      = b_volume + Grid % vol(c) * fun % n(c)
     c_position    = c_position + Grid % zc(c) * fun % n(c) * Grid % vol(c)
     rise_velocity = rise_velocity + Flow % w % n(c) * fun % n(c) * Grid % vol(c)
   end do
 
-  call Comm_Mod_Global_Sum_Real(b_volume)
-  call Comm_Mod_Global_Sum_Real(c_position)
-  call Comm_Mod_Global_Sum_Real(rise_velocity)
+  call Global % Sum_Real(b_volume)
+  call Global % Sum_Real(c_position)
+  call Global % Sum_Real(rise_velocity)
 
   ! Write to file
-  if (this_proc < 2) then
+  if (First_Proc()) then
     call File % Append_For_Writing_Ascii('benchmark.dat', fu)
 
-    write(fu,'(4(2x,e16.10e2))') time,                   &
+    write(fu,'(4(2x,e16.10e2))') Time % Get_Time(),      &
                                  b_volume,               &
                                  c_position/b_volume,    &
                                  rise_velocity/b_volume

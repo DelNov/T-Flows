@@ -1,12 +1,15 @@
 !==============================================================================!
-  subroutine Control_Mod_Surface_Tension(val, verbose)
+  subroutine Surface_Tension(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads the value of surface tension coefficient from the control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  real, intent(out) :: val
-  logical, optional :: verbose
+  class(Control_Type) :: Control  !! parent class
+  real,   intent(out) :: val      !! surface tension value
+  logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Real_Item('SURFACE_TENSION', 0.0, val, verbose)
+  call Control % Read_Real_Item('SURFACE_TENSION', 0.0, val, verbose)
 
   end subroutine

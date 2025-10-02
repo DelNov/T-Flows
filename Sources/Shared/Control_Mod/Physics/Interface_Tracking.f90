@@ -1,17 +1,18 @@
 !==============================================================================!
-  subroutine Control_Mod_Interface_Tracking(track_int, verbose)
+  subroutine Interface_Tracking(Control, track_int, verbose)
 !------------------------------------------------------------------------------!
-!   Reading if vof will be used to model multiphase situation                  !
+!>  Reads if VOF will be used to track interface in multiphase flow regimes.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  logical, intent(out) :: track_int
-  logical, optional    :: verbose
+  class(Control_Type)  :: Control    !! parent class
+  logical, intent(out) :: track_int  !! true if interface is tracked with VOF
+  logical, optional    :: verbose    !! controls output verbosity
 !-----------------------------------[Locals]-----------------------------------!
   character(SL) :: val
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('INTERFACE_TRACKING', 'no', val, verbose)
+  call Control % Read_Char_Item('INTERFACE_TRACKING', 'no', val, verbose)
   call String % To_Upper_Case(val)
 
   if( val .eq. 'YES' ) then
@@ -21,13 +22,10 @@
     track_int = .false.
 
   else
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown state for track front: ',   &
-                trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
-
+    call Message % Error(72,                                                 &
+                      'Unknown state for interface tracking: '//trim(val)//  &
+                      '. \n This error is critical.  Exiting.',              &
+                      file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

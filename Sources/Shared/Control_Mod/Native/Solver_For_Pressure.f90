@@ -1,22 +1,23 @@
 !==============================================================================!
-  subroutine Control_Mod_Solver_For_Pressure(val, verbose)
+  subroutine Solver_For_Pressure(Control, val, verbose)
+!------------------------------------------------------------------------------!
+!>  Reads linear solver for pressure (or pressure correction) from control file.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  character(SL), intent(out) :: val
-  logical, optional          :: verbose
+  class(Control_Type)        :: Control  !! parent class
+  character(SL), intent(out) :: val      !! linear solver (cg or bicg)
+  logical, optional          :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control_Mod_Read_Char_Item('SOLVER_FOR_PRESSURE', 'cg',  &
-                                   val, verbose)
+  call Control % Read_Char_Item('SOLVER_FOR_PRESSURE', 'cg', val, verbose)
   call String % To_Lower_Case(val)
 
-  if( val.ne.'bicg' .and. val.ne.'cgs' .and. val.ne.'cg') then
-    if(this_proc < 2) then
-      print *, '# ERROR!  Unknown linear solver for pressure: ', trim(val)
-      print *, '# Exiting!'
-    end if
-    call Comm_Mod_End
+  if(val .ne. 'bicg' .and. val .ne. 'cg' .and. val .ne. 'rs_amg') then
+    call Message % Error(60,                                      &
+             'Unknown linear solver for pressure: '//trim(val)//  &
+             '. \n This error is critical.  Exiting.',            &
+             file=__FILE__, line=__LINE__, one_proc=.true.)
   end if
 
   end subroutine

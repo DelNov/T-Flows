@@ -18,7 +18,7 @@
   character(8)                 :: name = 'check_xx'
   real,    contiguous, pointer :: phi_f(:), phi_n(:), phi_c(:)
   real,    contiguous, pointer :: phi_x(:), phi_y(:), phi_z(:)
-  integer, contiguous, pointer :: c_at_bnd(:), c_cnt(:)
+  integer, contiguous, pointer :: c_computed(:), c_visited(:)
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: YES = 1
   integer, parameter :: NO  = YES-1
@@ -27,7 +27,7 @@
   call Work % Connect_Real_Face(phi_f)
   call Work % Connect_Real_Node(phi_n)
   call Work % Connect_Real_Cell(phi_x, phi_y, phi_z, phi_c)
-  call Work % Connect_Int_Cell (c_at_bnd, c_cnt)
+  call Work % Connect_Int_Cell (c_computed, c_visited)
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -38,17 +38,6 @@
   Flow % gauss_miter = 100
   Flow % gauss_tol   = 1e-3
 
-  !----------------------------!
-  !   Find cells at boundary   !
-  !----------------------------!
-  c_at_bnd(:) = NO
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1, s)
-    c2 = Grid % faces_c(2, s)
-
-    if(c2 < 0) c_at_bnd(c1) = YES
-  end do
-
   !----------------------------------------------------------------------!
   !                                                                      !
   !   Test 1:                                                            !
@@ -58,14 +47,14 @@
   !                                                                      !
   !----------------------------------------------------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#=============================================================='
     print *, '# Performing Test 1 - least square cell based method'
     print *, '#--------------------------------------------------------------'
   end if
 
   ! Specify exact cell values variable over-writing boundary values
-  do c = -Grid % n_bnd_cells, Grid % n_cells
+  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -92,7 +81,7 @@
   !                                                         !
   !---------------------------------------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#=============================================================='
     print *, '# Performing Test 2 - Gaussian method from poor initial guess'
     print *, '#--------------------------------------------------------------'
@@ -122,7 +111,7 @@
   !                                                         !
   !---------------------------------------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#=============================================================='
     print *, '# Performing Test 3 - Gaussian method from better initial guess'
     print *, '#--------------------------------------------------------------'
@@ -130,7 +119,7 @@
 
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -180,7 +169,7 @@
   !                                                                         !
   !-------------------------------------------------------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#=============================================================='
     print *, '# Performing Test 4 - Gaussian method from an elaborate guess'
     print *, '#--------------------------------------------------------------'
@@ -189,7 +178,7 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 3)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     t % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -214,107 +203,83 @@
   t % grad_method = LEAST_SQUARES
   call Flow % Grad_Variable(t)
 
-  !--------------------------------------------------------------------!
-  !   Step 1: Extrapolate interior gradient values to boundary cells   !
-  !           using only values from interior cells - which are good   !
-  !           This step will leave the boundary cells surrounded by    !
-  !           other boundary cells unchanged (reset to zero, really)   !
-  !--------------------------------------------------------------------!
-  c_cnt(:) = 0
-  do c = 1, Grid % n_cells
+  !-----------------------------------------------------------------------!
+  !   Extrapolate interior gradient values to boundary cells using only   !
+  !   values which are known, either from interior cells, or cells near   !
+  !   boundaries computed in previous iterations.                         !
+  !-----------------------------------------------------------------------!
 
-    ! Cell is at the boundary, intervene here
-    if(c_at_bnd(c) .eq. YES) then
+  ! First assume all are computed although you know the cells near the
+  ! bounderies are not computed well; but they will be treated below
+  c_computed(:) = YES
 
-      ! Nullify its gradients, and the counter
-      ! for cells from which you interpolate
+  ! Mark cells which are not computed for the 1st time
+  ! At this point, these are cells near the boundaries
+  do s = 1, Grid % n_faces
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
+    if(c2 < 0) c_computed(c1) = NO
+  end do
+
+  call Grid % Exchange_Cells_Int(c_computed)
+
+  ! Nullify gradients for cells near boundaries
+  ! (where gradients are not computed properly),
+  ! and initialize c_visited
+  do c = Cells_In_Domain_And_Buffers()
+    if(c_computed(c) .eq. NO) then  ! if not computed
       t % x(c) = 0.0
       t % y(c) = 0.0
       t % z(c) = 0.0
-      c_cnt(c) = 0    ! probably not needed, initialized above
-
-      ! Browse through this cell's faces
-      do i_fac = 1, Grid % cells_n_faces(c)
-        s_prim  = Grid % cells_f(i_fac, c)
-        c1_prim = Grid % faces_c(1, s_prim)
-        c2_prim = Grid % faces_c(2, s_prim)
-
-        ! Consider c1_prim if it is not cell at boundary
-        if(c_at_bnd(c1_prim) .eq. NO) then
-          t % x(c) = t % x(c) + t % x(c1_prim)
-          t % y(c) = t % y(c) + t % y(c1_prim)
-          t % z(c) = t % z(c) + t % z(c1_prim)
-          c_cnt(c) = c_cnt(c) + 1
-        end if
-
-        ! Consider c2_prim if it is not cell at boundary
-        ! and not a boundary cell.
-        if(c_at_bnd(c2_prim) .eq. NO .and.  &
-           c2_prim .gt. 0) then
-          t % x(c) = t % x(c) + t % x(c2_prim)
-          t % y(c) = t % y(c) + t % y(c2_prim)
-          t % z(c) = t % z(c) + t % z(c2_prim)
-          c_cnt(c) = c_cnt(c) + 1
-        end if
-
-      end do
-
-      ! Work out the average
-      if(c_cnt(c) .gt. 0) then
-        t % x(c) = t % x(c) / c_cnt(c)
-        t % y(c) = t % y(c) / c_cnt(c)
-        t % z(c) = t % z(c) / c_cnt(c)
-      end if
-
-    end if  ! c at bnd
-
+      c_visited(c) = 0
+    end if
   end do
 
-  !-----------------------------------------------------------------------!
-  !   Step 2: Previous step left the cells at boundary, which are only    !
-  !           surrounded by other cells at boundary, untreated.  Here,    !
-  !           you are less selective and extrapolate even from cells at   !
-  !           boundaries, which were interpolated in the Step 1 above.    !
-  !-----------------------------------------------------------------------!
-  do c = 1, Grid % n_cells
+  !------------------------------------------------!
+  !   Extrapolate in several iterations, as long   !
+  !   as there are cells which are not computed.   !
+  !------------------------------------------------!
+  do iter = 1, 3
 
-    ! Cell is at the boundary, and hasn't been treated yet
-    if(c_at_bnd(c) .eq. YES .and. c_cnt(c) .eq. 0) then
+    ! Browse through faces to find the cells which need ...
+    ! ... updating, and accumulate gradients in them as well
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1, s)
+      c2 = Grid % faces_c(2, s)
 
-      ! Browse through this cell's faces
-      do i_fac = 1, Grid % cells_n_faces(c)
-        s_prim  = Grid % cells_f(i_fac, c)
-        c1_prim = Grid % faces_c(1, s_prim)
-        c2_prim = Grid % faces_c(2, s_prim)
-
-        if(c1_prim .ne. c  .and.  &     ! skip your own self
-           c_cnt(c1_prim) .gt. 0) then  ! consider only cells with values
-          t % x(c) = t % x(c) + t % x(c1_prim)
-          t % y(c) = t % y(c) + t % y(c1_prim)
-          t % z(c) = t % z(c) + t % z(c1_prim)
-          c_cnt(c) = c_cnt(c) + 1
+      if(c2 > 0) then
+        if(c_computed(c1) .eq. NO .and. c_computed(c2) .eq. YES) then
+          t % x(c1) = t % x(c1) + t % x(c2)
+          t % y(c1) = t % y(c1) + t % y(c2)
+          t % z(c1) = t % z(c1) + t % z(c2)
+          c_visited(c1) = c_visited(c1) + 1
         end if
 
-        if(c2_prim .ne. c  .and.  &     ! skip your own self
-           c2_prim .gt. 0  .and.  &     ! consider only cells with values
-           c_cnt(c2_prim) .gt. 0) then  ! don't use boundary cells
-          t % x(c) = t % x(c) + t % x(c2_prim)
-          t % y(c) = t % y(c) + t % y(c2_prim)
-          t % z(c) = t % z(c) + t % z(c2_prim)
-          c_cnt(c) = c_cnt(c) + 1
+        if(c_computed(c2) .eq. NO .and. c_computed(c1) .eq. YES) then
+          t % x(c2) = t % x(c2) + t % x(c1)
+          t % y(c2) = t % y(c2) + t % y(c1)
+          t % z(c2) = t % z(c2) + t % z(c1)
+          c_visited(c2) = c_visited(c2) + 1
         end if
-
-      end do
-
-      if(c_cnt(c) .gt. 0) then
-        t % x(c) = t % x(c) / c_cnt(c)
-        t % y(c) = t % y(c) / c_cnt(c)
-        t % z(c) = t % z(c) / c_cnt(c)
       end if
+    end do
 
-    end if  ! c at bnd
+    ! Browse throough cells, and calculate final values ...
+    ! ... of gradients in the cells which have been visited
+    do c = Cells_In_Domain_And_Buffers()
+      if(c_visited(c) > 0) then
+        t % x(c) = t % x(c) / c_visited(c)
+        t % y(c) = t % y(c) / c_visited(c)
+        t % z(c) = t % z(c) / c_visited(c)
+        c_visited(c)  = 0
+        c_computed(c) = YES  ! mark it as computed for the next iteration
+      end if
+    end do
+    call Grid % Exchange_Cells_Real(t % x)
+    call Grid % Exchange_Cells_Real(t % y)
+    call Grid % Exchange_Cells_Real(t % z)
 
-  end do
+  end do    ! iter
 
   ! Save the initial guess that you got
   call Grid % Save_Debug_Vtu(                                &
@@ -343,7 +308,7 @@
   !                                                                      !
   !----------------------------------------------------------------------!
 
-  if(this_proc < 2) then
+  if(First_Proc()) then
     print *, '#=============================================================='
     print *, '# Performing Test 5 - Field % Grad_Gauss_Pressure '
     print *, '#--------------------------------------------------------------'
@@ -352,7 +317,7 @@
   ! Specify exact cell values variable not touching bounary values
   ! This is supposed to mimic pressure solution, for example
   ! (This is the repetition of what was done in Test 4 & 5)
-  do c = 1, Grid % n_cells
+  do c = Cells_In_Domain_And_Buffers()
     p % n(c) =         Grid % xc(c)  &
                + 2.0 * Grid % yc(C)  &
                + 3.0 * Grid % zc(C)
@@ -372,6 +337,9 @@
   call Work % Disconnect_Real_Face(phi_f)
   call Work % Disconnect_Real_Node(phi_n)
   call Work % Disconnect_Real_Cell(phi_x, phi_y, phi_z, phi_c)
-  call Work % Disconnect_Int_Cell (c_at_bnd, c_cnt)
+  call Work % Disconnect_Int_Cell (c_computed, c_visited)
+
+  call Global % End_Parallel
+  stop
 
   end subroutine

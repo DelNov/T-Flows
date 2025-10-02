@@ -1,17 +1,19 @@
 !==============================================================================!
   pure subroutine Real_By_Index(Sort, n, x, indx)
 !------------------------------------------------------------------------------!
-!   Sorts real array x according to indx.                                      !
+!>  Sorts real array x according to index.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Sort_Type), intent(in)    :: Sort
-  integer,          intent(in)    :: n
-  real,             intent(inout) :: x(n)
-  integer,          intent(in)    :: indx(n)
+  class(Sort_Type), intent(in)    :: Sort     !! parent class
+  integer,          intent(in)    :: n        !! array size
+  real,             intent(inout) :: x(n)     !! array to be sorted
+  integer,          intent(in)    :: indx(n)  !! index for sorting
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: i
-  real, allocatable :: work(:)
+  integer           :: i        !! loop variable
+  real, allocatable :: work(:)  !! work array
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Sort)
 !==============================================================================!
 
   allocate(work(n)); work = 0.0

@@ -1,66 +1,65 @@
 #----------
 # Prologue
 #---------
- PROBLEM_NAME     cylinder
- HEAT_TRANSFER    no
+  PROBLEM_NAME     cylinder
+  HEAT_TRANSFER    no
 
- NUMBER_OF_TIME_STEPS    3600
- RESULTS_SAVE_INTERVAL      6
- SWARM_SAVE_INTERVAL        6
- BACKUP_SAVE_INTERVAL     300
- TIME_STEP                0.1
+  NUMBER_OF_TIME_STEPS    3600
+  RESULTS_SAVE_INTERVAL      6
+  SWARM_SAVE_INTERVAL        6
+  BACKUP_SAVE_INTERVAL     300
+  TIME_STEP                0.1
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
- NUMBER_OF_MONITORING_POINTS    1
-   MONITORING_POINT_001         1.5  0.5  0.5
+  NUMBER_OF_MONITORING_POINTS    1
+    MONITORING_POINT_001         1.5  0.5  0.5
 
- POINT_FOR_MONITORING_PLANES    1.5  0.5  0.5
+  POINT_FOR_MONITORING_PLANES    1.5  0.5  0.5
 
 #-----------------
 # Physical models
 #-----------------
- MASS_DENSITY           1.0
- DYNAMIC_VISCOSITY      1.0e-4
- HEAT_CAPACITY          1.0
- GRAVITATIONAL_VECTOR   0.0  0.0  0.0
+  MASS_DENSITY           1.0
+  DYNAMIC_VISCOSITY      1.0e-4
+  HEAT_CAPACITY          1.0
+  GRAVITATIONAL_VECTOR   0.0  0.0  0.0
 
- TURBULENCE_MODEL       none
- MASS_FLOW_RATES        2.0  0.0  0.0
+  TURBULENCE_MODEL       none
+  VOLUME_FLOW_RATES      2.0  0.0  0.0
 
 #----------------
 # Swarm related
 #----------------
- PARTICLE_TRACKING                          yes
- SWARM_DIAMETER                               1.8e-3
- SWARM_DENSITY                                1.0e+3
- NUMBER_OF_SWARM_SUB_STEPS                   12
- MAX_PARTICLES                               64
- SWARM_COEFFICIENT_OF_RESTITUTION             1.00
- STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    30
+  PARTICLE_TRACKING                          yes
+  SWARM_DIAMETER                               1.8e-3
+  SWARM_DENSITY                                1.0e+3
+  NUMBER_OF_SWARM_SUB_STEPS                   12
+  MAX_PARTICLES                               64
+  SWARM_COEFFICIENT_OF_RESTITUTION             1.00
+  STARTING_TIME_STEP_FOR_SWARM_COMPUTATION    30
 
 #----------------------
 # Numerical parameters
 #----------------------
+  PRESSURE_MOMENTUM_COUPLING    simple
 
- PRESSURE_MOMENTUM_COUPLING    simple
+  SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
+  SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
+  MAX_ITERATIONS_FOR_PRESSURE_SOLVER     250
 
- SIMPLE_UNDERRELAXATION_FOR_MOMENTUM    0.6
- SIMPLE_UNDERRELAXATION_FOR_PRESSURE    0.4
- MAX_ITERATIONS_FOR_PRESSURE_SOLVER     250
+  TIME_INTEGRATION_SCHEME  linear
 
- TIME_INTEGRATION_SCHEME  linear
-
- ADVECTION_SCHEME_FOR_MOMENTUM    minmod
+  ADVECTION_SCHEME_FOR_MOMENTUM    minmod
 
 #------------------------
 # Linear solver settings
 #------------------------
- PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
- TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
- TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
- TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+  PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
+  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
+  TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
 #--------------------
 # Initial conditions

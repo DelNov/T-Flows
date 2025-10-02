@@ -1,13 +1,15 @@
 !==============================================================================!
-  subroutine Domain_Mod_Allocate_Points(dom, n)
+  subroutine Allocate_Points(Dom, n)
+!------------------------------------------------------------------------------!
+!>  Sets the number of points and allocates memory for point storage.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  type(Domain_Type) :: dom
-  integer           :: n
+  class(Domain_Type)  :: Dom  !! domain under consideration
+  integer, intent(in) :: n    !! number of points in the .dom file
 !==============================================================================!
 
-  dom % n_points = n
-  allocate(dom % points(n))
+  Dom % n_points = n
+  allocate(Dom % points(n))
 
   end subroutine

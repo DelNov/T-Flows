@@ -1,18 +1,10 @@
 !==============================================================================!
-  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, ts, domain)
+  subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   This subroutine reads name.1d file created by Convert or Generator and     !
 !   averages the results in homogeneous directions.                            !
 !                                                                              !
 !   The results are then writen in files name_res.dat and name_res_plus.dat    !
-!------------------------------------------------------------------------------!
-  use Const_Mod                      ! constants
-  use Comm_Mod                       ! parallel stuff
-  use Grid_Mod,  only: Grid_Type
-  use Field_Mod
-  use Bulk_Mod,  only: Bulk_Type
-  use Var_Mod,   only: Var_Type
-  use Turb_Mod
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -20,7 +12,6 @@
   type(Turb_Type),  target :: Turb
   type(Vof_Type),   target :: Vof
   type(Swarm_Type), target :: Swarm
-  integer, intent(in)      :: ts
   integer, optional        :: domain
 !-----------------------------------[Locals]-----------------------------------!
   type(Var_Type),  pointer :: u, v, w, t
@@ -40,7 +31,7 @@
 !==============================================================================!
 
   ! Don't save if this is intial condition, nothing is developed yet
-  if(ts .eq. 0) return
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -49,10 +40,10 @@
   call Flow % Alias_Energy  (t)
 
   ! Read constant (defualt) values of physical properties
-  call Control_Mod_Dynamic_Viscosity   (visc_const)
-  call Control_Mod_Mass_Density        (dens_const)
-  call Control_Mod_Heat_Capacity       (capa_const)
-  call Control_Mod_Thermal_Conductivity(cond_const)
+  call Control % Dynamic_Viscosity   (visc_const)
+  call Control % Mass_Density        (dens_const)
+  call Control % Heat_Capacity       (capa_const)
+  call Control % Thermal_Conductivity(cond_const)
 
   call File % Set_Name(coord_name, extension='.1d')
 
@@ -60,16 +51,20 @@
   call File % Set_Name(coord_name, extension='.1d')
 
   !call File % Set_Name(0, res_name,      "-res.dat")
-  call File % Set_Name(res_name, time_step=ts, extension='-res.dat')
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       extension = '-res.dat')
   !call File % Set_Name(0, res_name_plus, "-res-plus.dat")
-  call File % Set_Name(res_name_plus, time_step=ts, extension='-res-plus.dat')
+  call File % Set_Name(res_name_plus,                 &
+                       time_step = Time % Curr_Dt(),  &
+                       extension = '-res-plus.dat')
 
   !------------------!
   !   Read 1d file   !
   !------------------!
   inquire(file=coord_name, exist=there)
   if(.not. there) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       print *, '#=============================================================='
       print *, '# In order to extract profiles and write them in ascii files'
       print *, '# the code has to read cell-faces coordinates '
@@ -86,12 +81,12 @@
     return
   end if
 
-  do c = 1, Grid % n_cells
-    ubulk    = bulk % flux_x / (dens_const * bulk % area_x)
+  do c = Cells_In_Domain_And_Buffers()
+    ubulk    = bulk % flux_x / bulk % area_x
     t_wall   = 0.0
     nu_mean  = 0.0
     n_points = 0
-  end do 
+  end do
 
   open(9, file=coord_name)
 
@@ -130,7 +125,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells 
+    do c = Cells_In_Domain()
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -166,31 +161,31 @@
 
   ! Average over all processors
   do pl=1, n_prob-1
-    call Comm_Mod_Global_Sum_Int(n_count(pl))
+    call Global % Sum_Int(n_count(pl))
 
-    call Comm_Mod_Global_Sum_Real(wall_p(pl))
+    call Global % Sum_Real(wall_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(u_p(pl))
-    call Comm_Mod_Global_Sum_Real(v_p(pl))
-    call Comm_Mod_Global_Sum_Real(w_p(pl))
+    call Global % Sum_Real(u_p(pl))
+    call Global % Sum_Real(v_p(pl))
+    call Global % Sum_Real(w_p(pl))
 
-    call Comm_Mod_Global_Sum_Real(uu_p(pl))
-    call Comm_Mod_Global_Sum_Real(vv_p(pl))
-    call Comm_Mod_Global_Sum_Real(ww_p(pl))
-    call Comm_Mod_Global_Sum_Real(uw_p(pl))
+    call Global % Sum_Real(uu_p(pl))
+    call Global % Sum_Real(vv_p(pl))
+    call Global % Sum_Real(ww_p(pl))
+    call Global % Sum_Real(uw_p(pl))
 
     count =  count + n_count(pl)
 
     if(Flow % heat_transfer) then
-      call Comm_Mod_Global_Sum_Real(t_p (pl))
-      call Comm_Mod_Global_Sum_Real(t2_p(pl))
-      call Comm_Mod_Global_Sum_Real(ut_p(pl))
-      call Comm_Mod_Global_Sum_Real(vt_p(pl))
-      call Comm_Mod_Global_Sum_Real(wt_p(pl))
+      call Global % Sum_Real(t_p (pl))
+      call Global % Sum_Real(t2_p(pl))
+      call Global % Sum_Real(ut_p(pl))
+      call Global % Sum_Real(vt_p(pl))
+      call Global % Sum_Real(wt_p(pl))
     end if
   end do
 
-  call Comm_Mod_Wait
+  call Global % Wait
 
   do i = 1, n_prob-1
     if(n_count(i) .ne. 0) then
@@ -214,7 +209,7 @@
   end do
 
   ! Calculating friction velocity and friction temperature
-    do c = 1, Grid % n_cells
+    do c = Cells_In_Domain_And_Buffers()
       u_tau_p = sqrt( (visc_const*sqrt(u_p(1)**2 +   &
                                       v_p(1)**2 +   &
                                       w_p(1)**2)    &
@@ -222,27 +217,27 @@
                                       / dens_const)
     end do
   if(u_tau_p .eq. 0.0) then
-    if(this_proc < 2) then
+    if(First_Proc()) then
       write(*,*) '# Friction velocity is zero in Save_Results.f90!'
     end if
     return
   end if
 
-  if(Flow % heat_transfer) then 
-    d_wall = 0.0 
-    do c = 1, Grid % n_cells
+  if(Flow % heat_transfer) then
+    d_wall = 0.0
+    do c = Cells_In_Domain_And_Buffers()
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = Turb % t_mean(c)
       end if
     end do
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     if(Flow % heat_flux > 0.0) then
-      call Comm_Mod_Global_Min_Real(t_inf)
+      call Global % Min_Real(t_inf)
     else
-      call Comm_Mod_Global_Max_Real(t_inf)
+      call Global % Max_Real(t_inf)
     end if
 
     do s = 1, Grid % n_faces
@@ -260,11 +255,11 @@
       end if
     end do
 
-    call Comm_Mod_Global_Sum_Real(t_wall)
-    call Comm_Mod_Global_Sum_Real(nu_mean)
-    call Comm_Mod_Global_Sum_Int(n_points)
+    call Global % Sum_Real(t_wall)
+    call Global % Sum_Real(nu_mean)
+    call Global % Sum_Int(n_points)
 
-    call Comm_Mod_Wait
+    call Global % Wait
 
     t_wall  = t_wall / n_points
     nu_mean = nu_mean / n_points
@@ -281,7 +276,7 @@
     cf      = u_tau_p**2/(0.5*ubulk**2)
     err     = abs(cf_dean - cf)/cf_dean * 100.0
     write(i,'(a1,(a12,e12.6))')  &
-    '#', 'ubulk    = ', ubulk 
+    '#', 'ubulk    = ', ubulk
     write(i,'(a1,(a12,e12.6))')  &
     '#', 're       = ', dens_const * ubulk * 2.0/visc_const
     write(i,'(a1,(a12,e12.6))')  &
@@ -289,11 +284,11 @@
     write(i,'(a1,(a12,e12.6))')  &
     '#', 'cf       = ', 2.0*(u_tau_p/ubulk)**2
     write(i,'(a1,(a12,f12.6))')  &
-    '#', 'Utau     = ', u_tau_p 
-    write(i,'(a1,(a12,f12.6,a2,a22))') & 
+    '#', 'Utau     = ', u_tau_p
+    write(i,'(a1,(a12,f12.6,a2,a22))') &
     '#', 'Cf_error = ', err, ' %', 'Dean formula is used.'
     if(Flow % heat_transfer) then
-      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean 
+      write(i,'(a1,(a12, f12.6))')'#', 'Nu number =', nu_mean
     end if
 
     if(Flow % heat_transfer) then
@@ -315,7 +310,7 @@
       if(n_count(i) .ne. 0) then
         write(3,'(12es15.5e3)') wall_p(i),                       & !  1
                                 u_p(i),                          & !  2
-                                uu_p(i),                         & !  3 
+                                uu_p(i),                         & !  3
                                 vv_p(i),                         & !  4
                                 ww_p(i),                         & !  5
                                 uw_p(i),                         & !  6
@@ -370,8 +365,8 @@
                                 0.5*(vv_p(i) + vv_p(n_prob-i)),    & !  4
                                 0.5*(ww_p(i) + ww_p(n_prob-i)),    & !  5
                                 0.5*(uw_p(i) - uw_p(n_prob-i)),    & !  6
-                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))     & 
-                              + 0.5*(vv_p(i) + vv_p(n_prob-i))     & 
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))     &
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))     &
                               + 0.5*(ww_p(i) + ww_p(n_prob-i))),   & !  7
                                 t_p(i),                            & !  8
                                 t2_p(i),                           & !  9
@@ -390,9 +385,9 @@
                                 0.5*(vv_p(i) + vv_p(n_prob-i)),  & !  4
                                 0.5*(ww_p(i) + ww_p(n_prob-i)),  & !  5
                                 0.5*(uw_p(i) - uw_p(n_prob-i)),  & !  6
-                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))   & !  7 
-                              + 0.5*(vv_p(i) + vv_p(n_prob-i))   & 
-                              + 0.5*(ww_p(i) + ww_p(n_prob-i)))   
+                           0.5*(0.5*(uu_p(i) + uu_p(n_prob-i))   & !  7
+                              + 0.5*(vv_p(i) + vv_p(n_prob-i))   &
+                              + 0.5*(ww_p(i) + ww_p(n_prob-i)))
       end if
     end do
   end if
@@ -417,6 +412,6 @@
     deallocate(wt_p)
   end if
 
-  if(this_proc < 2)  print *, '# Finished with User_Mod_Save_Results.f90.'
+  if(First_Proc())  print *, '# Finished with User_Mod_Save_Results.f90.'
 
   end subroutine

@@ -1,7 +1,11 @@
+#include "../Shared/Unused.h90"
+
 !==============================================================================!
   module Math_Mod
 !------------------------------------------------------------------------------!
-!   This module contains some basic mathematical (and related) functions       !
+!>  This module is a holder of the Math_Type, which is a collection of
+!>  some useful mathematical (and related) functions and subroutines used
+!>  in T-Flows.
 !------------------------------------------------------------------------------!
 !----------------------------------[Modules]-----------------------------------!
   use Const_Mod
@@ -10,11 +14,12 @@
 !==============================================================================!
 
   ! Default precision for "Approx_Real" and "Smaller_Real" functions
-  real, parameter :: DEFAULT_TOLERANCE = NANO
-
+  real, parameter :: DEFAULT_TOLERANCE = NANO  !! default tolerance for
+                                               !! Approx_Real and Smaller_Real
   !---------------!
   !   Math type   !
   !---------------!
+  !> Math_Type contains a number of useful mathematical (and related) rountes.
   type Math_Type
 
     contains
@@ -35,6 +40,7 @@
       procedure          :: Smaller_Real
       procedure          :: Tet_Inertia
       procedure          :: Tet_Volume
+      procedure          :: Triangle_Area
 
   end type
 
@@ -42,7 +48,8 @@
   !   Create one instance of Math type   !
   !     for all other modules to use     !
   !--------------------------------------!
-  type(Math_Type) :: Math
+  type(Math_Type) :: Math  !! definition of a singletone Math_Type,
+                           !! in essence one global Math object
 
   contains
 
@@ -63,5 +70,6 @@
 #   include "Math_Mod/Smaller_Real.f90"
 #   include "Math_Mod/Tet_Inertia.f90"
 #   include "Math_Mod/Tet_Volume.f90"
+#   include "Math_Mod/Triangle_Area.f90"
 
   end module

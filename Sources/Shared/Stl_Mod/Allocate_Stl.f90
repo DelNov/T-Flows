@@ -1,12 +1,15 @@
 !==============================================================================!
   subroutine Allocate_Stl(Stl, n_facets)
 !------------------------------------------------------------------------------!
-!   Creates an Stl object from a file                                          !
+!>  This subroutine initializes an Stl object, part of the Stl_Mod, for the
+!>  storage of geometry in the STL format. It allocates memory for storing
+!>  facet details such as normals and coordinates, setting the stage for
+!>  further processing of STL files.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Stl_Type)     :: Stl
-  integer, intent(in) :: n_facets
+  class(Stl_Type)     :: Stl       !! parent Stl_Type object
+  integer, intent(in) :: n_facets  !! number of facets in STL
 !==============================================================================!
 
   Stl % n_bnd_cells =  n_facets
