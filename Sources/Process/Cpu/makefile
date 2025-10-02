@@ -14,7 +14,7 @@ PROF    ?= no
 REAL    ?= double
 MPI     ?= no
 OMP     ?= no
-SORT    ?= quick
+SORT    ?= heap
 
 #-------------------------------------
 #   Check values passed to makefile
@@ -87,7 +87,7 @@ $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <PROF=no/yes> <REAL=double/single> <MPI=no/yes> <OMP=no/yes>   )
-$(info #        <SORT=quick/heap> <DIR_CASE=full_or_relative_path_to_case>     )
+$(info #        <SORT=heap/quick> <DIR_CASE=full_or_relative_path_to_case>     )
 $(info #        <clean>                                                        )
 $(info #                                                                       )
 $(info # Notes:                                                                )

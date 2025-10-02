@@ -15,7 +15,7 @@ PROF    ?= no
 REAL    ?= double
 MPI     ?= no
 OMP     ?= no
-SORT    ?= quick
+SORT    ?= heap
 
 #-------------------------------------
 #   Check values passed to makefile
@@ -140,7 +140,7 @@ $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=nvidia/gnu/intel> <GPU=yes/no> <REAL=double/single>   )
-$(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=quick/heap> <MPI=no/yes>  )
+$(info #        <DEBUG=no/yes> <ASSERT=yes/no> <SORT=heap/quick> <MPI=no/yes>  )
 $(info #        <SORT=quick/heap> <DIR_CASE=full_or_relative_path_to_case>     )
 $(info #        <clean/preprocess>                                             )
 $(info #                                                                       )

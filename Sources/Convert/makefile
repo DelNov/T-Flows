@@ -13,7 +13,7 @@ DEBUG   ?= no
 PROF    ?= no
 REAL    ?= double
 OMP     ?= yes
-SORT    ?= quick
+SORT    ?= heap
 
 #-------------------------------------
 #   Check values passed to makefile
@@ -71,7 +71,7 @@ $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
 $(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
 $(info #        <PROF=no/yes> <REAL=double/single> <OMP=yes/no>                )
-$(info #        <SORT=quick/heap> <clean>                                      )
+$(info #        <SORT=heap/quick> <clean>                                      )
 $(info #                                                                       )
 $(info # Notes:                                                                )
 $(info #   1. The first item, for each of the options above, is the default.   )
