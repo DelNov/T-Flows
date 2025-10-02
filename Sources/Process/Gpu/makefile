@@ -15,7 +15,7 @@ PROF    ?= no
 REAL    ?= double
 MPI     ?= no
 OMP     ?= no
-SORT    ?= quick
+SORT    ?= heap
 
 #-------------------------------------
 #   Check values passed to makefile

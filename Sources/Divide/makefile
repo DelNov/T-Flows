@@ -13,7 +13,7 @@ DEBUG   ?= no
 PROF    ?= no
 REAL    ?= double
 OMP     ?= no
-SORT    ?= quick
+SORT    ?= heap
 
 #-------------------------------------
 #   Check values passed to makefile
