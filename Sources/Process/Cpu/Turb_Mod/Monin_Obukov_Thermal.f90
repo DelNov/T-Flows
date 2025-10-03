@@ -1,20 +1,20 @@
 !==============================================================================!
-  real function Monin_Obukov_Thermal(Turb,                   &
-                                     u_tan, wall_dist, z_o,  &
-                                     t_p,  t_wall, grav)
+  pure real function Monin_Obukov_Thermal(Turb,                   &
+                                          u_tan, wall_dist, z_o,  &
+                                          t_p,  t_wall, grav)
 !------------------------------------------------------------------------------!
 !   Calculate wall-heat flux according to Monin-Obukov Similarity              !
 !   Theory (MOST)                                                              !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Turb_Type) :: Turb
-  real, intent(in) :: u_tan
-  real, intent(in) :: wall_dist
-  real, intent(in) :: z_o
-  real, intent(in) :: t_p
-  real, intent(in) :: t_wall
-  real, intent(in) :: grav
+  class(Turb_Type), intent(in) :: Turb
+  real,             intent(in) :: u_tan
+  real,             intent(in) :: wall_dist
+  real,             intent(in) :: z_o
+  real,             intent(in) :: t_p
+  real,             intent(in) :: t_wall
+  real,             intent(in) :: grav
 !------------------------------[Local parameters]------------------------------!
   real, parameter :: B1      = 9.4    ! parameters from Uno1995
   real, parameter :: B2      = 4.7
