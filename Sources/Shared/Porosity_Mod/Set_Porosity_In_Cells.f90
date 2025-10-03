@@ -12,7 +12,7 @@
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   character(len=SL)         :: name_out
-  integer                   :: c, f, l, n, i_ver, hits
+  integer                   :: c, f, l, i_ver, hits
   real                      :: xyz(3), xn(3), yn(3), zn(3), q(3), s(3)
   real                      :: a, g, u, t, mx, my, mz, nx, ny, nz, d(3), h(3)
   real                      :: e1(3), e2(3)

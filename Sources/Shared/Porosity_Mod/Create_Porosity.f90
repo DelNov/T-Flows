@@ -4,7 +4,7 @@
   class(Porosity_Type)    :: Por
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: reg, n, c, fu
+  integer       :: reg, n, c
   logical       :: found
   character(SL) :: porous_region_rank
   character(SL) :: next_strings(MAX_STRING_ITEMS)
