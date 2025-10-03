@@ -58,7 +58,7 @@
   !----------------------------------+----------!
   !   The procedure below should be activated   !
   !   only if wall function approach is used.   !
-  !----------------.----------------------------!
+  !---------------------------------------------!
   do s = 1, Grid % n_faces
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
