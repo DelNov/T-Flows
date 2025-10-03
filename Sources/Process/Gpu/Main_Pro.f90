@@ -21,7 +21,7 @@
   type(Field_Type), target :: Flow(MD)      ! flow field
   type(Turb_Type)          :: Turb(MD)      ! turbulence models for flows
   real                     :: ts, te
-  integer                  :: nc, ldt, sc
+  integer                  :: nc, ldt
   character(7)             :: root_control = 'control'
   logical                  :: read_backup(MD)
 !==============================================================================!

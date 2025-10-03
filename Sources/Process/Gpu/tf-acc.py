@@ -46,6 +46,19 @@ REVERSED  = "\033[7m"
 
 RESET = "\033[0m"
 
+#------------------------------------------------------------------------
+# Make sure that member functions don't get processed like member arrays
+#------------------------------------------------------------------------
+excluded_member_functions = {"Beta_Scalar",
+                             "Ebf_Momentum",
+                             "Ebf_Scalar",
+                             "Prandtl_Numb",
+                             "Prandtl_Turb",
+                             "Schmidt_Numb",
+                             "U_Plus_Log_Law",
+                             "U_Tan",
+                             "Y_Plus_Rough_Walls"}
+
 gpu_pointers_file   = "../../Shared/Gpu_Pointers_Mod.f90"
 grid_to_device_file = "../../Shared/Grid_Mod/Gpu/Copy_To_Device.f90"
 flow_to_device_file = "./Field_Mod/Gpu/Copy_To_Device.f90"
@@ -397,6 +410,7 @@ def Process_Tfp_Block(block):
                      "Faces_In_Region",
                      "Faces_In_Domain_And_At_Buffers",
                      "Face_Value"}
+  excluded_macros.add("Roughness_Coeff")
 
   print("")
   print(f"{RED}  # Pointers used in the block{RESET}")
@@ -482,6 +496,11 @@ def Process_Tfp_Block(block):
   for array in arrays:
 
     full_name = array
+
+    # Exclude member functions
+    member = re.sub(r'^.*%\s*', '', full_name).strip()
+    if member in excluded_member_functions:
+      continue
 
     # Create pointer variable name
     pointer_name = make_pointer_name(full_name)
