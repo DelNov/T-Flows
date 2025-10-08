@@ -112,11 +112,9 @@
         if(turb_y_plus(c1) < 3.0) then
           turb_vis_w(c1) = turb_vis_t(c1) + flow_viscosity(c1)
         else
-
           turb_vis_w(c1) =    turb_y_plus(c1) * flow_viscosity(c1)  &
                            / (  turb_y_plus(c1) * exp(-1.0 * ebf)       &
                               + u_plus * exp(-1.0/ebf) + TINY)
-
         end if
 
         if(Flow % heat_transfer) then
