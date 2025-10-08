@@ -58,7 +58,6 @@
       !$acc   flow_viscosity,  &
       !$acc   flow_density,  &
       !$acc   grid_wall_dist,  &
-      !$acc   log,  &
       !$acc   turb_y_plus,  &
       !$acc   turb_vis_w,  &
       !$acc   turb_vis_t,  &

@@ -247,6 +247,9 @@ def Find_Arrays_In_Block(block):
   # Remove "exp"
   cleaned_block = re.sub(r'\bexp\b', '', cleaned_block)
 
+  # Remove "log"
+  cleaned_block = re.sub(r'\blog\b', '', cleaned_block)
+
   # Remove "max"
   cleaned_block = re.sub(r'\bmax\b', '', cleaned_block)
 
