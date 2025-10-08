@@ -50,6 +50,7 @@
   !-----------------------!
   if(Turb % model .eq. LES_SMAGORINSKY) then
     call Gpu % Vector_Real_Copy_To_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_w)
     turb_vis_t => Turb % vis_t
     turb_vis_w => Turb % vis_w
   end if
@@ -59,8 +60,10 @@
   !----------------!
   if(Turb % model .eq. LES_WALE) then
     call Gpu % Vector_Real_Copy_To_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_w)
     call Gpu % Vector_Real_Copy_To_Device(Turb % wale_v)
     turb_vis_t  => Turb % vis_t
+    turb_vis_w  => Turb % vis_w
     turb_wale_v => Turb % wale_v
   end if
 

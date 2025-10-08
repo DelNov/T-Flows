@@ -53,6 +53,11 @@
 
     ! Variables such as time scale, length scale and production
     allocate(Turb % vis_t(-nb:nc));  Turb % vis_t = 0.
+    allocate(Turb % vis_w(-nb:nc));  Turb % vis_w = 0.
+
+    if(Flow % heat_transfer) then
+      allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.
+    end if
 
   end if ! LES_SMAGORINSKY
 
@@ -64,7 +69,12 @@
     allocate(Turb % wale_v(-nb:nc));  Turb % wale_v = 0.
 
     ! Other variables such as time scale, length scale and production
-    allocate(Turb % vis_t   (-nb:nc));  Turb % vis_t   = 0.
+    allocate(Turb % vis_t   (-nb:nc));  Turb % vis_t = 0.
+    allocate(Turb % vis_w   (-nb:nc));  Turb % vis_w = 0.
+
+    if(Flow % heat_transfer) then
+      allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.
+    end if
 
   end if
 
