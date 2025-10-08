@@ -704,14 +704,45 @@ def Process_Tfp_Block(block):
     block
   )
 
-
+  #-------------------------------------------------------------
   # Insert accelerator directives before the second "do" loop
   # (This part is relevant only for OpenACC, since OpenMP does
   #  not accept the inner sequential loop.)
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # At certain point, on October 8, 2025, the way in which the
+  # first_do_index and the second_do_index are worked out in a
+  # completelly different way, dodging the "end do", dodging
+  # the trailing comments and stuff.  This is good.
+  #-------------------------------------------------------------
+
+  # Find first "do " that's at the beginning of a line (ignoring whitespace)
+  lines = block.split('\n')
+  first_do_index = -1
+  current_pos = 0
+
+  for line in lines:
+    if line.strip().startswith('do '):
+      first_do_index = current_pos + line.find('do ')
+      break
+    current_pos += len(line) + 1  # +1 for newline
+
+  # Find second "do " that's at the beginning of a line
+  if first_do_index != -1:
+    second_do_index = -1
+    # Start from after first do
+    remaining_lines = block[first_do_index + 1:].split('\n')
+    current_pos = first_do_index + 1
+
+    for line in remaining_lines:
+      if line.strip().startswith('do '):
+        second_do_index = current_pos + line.find('do ')
+        break
+      current_pos += len(line) + 1
+
+  # At this point, you have the first_do_index and the
+  # second_do_index, # feel free to process the loops
   if begin_sequential_loop:
-    first_do_index = block.find("do ")
     if first_do_index != -1:
-      second_do_index = block.find("do ", first_do_index + 1)
       if second_do_index != -1:
 
         # Find the last end of line before the second do statement

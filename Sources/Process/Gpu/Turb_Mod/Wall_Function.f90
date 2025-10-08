@@ -171,7 +171,6 @@
 !1 !future   end if
         end if  ! n_scalars > 0
 
-      !$acc loop seq
       end do
       !$acc end parallel    ! s, faces
 
