@@ -33,6 +33,7 @@
       procedure          :: Gaussian_Elimination
       procedure          :: Harmonic_Mean
       procedure          :: Invert_3x3_Matrix
+      procedure          :: Random_Real
       procedure          :: Rotate_Vector
       procedure, private :: Set_Array_Range
       procedure          :: Signed_Lower_Limit
@@ -63,6 +64,7 @@
 #   include "Math_Mod/Gaussian_Elimination.f90"
 #   include "Math_Mod/Harmonic_Mean.f90"
 #   include "Math_Mod/Invert_3x3_Matrix.f90"
+#   include "Math_Mod/Random_Real.f90"
 #   include "Math_Mod/Rotate_Vector.f90"
 #   include "Math_Mod/Set_Array_Range.f90"
 #   include "Math_Mod/Signed_Lower_Limit.f90"
