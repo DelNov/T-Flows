@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Fields(Results, Turb, Flow, Grid,  &
+  subroutine Save_Vtu_Fields(Results, Grid, Flow, Turb,  &
                              plot_inside, domain)
 !------------------------------------------------------------------------------!
 !>  The Save_Vtu_Fields subroutine is a comprehensive and central
@@ -70,9 +70,9 @@
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type), target :: Results      !! parent class
-  type(Turb_Type),     target :: Turb         !! turbulence models
-  type(Field_Type),    target :: Flow         !! flow field
   type(Grid_Type)             :: Grid         !! computational grid
+  type(Field_Type),    target :: Flow         !! flow field
+  type(Turb_Type),     target :: Turb         !! turbulence models
   logical                     :: plot_inside  !! true to plots inside,
                                               !! false to plot on the boundary
   integer,           optional :: domain       !! computational domain

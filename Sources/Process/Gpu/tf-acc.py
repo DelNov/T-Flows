@@ -268,6 +268,33 @@ def Find_Arrays_In_Block(block):
   # Remove "sqrt"
   cleaned_block = re.sub(r'\bsqrt\b', '', cleaned_block)
 
+  # Remove "sin"
+  cleaned_block = re.sub(r'\bsin\b', '', cleaned_block)
+
+  # Remove "cos"
+  cleaned_block = re.sub(r'\bcos\b', '', cleaned_block)
+
+  # Remove "tan"
+  cleaned_block = re.sub(r'\btan\b', '', cleaned_block)
+
+  # Remove "sinh"
+  cleaned_block = re.sub(r'\bsinh\b', '', cleaned_block)
+
+  # Remove "cosh"
+  cleaned_block = re.sub(r'\bcosh\b', '', cleaned_block)
+
+  # Remove "tanh"
+  cleaned_block = re.sub(r'\btanh\b', '', cleaned_block)
+
+  # Remove "arcsin"
+  cleaned_block = re.sub(r'\barcsin\b', '', cleaned_block)
+
+  # Remove "arccos"
+  cleaned_block = re.sub(r'\barccos\b', '', cleaned_block)
+
+  # Remove "arctan"
+  cleaned_block = re.sub(r'\barctan\b', '', cleaned_block)
+
   # Remove empty parentheses
   cleaned_block = re.sub(r'\(\s*\)', '', cleaned_block)
 

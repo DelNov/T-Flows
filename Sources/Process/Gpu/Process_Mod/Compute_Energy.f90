@@ -101,6 +101,8 @@
   ! Insert cross diffusion terms (computers gradients as well)
   call Flow % Add_Cross_Diffusion_Term(Grid, Flow % t, cond_eff)
 
+  call User_Mod_Source(Grid, Flow, Turb, Flow % t, 0, Flow % Nat % A, b)
+
   !---------------------------------------!
   !     Part 2 of the under-relaxation    !
   !   (Part 1 is in Form_Energy_Matrix)   !

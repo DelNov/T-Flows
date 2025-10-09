@@ -447,8 +447,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A M C Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
   syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
-  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type
-  syn keyword fortranObjectTflows  Gpu            Amg
+  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type       Sparse_Type
+  syn keyword fortranObjectTflows  Gpu            Amg            Sparse
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
@@ -508,7 +508,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     flow_u_n  flow_u_o  flow_u_oo
   syn keyword fortranGPUTflows     flow_v_n  flow_v_o  flow_v_oo
   syn keyword fortranGPUTflows     flow_w_n  flow_w_o  flow_w_oo
-  syn keyword fortranGPUTflows     flow_t_n  flow_t_o  flow_t_oo
+  syn keyword fortranGPUTflows     flow_t_n  flow_t_o  flow_t_oo  flow_t_q
   syn keyword fortranGPUTflows     flow_p_n  flow_pp_n  flow_v_m
   syn keyword fortranGPUTflows     flow_shear  flow_vort  flow_v_flux_n
   syn keyword fortranGPUTflows     flow_grad_c2c  flow_phi_x  flow_phi_y  flow_phi_z

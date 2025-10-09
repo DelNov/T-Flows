@@ -28,10 +28,10 @@
   w    => Flow % w
 
   ! If not time for disturbing the velocity field, return
-  if(mod(Time % Curr_Dt(), 100) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 120) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(Time % Curr_Dt() > 1000) return
+  if(Time % Curr_Dt() > 1200) return
 
   ! Minimum and maximum size of eddies
   rmin = 0.2

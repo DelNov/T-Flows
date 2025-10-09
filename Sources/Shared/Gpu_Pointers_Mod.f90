@@ -33,6 +33,7 @@
 
   ! Access to Flow members
   real, contiguous, pointer :: flow_t_n(:), flow_t_o(:), flow_t_oo(:)
+  real, contiguous, pointer :: flow_t_q(:)
   real, contiguous, pointer :: flow_u_n(:), flow_u_o(:), flow_u_oo(:)
   real, contiguous, pointer :: flow_v_n(:), flow_v_o(:), flow_v_oo(:)
   real, contiguous, pointer :: flow_w_n(:), flow_w_o(:), flow_w_oo(:)

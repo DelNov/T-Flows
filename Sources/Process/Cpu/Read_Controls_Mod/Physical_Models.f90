@@ -233,8 +233,9 @@
     call Turb % Const_Spalart_Allmaras()
   end if
 
-  if(Turb % model .eq. LES_DYNAMIC .or.  &
-     Turb % model .eq. LES_SMAGORINSKY) then
+  if(Turb % model .eq. LES_DYNAMIC     .or.  &
+     Turb % model .eq. LES_SMAGORINSKY .or.  &
+     Turb % model .eq. LES_WALE) then
     call Turb % Const_Les()
   end if
 

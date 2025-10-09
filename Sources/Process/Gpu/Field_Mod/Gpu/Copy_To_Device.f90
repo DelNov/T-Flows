@@ -55,8 +55,10 @@
   if(Flow % heat_transfer) then
     call Gpu % Vector_Real_Copy_To_Device(Flow % t % n)
     call Gpu % Vector_Real_Copy_To_Device(Flow % t % o)
+    call Gpu % Vector_Real_Copy_To_Device(Flow % t % q)
     flow_t_n  => Flow % t % n
     flow_t_o  => Flow % t % o
+    flow_t_q  => Flow % t % q
     if(Flow % t % td_scheme .eq. PARABOLIC) then
       call Gpu % Vector_Real_Copy_To_Device(Flow % t % oo)
       flow_t_oo => Flow % t % oo

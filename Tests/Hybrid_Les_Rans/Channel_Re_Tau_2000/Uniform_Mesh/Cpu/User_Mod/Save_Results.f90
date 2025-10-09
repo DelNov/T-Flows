@@ -33,8 +33,8 @@
   logical                  :: there
 !==============================================================================!
 
-  ! Don't save if this is intial condition, nothing is developed yet
-  if(Time % Curr_Dt() .eq. 0) return
+  ! Don't save if you didn't start to gather statistics yet
+  if(Time % Curr_Dt() .lt. 12000) return
 
   ! Take aliases
   Grid => Flow % pnt_grid

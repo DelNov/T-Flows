@@ -69,9 +69,9 @@
 
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)
-      call Results % Save_Vtu_Fields(Turb(d), Flow(d), Grid(d),      &
+      call Results % Save_Vtu_Fields(Grid(d), Flow(d), Turb(d),      &
                                      plot_inside=.true., domain=d)
-      call Results % Save_Vtu_Fields(Turb(d), Flow(d), Grid(d),      &
+      call Results % Save_Vtu_Fields(Grid(d), Flow(d), Turb(d),      &
                                      plot_inside=.false., domain=d)
 
     end do  ! through domains

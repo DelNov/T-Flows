@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Random_Real(Math, seed, u)
+  pure subroutine Random_Real(Math, seed, u)
 !------------------------------------------------------------------------------!
 !>  Generates a real random number in the range 0 to 1, using Park-Miller meth.
 !------------------------------------------------------------------------------!
