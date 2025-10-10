@@ -46,6 +46,19 @@ REVERSED  = "\033[7m"
 
 RESET = "\033[0m"
 
+#------------------------------------------------------------------------
+# Make sure that member functions don't get processed like member arrays
+#------------------------------------------------------------------------
+excluded_member_functions = {"Beta_Scalar",
+                             "Ebf_Momentum",
+                             "Ebf_Scalar",
+                             "Prandtl_Numb",
+                             "Prandtl_Turb",
+                             "Schmidt_Numb",
+                             "U_Plus_Log_Law",
+                             "U_Tan",
+                             "Y_Plus_Rough_Walls"}
+
 gpu_pointers_file   = "../../Shared/Gpu_Pointers_Mod.f90"
 grid_to_device_file = "../../Shared/Grid_Mod/Gpu/Copy_To_Device.f90"
 flow_to_device_file = "./Field_Mod/Gpu/Copy_To_Device.f90"
@@ -234,6 +247,9 @@ def Find_Arrays_In_Block(block):
   # Remove "exp"
   cleaned_block = re.sub(r'\bexp\b', '', cleaned_block)
 
+  # Remove "log"
+  cleaned_block = re.sub(r'\blog\b', '', cleaned_block)
+
   # Remove "max"
   cleaned_block = re.sub(r'\bmax\b', '', cleaned_block)
 
@@ -251,6 +267,33 @@ def Find_Arrays_In_Block(block):
 
   # Remove "sqrt"
   cleaned_block = re.sub(r'\bsqrt\b', '', cleaned_block)
+
+  # Remove "sin"
+  cleaned_block = re.sub(r'\bsin\b', '', cleaned_block)
+
+  # Remove "cos"
+  cleaned_block = re.sub(r'\bcos\b', '', cleaned_block)
+
+  # Remove "tan"
+  cleaned_block = re.sub(r'\btan\b', '', cleaned_block)
+
+  # Remove "sinh"
+  cleaned_block = re.sub(r'\bsinh\b', '', cleaned_block)
+
+  # Remove "cosh"
+  cleaned_block = re.sub(r'\bcosh\b', '', cleaned_block)
+
+  # Remove "tanh"
+  cleaned_block = re.sub(r'\btanh\b', '', cleaned_block)
+
+  # Remove "arcsin"
+  cleaned_block = re.sub(r'\barcsin\b', '', cleaned_block)
+
+  # Remove "arccos"
+  cleaned_block = re.sub(r'\barccos\b', '', cleaned_block)
+
+  # Remove "arctan"
+  cleaned_block = re.sub(r'\barctan\b', '', cleaned_block)
 
   # Remove empty parentheses
   cleaned_block = re.sub(r'\(\s*\)', '', cleaned_block)
@@ -397,6 +440,7 @@ def Process_Tfp_Block(block):
                      "Faces_In_Region",
                      "Faces_In_Domain_And_At_Buffers",
                      "Face_Value"}
+  excluded_macros.add("Roughness_Coeff")
 
   print("")
   print(f"{RED}  # Pointers used in the block{RESET}")
@@ -482,6 +526,11 @@ def Process_Tfp_Block(block):
   for array in arrays:
 
     full_name = array
+
+    # Exclude member functions
+    member = re.sub(r'^.*%\s*', '', full_name).strip()
+    if member in excluded_member_functions:
+      continue
 
     # Create pointer variable name
     pointer_name = make_pointer_name(full_name)
@@ -685,14 +734,45 @@ def Process_Tfp_Block(block):
     block
   )
 
-
+  #-------------------------------------------------------------
   # Insert accelerator directives before the second "do" loop
   # (This part is relevant only for OpenACC, since OpenMP does
   #  not accept the inner sequential loop.)
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # At certain point, on October 8, 2025, the way in which the
+  # first_do_index and the second_do_index are worked out in a
+  # completelly different way, dodging the "end do", dodging
+  # the trailing comments and stuff.  This is good.
+  #-------------------------------------------------------------
+
+  # Find first "do " that's at the beginning of a line (ignoring whitespace)
+  lines = block.split('\n')
+  first_do_index = -1
+  current_pos = 0
+
+  for line in lines:
+    if line.strip().startswith('do '):
+      first_do_index = current_pos + line.find('do ')
+      break
+    current_pos += len(line) + 1  # +1 for newline
+
+  # Find second "do " that's at the beginning of a line
+  if first_do_index != -1:
+    second_do_index = -1
+    # Start from after first do
+    remaining_lines = block[first_do_index + 1:].split('\n')
+    current_pos = first_do_index + 1
+
+    for line in remaining_lines:
+      if line.strip().startswith('do '):
+        second_do_index = current_pos + line.find('do ')
+        break
+      current_pos += len(line) + 1
+
+  # At this point, you have the first_do_index and the
+  # second_do_index, # feel free to process the loops
   if begin_sequential_loop:
-    first_do_index = block.find("do ")
     if first_do_index != -1:
-      second_do_index = block.find("do ", first_do_index + 1)
       if second_do_index != -1:
 
         # Find the last end of line before the second do statement

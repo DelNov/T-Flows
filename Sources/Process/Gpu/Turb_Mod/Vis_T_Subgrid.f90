@@ -20,10 +20,8 @@
   real, parameter :: A_POW = 8.3
   real, parameter :: B_POW = 1.0/7.0
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, s, c1, c2
-  real    :: nx, ny, nz
-  real    :: cs, lf, u_tau, nc2, u_tan, nu
-  real    :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
+  integer :: c
+  real    :: u_tau, u_tan, cs, nu, lf
 !==============================================================================!
 
   !---------------!
@@ -95,6 +93,12 @@
 
   end if
 
+  !-------------------!
+  !   Wall function   !
+  !-------------------!
+  call Turb % Wall_Function(Grid, Flow)
+
+  ! Refresh buffers
   call Grid % Exchange_Cells_Real(Turb % vis_t)
 
   end subroutine

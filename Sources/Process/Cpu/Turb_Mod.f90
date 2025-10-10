@@ -240,6 +240,8 @@
       procedure, private :: Vis_T_Wale
       procedure, private :: Vis_T_Tensorial
 
+      procedure, private :: Wall_Function
+
       procedure, private :: Beta_Scalar
       procedure, private :: Ebf_Momentum
       procedure, private :: Ebf_Scalar
@@ -320,6 +322,7 @@
 #   include "Turb_Mod/Vis_T_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Vis_T_Wale.f90"
 #   include "Turb_Mod/Vis_T_Tensorial.f90"
+#   include "Turb_Mod/Wall_Function.f90"
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
 #   include "Turb_Mod/Beta_Scalar.f90"

@@ -33,6 +33,7 @@
 
   ! Access to Flow members
   real, contiguous, pointer :: flow_t_n(:), flow_t_o(:), flow_t_oo(:)
+  real, contiguous, pointer :: flow_t_q(:)
   real, contiguous, pointer :: flow_u_n(:), flow_u_o(:), flow_u_oo(:)
   real, contiguous, pointer :: flow_v_n(:), flow_v_o(:), flow_v_oo(:)
   real, contiguous, pointer :: flow_w_n(:), flow_w_o(:), flow_w_oo(:)
@@ -49,6 +50,7 @@
   real,    contiguous, pointer :: phi_n(:), phi_o(:), phi_oo(:)
   real,    contiguous, pointer :: turb_y_plus(:), turb_wale_v(:)
   real,    contiguous, pointer :: turb_vis_t(:), turb_vis_w(:), turb_con_w(:)
+  real,    contiguous, pointer :: turb_diff_w(:)
   real,    contiguous, pointer :: turb_h_max(:), turb_h_min(:), turb_h_w(:)
   real,    contiguous, pointer :: turb_z_o(:)
   real,    contiguous, pointer :: turb_vis_n(:), turb_vis_o(:), turb_vis_oo(:)

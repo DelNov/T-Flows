@@ -43,10 +43,6 @@
     turb_h_max => Turb % h_max
     turb_h_min => Turb % h_min
     turb_h_w   => Turb % h_w
-    if(Flow % heat_transfer) then
-      call Gpu % Vector_Real_Copy_To_Device(Turb % con_w)
-      turb_con_w => Turb % con_w
-    end if ! Flow % heat_transfer
   end if
 
   !-----------------------!
@@ -54,7 +50,9 @@
   !-----------------------!
   if(Turb % model .eq. LES_SMAGORINSKY) then
     call Gpu % Vector_Real_Copy_To_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_w)
     turb_vis_t => Turb % vis_t
+    turb_vis_w => Turb % vis_w
   end if
 
   !----------------!
@@ -62,8 +60,10 @@
   !----------------!
   if(Turb % model .eq. LES_WALE) then
     call Gpu % Vector_Real_Copy_To_Device(Turb % vis_t)
+    call Gpu % Vector_Real_Copy_To_Device(Turb % vis_w)
     call Gpu % Vector_Real_Copy_To_Device(Turb % wale_v)
     turb_vis_t  => Turb % vis_t
+    turb_vis_w  => Turb % vis_w
     turb_wale_v => Turb % wale_v
   end if
 
@@ -83,6 +83,15 @@
     call Gpu % Vector_Real_Copy_To_Device(Flow % vort)
     flow_shear => Flow % shear
     flow_vort  => Flow % vort
+
+    ! Energy anc scalar transport
+    if(Flow % heat_transfer) then
+      call Gpu % Vector_Real_Copy_To_Device(Turb % con_w)
+      turb_con_w => Turb % con_w
+    end if ! Flow % heat_transfer
+    if(Flow % n_scalars .gt. 0) then
+      turb_diff_w => Turb % diff_w
+    end if
 
   end if
 

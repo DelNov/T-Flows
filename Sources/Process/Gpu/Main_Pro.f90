@@ -21,7 +21,7 @@
   type(Field_Type), target :: Flow(MD)      ! flow field
   type(Turb_Type)          :: Turb(MD)      ! turbulence models for flows
   real                     :: ts, te
-  integer                  :: nc, ldt, sc
+  integer                  :: nc, ldt
   character(7)             :: root_control = 'control'
   logical                  :: read_backup(MD)
 !==============================================================================!
@@ -213,6 +213,8 @@
       call Grid(1) % Update_Grid_On_Host()
       call Results % Main_Results (Grid(1), Flow(1), Turb(1), 1)
     end if
+
+    call User_Mod_End_Of_Time_Step(Grid(1), Flow(1), Turb(1))
 
   end do    ! time steps
   call cpu_time(te)
