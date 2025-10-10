@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine User_Mod_Source(Grid, Flow, Turb, phi, sc)
+  subroutine User_Mod_Source(Grid, Flow, Turb, phi, sc, a, b)
 !------------------------------------------------------------------------------!
 !   User-defined source terms for scalar variables.                            !
 !   Be mindful that this can be performed on the GPUs                          !
@@ -11,11 +11,12 @@
   type(Turb_Type),     target   :: Turb
   type(Var_Type),      target   :: phi   !! scalar being solved
   integer, intent(in), optional :: sc    !! scalar rank (optional)
+  type(Sparse_Type)             :: a     !! sparse system matrix
+  real, dimension(:)            :: b     !! right hand side vector
 !-----------------------------------[Locals]-----------------------------------!
-  real,      contiguous, pointer :: val(:)  ! pointer to matrix values
-  integer,   contiguous, pointer :: dia(:)  ! pointer to matrix diagonal
-  real,      contiguous, pointer :: b(:)    ! pointer to right hand side
-  integer                        :: c       ! cell counter
+  real,    contiguous, pointer :: val(:)  ! pointer to matrix values
+  integer, contiguous, pointer :: dia(:)  ! pointer to matrix diagonal
+  integer                      :: c       ! cell counter
 !==============================================================================!
 
   !-----------------------------!
@@ -23,7 +24,6 @@
   !-----------------------------!
   val => Flow % Nat % A % val
   dia => Flow % Nat % A % dia
-  b   => Flow % Nat % b
 
   !------------------------------------!
   !                                    !
