@@ -18,7 +18,9 @@
 !==============================================================================!
 
   !-------------------!
+  !                   !
   !   Wall function   !
+  !                   !
   !-------------------+--------------!
   !   Law of the wall:               !
   !                                  !
@@ -46,18 +48,34 @@
 
         kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
-        ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coeff(Grid, c1, c2)
+        !----------------------------------!
+        !   Set up roughness coefficient   !
+        !----------------------------------!
+        z_o = Turb % z_o(c2)    ! take the value specified in control file
+        if(z_o .gt. TINY) then  ! set lower limit based on wall distance
+          z_o = max(Grid % wall_dist(c1)  &
+              / (Turb % e_log * max(Turb % y_plus(c1), 1.0)), z_o)
+        end if
 
-        u_tan = Flow % U_Tan(Grid, s)
+        !------------------------------------------------!
+        !   Work out the tangential velocity component   !
+        !   (Assume it is the same ase the magnitude)    !
+        !------------------------------------------------!
+        u_tan = sqrt(  Flow % u % n(c1) ** 2   &
+                     + Flow % v % n(c1) ** 2   &
+                     + Flow % w % n(c1) ** 2)
 
         nu = Flow % viscosity(c1) / Flow % density(c1)
 
-        ! Calculate u_tau for smooth wall
+        !---------------------!
+        !   Calculate u_tau   !
+        !---------------------!
+
+        ! First calculate u_tau for smooth wall ...
         u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c1))**B_POW) &
                 ** (1.0/(1.0+B_POW))
 
-        ! Calculate u_tau for rough wall
+        ! ... then correct, if needed, for rough wall
         if(z_o .gt. TINY) then
           u_tau = u_tan * Turb % kappa / log(Grid % wall_dist(c1)/z_o)
         end if
@@ -69,20 +87,30 @@
 !1 !future           t % n(c2), abs(Flow % grav_z))
 !1 !future end if
 
-        ! Calculate y+
-        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(    &
-                                   u_tau,                 &
-                                   Grid % wall_dist(c1),  &
-                                   kin_vis,               &
-                                   z_o)
+        !------------------!
+        !   Calculate y+   !
+        !------------------!
+        Turb % y_plus(c1) = u_tau * (Grid % wall_dist(c1) + z_o) / kin_vis
 
-        u_plus = Turb % U_Plus_Log_Law(               &
-                               Grid % wall_dist(c1),  &
-                               Turb % y_plus(c1),     &
-                               z_o)
+        !------------------!
+        !   Calculate u+   !
+        !------------------!
 
+        ! First salculate u+ for smooth walls ...
+        u_plus = log( max(Turb % y_plus(c1), 1.05) * Turb % e_log )  &
+               / Turb % kappa
 
-        ebf = Turb % Ebf_Momentum(c1)
+        ! ... then correct, if needed, for rough walls
+        if(z_o > TINY) then
+          u_plus = log( (Grid % wall_dist(c1) + z_o) / z_o)  &
+                 / (Turb % kappa + TINY) + TINY
+        end if
+
+        !-------------------------------------------------!
+        !   Calculate blending coefficient for momentum   !
+        !-------------------------------------------------!
+        ebf = max(   0.01 * Turb % y_plus(c1)**4            &
+                  / (1.0 + 5.0 * Turb % y_plus(c1)), TINY)
 
         if(Turb % y_plus(c1) < 3.0) then
           Turb % vis_w(c1) = Turb % vis_t(c1) + Flow % viscosity(c1)
@@ -92,10 +120,16 @@
                               + u_plus * exp(-1.0/ebf) + TINY)
         end if
 
+        !-------------------------------------------------!
+        !   For heat transfer problems, calculate con_w   !
+        !-------------------------------------------------!
         if(Flow % heat_transfer) then
-          pr_t = Turb % Prandtl_Turb(Flow, c1)
-          pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
-          beta = Turb % Beta_Scalar(pr, pr_t)
+          pr_t = 0.4                      ! WARNING: GOOD ONLY FOR LES
+          pr   = Flow % viscosity(c1)  &  ! laminar Prandtl number
+               * Flow % capacity(c1)   &
+               / Flow % conductivity(c1)
+          beta = 9.24 * ((pr/pr_t)**0.75 - 1.0)  &
+                      * (1.0 + 0.28 * exp(-0.007*pr/pr_t))
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
@@ -103,7 +137,10 @@
             beta = 0.0
           end if
 
-          ebf = Turb % Ebf_Scalar(c1, pr)
+          ! Calculate blending coefficient for scalar(s)
+          ebf = 0.01 * ((pr * Turb % y_plus(c1)) ** 4  &
+              / ((1.0 + 5.0 * pr**3 * Turb % y_plus(c1)) + TINY))
+
           Turb % con_w(c1) =    Turb % y_plus(c1)                         &
                               * Flow % viscosity(c1)                      &
                               * Flow % capacity(c1)                       &
@@ -119,9 +156,14 @@
 !1 !future   end if
         end if  ! heat transfer
 
+        !-----------------------------------------------------!
+        !   For scalar transport problems, calculate diff_w   !
+        !-----------------------------------------------------!
         if(Flow % n_scalars > 0) then
-          sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
-          beta = Turb % Beta_Scalar(sc, sc_t)
+          sc =  Flow % viscosity(c1)  &                       ! Schmidt number
+             / (Flow % diffusivity(c1) * Flow % density(c1))
+          beta = 9.24 * ((sc/sc_t)**0.75 - 1.0)  &
+                      * (1.0 + 0.28 * exp(-0.007*sc/sc_t))
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer: New
           ! temperature inlet profile consistent with wall functions"
@@ -129,7 +171,9 @@
             beta = 0.0
           end if
 
-          ebf = Turb % Ebf_Scalar(c1, sc)
+          ! Calculate blending coefficient for scalar(s)
+          ebf = 0.01 * ((sc * Turb % y_plus(c1)) ** 4  &
+              / ((1.0 + 5.0 * sc**3 * Turb % y_plus(c1)) + TINY))
           Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
               * (Flow % viscosity(c1)/Flow % density(c1))         &
               / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
