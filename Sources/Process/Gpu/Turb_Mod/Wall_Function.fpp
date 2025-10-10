@@ -9,20 +9,13 @@
   type(Grid_Type)          :: Grid
   type(Field_Type)         :: Flow
 !-----------------------------------[Locals]-----------------------------------!
-  type(Var_Type),   pointer :: u, v, w, t
-  type(Var_Type),   pointer :: vis
-  integer                   :: reg, s, c1, c2
-  real                      :: u_tau, u_tan, nu
-  real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
+  integer :: reg, s, c1, c2
+  real    :: u_tau, u_tan, nu
+  real    :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !------------------------------[Local parameters]------------------------------!
-  real, parameter           :: A_POW = 8.3
-  real, parameter           :: B_POW = 1.0/7.0
+  real, parameter :: A_POW = 8.3
+  real, parameter :: B_POW = 1.0/7.0
 !==============================================================================!
-
-  ! Take aliases
-  vis  => Turb % vis
-  call Flow % Alias_Momentum(u, v, w)
-  call Flow % Alias_Energy  (t)
 
   !-------------------!
   !   Wall function   !
