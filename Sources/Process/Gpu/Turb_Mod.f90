@@ -97,6 +97,7 @@
 
       ! Functions to set turbulence constants
       ! They are called from Read_Command_Mod
+      procedure :: Const_Les
       procedure :: Const_Spalart_Allmaras
       ! Computation of various turbulent quantities
       procedure, private :: Compute_Variable
