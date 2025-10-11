@@ -112,17 +112,17 @@
 
   ! Inertial and advection terms
   if(comp .eq. 1) then
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % u, visc_eff)
     call Flow % Add_Inertial_Term (Grid, Flow % u, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % u, Flow % density)
-    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % u, visc_eff)
   else if(comp .eq. 2) then
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % v, visc_eff)
     call Flow % Add_Inertial_Term (Grid, Flow % v, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % v, Flow % density)
-    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % v, visc_eff)
   else if(comp .eq. 3) then
+    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % w, visc_eff)
     call Flow % Add_Inertial_Term (Grid, Flow % w, Flow % density)
     call Flow % Add_Advection_Term(Grid, Flow % w, Flow % density)
-    call Flow % Add_Cross_Diffusion_Term(Grid, Flow % w, visc_eff)
   end if
 
   ! Pressure force

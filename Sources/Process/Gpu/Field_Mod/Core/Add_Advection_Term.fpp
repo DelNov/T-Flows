@@ -21,6 +21,10 @@
 
   call Profiler % Start('Add_Advection_Term')
 
+  ! Now this check is really important: we need the
+  ! actual gradients of the variable we are solving
+  Assert(Flow % stores_gradients_of .eq. phi % name)
+
   ! Take some aliases
   b     => Flow % Nat % b
   blend =  phi % blend
