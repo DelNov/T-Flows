@@ -28,10 +28,10 @@
   w    => Flow % w
 
   ! If not time for disturbing the velocity field, return
-  if(mod(Time % Curr_Dt(), 120) .ne. 0) return
+  if(mod(Time % Curr_Dt(), 100) .ne. 0) return
 
   ! If too late to disturb, get out too
-  if(Time % Curr_Dt() > 1200) return
+  if(Time % Curr_Dt() > 1000) return
 
   ! Minimum and maximum size of eddies
   rmin = 0.2
@@ -77,7 +77,7 @@
 
     ! Superimpose eddies on the velocity field
     do dir = 1, 4
-      do c = Cells_In_Domain_And_Buffers()
+      do c = 1, Grid % n_cells
         xc = Grid % xc(c)
         yc = Grid % yc(c)
         zc = Grid % zc(c)
@@ -100,12 +100,12 @@
   end do
 
   vmax = 0
-  do c = Cells_In_Domain_And_Buffers()
+  do c = 1, Grid % n_cells
     vmax = max(vmax, abs(v % n(c)))
     vmax = max(vmax, abs(w % n(c)))
   end do
   call Global % Max_Real(vmax)
-  do c = Cells_In_Domain_And_Buffers()
+  do c = 1, Grid % n_cells
     v % n(c) = v % n(c) / vmax / 10.0
     w % n(c) = w % n(c) / vmax / 10.0
   end do

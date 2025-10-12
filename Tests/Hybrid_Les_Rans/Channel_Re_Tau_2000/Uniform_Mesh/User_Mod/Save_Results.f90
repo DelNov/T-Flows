@@ -33,8 +33,8 @@
   logical                  :: there
 !==============================================================================!
 
-  ! Don't save if you didn't start to gather statistics yet
-  if(Time % Curr_Dt() .lt. 12000) return
+  ! Don't save if this is intial condition, nothing is developed yet
+  if(Time % Curr_Dt() .eq. 0) return
 
   ! Take aliases
   Grid => Flow % pnt_grid
@@ -130,7 +130,7 @@
   !   Average the results   !
   !-------------------------!
   do i = 1, n_prob-1
-    do c = Cells_In_Domain()
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
       if(Grid % zc(c) > (z_p(i)) .and.  &
          Grid % zc(c) < (z_p(i+1))) then
 
@@ -251,7 +251,7 @@
 
   if(Flow % heat_transfer) then
     d_wall = 0.0 
-    do c = Cells_In_Domain_And_Buffers()
+    do c = 1, Grid % n_cells
       if(Grid % wall_dist(c) > d_wall) then
         d_wall = Grid % wall_dist(c)
         t_inf  = Turb % t_mean(c)

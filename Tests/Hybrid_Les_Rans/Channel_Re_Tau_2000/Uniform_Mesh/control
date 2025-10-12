@@ -5,7 +5,7 @@
 
   HEAT_TRANSFER   yes
 
-  TIME_STEP                                     0.05
+  TIME_STEP                                     0.01
   NUMBER_OF_TIME_STEPS                      18000
   STARTING_TIME_STEP_FOR_TURB_STATISTICS     6000
   RESULTS_SAVE_INTERVAL                       600
@@ -26,10 +26,10 @@
   DYNAMIC_VISCOSITY      3.e-5
   HEAT_CAPACITY          1.0
 
-  TURBULENCE_MODEL       les_wale
+  TURBULENCE_MODEL       hybrid_les_rans
 
   PRESSURE_DROPS     0.0036   0.0   0.0
-  BULK_VELOCITIES    1.32     0.0   0.0
+  VOLUME_FLOW_RATES  8.28     0.0   0.0
 
 #----------------------
 # Numerical parameters
