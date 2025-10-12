@@ -40,7 +40,7 @@
   TIME_INTEGRATION_SCHEME               parabolic
 
   ADVECTION_SCHEME_FOR_MOMENTUM	       smart
-  # BLENDING_COEFFICIENT_FOR_MOMENTUM     0.8
+  # BLENDING_COEFFICIENTS_FOR_MOMENTUM     0.8  0.2  0.0
 
 #--------------------------
 # Linear solver parameters

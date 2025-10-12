@@ -62,12 +62,15 @@
   ! From boundary conditions
   call Turb % Insert_Variable_Bc(Grid, Flow, phi, visc_eff)
 
+  ! Insert cross diffusion terms
+  ! (This step computes computes
+  !  gradients as well, which is
+  !  very good to keep in mind.)
+  call Flow % Add_Cross_Diffusion_Term(Grid, phi, visc_eff)
+
   ! Inertial and advection terms
   call Flow % Add_Inertial_Term (Grid, phi, Flow % density)
   call Flow % Add_Advection_Term(Grid, phi, Flow % density)
-
-  ! Insert cross diffusion terms (computers gradients as well)
-  call Flow % Add_Cross_Diffusion_Term(Grid, phi, visc_eff)
 
   !-----------------------------------------!
   !   Insert source term for the variable   !

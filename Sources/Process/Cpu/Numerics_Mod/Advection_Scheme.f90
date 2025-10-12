@@ -146,8 +146,8 @@
     phi_f_c = phi % n(c) + fj * sgn * (phi % n(c2)-phi % n(c1))  ! central part
     phi_f_u = phi % n(c)                                         ! upwind part
     ! Blended value
-    phi_f   =        phi % blend  * phi_f_c   &
-            + (1.0 - phi % blend) * phi_f_u
+    phi_f   =        phi % blends(1)  * phi_f_c   &
+            + (1.0 - phi % blends(1)) * phi_f_u
     return
   end if
 

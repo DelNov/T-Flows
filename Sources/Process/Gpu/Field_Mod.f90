@@ -167,9 +167,10 @@
       procedure :: Buoyancy_Forces
       procedure :: Calculate_Bulk_Velocities
       procedure :: Calculate_Shear_And_Vorticity
-      procedure :: Prandtl_Numb
-      procedure :: Schmidt_Numb
-      procedure :: U_Tan
+      ! Unfortunatelly, the following three procedures can't be ported to GPUs
+!     procedure :: Prandtl_Numb
+!     procedure :: Schmidt_Numb
+!     procedure :: U_Tan
       procedure :: Volume_Average
 
       ! Procedures to copy field to device
@@ -211,9 +212,10 @@
 #   include "Field_Mod/Utilities/Buoyancy_Forces.f90"
 #   include "Field_Mod/Utilities/Calculate_Bulk_Velocities.f90"
 #   include "Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90"
-#   include "Field_Mod/Utilities/Prandtl_Numb.f90"
-#   include "Field_Mod/Utilities/Schmidt_Numb.f90"
-#   include "Field_Mod/Utilities/U_Tan.f90"
+    ! Unfortunatelly, the following three procedures can't be ported to GPUs
+!   include "Field_Mod/Utilities/Prandtl_Numb.f90"
+!   include "Field_Mod/Utilities/Schmidt_Numb.f90"
+!   include "Field_Mod/Utilities/U_Tan.f90"
 #   include "Field_Mod/Utilities/Volume_Average.f90"
 
     !--------------------!

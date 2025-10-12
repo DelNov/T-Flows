@@ -39,6 +39,9 @@
   Tok % first = Tok % whole(1:1)
   Tok % last  = Tok % whole(l:l)
 
+  ! Initialize the tokens
+  Tok % tokens(1:MAX_TOKENS) = ''
+
   ! Then parse
   Tok % n_tokens = 0
   if(Tok % whole(1:1) >= '!') then

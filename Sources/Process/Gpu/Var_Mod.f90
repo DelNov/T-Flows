@@ -43,7 +43,8 @@
 
     ! Parameters for numerical solution of the variable
     character(SL) :: solver        !! linear solver to use for this variable
-    real          :: blend         !! upwind blending (1.0 central; 0.0 upwind)
+    real          :: blends(3)     !! blending coefficients; amont of:
+                                   !! 1: central, 2: upwind, 3: luds
     integer       :: td_scheme     !! time-disretization scheme
     real          :: tol = PICO    !! linear solver tolerance
     real          :: urf           !! under-relaxation factor

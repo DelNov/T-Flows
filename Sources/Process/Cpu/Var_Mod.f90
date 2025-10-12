@@ -75,9 +75,10 @@
       !! list of options passed to PETSc preconditioner
     integer       :: adv_scheme    !! advection scheme
     integer       :: grad_method   !! gradient computation method
-    real          :: blend         !! upwind blending (1.0 central; 0.0 upwind)
+    real          :: blends(3)     !! blending coefficients; amont of:
+                                   !! 1: central, 2: upwind, 3: luds
     integer       :: td_scheme     !! time-disretization scheme
-    real          :: tol           !! linear solver tolerance
+    real          :: tol = PICO    !! linear solver tolerance
     real          :: urf           !! under-relaxation factor
     integer       :: miter         !! max number of iterations for variable
     integer       :: niter         !! executed number of iterations for var

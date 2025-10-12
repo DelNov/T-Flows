@@ -97,6 +97,7 @@
 
       ! Functions to set turbulence constants
       ! They are called from Read_Command_Mod
+      procedure :: Const_Les
       procedure :: Const_Spalart_Allmaras
       ! Computation of various turbulent quantities
       procedure, private :: Compute_Variable
@@ -112,14 +113,15 @@
       procedure, private :: Vis_T_Wale
       procedure, private :: Wall_Function
 
-      procedure, private :: Beta_Scalar
-      procedure, private :: Ebf_Momentum
-      procedure, private :: Ebf_Scalar
-      procedure          :: Prandtl_Turb
+      ! Unfortunatelly, the following seven procedures can't be ported to GPUs
+!     procedure, private :: Beta_Scalar
+!     procedure, private :: Ebf_Momentum
+!     procedure, private :: Ebf_Scalar
+!     procedure          :: Prandtl_Turb
 
-      procedure :: Y_Plus_Rough_Walls
-      procedure :: U_Plus_Log_Law
-      procedure :: Roughness_Coeff
+!     procedure :: Y_Plus_Rough_Walls
+!     procedure :: U_Plus_Log_Law
+!     procedure :: Roughness_Coeff
 
       procedure :: Les
 
@@ -166,14 +168,16 @@
 #   include "Turb_Mod/Wall_Function.f90"
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
-#   include "Turb_Mod/Beta_Scalar.f90"
-#   include "Turb_Mod/Ebf_Momentum.f90"
-#   include "Turb_Mod/Ebf_Scalar.f90"
-#   include "Turb_Mod/Prandtl_Turb.f90"
 
-#   include "Turb_Mod/Y_Plus_Rough_Walls.f90"
-#   include "Turb_Mod/U_Plus_Log_Law.f90"
-#   include "Turb_Mod/Roughness_Coeff.f90"
+    ! Unfortunatelly, the following seven procedures can't be ported to GPUs
+!   include "Turb_Mod/Beta_Scalar.f90"
+!   include "Turb_Mod/Ebf_Momentum.f90"
+!   include "Turb_Mod/Ebf_Scalar.f90"
+!   include "Turb_Mod/Prandtl_Turb.f90"
+
+!   include "Turb_Mod/Y_Plus_Rough_Walls.f90"
+!   include "Turb_Mod/U_Plus_Log_Law.f90"
+!   include "Turb_Mod/Roughness_Coeff.f90"
 
 #   include "Turb_Mod/Les.f90"
 

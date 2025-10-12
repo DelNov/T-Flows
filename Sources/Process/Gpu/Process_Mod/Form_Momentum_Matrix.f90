@@ -74,7 +74,7 @@
     do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
       c1 = grid_faces_c(1,s)   ! inside cell
       c2 = grid_faces_c(2,s)   ! boundary cell
-      visc_eff(c2) = flow_viscosity(c1)
+      visc_eff(c1) = flow_viscosity(c1)
     end do
     !$acc end parallel
   end do
@@ -114,7 +114,7 @@
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
           c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_w(c1)
+          visc_eff(c1) = turb_vis_w(c1)
         end do
         !$acc end parallel
 
@@ -131,7 +131,7 @@
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
           c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c2) = turb_vis_t(c1)
+          visc_eff(c1) = turb_vis_t(c1)
         end do
         !$acc end parallel
 
@@ -304,7 +304,7 @@
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
           c2 = grid_faces_c(2,s)   ! boundary cell
-          a12 = visc_eff(c2) * fc(s)
+          a12 = visc_eff(c1) * fc(s)
           val(dia(c1)) = val(dia(c1)) + a12
         end do
         !$acc end parallel

@@ -94,12 +94,15 @@
   ! From boundary conditions
   call Process % Insert_Energy_Bc(Grid, Flow)
 
+  ! Insert cross diffusion terms
+  ! (This step computes computes
+  !  gradients as well, which is
+  !  very good to keep in mind.)
+  call Flow % Add_Cross_Diffusion_Term(Grid, Flow % t, cond_eff)
+
   ! Inertial and advection terms
   call Flow % Add_Inertial_Term (Grid, Flow % t, dens_capa)
   call Flow % Add_Advection_Term(Grid, Flow % t, dens_capa)
-
-  ! Insert cross diffusion terms (computers gradients as well)
-  call Flow % Add_Cross_Diffusion_Term(Grid, Flow % t, cond_eff)
 
   call User_Mod_Source(Grid, Flow, Turb, Flow % t, 0, Flow % Nat % A, b)
 

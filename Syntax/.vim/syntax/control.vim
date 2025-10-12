@@ -66,11 +66,11 @@ syn keyword controlKeyword   ADVECTION_SCHEME_FOR_MOMENTUM
 syn keyword controlKeyword   ADVECTION_SCHEME_FOR_SCALARS
 syn keyword controlKeyword   ADVECTION_SCHEME_FOR_TURBULENCE
 syn keyword controlKeyword   ADVECTION_SCHEME_FOR_VOF
-syn keyword controlKeyword   BLENDING_COEFFICIENT_FOR_ENERGY
-syn keyword controlKeyword   BLENDING_COEFFICIENT_FOR_MOMENTUM
-syn keyword controlKeyword   BLENDING_COEFFICIENT_FOR_SCALARS
-syn keyword controlKeyword   BLENDING_COEFFICIENT_FOR_TURBULENCE
-syn keyword controlKeyword   BLENDING_COEFFICIENT_FOR_VOF
+syn keyword controlKeyword   BLENDING_COEFFICIENTS_FOR_ENERGY
+syn keyword controlKeyword   BLENDING_COEFFICIENTS_FOR_MOMENTUM
+syn keyword controlKeyword   BLENDING_COEFFICIENTS_FOR_SCALARS
+syn keyword controlKeyword   BLENDING_COEFFICIENTS_FOR_TURBULENCE
+syn keyword controlKeyword   BLENDING_COEFFICIENTS_FOR_VOF
 syn keyword controlKeyword   BLEND_SYSTEM_MATRICES
 syn keyword controlKeyword   CHOI_CORRECTION
 syn keyword controlKeyword   GRADIENT_METHOD_FOR_ENERGY

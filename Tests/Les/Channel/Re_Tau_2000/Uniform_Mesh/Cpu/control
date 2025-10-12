@@ -6,7 +6,7 @@
   HEAT_TRANSFER   yes
 
   TIME_STEP                                     0.05
-  NUMBER_OF_TIME_STEPS                      18000
+  NUMBER_OF_TIME_STEPS                        100
   STARTING_TIME_STEP_FOR_TURB_STATISTICS     6000
   RESULTS_SAVE_INTERVAL                       600
   BACKUP_SAVE_INTERVAL                        600
@@ -42,8 +42,10 @@
 
   TIME_INTEGRATION_SCHEME  parabolic
 
-  ADVECTION_SCHEME_FOR_MOMENTUM    central
-  ADVECTION_SCHEME_FOR_ENERGY      smart
+  ADVECTION_SCHEME_FOR_MOMENTUM      blended
+  ADVECTION_SCHEME_FOR_ENERGY        blended
+  BLENDING_COEFFICIENTS_FOR_MOMENTUM  0.9  0.1  0.0
+  BLENDING_COEFFICIENTS_FOR_ENERGY    0.9  0.1  0.0
 
   PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 

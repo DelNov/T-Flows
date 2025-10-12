@@ -1,0 +1,1880 @@
+# Grace project file
+#
+@version 50125
+@page size 792, 612
+@page scroll 5%
+@page inout 5%
+@link page off
+@map font 0 to "Times-Roman", "Times-Roman"
+@map font 1 to "Times-Italic", "Times-Italic"
+@map font 2 to "Times-Bold", "Times-Bold"
+@map font 3 to "Times-BoldItalic", "Times-BoldItalic"
+@map font 4 to "Helvetica", "Helvetica"
+@map font 5 to "Helvetica-Oblique", "Helvetica-Oblique"
+@map font 6 to "Helvetica-Bold", "Helvetica-Bold"
+@map font 7 to "Helvetica-BoldOblique", "Helvetica-BoldOblique"
+@map font 8 to "Courier", "Courier"
+@map font 9 to "Courier-Oblique", "Courier-Oblique"
+@map font 10 to "Courier-Bold", "Courier-Bold"
+@map font 11 to "Courier-BoldOblique", "Courier-BoldOblique"
+@map font 12 to "Symbol", "Symbol"
+@map font 13 to "ZapfDingbats", "ZapfDingbats"
+@map color 0 to (255, 255, 255), "white"
+@map color 1 to (0, 0, 0), "black"
+@map color 2 to (255, 0, 0), "red"
+@map color 3 to (0, 255, 0), "green"
+@map color 4 to (0, 0, 255), "blue"
+@map color 5 to (255, 255, 0), "yellow"
+@map color 6 to (188, 143, 143), "brown"
+@map color 7 to (220, 220, 220), "grey"
+@map color 8 to (148, 0, 211), "violet"
+@map color 9 to (0, 255, 255), "cyan"
+@map color 10 to (255, 0, 255), "magenta"
+@map color 11 to (255, 165, 0), "orange"
+@map color 12 to (114, 33, 188), "indigo"
+@map color 13 to (103, 7, 72), "maroon"
+@map color 14 to (64, 224, 208), "turquoise"
+@map color 15 to (0, 139, 0), "green4"
+@reference date 0
+@date wrap off
+@date wrap year 1950
+@default linewidth 1.0
+@default linestyle 1
+@default color 1
+@default pattern 1
+@default font 0
+@default char size 1.000000
+@default symbol size 1.000000
+@default sformat "%16.8g"
+@background color 0
+@page background fill on
+@timestamp off
+@timestamp 0.03, 0.03
+@timestamp color 1
+@timestamp rot 0
+@timestamp font 0
+@timestamp char size 1.000000
+@timestamp def "Fri Oct 19 11:34:10 2018"
+@with line
+@    line on
+@    line loctype view
+@    line 0.188215105862, 0.772048939695, 0.286254321548, 0.772048939695
+@    line linewidth 4.0
+@    line linestyle 1
+@    line color 1
+@    line arrow 0
+@    line arrow type 0
+@    line arrow length 1.000000
+@    line arrow layout 1.000000, 1.000000
+@line def
+@with line
+@    line on
+@    line loctype view
+@    line 0.182568282568, 0.699113399113, 0.287065637065, 0.699113399113
+@    line linewidth 1.0
+@    line linestyle 3
+@    line color 1
+@    line arrow 0
+@    line arrow type 0
+@    line arrow length 1.000000
+@    line arrow layout 1.000000, 1.000000
+@line def
+@with line
+@    line on
+@    line loctype view
+@    line 0.183862433862, 0.608823108823, 0.28835978836, 0.608823108823
+@    line linewidth 1.0
+@    line linestyle 3
+@    line color 1
+@    line arrow 0
+@    line arrow type 0
+@    line arrow length 1.000000
+@    line arrow layout 1.000000, 1.000000
+@line def
+@with string
+@    string on
+@    string loctype view
+@    string 0.304375804376, 0.757711493006
+@    string color 1
+@    string rot 0
+@    string font 0
+@    string just 0
+@    string char size 1.920000
+@    string def "Re\stau \N = 2000"
+@with string
+@    string on
+@    string loctype view
+@    string 0.304375804376, 0.683183183183
+@    string color 1
+@    string rot 0
+@    string font 0
+@    string just 0
+@    string char size 1.820000
+@    string def "1/0.41 ln(y\S+\N)  + 5.2  "
+@with string
+@    string on
+@    string loctype view
+@    string 0.310903760904, 0.599678249678
+@    string color 1
+@    string rot 0
+@    string font 0
+@    string just 0
+@    string char size 1.820000
+@    string def "y\S+"
+@r0 off
+@link r0 to g0
+@r0 type above
+@r0 linestyle 1
+@r0 linewidth 1.0
+@r0 color 1
+@r0 line 0, 0, 0, 0
+@r1 off
+@link r1 to g0
+@r1 type above
+@r1 linestyle 1
+@r1 linewidth 1.0
+@r1 color 1
+@r1 line 0, 0, 0, 0
+@r2 off
+@link r2 to g0
+@r2 type above
+@r2 linestyle 1
+@r2 linewidth 1.0
+@r2 color 1
+@r2 line 0, 0, 0, 0
+@r3 off
+@link r3 to g0
+@r3 type above
+@r3 linestyle 1
+@r3 linewidth 1.0
+@r3 color 1
+@r3 line 0, 0, 0, 0
+@r4 off
+@link r4 to g0
+@r4 type above
+@r4 linestyle 1
+@r4 linewidth 1.0
+@r4 color 1
+@r4 line 0, 0, 0, 0
+@g0 on
+@g0 hidden false
+@g0 type XY
+@g0 stacked false
+@g0 bar hgap 0.000000
+@g0 fixedpoint off
+@g0 fixedpoint type 0
+@g0 fixedpoint xy 0.000000, 0.000000
+@g0 fixedpoint format general general
+@g0 fixedpoint prec 6, 6
+@with g0
+@    world 0.5, 0, 5000, 35
+@    stack world 0, 0, 0, 0
+@    znorm 1
+@    view 0.150000, 0.150000, 1.150000, 0.850000
+@    title ""
+@    title font 0
+@    title size 1.500000
+@    title color 1
+@    subtitle ""
+@    subtitle font 0
+@    subtitle size 1.020000
+@    subtitle color 1
+@    xaxes scale Logarithmic
+@    yaxes scale Normal
+@    xaxes invert off
+@    yaxes invert off
+@    xaxis  on
+@    xaxis  type zero false
+@    xaxis  offset 0.000000 , 0.000000
+@    xaxis  bar on
+@    xaxis  bar color 1
+@    xaxis  bar linestyle 1
+@    xaxis  bar linewidth 1.0
+@    xaxis  label "y\S+"
+@    xaxis  label layout para
+@    xaxis  label place auto
+@    xaxis  label char size 1.970000
+@    xaxis  label font 0
+@    xaxis  label color 1
+@    xaxis  label place normal
+@    xaxis  tick on
+@    xaxis  tick major 10
+@    xaxis  tick minor ticks 9
+@    xaxis  tick default 6
+@    xaxis  tick place rounded true
+@    xaxis  tick in
+@    xaxis  tick major size 1.000000
+@    xaxis  tick major color 1
+@    xaxis  tick major linewidth 1.0
+@    xaxis  tick major linestyle 1
+@    xaxis  tick major grid off
+@    xaxis  tick minor color 1
+@    xaxis  tick minor linewidth 1.0
+@    xaxis  tick minor linestyle 1
+@    xaxis  tick minor grid off
+@    xaxis  tick minor size 0.500000
+@    xaxis  ticklabel on
+@    xaxis  ticklabel format general
+@    xaxis  ticklabel prec 5
+@    xaxis  ticklabel formula ""
+@    xaxis  ticklabel append ""
+@    xaxis  ticklabel prepend ""
+@    xaxis  ticklabel angle 0
+@    xaxis  ticklabel skip 0
+@    xaxis  ticklabel stagger 0
+@    xaxis  ticklabel place normal
+@    xaxis  ticklabel offset auto
+@    xaxis  ticklabel offset 0.000000 , 0.010000
+@    xaxis  ticklabel start type auto
+@    xaxis  ticklabel start 0.000000
+@    xaxis  ticklabel stop type auto
+@    xaxis  ticklabel stop 0.000000
+@    xaxis  ticklabel char size 1.980000
+@    xaxis  ticklabel font 0
+@    xaxis  ticklabel color 1
+@    xaxis  tick place both
+@    xaxis  tick spec type none
+@    yaxis  on
+@    yaxis  type zero false
+@    yaxis  offset 0.000000 , 0.000000
+@    yaxis  bar on
+@    yaxis  bar color 1
+@    yaxis  bar linestyle 1
+@    yaxis  bar linewidth 1.0
+@    yaxis  label "U\S+"
+@    yaxis  label layout para
+@    yaxis  label place auto
+@    yaxis  label char size 1.970000
+@    yaxis  label font 0
+@    yaxis  label color 1
+@    yaxis  label place normal
+@    yaxis  tick on
+@    yaxis  tick major 10
+@    yaxis  tick minor ticks 1
+@    yaxis  tick default 6
+@    yaxis  tick place rounded true
+@    yaxis  tick in
+@    yaxis  tick major size 1.000000
+@    yaxis  tick major color 1
+@    yaxis  tick major linewidth 1.0
+@    yaxis  tick major linestyle 1
+@    yaxis  tick major grid off
+@    yaxis  tick minor color 1
+@    yaxis  tick minor linewidth 1.0
+@    yaxis  tick minor linestyle 1
+@    yaxis  tick minor grid off
+@    yaxis  tick minor size 0.500000
+@    yaxis  ticklabel on
+@    yaxis  ticklabel format general
+@    yaxis  ticklabel prec 5
+@    yaxis  ticklabel formula ""
+@    yaxis  ticklabel append ""
+@    yaxis  ticklabel prepend ""
+@    yaxis  ticklabel angle 0
+@    yaxis  ticklabel skip 0
+@    yaxis  ticklabel stagger 0
+@    yaxis  ticklabel place normal
+@    yaxis  ticklabel offset auto
+@    yaxis  ticklabel offset 0.000000 , 0.010000
+@    yaxis  ticklabel start type auto
+@    yaxis  ticklabel start 0.000000
+@    yaxis  ticklabel stop type auto
+@    yaxis  ticklabel stop 0.000000
+@    yaxis  ticklabel char size 1.980000
+@    yaxis  ticklabel font 0
+@    yaxis  ticklabel color 1
+@    yaxis  tick place both
+@    yaxis  tick spec type none
+@    altxaxis  off
+@    altyaxis  off
+@    legend on
+@    legend loctype view
+@    legend 0.159, 0.759
+@    legend box color 1
+@    legend box pattern 1
+@    legend box linewidth 1.0
+@    legend box linestyle 0
+@    legend box fill color 0
+@    legend box fill pattern 1
+@    legend font 0
+@    legend char size 1.550000
+@    legend color 1
+@    legend length 8
+@    legend vgap 1
+@    legend hgap 1
+@    legend invert false
+@    frame type 0
+@    frame linestyle 1
+@    frame linewidth 1.0
+@    frame color 1
+@    frame pattern 1
+@    frame background color 0
+@    frame background pattern 0
+@    s0 hidden false
+@    s0 type xy
+@    s0 symbol 0
+@    s0 symbol size 1.000000
+@    s0 symbol color 1
+@    s0 symbol pattern 1
+@    s0 symbol fill color 1
+@    s0 symbol fill pattern 0
+@    s0 symbol linewidth 1.0
+@    s0 symbol linestyle 1
+@    s0 symbol char 65
+@    s0 symbol char font 0
+@    s0 symbol skip 0
+@    s0 line type 1
+@    s0 line linestyle 3
+@    s0 line linewidth 1.0
+@    s0 line color 1
+@    s0 line pattern 1
+@    s0 baseline type 0
+@    s0 baseline off
+@    s0 dropline off
+@    s0 fill type 0
+@    s0 fill rule 0
+@    s0 fill color 1
+@    s0 fill pattern 1
+@    s0 avalue off
+@    s0 avalue type 2
+@    s0 avalue char size 1.000000
+@    s0 avalue font 0
+@    s0 avalue color 1
+@    s0 avalue rot 0
+@    s0 avalue format general
+@    s0 avalue prec 3
+@    s0 avalue prepend ""
+@    s0 avalue append ""
+@    s0 avalue offset 0.000000 , 0.000000
+@    s0 errorbar on
+@    s0 errorbar place both
+@    s0 errorbar color 1
+@    s0 errorbar pattern 1
+@    s0 errorbar size 1.000000
+@    s0 errorbar linewidth 1.0
+@    s0 errorbar linestyle 1
+@    s0 errorbar riser linewidth 1.0
+@    s0 errorbar riser linestyle 1
+@    s0 errorbar riser clip off
+@    s0 errorbar riser clip length 0.100000
+@    s0 comment "/home/muhamed/NewT-Rex/T-Rex/Test/TestCases/temp/U_lin.dat"
+@    s0 legend  ""
+@    s1 hidden false
+@    s1 type xy
+@    s1 symbol 0
+@    s1 symbol size 1.000000
+@    s1 symbol color 1
+@    s1 symbol pattern 1
+@    s1 symbol fill color 1
+@    s1 symbol fill pattern 0
+@    s1 symbol linewidth 1.0
+@    s1 symbol linestyle 1
+@    s1 symbol char 65
+@    s1 symbol char font 0
+@    s1 symbol skip 0
+@    s1 line type 1
+@    s1 line linestyle 3
+@    s1 line linewidth 1.0
+@    s1 line color 1
+@    s1 line pattern 1
+@    s1 baseline type 0
+@    s1 baseline off
+@    s1 dropline off
+@    s1 fill type 0
+@    s1 fill rule 0
+@    s1 fill color 1
+@    s1 fill pattern 1
+@    s1 avalue off
+@    s1 avalue type 2
+@    s1 avalue char size 1.000000
+@    s1 avalue font 0
+@    s1 avalue color 1
+@    s1 avalue rot 0
+@    s1 avalue format general
+@    s1 avalue prec 3
+@    s1 avalue prepend ""
+@    s1 avalue append ""
+@    s1 avalue offset 0.000000 , 0.000000
+@    s1 errorbar on
+@    s1 errorbar place both
+@    s1 errorbar color 1
+@    s1 errorbar pattern 1
+@    s1 errorbar size 1.000000
+@    s1 errorbar linewidth 1.0
+@    s1 errorbar linestyle 1
+@    s1 errorbar riser linewidth 1.0
+@    s1 errorbar riser linestyle 1
+@    s1 errorbar riser clip off
+@    s1 errorbar riser clip length 0.100000
+@    s1 comment "/home/muhamed/NewT-Rex/T-Rex/Test/TestCases/temp/U_log.dat"
+@    s1 legend  ""
+@    s2 hidden false
+@    s2 type xy
+@    s2 symbol 0
+@    s2 symbol size 1.000000
+@    s2 symbol color 1
+@    s2 symbol pattern 1
+@    s2 symbol fill color 1
+@    s2 symbol fill pattern 0
+@    s2 symbol linewidth 1.0
+@    s2 symbol linestyle 1
+@    s2 symbol char 65
+@    s2 symbol char font 0
+@    s2 symbol skip 0
+@    s2 line type 1
+@    s2 line linestyle 1
+@    s2 line linewidth 3.5
+@    s2 line color 1
+@    s2 line pattern 1
+@    s2 baseline type 0
+@    s2 baseline off
+@    s2 dropline off
+@    s2 fill type 0
+@    s2 fill rule 0
+@    s2 fill color 1
+@    s2 fill pattern 1
+@    s2 avalue off
+@    s2 avalue type 2
+@    s2 avalue char size 1.000000
+@    s2 avalue font 0
+@    s2 avalue color 1
+@    s2 avalue rot 0
+@    s2 avalue format general
+@    s2 avalue prec 3
+@    s2 avalue prepend ""
+@    s2 avalue append ""
+@    s2 avalue offset 0.000000 , 0.000000
+@    s2 errorbar on
+@    s2 errorbar place both
+@    s2 errorbar color 1
+@    s2 errorbar pattern 1
+@    s2 errorbar size 1.000000
+@    s2 errorbar linewidth 1.0
+@    s2 errorbar linestyle 1
+@    s2 errorbar riser linewidth 1.0
+@    s2 errorbar riser linestyle 1
+@    s2 errorbar riser clip off
+@    s2 errorbar riser clip length 0.100000
+@    s2 comment "Cols 1:2"
+@    s2 legend  ""
+@target G0.S0
+@type xy
+               1                1
+               2                2
+               3                3
+               4                4
+               5                5
+               6                6
+               7                7
+               8                8
+               9                9
+              10               10
+              11               11
+              12               12
+              13               13
+              14               14
+&
+@target G0.S1
+@type xy
+              10         10.81606
+              40         14.19727
+              70         15.56218
+             100         16.43212
+             130         17.07203
+             160         17.57847
+             190         17.99762
+             220         18.35519
+             250         18.66698
+             280         18.94339
+             310         19.19164
+             340         19.41694
+             370         19.62318
+             400         19.81333
+             430         19.98972
+             460         20.15421
+             490         20.30831
+             520         20.45324
+             550         20.59004
+             580         20.71958
+             610         20.84258
+             640         20.95968
+             670         21.07141
+             700         21.17824
+             730          21.2806
+             760         21.37883
+             790         21.47325
+             820         21.56416
+             850          21.6518
+             880         21.73639
+             910         21.81816
+             940         21.89727
+             970         21.97389
+            1000         22.04818
+            1030         22.12028
+            1060          22.1903
+            1090         22.25837
+            1120         22.32459
+            1150         22.38907
+            1180         22.45188
+            1210         22.51311
+            1240         22.57285
+            1270         22.63115
+            1300          22.6881
+            1330         22.74374
+            1360         22.79815
+            1390         22.85136
+            1420         22.90344
+            1450         22.95444
+            1480         23.00438
+            1510         23.05333
+            1540         23.10131
+            1570         23.14837
+            1600         23.19453
+            1630         23.23984
+            1660         23.28432
+            1690         23.32801
+            1720         23.37093
+            1750          23.4131
+            1780         23.45456
+            1810         23.49532
+            1840         23.53542
+            1870         23.57486
+            1900         23.61368
+            1930         23.65189
+            1960         23.68951
+            1990         23.72656
+            2020         23.76306
+            2050         23.79901
+            2080         23.83445
+            2110         23.86937
+            2140         23.90381
+            2170         23.93776
+            2200         23.97125
+            2230         24.00429
+            2260         24.03688
+            2290         24.06904
+            2320         24.10079
+            2350         24.13212
+            2380         24.16306
+            2410         24.19361
+            2440         24.22379
+            2470         24.25359
+            2500         24.28304
+            2530         24.31213
+            2560         24.34089
+            2590          24.3693
+            2620         24.39739
+            2650         24.42516
+            2680         24.45261
+            2710         24.47977
+            2740         24.50662
+            2770         24.53318
+            2800         24.55945
+            2830         24.58544
+            2860         24.61116
+            2890         24.63661
+            2920          24.6618
+            2950         24.68673
+            2980         24.71141
+            3010         24.73584
+            3040         24.76003
+            3070         24.78398
+            3100          24.8077
+            3130         24.83119
+            3160         24.85446
+            3190          24.8775
+            3220         24.90033
+            3250         24.92295
+            3280         24.94536
+            3310         24.96757
+            3340         24.98957
+            3370         25.01139
+            3400           25.033
+            3430         25.05443
+            3460         25.07567
+            3490         25.09672
+            3520          25.1176
+            3550          25.1383
+            3580         25.15882
+            3610         25.17918
+            3640         25.19936
+            3670         25.21938
+            3700         25.23924
+            3730         25.25893
+            3760         25.27847
+            3790         25.29786
+            3820         25.31709
+            3850         25.33617
+            3880          25.3551
+            3910         25.37388
+            3940         25.39253
+            3970         25.41103
+            4000         25.42939
+            4030         25.44761
+            4060          25.4657
+            4090         25.48366
+            4120         25.50148
+            4150         25.51918
+            4180         25.53675
+            4210         25.55419
+            4240         25.57151
+            4270         25.58871
+            4300         25.60578
+            4330         25.62274
+            4360         25.63958
+            4390         25.65631
+            4420         25.67291
+            4450         25.68941
+            4480          25.7058
+            4510         25.72208
+            4540         25.73825
+            4570         25.75431
+            4600         25.77027
+            4630         25.78613
+            4660         25.80188
+            4690         25.81753
+            4720         25.83308
+            4750         25.84854
+            4780         25.86389
+            4810         25.87915
+            4840         25.89432
+            4870         25.90939
+            4900         25.92437
+            4930         25.93925
+            4960         25.95405
+            4990         25.96876
+            5020         25.98338
+            5050         25.99791
+            5080         26.01236
+            5110         26.02672
+            5140           26.041
+            5170         26.05519
+            5200          26.0693
+            5230         26.08333
+            5260         26.09728
+            5290         26.11115
+            5320         26.12495
+            5350         26.13866
+            5380          26.1523
+            5410         26.16586
+            5440         26.17935
+            5470         26.19276
+            5500          26.2061
+            5530         26.21937
+            5560         26.23257
+            5590         26.24569
+            5620         26.25875
+            5650         26.27173
+            5680         26.28465
+            5710          26.2975
+            5740         26.31028
+            5770         26.32299
+            5800         26.33564
+            5830         26.34823
+            5860         26.36074
+            5890          26.3732
+            5920         26.38559
+            5950         26.39792
+            5980         26.41018
+            6010         26.42239
+            6040         26.43454
+            6070         26.44662
+            6100         26.45864
+            6130         26.47061
+            6160         26.48252
+            6190         26.49437
+            6220         26.50616
+            6250         26.51789
+            6280         26.52957
+            6310          26.5412
+            6340         26.55276
+            6370         26.56428
+            6400         26.57574
+            6430         26.58715
+            6460          26.5985
+            6490          26.6098
+            6520         26.62105
+            6550         26.63224
+            6580         26.64339
+            6610         26.65449
+            6640         26.66553
+            6670         26.67653
+            6700         26.68747
+            6730         26.69837
+            6760         26.70922
+            6790         26.72001
+            6820         26.73077
+            6850         26.74147
+            6880         26.75213
+            6910         26.76274
+            6940         26.77331
+            6970         26.78383
+            7000         26.79431
+            7030         26.80474
+            7060         26.81512
+            7090         26.82547
+            7120         26.83576
+            7150         26.84602
+            7180         26.85623
+            7210          26.8664
+            7240         26.87653
+            7270         26.88661
+            7300         26.89666
+            7330         26.90666
+            7360         26.91662
+            7390         26.92654
+            7420         26.93642
+            7450         26.94627
+            7480         26.95607
+            7510         26.96583
+            7540         26.97556
+            7570         26.98524
+            7600         26.99489
+            7630          27.0045
+            7660         27.01407
+            7690          27.0236
+            7720          27.0331
+            7750         27.04256
+            7780         27.05198
+            7810         27.06137
+            7840         27.07072
+            7870         27.08003
+            7900         27.08931
+            7930         27.09856
+            7960         27.10777
+            7990         27.11694
+            8020         27.12608
+            8050         27.13519
+            8080         27.14426
+            8110          27.1533
+            8140         27.16231
+            8170         27.17128
+            8200         27.18022
+            8230         27.18913
+            8260           27.198
+            8290         27.20684
+            8320         27.21565
+            8350         27.22443
+            8380         27.23318
+            8410          27.2419
+            8440         27.25058
+            8470         27.25923
+            8500         27.26786
+            8530         27.27645
+            8560         27.28501
+            8590         27.29355
+            8620         27.30205
+            8650         27.31052
+            8680         27.31897
+            8710         27.32738
+            8740         27.33577
+            8770         27.34413
+            8800         27.35246
+            8830         27.36076
+            8860         27.36903
+            8890         27.37727
+            8920         27.38549
+            8950         27.39368
+            8980         27.40184
+            9010         27.40998
+            9040         27.41808
+            9070         27.42616
+            9100         27.43422
+            9130         27.44225
+            9160         27.45025
+            9190         27.45822
+            9220         27.46617
+            9250         27.47409
+            9280         27.48199
+            9310         27.48986
+            9340         27.49771
+            9370         27.50553
+            9400         27.51333
+            9430          27.5211
+            9460         27.52885
+            9490         27.53657
+            9520         27.54427
+            9550         27.55194
+            9580         27.55959
+            9610         27.56722
+            9640         27.57482
+            9670          27.5824
+            9700         27.58995
+            9730         27.59749
+            9760         27.60499
+            9790         27.61248
+            9820         27.61994
+            9850         27.62738
+            9880          27.6348
+            9910         27.64219
+            9940         27.64956
+            9970         27.65692
+           10000         27.66425
+           10030         27.67155
+           10060         27.67884
+           10090          27.6861
+           10120         27.69334
+           10150         27.70056
+           10180         27.70776
+           10210         27.71493
+           10240         27.72209
+           10270         27.72923
+           10300         27.73634
+           10330         27.74343
+           10360         27.75051
+           10390         27.75756
+           10420         27.76459
+           10450          27.7716
+           10480         27.77859
+           10510         27.78557
+           10540         27.79252
+           10570         27.79945
+           10600         27.80636
+           10630         27.81326
+           10660         27.82013
+           10690         27.82699
+           10720         27.83382
+           10750         27.84064
+           10780         27.84743
+           10810         27.85421
+           10840         27.86097
+           10870         27.86771
+           10900         27.87444
+           10930         27.88114
+           10960         27.88782
+           10990         27.89449
+           11020         27.90114
+           11050         27.90777
+           11080         27.91438
+           11110         27.92098
+           11140         27.92756
+           11170         27.93411
+           11200         27.94066
+           11230         27.94718
+           11260         27.95369
+           11290         27.96018
+           11320         27.96665
+           11350          27.9731
+           11380         27.97954
+           11410         27.98596
+           11440         27.99237
+           11470         27.99876
+           11500         28.00513
+           11530         28.01148
+           11560         28.01782
+           11590         28.02414
+           11620         28.03045
+           11650         28.03674
+           11680         28.04301
+           11710         28.04926
+           11740         28.05551
+           11770         28.06173
+           11800         28.06794
+           11830         28.07413
+           11860         28.08031
+           11890         28.08647
+           11920         28.09262
+           11950         28.09875
+           11980         28.10486
+           12010         28.11096
+           12040         28.11705
+           12070         28.12312
+           12100         28.12917
+           12130         28.13521
+           12160         28.14124
+           12190         28.14725
+           12220         28.15324
+           12250         28.15922
+           12280         28.16519
+           12310         28.17114
+           12340         28.17707
+           12370           28.183
+           12400         28.18891
+           12430          28.1948
+           12460         28.20068
+           12490         28.20655
+           12520          28.2124
+           12550         28.21824
+           12580         28.22406
+           12610         28.22987
+           12640         28.23566
+           12670         28.24144
+           12700         28.24721
+           12730         28.25297
+           12760         28.25871
+           12790         28.26444
+           12820         28.27015
+           12850         28.27585
+           12880         28.28154
+           12910         28.28721
+           12940         28.29288
+           12970         28.29852
+           13000         28.30416
+           13030         28.30978
+           13060         28.31539
+           13090         28.32098
+           13120         28.32657
+           13150         28.33214
+           13180          28.3377
+           13210         28.34324
+           13240         28.34878
+           13270          28.3543
+           13300          28.3598
+           13330          28.3653
+           13360         28.37078
+           13390         28.37625
+           13420         28.38171
+           13450         28.38716
+           13480         28.39259
+           13510         28.39801
+           13540         28.40342
+           13570         28.40882
+           13600         28.41421
+           13630         28.41958
+           13660         28.42494
+           13690         28.43029
+           13720         28.43563
+           13750         28.44096
+           13780         28.44628
+           13810         28.45158
+           13840         28.45687
+           13870         28.46215
+           13900         28.46742
+           13930         28.47268
+           13960         28.47793
+           13990         28.48317
+           14020         28.48839
+           14050          28.4936
+           14080         28.49881
+           14110           28.504
+           14140         28.50918
+           14170         28.51435
+           14200          28.5195
+           14230         28.52465
+           14260         28.52979
+           14290         28.53491
+           14320         28.54003
+           14350         28.54514
+           14380         28.55023
+           14410         28.55531
+           14440         28.56038
+           14470         28.56545
+           14500          28.5705
+           14530         28.57554
+           14560         28.58057
+           14590         28.58559
+           14620          28.5906
+           14650          28.5956
+           14680         28.60059
+           14710         28.60557
+           14740         28.61054
+           14770          28.6155
+           14800         28.62045
+           14830         28.62538
+           14860         28.63031
+           14890         28.63523
+           14920         28.64014
+           14950         28.64504
+           14980         28.64993
+           15010         28.65481
+           15040         28.65968
+           15070         28.66454
+           15100         28.66939
+           15130         28.67423
+           15160         28.67906
+           15190         28.68388
+           15220          28.6887
+           15250          28.6935
+           15280         28.69829
+           15310         28.70308
+           15340         28.70785
+           15370         28.71262
+           15400         28.71737
+           15430         28.72212
+           15460         28.72686
+           15490         28.73159
+           15520         28.73631
+           15550         28.74102
+           15580         28.74572
+           15610         28.75041
+           15640         28.75509
+           15670         28.75976
+           15700         28.76443
+           15730         28.76909
+           15760         28.77373
+           15790         28.77837
+           15820           28.783
+           15850         28.78762
+           15880         28.79223
+           15910         28.79684
+           15940         28.80143
+           15970         28.80602
+           16000         28.81059
+           16030         28.81516
+           16060         28.81972
+           16090         28.82428
+           16120         28.82882
+           16150         28.83335
+           16180         28.83788
+           16210          28.8424
+           16240         28.84691
+           16270         28.85141
+           16300          28.8559
+           16330         28.86039
+           16360         28.86486
+           16390         28.86933
+           16420         28.87379
+           16450         28.87824
+           16480         28.88269
+           16510         28.88713
+           16540         28.89155
+           16570         28.89597
+           16600         28.90039
+           16630         28.90479
+           16660         28.90919
+           16690         28.91357
+           16720         28.91795
+           16750         28.92233
+           16780         28.92669
+           16810         28.93105
+           16840          28.9354
+           16870         28.93974
+           16900         28.94407
+           16930         28.94839
+           16960         28.95271
+           16990         28.95703
+           17020         28.96133
+           17050         28.96562
+           17080         28.96991
+           17110         28.97419
+           17140         28.97846
+           17170         28.98273
+           17200         28.98699
+           17230         28.99124
+           17260         28.99548
+           17290         28.99972
+           17320         29.00394
+           17350         29.00817
+           17380         29.01238
+           17410         29.01659
+           17440         29.02078
+           17470         29.02497
+           17500         29.02916
+           17530         29.03334
+           17560         29.03751
+           17590         29.04167
+           17620         29.04583
+           17650         29.04998
+           17680         29.05412
+           17710         29.05826
+           17740         29.06238
+           17770         29.06651
+           17800         29.07062
+           17830         29.07473
+           17860         29.07882
+           17890         29.08292
+           17920         29.08701
+           17950         29.09109
+           17980         29.09516
+           18010         29.09922
+           18040         29.10328
+           18070         29.10734
+           18100         29.11138
+           18130         29.11542
+           18160         29.11946
+           18190         29.12348
+           18220          29.1275
+           18250         29.13151
+           18280         29.13552
+           18310         29.13952
+           18340         29.14351
+           18370          29.1475
+           18400         29.15148
+           18430         29.15545
+           18460         29.15942
+           18490         29.16338
+           18520         29.16733
+           18550         29.17128
+           18580         29.17522
+           18610         29.17916
+           18640         29.18309
+           18670         29.18701
+           18700         29.19092
+           18730         29.19483
+           18760         29.19874
+           18790         29.20263
+           18820         29.20653
+           18850         29.21041
+           18880         29.21429
+           18910         29.21816
+           18940         29.22203
+           18970         29.22589
+           19000         29.22974
+           19030         29.23359
+           19060         29.23743
+           19090         29.24127
+           19120          29.2451
+           19150         29.24892
+           19180         29.25274
+           19210         29.25655
+           19240         29.26036
+           19270         29.26416
+           19300         29.26795
+           19330         29.27174
+           19360         29.27552
+           19390          29.2793
+           19420         29.28307
+           19450         29.28684
+           19480         29.29059
+           19510         29.29435
+           19540         29.29809
+           19570         29.30184
+           19600         29.30557
+           19630          29.3093
+           19660         29.31303
+           19690         29.31675
+           19720         29.32046
+           19750         29.32417
+           19780         29.32787
+           19810         29.33157
+           19840         29.33526
+           19870         29.33894
+           19900         29.34262
+           19930          29.3463
+           19960         29.34996
+           19990         29.35363
+           20020         29.35728
+           20050         29.36094
+           20080         29.36458
+           20110         29.36823
+           20140         29.37186
+           20170         29.37549
+           20200         29.37912
+           20230         29.38274
+           20260         29.38635
+           20290         29.38996
+           20320         29.39356
+           20350         29.39716
+           20380         29.40075
+           20410         29.40434
+           20440         29.40792
+           20470          29.4115
+           20500         29.41507
+           20530         29.41864
+           20560          29.4222
+           20590         29.42576
+           20620         29.42931
+           20650         29.43286
+           20680          29.4364
+           20710         29.43993
+           20740         29.44346
+           20770         29.44699
+           20800         29.45051
+           20830         29.45403
+           20860         29.45753
+           20890         29.46104
+           20920         29.46454
+           20950         29.46803
+           20980         29.47152
+           21010         29.47501
+           21040         29.47849
+           21070         29.48196
+           21100         29.48544
+           21130          29.4889
+           21160         29.49236
+           21190         29.49582
+           21220         29.49927
+           21250         29.50271
+           21280         29.50615
+           21310         29.50959
+           21340         29.51302
+           21370         29.51645
+           21400         29.51987
+           21430         29.52329
+           21460          29.5267
+           21490          29.5301
+           21520         29.53351
+           21550         29.53691
+           21580          29.5403
+           21610         29.54369
+           21640         29.54707
+           21670         29.55045
+           21700         29.55382
+           21730         29.55719
+           21760         29.56056
+           21790         29.56392
+           21820         29.56727
+           21850         29.57062
+           21880         29.57397
+           21910         29.57731
+           21940         29.58065
+           21970         29.58398
+           22000         29.58731
+           22030         29.59064
+           22060         29.59395
+           22090         29.59727
+           22120         29.60058
+           22150         29.60388
+           22180         29.60719
+           22210         29.61048
+           22240         29.61377
+           22270         29.61706
+           22300         29.62035
+           22330         29.62362
+           22360          29.6269
+           22390         29.63017
+           22420         29.63344
+           22450          29.6367
+           22480         29.63995
+           22510         29.64321
+           22540         29.64646
+           22570          29.6497
+           22600         29.65294
+           22630         29.65618
+           22660         29.65941
+           22690         29.66263
+           22720         29.66586
+           22750         29.66907
+           22780         29.67229
+           22810          29.6755
+           22840          29.6787
+           22870         29.68191
+           22900          29.6851
+           22930          29.6883
+           22960         29.69148
+           22990         29.69467
+           23020         29.69785
+           23050         29.70103
+           23080          29.7042
+           23110         29.70737
+           23140         29.71053
+           23170         29.71369
+           23200         29.71685
+           23230            29.72
+           23260         29.72315
+           23290         29.72629
+           23320         29.72943
+           23350         29.73257
+           23380          29.7357
+           23410         29.73883
+           23440         29.74195
+           23470         29.74507
+           23500         29.74818
+           23530          29.7513
+           23560          29.7544
+           23590         29.75751
+           23620         29.76061
+           23650          29.7637
+           23680         29.76679
+           23710         29.76988
+           23740         29.77297
+           23770         29.77605
+           23800         29.77913
+           23830          29.7822
+           23860         29.78526
+           23890         29.78833
+           23920         29.79139
+           23950         29.79445
+           23980          29.7975
+           24010         29.80055
+           24040          29.8036
+           24070         29.80664
+           24100         29.80968
+           24130         29.81271
+           24160         29.81574
+           24190         29.81877
+           24220         29.82179
+           24250         29.82481
+           24280         29.82783
+           24310         29.83084
+           24340         29.83385
+           24370         29.83685
+           24400         29.83985
+           24430         29.84285
+           24460         29.84584
+           24490         29.84883
+           24520         29.85182
+           24550          29.8548
+           24580         29.85778
+           24610         29.86075
+           24640         29.86372
+           24670         29.86669
+           24700         29.86965
+           24730         29.87262
+           24760         29.87557
+           24790         29.87852
+           24820         29.88148
+           24850         29.88442
+           24880         29.88737
+           24910          29.8903
+           24940         29.89324
+           24970         29.89617
+           25000          29.8991
+           25030         29.90203
+           25060         29.90495
+           25090         29.90786
+           25120         29.91078
+           25150         29.91369
+           25180          29.9166
+           25210          29.9195
+           25240          29.9224
+           25270          29.9253
+           25300         29.92819
+           25330         29.93109
+           25360         29.93397
+           25390         29.93686
+           25420         29.93974
+           25450         29.94261
+           25480         29.94549
+           25510         29.94835
+           25540         29.95122
+           25570         29.95408
+           25600         29.95695
+           25630          29.9598
+           25660         29.96266
+           25690         29.96551
+           25720         29.96835
+           25750          29.9712
+           25780         29.97404
+           25810         29.97687
+           25840         29.97971
+           25870         29.98253
+           25900         29.98536
+           25930         29.98818
+           25960           29.991
+           25990         29.99382
+           26020         29.99664
+           26050         29.99945
+           26080         30.00225
+           26110         30.00506
+           26140         30.00786
+           26170         30.01066
+           26200         30.01345
+           26230         30.01624
+           26260         30.01903
+           26290         30.02181
+           26320          30.0246
+           26350         30.02738
+           26380         30.03015
+           26410         30.03292
+           26440         30.03569
+           26470         30.03846
+           26500         30.04122
+           26530         30.04398
+           26560         30.04674
+           26590         30.04949
+           26620         30.05224
+           26650         30.05499
+           26680         30.05773
+           26710         30.06047
+           26740         30.06321
+           26770         30.06594
+           26800         30.06868
+           26830         30.07141
+           26860         30.07413
+           26890         30.07685
+           26920         30.07957
+           26950         30.08229
+           26980           30.085
+           27010         30.08771
+           27040         30.09042
+           27070         30.09313
+           27100         30.09583
+           27130         30.09852
+           27160         30.10122
+           27190         30.10391
+           27220          30.1066
+           27250         30.10929
+           27280         30.11197
+           27310         30.11465
+           27340         30.11733
+           27370         30.12001
+           27400         30.12268
+           27430         30.12535
+           27460         30.12801
+           27490         30.13068
+           27520         30.13334
+           27550         30.13599
+           27580         30.13865
+           27610          30.1413
+           27640         30.14395
+           27670          30.1466
+           27700         30.14924
+           27730         30.15188
+           27760         30.15452
+           27790         30.15715
+           27820         30.15978
+           27850         30.16241
+           27880         30.16504
+           27910         30.16766
+           27940         30.17028
+           27970          30.1729
+           28000         30.17551
+           28030         30.17812
+           28060         30.18073
+           28090         30.18334
+           28120         30.18594
+           28150         30.18854
+           28180         30.19114
+           28210         30.19374
+           28240         30.19633
+           28270         30.19892
+           28300         30.20151
+           28330         30.20409
+           28360         30.20667
+           28390         30.20925
+           28420         30.21183
+           28450          30.2144
+           28480         30.21697
+           28510         30.21954
+           28540          30.2221
+           28570         30.22466
+           28600         30.22722
+           28630         30.22978
+           28660         30.23234
+           28690         30.23489
+           28720         30.23744
+           28750         30.23998
+           28780         30.24253
+           28810         30.24507
+           28840         30.24761
+           28870         30.25014
+           28900         30.25268
+           28930         30.25521
+           28960         30.25773
+           28990         30.26026
+           29020         30.26278
+           29050          30.2653
+           29080         30.26782
+           29110         30.27033
+           29140         30.27285
+           29170         30.27536
+           29200         30.27786
+           29230         30.28037
+           29260         30.28287
+           29290         30.28537
+           29320         30.28787
+           29350         30.29036
+           29380         30.29285
+           29410         30.29534
+           29440         30.29783
+           29470         30.30031
+           29500          30.3028
+           29530         30.30527
+           29560         30.30775
+           29590         30.31022
+           29620          30.3127
+           29650         30.31516
+           29680         30.31763
+           29710          30.3201
+           29740         30.32256
+           29770         30.32502
+           29800         30.32747
+           29830         30.32993
+           29860         30.33238
+           29890         30.33483
+           29920         30.33727
+           29950         30.33972
+           29980         30.34216
+           30010          30.3446
+           30040         30.34704
+           30070         30.34947
+           30100          30.3519
+           30130         30.35433
+           30160         30.35676
+           30190         30.35918
+           30220         30.36161
+           30250         30.36403
+           30280         30.36645
+           30310         30.36886
+           30340         30.37127
+           30370         30.37369
+           30400         30.37609
+           30430          30.3785
+           30460          30.3809
+           30490          30.3833
+           30520          30.3857
+           30550          30.3881
+           30580         30.39049
+           30610         30.39288
+           30640         30.39527
+           30670         30.39766
+           30700         30.40004
+           30730         30.40243
+           30760          30.4048
+           30790         30.40718
+           30820         30.40956
+           30850         30.41193
+           30880          30.4143
+           30910         30.41667
+           30940         30.41903
+           30970          30.4214
+           31000         30.42376
+           31030         30.42612
+           31060         30.42848
+           31090         30.43083
+           31120         30.43319
+           31150         30.43553
+           31180         30.43788
+           31210         30.44023
+           31240         30.44257
+           31270         30.44491
+           31300         30.44725
+           31330         30.44959
+           31360         30.45192
+           31390         30.45425
+           31420         30.45658
+           31450         30.45891
+           31480         30.46124
+           31510         30.46356
+           31540         30.46588
+           31570          30.4682
+           31600         30.47052
+           31630         30.47283
+           31660         30.47514
+           31690         30.47745
+           31720         30.47976
+           31750         30.48207
+           31780         30.48437
+           31810         30.48667
+           31840         30.48897
+           31870         30.49127
+           31900         30.49356
+           31930         30.49586
+           31960         30.49815
+           31990         30.50043
+           32020         30.50272
+           32050         30.50501
+           32080         30.50729
+           32110         30.50957
+           32140         30.51184
+           32170         30.51412
+           32200         30.51639
+           32230         30.51867
+           32260         30.52094
+           32290          30.5232
+           32320         30.52547
+           32350         30.52773
+           32380         30.52999
+           32410         30.53225
+           32440         30.53451
+           32470         30.53676
+           32500         30.53901
+           32530         30.54126
+           32560         30.54351
+           32590         30.54576
+           32620           30.548
+           32650         30.55025
+           32680         30.55248
+           32710         30.55472
+           32740         30.55696
+           32770         30.55919
+           32800         30.56142
+           32830         30.56365
+           32860         30.56588
+           32890         30.56811
+           32920         30.57033
+           32950         30.57255
+           32980         30.57477
+           33010         30.57699
+           33040         30.57921
+           33070         30.58142
+           33100         30.58363
+           33130         30.58584
+           33160         30.58805
+           33190         30.59025
+           33220         30.59246
+           33250         30.59466
+           33280         30.59686
+           33310         30.59906
+           33340         30.60125
+           33370         30.60345
+           33400         30.60564
+           33430         30.60783
+           33460         30.61001
+           33490          30.6122
+           33520         30.61438
+           33550         30.61657
+           33580         30.61875
+           33610         30.62092
+           33640          30.6231
+           33670         30.62527
+           33700         30.62745
+           33730         30.62962
+           33760         30.63178
+           33790         30.63395
+           33820         30.63612
+           33850         30.63828
+           33880         30.64044
+           33910          30.6426
+           33940         30.64475
+           33970         30.64691
+           34000         30.64906
+           34030         30.65121
+           34060         30.65336
+           34090         30.65551
+           34120         30.65766
+           34150          30.6598
+           34180         30.66194
+           34210         30.66408
+           34240         30.66622
+           34270         30.66835
+           34300         30.67049
+           34330         30.67262
+           34360         30.67475
+           34390         30.67688
+           34420         30.67901
+           34450         30.68113
+           34480         30.68325
+           34510         30.68538
+           34540         30.68749
+           34570         30.68961
+           34600         30.69173
+           34630         30.69384
+           34660         30.69596
+           34690         30.69806
+           34720         30.70017
+           34750         30.70228
+           34780         30.70438
+           34810         30.70649
+           34840         30.70859
+           34870         30.71069
+           34900         30.71279
+           34930         30.71488
+           34960         30.71698
+           34990         30.71907
+           35020         30.72116
+           35050         30.72325
+           35080         30.72533
+           35110         30.72742
+           35140          30.7295
+           35170         30.73158
+           35200         30.73366
+           35230         30.73574
+           35260         30.73782
+           35290         30.73989
+           35320         30.74196
+           35350         30.74403
+           35380          30.7461
+           35410         30.74817
+           35440         30.75023
+           35470          30.7523
+           35500         30.75436
+           35530         30.75642
+           35560         30.75848
+           35590         30.76054
+           35620         30.76259
+           35650         30.76464
+           35680          30.7667
+           35710         30.76875
+           35740          30.7708
+           35770         30.77284
+           35800         30.77489
+           35830         30.77693
+           35860         30.77897
+           35890         30.78101
+           35920         30.78305
+           35950         30.78508
+           35980         30.78712
+           36010         30.78915
+           36040         30.79118
+           36070         30.79321
+           36100         30.79524
+           36130         30.79727
+           36160         30.79929
+           36190         30.80131
+           36220         30.80333
+           36250         30.80535
+           36280         30.80737
+           36310         30.80939
+           36340          30.8114
+           36370         30.81341
+           36400         30.81542
+           36430         30.81743
+           36460         30.81944
+           36490         30.82145
+           36520         30.82345
+           36550         30.82545
+           36580         30.82746
+           36610         30.82945
+           36640         30.83145
+           36670         30.83345
+           36700         30.83545
+           36730         30.83744
+           36760         30.83943
+           36790         30.84142
+           36820         30.84341
+           36850         30.84539
+           36880         30.84738
+           36910         30.84936
+           36940         30.85134
+           36970         30.85332
+           37000          30.8553
+           37030         30.85728
+           37060         30.85925
+           37090         30.86123
+           37120          30.8632
+           37150         30.86517
+           37180         30.86714
+           37210          30.8691
+           37240         30.87107
+           37270         30.87303
+           37300           30.875
+           37330         30.87696
+           37360         30.87892
+           37390         30.88087
+           37420         30.88283
+           37450         30.88478
+           37480         30.88674
+           37510         30.88869
+           37540         30.89064
+           37570         30.89259
+           37600         30.89454
+           37630         30.89648
+           37660         30.89842
+           37690         30.90037
+           37720         30.90231
+           37750         30.90425
+           37780         30.90619
+           37810         30.90812
+           37840         30.91006
+           37870         30.91199
+           37900         30.91392
+           37930         30.91585
+           37960         30.91778
+           37990          30.9197
+           38020         30.92163
+           38050         30.92355
+           38080         30.92547
+           38110         30.92739
+           38140         30.92931
+           38170         30.93123
+           38200         30.93315
+           38230         30.93506
+           38260         30.93698
+           38290         30.93889
+           38320          30.9408
+           38350         30.94271
+           38380         30.94461
+           38410         30.94652
+           38440         30.94843
+           38470         30.95033
+           38500         30.95223
+           38530         30.95413
+           38560         30.95603
+           38590         30.95792
+           38620         30.95982
+           38650         30.96171
+           38680          30.9636
+           38710          30.9655
+           38740         30.96738
+           38770         30.96927
+           38800         30.97116
+           38830         30.97305
+           38860         30.97493
+           38890         30.97681
+           38920         30.97869
+           38950         30.98057
+           38980         30.98245
+           39010         30.98433
+           39040          30.9862
+           39070         30.98808
+           39100         30.98994
+           39130         30.99182
+           39160         30.99368
+           39190         30.99555
+           39220         30.99742
+           39250         30.99928
+           39280         31.00115
+           39310         31.00301
+           39340         31.00487
+           39370         31.00673
+           39400         31.00859
+           39430         31.01044
+           39460          31.0123
+           39490         31.01415
+           39520         31.01601
+           39550         31.01786
+           39580         31.01971
+           39610         31.02155
+           39640          31.0234
+           39670         31.02524
+           39700         31.02709
+           39730         31.02893
+           39760         31.03077
+           39790         31.03261
+           39820         31.03445
+           39850         31.03629
+           39880         31.03812
+           39910         31.03996
+           39940         31.04179
+           39970         31.04362
+           40000         31.04545
+&
+@target G0.S2
+@type xy
+        1.043664         1.043026
+        3.344367         3.310076
+        6.115091         5.812428
+        9.450994          8.12556
+        13.46611         9.936342
+        18.29694          11.2909
+        24.10656         12.33892
+        31.08951         13.19322
+        39.47731         13.92284
+        49.54469         14.56941
+        61.61666         15.15922
+        76.07608         15.70995
+        93.37178         16.23441
+        114.0268         16.74272
+        138.6463         17.24344
+        167.9239         17.74387
+        202.6464         18.25027
+        243.6937          18.7696
+         292.033         19.31854
+         348.705         19.91328
+        414.7979          20.5367
+        491.4073         21.16348
+        579.5794         21.64491
+         680.236         22.01394
+        794.0826         22.31253
+        921.5042         22.56651
+        1062.458         22.79941
+        1216.375         23.02874
+        1382.092         23.21887
+        1557.828         23.37805
+        1741.214           23.503
+        1929.405          23.5695
+        1929.405          23.5724
+        1741.214         23.49735
+        1557.828         23.37175
+        1382.092         23.21971
+        1216.375         23.03514
+        1062.458         22.81144
+        921.5042         22.58428
+        794.0826         22.34013
+         680.236         22.03546
+        579.5794         21.66749
+        491.4073         21.20119
+        414.7979         20.57734
+         348.705         19.95157
+         292.033         19.35542
+        243.6937         18.80612
+        202.6464         18.28703
+        167.9239         17.78172
+        138.6463         17.28284
+        114.0268         16.78359
+        93.37178         16.27627
+        76.07608         15.75214
+        61.61666         15.20101
+        49.54469         14.61005
+        39.47731         13.96156
+        31.08951          13.2292
+        24.10656         12.37121
+        18.29694         11.31835
+        13.46611         9.957593
+        9.450994         8.139641
+        6.115091         5.820009
+        3.344367         3.313559
+        1.043664          1.04407
+&

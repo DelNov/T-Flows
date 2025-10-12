@@ -27,14 +27,14 @@
 #-----------------
   BUOYANCY                       thermal
   GRAVITATIONAL_VECTOR           0.0,  0.0,  -0.03215
-  REFERENCE_TEMPERATURE          10.0 
+  REFERENCE_TEMPERATURE          10.0
 
 #---------------------
 # Physical properties
 #---------------------
   MASS_DENSITY           1.0
-  THERMAL_CONDUCTIVITY   21.28e-6 
-  DYNAMIC_VISCOSITY      15.11e-6  
+  THERMAL_CONDUCTIVITY   21.28e-6
+  DYNAMIC_VISCOSITY      15.11e-6
   HEAT_CAPACITY          1.0
 
   TURBULENCE_MODEL    les_dynamic
@@ -50,9 +50,9 @@
 
   TIME_INTEGRATION_SCHEME  parabolic
 
-  ADVECTION_SCHEME_FOR_MOMENTUM     blended
-  BLENDING_COEFFICIENT_FOR_MOMENTUM 0.99
-  ADVECTION_SCHEME_FOR_ENERGY      smart
+  ADVECTION_SCHEME_FOR_MOMENTUM       blended
+  BLENDING_COEFFICIENTS_FOR_MOMENTUM  0.99  0.01  0.0
+  ADVECTION_SCHEME_FOR_ENERGY         smart
 
   PRECONDITIONER_FOR_SYSTEM_MATRIX    incomplete_cholesky
 

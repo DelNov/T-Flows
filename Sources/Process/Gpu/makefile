@@ -316,11 +316,11 @@ endif
 #--------------------
 ifneq ($(DIR_CASE), no)
   ifeq ('$(wildcard $(DIR_CASE))','')
-    $(info Case directory $(DIR_CASE) does not exist!)
+    $(error Case directory $(DIR_CASE) does not exist!)
   else
     $(info Compling for the case in $(DIR_CASE))
     ifeq ('$(wildcard $(DIR_CASE)/$(DIR_USER))','')
-      $(info Directory with user functions $(DIR_CASE)/$(DIR_USER) does not exist!)
+      $(error Directory with user functions $(DIR_CASE)/$(DIR_USER) does not exist!)
     else
       $(info Linking user functions from directory $(DIR_CASE)/$(DIR_USER))
 
