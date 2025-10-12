@@ -45,7 +45,7 @@
     if(i .eq. 1) ui => Flow % u
     if(i .eq. 2) ui => Flow % v
     if(i .eq. 3) ui => Flow % w
-    call Control % Blending_Coefficient_For_Momentum  (ui % blend)
+    call Control % Blending_Coefficients_For_Momentum (ui % blends, .true.)
     call Control % Simple_Underrelaxation_For_Momentum(ui % urf)
     call Control % Blend_System_Matrices(ui % blend_matrix, .false.)
   end do
@@ -64,7 +64,7 @@
   !   Related to heat transfer   !
   !------------------------------!
   if(Flow % heat_transfer) then
-    call Control % Blending_Coefficient_For_Energy  (Flow % t % blend)
+    call Control % Blending_Coefficients_For_Energy (Flow % t % blends, .true.)
     call Control % Simple_Underrelaxation_For_Energy(Flow % t % urf)
     call Control % Blend_System_Matrices(Flow % t % blend_matrix, .false.)
   end if
@@ -74,7 +74,7 @@
   !--------------------------------!
   do sc = 1, Flow % n_scalars
     phi => Flow % scalar(sc)
-    call Control % Blending_Coefficient_For_Scalars  (phi % blend)
+    call Control % Blending_Coefficients_For_Scalars (phi % blends, .true.)
     call Control % Simple_Underrelaxation_For_Scalars(phi % urf)
     call Control % Blend_System_Matrices(phi % blend_matrix, .false.)
   end do
@@ -86,7 +86,7 @@
     nullify(tq)
     if(i .eq. 5) tq => Turb % vis
     if(associated(tq)) then
-      call Control % Blending_Coefficient_For_Turbulence  (tq % blend)
+      call Control % Blending_Coefficients_For_Turbulence (tq % blends, .true.)
       call Control % Simple_Underrelaxation_For_Turbulence(tq % urf)
       call Control % Blend_System_Matrices(tq % blend_matrix, .false.)
     end if
