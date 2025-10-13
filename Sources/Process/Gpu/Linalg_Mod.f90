@@ -18,6 +18,7 @@
     contains
       procedure :: Mat_X_Vec
       procedure :: Sca_O_Dia
+      procedure :: Set_Singular
       procedure :: Sys_Normalize
       procedure :: Sys_Restore
       procedure :: Vec_Copy
@@ -37,6 +38,7 @@
   contains
 #   include "Linalg_Mod/Mat_X_Vec.f90"
 #   include "Linalg_Mod/Sca_O_Dia.f90"
+#   include "Linalg_Mod/Set_Singular.f90"
 #   include "Linalg_Mod/Sys_Normalize.f90"
 #   include "Linalg_Mod/Sys_Restore.f90"
 #   include "Linalg_Mod/Vec_Copy.f90"

@@ -46,6 +46,11 @@
                                inside_cell=b)
 # endif
 
+  ! Set singularity to the matrix
+  if(.not. Flow % has_pressure) then
+    call Linalg % Set_Singular(Grid % n_cells, Flow % Nat % A)
+  end if
+
   !------------------------!
   !   Call linear solver   !
   !------------------------!

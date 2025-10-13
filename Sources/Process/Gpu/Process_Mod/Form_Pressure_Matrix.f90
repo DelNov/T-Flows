@@ -110,7 +110,7 @@
   !$acc   dia   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    val(dia(c)) = val(dia(c)) * (1.0 + MILI)
+    val(dia(c)) = val(dia(c))
   end do
   !$acc end parallel
 
