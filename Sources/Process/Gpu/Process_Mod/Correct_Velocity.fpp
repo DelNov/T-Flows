@@ -18,7 +18,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
-  real                      :: a12, b_tmp
+  real                      :: a12, b_tmp, vol_res
   real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -145,12 +145,13 @@
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
-  Flow % vol_res = 0.0
+  vol_res = 0.0
   !$tf-acc loop begin
   do c = Cells_In_Domain()  ! all present
-    Flow % vol_res = max(Flow % vol_res, abs(b(c)))
+    vol_res = max(vol_res, abs(b(c)))
   end do
   !$tf-acc loop end
+  Flow % vol_res = vol_res
 
   ! Find maximum volume balance error over all processors
   call Global % Max_Real(Flow % vol_res)
