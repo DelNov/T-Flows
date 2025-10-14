@@ -112,7 +112,11 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  if(.not. present(norm)) then
+    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  else
+    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
+  end if
 
   if(res < tol) then
     iter = 0
