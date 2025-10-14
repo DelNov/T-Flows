@@ -3,7 +3,9 @@
 !------------------------------------------------------------------------------!
 !   This function is called after saving the results.                          !
 !                                                                              !
-!   Note: Be aware that this function is called from CPU only.                 !
+!   Note: Be aware that this function is called from CPU only, at the moment   !
+!         when results are downloaded to host (CPU).  Thus, in essence, this   !
+!         function doesn't need any special GPU directives.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
