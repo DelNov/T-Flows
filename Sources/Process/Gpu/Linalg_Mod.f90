@@ -17,6 +17,8 @@
 
     contains
       procedure :: Mat_X_Vec
+      procedure :: Min_Max_Vec
+      procedure :: Normalized_Root_Mean_Square
       procedure :: Sca_O_Dia
       procedure :: Set_Singular
       procedure :: Sys_Normalize
@@ -37,6 +39,8 @@
 
   contains
 #   include "Linalg_Mod/Mat_X_Vec.f90"
+#   include "Linalg_Mod/Min_Max_Vec.f90"
+#   include "Linalg_Mod/Normalized_Root_Mean_Square.f90"
 #   include "Linalg_Mod/Sca_O_Dia.f90"
 #   include "Linalg_Mod/Set_Singular.f90"
 #   include "Linalg_Mod/Sys_Normalize.f90"

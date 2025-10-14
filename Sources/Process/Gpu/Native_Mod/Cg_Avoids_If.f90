@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Cg(Nat, x, miter, niter, tol, fin_res)
+  subroutine Cg(Nat, x, miter, niter, tol, fin_res, norm)
 !------------------------------------------------------------------------------!
 !   Note: This is an alternative algorithm and I am honestly not sure where    !
 !         I have found it any more, but it avoids one "if" block during the    !
@@ -10,17 +10,18 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Native_Type), target, intent(inout) :: Nat       !! parent class
-  real, intent(out)    :: x(1:Nat % pnt_grid % n_cells)  !! unknown vector
-  integer, intent(in)  :: miter    !! maximum iterations
-  integer, intent(out) :: niter    !! performed iterations
-  real,    intent(in)  :: tol      !! target solver tolerance
-  real,    intent(out) :: fin_res  !! achieved residual
+  real,           intent(out) :: x(1:Nat % pnt_grid % n_cells)  !! unknown vec.
+  integer,        intent(in)  :: miter    !! maximum iterations
+  integer,        intent(out) :: niter    !! performed iterations
+  real,           intent(in)  :: tol      !! target solver tolerance
+  real,           intent(out) :: fin_res  !! achieved residual
+  real, optional, intent(in)  :: norm     !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Sparse_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
   real, contiguous,  pointer :: r(:), p(:), q(:), d_inv(:), r_d_inv(:)
-  real                       :: fn, alpha, beta, pq, rho, rho_old, res
+  real                       :: fn, alpha, beta, pq, rho, rho_old, res, bnrm2
   integer                    :: nt, ni, iter
 !==============================================================================!
 
@@ -34,6 +35,8 @@
   nt    =  Grid % n_cells
   ni    =  Grid % n_cells - Grid % Comm % n_buff_cells
 
+  res = 0.0
+
   !---------------------------------!
   !   Normalize the linear system   !
   !---------------------------------!
@@ -46,6 +49,17 @@
   ! Scalar over diagonal (to take the mystery out: computes d_inv)
   call Linalg % Sca_O_Dia(ni, d_inv, 1.0, A)
 
+  if(.not. present(norm)) then
+    bnrm2 = Linalg % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
+  else
+    bnrm2 = Linalg % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
+  end if
+
+  if(bnrm2 < tol) then
+    iter = 0
+    goto 1
+  end if
+
   !----------------!
   !   r = b - Ax   !     =-->  (q used for temporary storing Ax)
   !----------------!
@@ -53,14 +67,19 @@
   call Linalg % Vec_P_Sca_X_Vec(ni, r(1:ni), b(1:ni), -1.0, q(1:ni))
 
   ! Check first residual
-  call Linalg % Vec_X_Vec(ni, r_d_inv(1:ni), r(1:ni), d_inv(1:ni))
-  call Linalg % Vec_D_Vec(ni, res, r_d_inv(1:ni), r_d_inv(1:ni))
-  res = sqrt(res)
+  if(.not. present(norm)) then
+    res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt))
+  else
+    res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt), norm)
+  end if
+
+  if(res < tol) then
+    iter = 0
+    goto 1
+  end if
 
   fin_res = res
   niter   = 0
-
-  if(res .lt. tol) goto 2
 
   !---------------!
   !   z = r \ M   !    =--> (q used for z)
@@ -123,9 +142,11 @@
     !--------------------!
     !   Check residual   !
     !--------------------!
-    call Linalg % Vec_X_Vec(ni, r_d_inv(1:ni), r(1:ni), d_inv(1:ni))
-    call Linalg % Vec_D_Vec(ni, res, r_d_inv(1:ni), r_d_inv(1:ni))
-    res = sqrt(res)
+    if(.not. present(norm)) then
+      res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt))
+    else
+      res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt), norm)
+    end if
 
     if(res .lt. tol) goto 1
 
@@ -151,7 +172,6 @@
   !-------------------------------!
   !   Restore the linear system   !
   !-------------------------------!
-2 continue
   call Linalg % Sys_Restore(ni, fn, A, b)
 
   call Work % Disconnect_Real_Cell(p, q, r, r_d_inv)
