@@ -9,6 +9,6 @@
 !==============================================================================!
 
   call Control % Read_Real_Item('NORMALIZATION_FOR_MOMENTUM_SOLVER',  &
-                                 1.0e-6, val, verbose)
+                                 1.0, val, verbose)
 
   end subroutine
