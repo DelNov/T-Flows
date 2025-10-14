@@ -224,6 +224,7 @@
     !   Advection   !
     !               !
     !---------------!
+
     call Numerics_Mod_Advection_Term(ui, Flow % density, v_flux % n, fi)
 
     !---------------!
@@ -285,8 +286,8 @@
         ! Outflow is not included because it was causing problems
         if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.  &
            (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.  &
-           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.  &
-           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)  .or.  &
+           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT)) then
            ! (Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) ) then
           M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
           fi(c1) = fi(c1) + m12 * ui % n(c2)
