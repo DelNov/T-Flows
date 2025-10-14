@@ -80,13 +80,6 @@
   end do
   !$tf-acc loop end
 
-  ! De-singularize the system matrix ... just like this, ad-hoc
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present
-    val(dia(c)) = val(dia(c))
-  end do
-  !$tf-acc loop end
-
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells  ! this is for debugging and should be on CPU

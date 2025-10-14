@@ -14,7 +14,7 @@
   real,    contiguous, pointer :: val(:)
   real,    contiguous, pointer :: b(:)
   integer, contiguous, pointer :: row(:), col(:)
-  real                         :: urf, p_max, p_min
+  real                         :: urf, p_max, p_min, p_nor, p_nor_c
   integer                      :: c, call_type
   integer, save                :: call_count = 0
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -29,6 +29,35 @@
   col => Flow % Nat % A % col
   b   => Flow % Nat % b
   urf =  Flow % pp % urf
+
+  !--------------------------------------------------!
+  !   Find the value for normalization of pressure   !
+  !--------------------------------------------------!
+
+  ! From control file
+  call Control % Normalization_For_Pressure_Solver(p_nor_c)
+
+  ! Calculate pressure magnitude for normalization of pressure solution
+  p_max = -HUGE
+  p_min = +HUGE
+  !$acc parallel loop independent reduction(max: p_max) reduction(min: p_min)  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   flow_p_n   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+    p_max = max(p_max, flow_p_n(c))
+    p_min = min(p_min, flow_p_n(c))
+  end do
+  !$acc end parallel
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
+  ! Normalize pressure with the maximum of pressure difference,
+  ! value defined in control file and pressure drops.
+  p_nor = max( (p_max-p_min), p_nor_c, abs(Flow % bulk % p_drop_x),  &
+                                       abs(Flow % bulk % p_drop_y),  &
+                                       abs(Flow % bulk % p_drop_z) )
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
@@ -58,7 +87,8 @@
     call Profiler % Start('CG_for_Pressure')
     call Flow % Nat % Cg(Flow % pp % n(1:Grid % n_cells),       &
                          Flow % pp % miter, Flow % pp % niter,  &
-                         Flow % pp % tol,   Flow % pp % res)
+                         Flow % pp % tol,   Flow % pp % res,    &
+                         norm = p_nor)
     call Profiler % Stop('CG_for_Pressure')
   else if(Flow % pp % solver .eq. 'rs_amg') then
     call Profiler % Start('AMG_for_Pressure')

@@ -101,19 +101,6 @@
   end do
   !$acc end parallel
 
-  ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   val,  &
-  !$acc   dia   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    val(dia(c)) = val(dia(c))
-  end do
-  !$acc end parallel
-
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0
   do c = 1, Grid % n_cells  ! this is for debugging and should be on CPU

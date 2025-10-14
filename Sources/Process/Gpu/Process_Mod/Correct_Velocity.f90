@@ -22,7 +22,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
-  real                      :: a12, b_tmp, max_abs_val
+  real                      :: a12, b_tmp
   real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -192,20 +192,20 @@
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
-  max_abs_val = 0.0
-  !$acc parallel loop independent reduction(max: max_abs_val)  &
+  Flow % vol_res = 0.0
+  !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    max_abs_val = max(max_abs_val, abs(b(c)))
+    Flow % vol_res = max(Flow % vol_res, abs(b(c)))
   end do
   !$acc end parallel
 
   ! Find maximum volume balance error over all processors
-  call Global % Max_Real(max_abs_val)
+  call Global % Max_Real(Flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -248,8 +248,8 @@
   !-------------------------------!
   !@ Use this for REPORT_VOLUME_BALANCE somehow?
   !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
-  !@                       'after correction: ', max_abs_val
-  call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
+  !@                       'after correction: ', Flow % vol_res
+  call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
 
   call Profiler % Stop('Correct_Velocity')
 

@@ -19,6 +19,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
+  integer,   contiguous, pointer :: row(:)
   real,      contiguous, pointer :: dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
   real                           :: a12, a21, fl, cfs
@@ -37,6 +38,7 @@
   val => Flow % Nat % A % val
   dia => Flow % Nat % A % dia
   pos => Flow % Nat % A % pos
+  row => Flow % Nat % A % row
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
@@ -312,6 +314,31 @@
       end if  ! boundary condition
     end do    ! region
   end if      ! turbulence model
+
+  if(Flow % u % blend_matrix) then
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. INFLOW) then
+
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   flow_v_flux_n,  &
+        !$acc   val,  &
+        !$acc   dia,  &
+        !$acc   dens   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+          c1 = grid_faces_c(1,s)   ! inside cell
+          fl = flow_v_flux_n(s)
+          val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * dens(c1)
+        end do
+        !$acc end parallel
+
+      end if
+    end do
+  end if
 
   !------------------------------------!
   !                                    !

@@ -12,7 +12,7 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:)
+  real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:), dens(:)
   real                      :: m12
   integer                   :: reg, s, c, c1, c2
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -25,6 +25,7 @@
   b    => Flow % Nat % b
   fc   => Flow % Nat % A % fc
   visc => Flow % viscosity
+  dens => Flow % density
 
   if(comp .eq. 1) ui_n => Flow % u % n
   if(comp .eq. 2) ui_n => Flow % v % n
@@ -46,8 +47,14 @@
   !$acc end parallel
 
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
+    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
+       Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !--------------------------!
+      !   Viscous contribution   !
+      !--------------------------!
 
       !$acc parallel loop  &
       !$acc present(  &
@@ -66,6 +73,30 @@
         b(c1) = b(c1) + m12 * ui_n(c2)
       end do
       !$acc end parallel
+
+      !--------------------------!
+      !   Blended contribution   !
+      !--------------------------!
+
+      if(Flow % u % blend_matrix) then
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   flow_v_flux_n,  &
+        !$acc   dens,  &
+        !$acc   b,  &
+        !$acc   ui_n   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+          c1 = grid_faces_c(1,s)
+          c2 = grid_faces_c(2,s)
+          m12 = -min(flow_v_flux_n(s), 0.0) * dens(c1)
+          b(c1) = b(c1) + m12 * ui_n(c2)
+        end do
+        !$acc end parallel
+      end if
 
     end if
   end do
