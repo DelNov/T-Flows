@@ -59,14 +59,7 @@
   call Global % Min_Real(x_min)
   call Global % Max_Real(x_max)
 
-  ! Create a plateau for very small sources and values
-  !if( (x_max-x_min) < NANO .and. rms < NANO ) then
-  !  rms = PICO
-  !else
-  !  rms = rms / (x_max - x_min + TINY)
-  !end if
-
-  ! avoid roundoff error and divided-by-zero
+  ! Avoid roundoff error and divided-by-zero
   ! don't do rms = rms / (x_max - x_min + TINY)
   ! because e.g. 1.0 - 1.0 + 1e-30 = 0.0
   x_max_min = x_max - x_min
