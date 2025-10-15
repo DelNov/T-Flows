@@ -38,7 +38,7 @@
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   integer                        :: s, c1, c2, c, i_cel, i, nz
-  real                           :: a12
+  real                           :: a12, w1, w2
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -75,6 +75,7 @@
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   fc,  &
   !$acc   flow_v_m,  &
   !$acc   val,  &
@@ -88,7 +89,13 @@
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       if(c2 .gt. 0) then
-        a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = fc(s) * (w1 * flow_v_m(c1) + w2 * flow_v_m(c2))
+
         if(c1 .lt. c2) then
           val(pos(1,s)) = -a12
           val(pos(2,s)) = -a12

@@ -11,7 +11,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), grid_si(:), grid_dxi(:), temp(:)
   real                      :: b_tmp, b_f, xic1, xic2, x_f, grav_i
-  real                      :: dens_f, temp_f
+  real                      :: w1, w2, dens_f, temp_f
   integer                   :: c, c1, c2, s, i_cel, reg
 # if T_FLOWS_DEBUG == 1
     character(SL)           :: append
@@ -60,9 +60,13 @@
       s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
 
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
         ! Temperature and density at the face
-        temp_f = Face_Value(s, Flow % t % n(c1),   Flow % t % n(c2))
-        dens_f = Face_Value(s, Flow % density(c1), Flow % density(c2))
+        temp_f = w1 * Flow % t % n(c1)   + w2 * Flow % t % n(c2)
+        dens_f = w1 * Flow % density(c1) + w2 * Flow % density(c2)
 
         ! Units here: [kg/m^3 K]
         b_f = dens_f * (Flow % t_ref - temp_f)

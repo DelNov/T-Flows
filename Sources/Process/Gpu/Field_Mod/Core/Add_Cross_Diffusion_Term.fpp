@@ -12,7 +12,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:)
   real                      :: b_tmp, coef_f, f_ex, f_im, blend
-  real                      :: phix_f, phiy_f, phiz_f
+  real                      :: w1, w2, phix_f, phiy_f, phiz_f
   integer                   :: s, c1, c2, i_cel, reg
 !==============================================================================!
 
@@ -40,13 +40,17 @@
       s  = Grid % cells_f(i_cel, c1)
       if(c2 .gt. 0) then
 
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
         ! Derivatives at the face
-        phix_f = Face_Value(s, Flow % phi_x(c1), Flow % phi_x(c2))
-        phiy_f = Face_Value(s, Flow % phi_y(c1), Flow % phi_y(c2))
-        phiz_f = Face_Value(s, Flow % phi_z(c1), Flow % phi_z(c2))
+        phix_f = w1 * Flow % phi_x(c1) + w2 * Flow % phi_x(c2)
+        phiy_f = w1 * Flow % phi_y(c1) + w2 * Flow % phi_y(c2)
+        phiz_f = w1 * Flow % phi_z(c1) + w2 * Flow % phi_z(c2)
 
         ! Value of the coefficient at the cel face
-        coef_f = Face_Value(s, coef(c1), coef(c2))
+        coef_f = w1 * coef(c1) + w2 * coef(c2)
 
         f_ex = coef_f * (  phix_f * Grid % sx(s)   &
                          + phiy_f * Grid % sy(s)   &

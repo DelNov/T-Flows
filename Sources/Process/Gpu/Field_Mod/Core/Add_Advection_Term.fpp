@@ -17,7 +17,7 @@
   real                      :: advect, upwind
   real                      :: coef_phi1, coef_phi2, coef_f, phi_c
   real                      :: fl, dx, dy, dz, blend_1, blend_2, blend_3
-  real                      :: phi_luds_1, phi_luds_2
+  real                      :: w1, w2, phi_luds_1, phi_luds_2
   integer                   :: s, c1, c2, i_cel, reg
   integer                   :: m10_c1c2, m01_c1c2, c
 !==============================================================================!
@@ -110,13 +110,17 @@
 
       if(c2 .gt. 0) then
 
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
         !--------------------!
         !   Centered value   !
         !--------------------!
-        phi_c = Face_Value(s, phi % n(c1), phi % n(c2))
+        phi_c = w1 * phi % n(c1) + w2 * phi % n(c2)
 
         ! Value of the coefficient at the cel face
-        coef_f = Face_Value(s, coef(c1), coef(c2))
+        coef_f = w1 * coef(c1) + w2 * coef(c2)
 
         !-----------------------------------------------!
         !   Linear upwind differencing scheme (LUDS)    !
@@ -187,8 +191,12 @@
 
         if(c2 .gt. 0) then
 
+          w1 = Grid % f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
           ! Value of the coefficient at the cel face
-          coef_f = Face_Value(s, coef(c1), coef(c2))
+          coef_f = w1 * coef(c1) + w2 * coef(c2)
 
           ! Coefficient multiplied with variable, with upwind blending
           coef_phi1 = coef_f * phi % n(c1)

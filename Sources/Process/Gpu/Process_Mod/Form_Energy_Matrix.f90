@@ -35,7 +35,7 @@
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens_capa(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  real                           :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -145,6 +145,7 @@
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   cond_eff,  &
   !$acc   fc,  &
   !$acc   val,  &
@@ -160,7 +161,11 @@
 
       if(c2 .gt. 0) then
 
-        a12 = Face_Value(s, cond_eff(c1), cond_eff(c2)) * fc(s)
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = (w1 * cond_eff(c1) + w2 * cond_eff(c2)) * fc(s)
         a21 = a12
 
         if(c1 .lt. c2) then
@@ -191,6 +196,7 @@
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
     !$acc   flow_v_flux_n,  &
+    !$acc   grid_f,  &
     !$acc   dens_capa,  &
     !$acc   val,  &
     !$acc   pos,  &
@@ -206,7 +212,11 @@
 
         if(c2 .gt. 0) then
 
-          cfs = Face_Value(s, dens_capa(c1), dens_capa(c2))
+          w1 = grid_f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
+          cfs = w1 * dens_capa(c1) + w2 * dens_capa(c2)
           a12 = 0.0
           a21 = 0.0
 

@@ -38,7 +38,7 @@
   real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:), fc(:)
   real, contiguous, pointer :: u_n(:), v_n(:), w_n(:)
   real                      :: a12, b_tmp, max_abs_val
-  real                      :: u_f, v_f, w_f
+  real                      :: u_f, v_f, w_f, w1, w2
   real                      :: area_in, area_out, vol_in, vol_out, ratio
   integer                   :: s, c1, c2, i_cel, c, reg
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -196,6 +196,7 @@
   !$acc   grid_region_f_face,  &
   !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
+  !$acc   grid_f,  &
   !$acc   u_n,  &
   !$acc   p_x,  &
   !$acc   flow_v_m,  &
@@ -215,18 +216,23 @@
     c1 = grid_faces_c(1,s)
     c2 = grid_faces_c(2,s)
 
+    w1 = grid_f(s)
+    w2 = 1.0 - w1
+
     ! Velocity plus the cell-centered pressure gradient
     ! Units: kg / (m^2 s^2) * m^3 * s / kg = m / s
-    u_f = Face_Value(s, u_n(c1)+p_x(c1) * flow_v_m(c1),  u_n(c2)+p_x(c2) * flow_v_m(c2))
-    v_f = Face_Value(s, v_n(c1)+p_y(c1) * flow_v_m(c1),  v_n(c2)+p_y(c2) * flow_v_m(c2))
-    w_f = Face_Value(s, w_n(c1)+p_z(c1) * flow_v_m(c1),  w_n(c2)+p_z(c2) * flow_v_m(c2))
-
+    u_f = w1 * (u_n(c1) + p_x(c1) * flow_v_m(c1))  &
+        + w2 * (u_n(c2) + p_x(c2) * flow_v_m(c2))
+    v_f = w1 * (v_n(c1) + p_y(c1) * flow_v_m(c1))  &
+        + w2 * (v_n(c2) + p_y(c2) * flow_v_m(c2))
+    w_f = w1 * (w_n(c1) + p_z(c1) * flow_v_m(c1))  &
+        + w2 * (w_n(c2) + p_z(c2) * flow_v_m(c2))
 
     ! This is a bit of a code repetition, the
     ! same thing is in the Form_Pressure_Matrix
     ! Anyhow, units are given here are
     !  Units: m * m^3 s / kg = m^4 s / kg
-    a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+    a12 = fc(s) * (w1 * flow_v_m(c1) + w2 * flow_v_m(c2))
 
     ! Volume flux without the cell-centered pressure gradient
     ! but with the staggered pressure difference

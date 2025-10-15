@@ -44,8 +44,10 @@
   grid_sx  => Grid % sx
   grid_sy  => Grid % sy
   grid_sz  => Grid % sz
+  call Gpu % Vector_Real_Copy_To_Device(Grid % f)
   call Gpu % Vector_Real_Copy_To_Device(Grid % s)
   call Gpu % Vector_Real_Copy_To_Device(Grid % d)
+  grid_f   => Grid % f
   grid_s   => Grid % s
   grid_d   => Grid % d
   call Gpu % Vector_Real_Copy_To_Device(Grid % vol)

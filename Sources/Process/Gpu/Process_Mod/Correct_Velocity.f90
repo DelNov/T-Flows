@@ -22,7 +22,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
-  real                      :: a12, b_tmp, vol_res
+  real                      :: a12, b_tmp, vol_res, w1, w2
   real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -91,6 +91,7 @@
   !$acc   grid_region_f_face,  &
   !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
+  !$acc   grid_f,  &
   !$acc   fc,  &
   !$acc   flow_v_m,  &
   !$acc   flow_v_flux_n,  &
@@ -100,7 +101,10 @@
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
-    a12 = -fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+    w1 = grid_f(s)
+    w2 = 1.0 - w1
+
+    a12 = -fc(s) * (w1 * flow_v_m(c1) + w2 * flow_v_m(c2))
 
     flow_v_flux_n(s) = flow_v_flux_n(s)  &
                          + (flow_pp_n(c2) - flow_pp_n(c1)) * a12
@@ -220,6 +224,7 @@
   !$acc   grid_region_f_face,  &
   !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
+  !$acc   grid_f,  &
   !$acc   visc,  &
   !$acc   dens,  &
   !$acc   flow_v_flux_n,  &
@@ -230,7 +235,10 @@
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
-    nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
+    w1 = grid_f(s)
+    w2 = 1.0 - w1
+
+    nu_f = w1 * visc(c1)/dens(c1) + w2 * visc(c2)/dens(c2)
 
     cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * grid_d(s)**2)
     pe_t    = abs(flow_v_flux_n(s)) / fc(s) / nu_f
