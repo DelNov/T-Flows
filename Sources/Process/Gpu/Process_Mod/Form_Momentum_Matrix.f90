@@ -6,9 +6,24 @@
   subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Momentum matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An alias for density is defined
+!     - Effective viscosity is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Viscous coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Viscous coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)           :: Process
+  class(Process_Type)                 :: Process
   type(Grid_Type), intent(in), target :: Grid
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
@@ -44,6 +59,12 @@
 
   Assert(urf > 0.0)
 
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
+
   !------------------------!
   !   Initialize density   !
   !------------------------!
@@ -63,23 +84,6 @@
     visc_eff(c) = flow_viscosity(c)
   end do
   !$acc end parallel
-
-  do reg = Boundary_Regions()
-    !$acc parallel loop  &
-    !$acc present(  &
-    !$acc   grid_region_f_face,  &
-    !$acc   grid_region_l_face,  &
-    !$acc   grid_faces_c,  &
-    !$acc   visc_eff,  &
-    !$acc   flow_viscosity   &
-    !$acc )
-    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-      c1 = grid_faces_c(1,s)   ! inside cell
-      c2 = grid_faces_c(2,s)   ! boundary cell
-      visc_eff(c1) = flow_viscosity(c1)
-    end do
-    !$acc end parallel
-  end do
 
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
@@ -115,25 +119,7 @@
         !$acc )
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
           visc_eff(c1) = turb_vis_w(c1)
-        end do
-        !$acc end parallel
-
-      else
-
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   turb_vis_t   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_t(c1)
         end do
         !$acc end parallel
 
@@ -143,7 +129,9 @@
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$acc parallel loop independent  &
@@ -155,15 +143,15 @@
   end do
   !$acc end parallel
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !----------------------------------------------!
+  !   Viscosity coefficients inside the domain   !
+  !----------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
@@ -260,9 +248,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !--------------------------------------------!
+  !   Viscous coefficients on the boundaries   !
+  !--------------------------------------------!
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. WALLFL  .or.  &
@@ -287,6 +275,9 @@
      end if  ! boundary condition
   end do    ! regions
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(Flow % u % blend_matrix) then
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. INFLOW) then
@@ -312,11 +303,11 @@
     end do
   end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$acc parallel loop independent  &
     !$acc present(  &

@@ -2,6 +2,20 @@
   subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb,  &
                                 cond_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Energy matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for density times capacity is defined
+!     - Effective conductivty is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Conductivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Conductivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                   :: Process
@@ -36,9 +50,15 @@
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
+  Assert(urf > 0.0)
+
   call Work % Connect_Real_Cell(dens_capa)
 
-  Assert(urf > 0.0)
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
 
   !--------------------------------------------------------------------------!
   !   Initialize density times thermal capacity and effective conductivity   !
@@ -71,7 +91,9 @@
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$tf-acc loop begin
@@ -80,15 +102,15 @@
   end do
   !$tf-acc loop end
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients inside the domain   !
+  !-------------------------------------------------!
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
@@ -157,9 +179,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients on the boundaries   !
+  !-------------------------------------------------!
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
@@ -175,6 +197,9 @@
     end if
   end do
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(Flow % t % blend_matrix) then
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. INFLOW) then
@@ -191,11 +216,11 @@
     end do
   end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$tf-acc loop begin
     do c = Cells_In_Domain()  ! all present, was independent

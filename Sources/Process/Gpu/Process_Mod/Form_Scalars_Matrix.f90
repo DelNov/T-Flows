@@ -6,6 +6,21 @@
   subroutine Form_Scalars_Matrix(Process, Grid, Flow, Turb,  &
                                  diff_eff, sc, urf, dt)
 !------------------------------------------------------------------------------!
+!   Scalars matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for effective diffusivity is defined, but without turbulent
+!       parts yet
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Diffusivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Diffusivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                  :: Process
@@ -44,6 +59,12 @@
 
   Assert(urf > 0.0)
 
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
+
   !-----------------------------------------------------------!
   !   Start by copying molecular viscosity to the effective   !
   !-----------------------------------------------------------!
@@ -60,7 +81,9 @@
   !$acc end parallel
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$acc parallel loop independent  &
@@ -72,15 +95,15 @@
   end do
   !$acc end parallel
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients inside the domain   !
+  !------------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
@@ -177,9 +200,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients on the boundaries   !
+  !------------------------------------------------!
 
   phi_bnd_cond_type => phi % bnd_cond_type
   !$acc parallel loop  &
@@ -204,6 +227,9 @@
   end do
   !$acc end parallel
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(phi % blend_matrix) then
 
     phi_bnd_cond_type => phi % bnd_cond_type
