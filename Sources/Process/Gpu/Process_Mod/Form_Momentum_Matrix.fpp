@@ -72,7 +72,7 @@
     ! Inside the domain, add turbulent viscosity
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
-      visc_eff(c) = visc_eff(c) + turb_vis_t(c)
+      visc_eff(c) = visc_eff(c) + Turb % vis_t(c)
     end do
     !$tf-acc loop end
 
@@ -86,7 +86,7 @@
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
           c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_w(c1)
+          visc_eff(c1) = Turb % vis_w(c1)
         end do
         !$tf-acc loop end
 
@@ -96,7 +96,7 @@
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
           c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_t(c1)
+          visc_eff(c1) = Turb % vis_t(c1)
         end do
         !$tf-acc loop end
 

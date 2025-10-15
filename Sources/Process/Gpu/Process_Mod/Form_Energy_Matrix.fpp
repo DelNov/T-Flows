@@ -65,7 +65,7 @@
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
-      cond_eff(c) = cond_eff(c) + turb_vis_t(c) / 0.9  ! hard-coded Pr_t
+      cond_eff(c) = cond_eff(c) + Turb % vis_t(c) / 0.9  ! hard-coded Pr_t
     end do
     !$tf-acc loop end
   end if
