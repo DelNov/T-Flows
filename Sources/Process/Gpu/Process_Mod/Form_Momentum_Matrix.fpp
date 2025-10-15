@@ -195,39 +195,20 @@
   !------------------------------------!
   !   Coefficients on the boundaries   !
   !------------------------------------!
-  if(Turb % model .eq. NO_TURBULENCE_MODEL) then
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
 
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$tf-acc loop end
-      end if  ! boundary condition
-    end do    ! regions
-  else        ! turbulence model
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
-
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$tf-acc loop end
-
-      end if  ! boundary condition
-    end do    ! region
-  end if      ! turbulence model
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)   ! inside cell
+        a12 = visc_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$tf-acc loop end
+     end if  ! boundary condition
+  end do    ! regions
 
   if(Flow % u % blend_matrix) then
     do reg = Boundary_Regions()

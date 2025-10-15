@@ -263,57 +263,29 @@
   !------------------------------------!
   !   Coefficients on the boundaries   !
   !------------------------------------!
-  if(Turb % model .eq. NO_TURBULENCE_MODEL) then
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
 
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   fc,  &
-        !$acc   val,  &
-        !$acc   dia   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          c1 = grid_faces_c(1,s)   ! inside cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$acc end parallel
-      end if  ! boundary condition
-    end do    ! regions
-  else        ! turbulence model
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
-
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   fc,  &
-        !$acc   val,  &
-        !$acc   dia   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$acc end parallel
-
-      end if  ! boundary condition
-    end do    ! region
-  end if      ! turbulence model
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   visc_eff,  &
+      !$acc   fc,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
+        a12 = visc_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+     end if  ! boundary condition
+  end do    ! regions
 
   if(Flow % u % blend_matrix) then
     do reg = Boundary_Regions()
