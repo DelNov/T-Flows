@@ -179,6 +179,7 @@
 
   ! Optional volumetric flux
   if(present(volume_flux)) then
+
     write(str1, '(i0.0)') data_offset
     write(fu) IN_4 // '<DataArray type='//floatp        //  &
                       ' Name="Volumetric Flux [m^3/s]"' //  &
@@ -186,6 +187,15 @@
                       ' offset="' // trim(str1) //'">'  // LF
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + (s_l-s_f+1) * RP      ! prepare for next
+
+    write(str1, '(i0.0)') data_offset
+    write(fu) IN_4 // '<DataArray type='//floatp       //  &
+                      ' Name="Normal Velocity [m/s]"'  //  &
+                      ' format="appended"'             //  &
+                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '</DataArray>' // LF
+    data_offset = data_offset + SP + (s_l-s_f+1) * RP      ! prepare for next
+
   end if
 
   ! Number of nodes
@@ -320,11 +330,19 @@
   ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   if(present(volume_flux)) then
+
     data_size = int((s_l-s_f+1) * RP, SP)
     write(fu) data_size
     do s = s_f, s_l
       write(fu) volume_flux(s)
     end do
+
+    data_size = int((s_l-s_f+1) * RP, SP)
+    write(fu) data_size
+    do s = s_f, s_l
+      write(fu) volume_flux(s) / Grid % s(s)
+    end do
+
   end if
 
   call Profiler % Stop('Save_Vtu_Faces (optional real - optimize!)')
