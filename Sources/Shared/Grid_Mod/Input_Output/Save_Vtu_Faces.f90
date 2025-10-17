@@ -325,27 +325,27 @@
   end do
   write(fu) i_buffer(1:i)
 
-  call Profiler % Start('Save_Vtu_Faces (optional real - optimize!)')
-
   ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   if(present(volume_flux)) then
 
     data_size = int((s_l-s_f+1) * RP, SP)
     write(fu) data_size
+    i = 0
     do s = s_f, s_l
-      write(fu) volume_flux(s)
+      i=i+1;  r_buffer(i) = volume_flux(s)
     end do
+    write(fu) r_buffer(1:i)
 
     data_size = int((s_l-s_f+1) * RP, SP)
     write(fu) data_size
+    i = 0
     do s = s_f, s_l
-      write(fu) volume_flux(s) / Grid % s(s)
+      i=i+1;  r_buffer(i) = volume_flux(s) / Grid % s(s)
     end do
+    write(fu) r_buffer(1:i)
 
   end if
-
-  call Profiler % Stop('Save_Vtu_Faces (optional real - optimize!)')
 
   ! Number of nodes
   data_size = int((s_l-s_f+1) * IP, SP)
