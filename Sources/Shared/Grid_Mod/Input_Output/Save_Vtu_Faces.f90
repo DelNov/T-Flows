@@ -1,14 +1,13 @@
 !==============================================================================!
   subroutine Save_Vtu_Faces(Grid, sub, plot_inside, plot_shadows,  &
-                                  real_phi_f, int_phi_f)
+                                  volume_flux)
 !------------------------------------------------------------------------------!
 !>  Writes boundary condition .faces.vtu or shadow .shadow.vtu file.
 !>  It is called primarily from Generate and Convert, and the most usefult use
 !>  of the .vtu files created by this function is to check the prescribed
-!>  boundary conditions, as well as periodic boundary conditions.  Two optoinal
-!>  arguments (real_phi_f and int_phi_f, can be used to plot face-based data.
-!>  The latter mechanism is used from Process, albeit indirectly from
-!>  Determine_Threads to plot OMP threads.
+!>  boundary conditions, as well as periodic boundary conditions.  The optoinal
+!>  argument (volume_flux) can be used to plot face-based volumetric flux
+!>  (unit: [m^3/s]) and face-normal velocity (unit: [m/s])
 !------------------------------------------------------------------------------!
 !   Functionality                                                              !
 !                                                                              !
@@ -28,10 +27,7 @@
   integer, intent(in) :: sub(1:2)      !! 1=subdomaintotal number of subdomains
   logical,   optional :: plot_inside   !! plot faces inside the domain
   logical,   optional :: plot_shadows  !! plot shadow faces
-  real,      optional :: real_phi_f(1:Grid % n_faces)  !! real face-based data
-                                                       !! to be plotted
-  integer,   optional :: int_phi_f (1:Grid % n_faces)  !! integer face-based
-                                                       !! data to be plotted
+  real,      optional :: volume_flux(1:Grid % n_faces)  !! volumetric flux
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)          :: data_size
   integer              :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns
@@ -181,26 +177,15 @@
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
 
-  ! Optional real face variable
-  if(present(real_phi_f)) then
+  ! Optional volumetric flux
+  if(present(volume_flux)) then
     write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//floatp       //  &
-                      ' Name="Real Face Variable"'     //  &
-                      ' format="appended"'             //  &
-                      ' offset="' // trim(str1) //'">' // LF
+    write(fu) IN_4 // '<DataArray type='//floatp        //  &
+                      ' Name="Volumetric Flux [m^3/s]"' //  &
+                      ' format="appended"'              //  &
+                      ' offset="' // trim(str1) //'">'  // LF
     write(fu) IN_4 // '</DataArray>' // LF
     data_offset = data_offset + SP + (s_l-s_f+1) * RP      ! prepare for next
-  end if
-
-  ! Optional integer face variable
-  if(present(int_phi_f)) then
-    write(str1, '(i0.0)') data_offset
-    write(fu) IN_4 // '<DataArray type='//intp         //  &
-                      ' Name="Integer Face Variable"'  //  &
-                      ' format="appended"'             //  &
-                      ' offset="' // trim(str1) //'">' // LF
-    write(fu) IN_4 // '</DataArray>' // LF
-    data_offset = data_offset + SP + (s_l-s_f+1) * IP      ! prepare for next
   end if
 
   ! Number of nodes
@@ -334,29 +319,15 @@
 
   ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
-  if(present(real_phi_f)) then
+  if(present(volume_flux)) then
     data_size = int((s_l-s_f+1) * RP, SP)
     write(fu) data_size
     do s = s_f, s_l
-      write(fu) real_phi_f(s)
+      write(fu) volume_flux(s)
     end do
   end if
 
   call Profiler % Stop('Save_Vtu_Faces (optional real - optimize!)')
-
-  call Profiler % Start('Save_Vtu_Faces (optional int - optimize!)')
-
-  ! Optional integer face variable
-  ! (Check c1 and c2 for shadow faces, seems to be something messed up)
-  if(present(int_phi_f)) then
-    data_size = int((s_l-s_f+1) * IP, SP)
-    write(fu) data_size
-    do s = s_f, s_l
-      write(fu) int_phi_f(s)
-    end do
-  end if
-
-  call Profiler % Stop('Save_Vtu_Faces (optional int - optimize!)')
 
   ! Number of nodes
   data_size = int((s_l-s_f+1) * IP, SP)
