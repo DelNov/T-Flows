@@ -335,7 +335,7 @@
   ! Optional real face variable
   ! (Check c1 and c2 for shadow faces, seems to be something messed up)
   if(present(real_phi_f)) then
-    data_size = int((s_l-s_f+1) * IP, SP)
+    data_size = int((s_l-s_f+1) * RP, SP)
     write(fu) data_size
     do s = s_f, s_l
       write(fu) real_phi_f(s)
