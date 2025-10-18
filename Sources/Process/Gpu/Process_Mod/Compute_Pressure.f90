@@ -67,7 +67,8 @@
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
   !---------------------------------------------------------------!
-  call Process % Insert_Volume_Source_For_Pressure(Flow, Grid)
+  call Process % Balance_Volume(Flow, Grid)
+  call Process % Rhie_And_Chow (Flow, Grid)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("bp_0",                &
