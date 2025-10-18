@@ -21,7 +21,7 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid    !! grid under consideration
-  character(*)     :: append  !! appendinx to file name
+  character(*)     :: append  !! appendix to file name
 
   !-------------!
   !   Scalars   !
