@@ -37,9 +37,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:), fc(:)
   real, contiguous, pointer :: u_n(:), v_n(:), w_n(:)
-  real                      :: a12, b_tmp, max_abs_val
+  real                      :: vol_in, vol_out, area_in, area_out
+  real                      :: a12, b_tmp, fac, max_abs_val
   real                      :: u_f, v_f, w_f, w1, w2
-  real                      :: area_in, area_out, vol_in, vol_out, ratio
   integer                   :: s, c1, c2, i_cel, c, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -50,8 +50,8 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b  => Flow % Nat % b
-  fc => Flow % Nat % A % fc
+  b    => Flow % Nat % b
+  fc   => Flow % Nat % A % fc
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -88,28 +88,41 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    !$acc parallel loop  &
-    !$acc present(  &
-    !$acc   grid_region_f_face,  &
-    !$acc   grid_region_l_face,  &
-    !$acc   grid_faces_c,  &
-    !$acc   flow_v_flux_n,  &
-    !$acc   flow_u_n,  &
-    !$acc   grid_sx,  &
-    !$acc   flow_v_n,  &
-    !$acc   grid_sy,  &
-    !$acc   flow_w_n,  &
-    !$acc   grid_sz   &
-    !$acc )
-    do s = grid_region_f_face(reg), grid_region_l_face(reg)
-      c2 = grid_faces_c(2,s)  ! boundary cell
-      flow_v_flux_n(s) = flow_u_n(c2) * grid_sx(s)  &
-                           + flow_v_n(c2) * grid_sy(s)  &
-                           + flow_w_n(c2) * grid_sz(s)
-    end do
-    !$acc end parallel
+    if(Grid % region % type(reg) .eq. SYMMETRY) then
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   flow_v_flux_n   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
+        flow_v_flux_n(s) = 0.0
+      end do
+      !$acc end parallel
+    else
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   flow_v_flux_n,  &
+      !$acc   flow_u_n,  &
+      !$acc   grid_sx,  &
+      !$acc   flow_v_n,  &
+      !$acc   grid_sy,  &
+      !$acc   flow_w_n,  &
+      !$acc   grid_sz   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
+        c2 = grid_faces_c(2,s)  ! boundary cell
+        flow_v_flux_n(s) = flow_u_n(c2) * grid_sx(s)  &
+                             + flow_v_n(c2) * grid_sy(s)  &
+                             + flow_w_n(c2) * grid_sz(s)
+      end do
+      !$acc end parallel  ! faces
+    end if    ! boundary region type
 
-  end do
+  end do      ! regions
 
   !-------------------------------------------!
   !   Calcululate inflow and outflow volume   !
@@ -138,7 +151,8 @@
 
     end if
 
-    if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
+    if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$acc parallel loop reduction(+: area_out,vol_out)  &
@@ -157,33 +171,67 @@
     end if
   end do
 
-  call Global % Sum_Reals(vol_in, area_in)
+  call Global % Sum_Reals(vol_in,   &
+                          vol_out,  &
+                          area_in,  &
+                          area_out)
 
   !-----------------------------------------------------------------!
   !   If there is volume imbalance in the source for the pressure   !
   !   (correction) equation, pressure will converge poorly, if at   !
   !   all. Thus, correct the outlet fluxes to enforce the balance   !
   !-----------------------------------------------------------------!
-  if(.not. Math % Approx_Real(vol_in, vol_out, FEMTO)) then
-    ratio = vol_in / vol_out
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
-         Grid % region % type(reg) .eq. CONVECT) then
 
-        !$acc parallel loop  &
+  if(.not. Math % Approx_Real(vol_in, vol_out, FEMTO)) then
+
+    ! You should compute the "fac" now ...
+    fac = vol_in / (vol_out + TINY)
+
+    ! ... and correct all velocities
+    vol_out = 0.0
+
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
+
+        !$acc parallel loop reduction(+: vol_out)  &
         !$acc present(  &
         !$acc   grid_region_f_face,  &
         !$acc   grid_region_l_face,  &
-        !$acc   flow_v_flux_n   &
+        !$acc   grid_faces_c,  &
+        !$acc   flow_u_n,  &
+        !$acc   flow_v_n,  &
+        !$acc   flow_w_n,  &
+        !$acc   flow_v_flux_n,  &
+        !$acc   grid_sx,  &
+        !$acc   grid_sy,  &
+        !$acc   grid_sz   &
         !$acc )
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          flow_v_flux_n(s) = flow_v_flux_n(s) * ratio
+          c2 = grid_faces_c(2,s)
+
+          ! Update velocity components ...
+          flow_u_n(c2) = flow_u_n(c2) * fac
+          flow_v_n(c2) = flow_v_n(c2) * fac
+          flow_w_n(c2) = flow_w_n(c2) * fac
+
+          ! ... volume flux itself ...
+          flow_v_flux_n(s) = flow_u_n(c2) * grid_sx(s)    &
+                               + flow_v_n(c2) * grid_sy(s)    &
+                               + flow_w_n(c2) * grid_sz(s)
+
+          ! ... and bulk volume out
+          vol_out = vol_out + flow_v_flux_n(s)
         end do
         !$acc end parallel
 
       end if
     end do
   end if
+
+  ! Holy mackrele: summ it up over all processors
+  call Global % Sum_Real(vol_out)  ! not checked
 
   !--------------------------------------------------!
   !   Calculate volume fluxes through inside faces   !

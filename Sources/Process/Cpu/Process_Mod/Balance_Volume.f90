@@ -171,10 +171,10 @@
 
   end if  ! flow has pressure
 
-  call Global % Sum_Real(bulk % vol_in)
-  call Global % Sum_Real(bulk % vol_out)
-  call Global % Sum_Real(bulk % area_in)
-  call Global % Sum_Real(bulk % area_out)
+  call Global % Sum_Reals(bulk % vol_in,   &
+                          bulk % vol_out,  &
+                          bulk % area_in,  &
+                          bulk % area_out)
 
   ! Avoid divisions by zero for the cases without any fluid motion
   fac = 1.0

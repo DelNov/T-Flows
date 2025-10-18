@@ -19,7 +19,7 @@
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
   real                      :: a12, b_tmp, vol_res, w1, w2
-  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
+  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f, dt
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -34,6 +34,7 @@
   fc   => Flow % Nat % A % fc
   dens => Flow % density
   visc => Flow % viscosity
+  dt   =  Flow % dt
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'PP')
@@ -125,8 +126,9 @@
   !-----------------------------!
 
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW .or.  &
+    if(Grid % region % type(reg) .eq. INFLOW   .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+       Grid % region % type(reg) .eq. PRESSURE .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$tf-acc loop begin
@@ -138,6 +140,12 @@
 
     end if
   end do
+
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()
+    b(c) = b(c) / (Grid % vol(c) / dt)
+  end do
+  !$tf-acc loop end
 
 # if T_FLOWS_DEBUG == 1
   call Grid % Save_Debug_Vtu("bp_1",               &

@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtu_Faces(Grid, sub, plot_inside, plot_shadows,  &
+  subroutine Save_Vtu_Faces(Grid, sub, append, plot_inside, plot_shadows,  &
                                   volume_flux)
 !------------------------------------------------------------------------------!
 !>  Writes boundary condition .faces.vtu or shadow .shadow.vtu file.
@@ -23,11 +23,12 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type)    :: Grid          !! grid being processes
-  integer, intent(in) :: sub(1:2)      !! 1=subdomaintotal number of subdomains
-  logical,   optional :: plot_inside   !! plot faces inside the domain
-  logical,   optional :: plot_shadows  !! plot shadow faces
-  real,      optional :: volume_flux(1:Grid % n_faces)  !! volumetric flux
+  class(Grid_Type)       :: Grid          !! grid being processes
+  integer, intent(in)    :: sub(1:2)      !! subdomain/tot. number of subdomains
+  character(*), optional :: append        !! appendix to file name
+  logical,      optional :: plot_inside   !! plot faces inside the domain
+  logical,      optional :: plot_shadows  !! plot shadow faces
+  real,         optional :: volume_flux(1:Grid % n_faces)  !! volumetric flux
 !-----------------------------------[Locals]-----------------------------------!
   integer(SP)          :: data_size
   integer              :: c2, n, s, s_f, s_l, cell_offset, data_offset, n_conns
@@ -92,9 +93,16 @@
   !------------------------!
   !   Open the .vtu file   !
   !------------------------!
-  call File % Set_Name(name_out,         &
-                       processor = sub,  &
-                       extension = trim(ext))
+  if(present(append)) then
+    call File % Set_Name(name_out,                       &
+                         appendix  = '-'//trim(append),  &
+                         processor = sub,                &
+                         extension = trim(ext))
+  else
+    call File % Set_Name(name_out,                       &
+                         processor = sub,                &
+                         extension = trim(ext))
+  end if
   call File % Open_For_Writing_Binary(name_out, fu)
 
   !------------!

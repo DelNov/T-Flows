@@ -33,9 +33,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), p_x(:), p_y(:), p_z(:), fc(:)
   real, contiguous, pointer :: u_n(:), v_n(:), w_n(:)
-  real                      :: a12, b_tmp, max_abs_val
+  real                      :: vol_in, vol_out, area_in, area_out
+  real                      :: a12, b_tmp, fac, max_abs_val
   real                      :: u_f, v_f, w_f, w1, w2
-  real                      :: area_in, area_out, vol_in, vol_out, ratio
   integer                   :: s, c1, c2, i_cel, c, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -46,8 +46,8 @@
   ! Take some aliases
   ! GPU version doesn't work if you use directly Flow % whatever_variable
   ! These aliases are really needed, not just some gimmick to shorten the code
-  b  => Flow % Nat % b
-  fc => Flow % Nat % A % fc
+  b    => Flow % Nat % b
+  fc   => Flow % Nat % A % fc
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'P')
@@ -79,16 +79,24 @@
   !----------------------------------------------------!
   do reg = Boundary_Regions()
 
-    !$tf-acc loop begin
-    do s = Faces_In_Region(reg)
-      c2 = Grid % faces_c(2,s)  ! boundary cell
-      Flow % v_flux % n(s) = Flow % u % n(c2) * Grid % sx(s)  &
-                           + Flow % v % n(c2) * Grid % sy(s)  &
-                           + Flow % w % n(c2) * Grid % sz(s)
-    end do
-    !$tf-acc loop end
+    if(Grid % region % type(reg) .eq. SYMMETRY) then
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)
+        Flow % v_flux % n(s) = 0.0
+      end do
+      !$tf-acc loop end
+    else
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)
+        c2 = Grid % faces_c(2,s)  ! boundary cell
+        Flow % v_flux % n(s) = Flow % u % n(c2) * Grid % sx(s)  &
+                             + Flow % v % n(c2) * Grid % sy(s)  &
+                             + Flow % w % n(c2) * Grid % sz(s)
+      end do  ! faces
+      !$tf-acc loop end
+    end if    ! boundary region type
 
-  end do
+  end do      ! regions
 
   !-------------------------------------------!
   !   Calcululate inflow and outflow volume   !
@@ -111,7 +119,8 @@
 
     end if
 
-    if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
+    if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$tf-acc loop begin
@@ -124,28 +133,55 @@
     end if
   end do
 
-  call Global % Sum_Reals(vol_in, area_in)
+  call Global % Sum_Reals(vol_in,   &
+                          vol_out,  &
+                          area_in,  &
+                          area_out)
 
   !-----------------------------------------------------------------!
   !   If there is volume imbalance in the source for the pressure   !
   !   (correction) equation, pressure will converge poorly, if at   !
   !   all. Thus, correct the outlet fluxes to enforce the balance   !
   !-----------------------------------------------------------------!
+
   if(.not. Math % Approx_Real(vol_in, vol_out, FEMTO)) then
-    ratio = vol_in / vol_out
+
+    ! You should compute the "fac" now ...
+    fac = vol_in / (vol_out + TINY)
+
+    ! ... and correct all velocities
+    vol_out = 0.0
+
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
-         Grid % region % type(reg) .eq. CONVECT) then
+      if(Grid % region % type(reg) .eq. OUTFLOW   .or.  &
+         Grid % region % type(reg) .eq. CONVECT   .or.  &
+         Grid % region % type(reg) .eq. PRESSURE) then
 
         !$tf-acc loop begin
         do s = Faces_In_Region(reg)  ! all present
-          Flow % v_flux % n(s) = Flow % v_flux % n(s) * ratio
+          c2 = Grid % faces_c(2,s)
+
+          ! Update velocity components ...
+          Flow % u % n(c2) = Flow % u % n(c2) * fac
+          Flow % v % n(c2) = Flow % v % n(c2) * fac
+          Flow % w % n(c2) = Flow % w % n(c2) * fac
+
+          ! ... volume flux itself ...
+          Flow % v_flux % n(s) = Flow % u % n(c2) * Grid % sx(s)    &
+                               + Flow % v % n(c2) * Grid % sy(s)    &
+                               + Flow % w % n(c2) * Grid % sz(s)
+
+          ! ... and bulk volume out
+          vol_out = vol_out + Flow % v_flux % n(s)
         end do
         !$tf-acc loop end
 
       end if
     end do
   end if
+
+  ! Holy mackrele: summ it up over all processors
+  call Global % Sum_Real(vol_out)  ! not checked
 
   !--------------------------------------------------!
   !   Calculate volume fluxes through inside faces   !

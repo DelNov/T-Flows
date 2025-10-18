@@ -23,7 +23,7 @@
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
   real                      :: a12, b_tmp, vol_res, w1, w2
-  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
+  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f, dt
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -38,6 +38,7 @@
   fc   => Flow % Nat % A % fc
   dens => Flow % density
   visc => Flow % viscosity
+  dt   =  Flow % dt
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'PP')
@@ -166,8 +167,9 @@
   !-----------------------------!
 
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW .or.  &
+    if(Grid % region % type(reg) .eq. INFLOW   .or.  &
+       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+       Grid % region % type(reg) .eq. PRESSURE .or.  &
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$acc parallel loop  &
@@ -186,6 +188,18 @@
 
     end if
   end do
+
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   b,  &
+  !$acc   grid_vol   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+    b(c) = b(c) / (grid_vol(c) / dt)
+  end do
+  !$acc end parallel
 
 # if T_FLOWS_DEBUG == 1
   call Grid % Save_Debug_Vtu("bp_1",               &
