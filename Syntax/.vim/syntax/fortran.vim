@@ -503,7 +503,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     grid_dx  grid_dy  grid_dz
   syn keyword fortranGPUTflows     grid_sx  grid_sy  grid_sz
   syn keyword fortranGPUTflows     grid_xc  grid_yc  grid_zc
-  syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol  grid_wall_dist
+  syn keyword fortranGPUTflows     grid_f, grid_d  grid_s  grid_vol  grid_wall_dist
   syn keyword fortranGPUTflows     flow_density  flow_capacity
   syn keyword fortranGPUTflows     flow_viscosity  flow_conductivity
   syn keyword fortranGPUTflows     flow_diffusivity
