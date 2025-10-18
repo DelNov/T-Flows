@@ -108,12 +108,14 @@
   do c1 = Cells_In_Domain()  ! all present
 
     b_tmp = b(c1)
-    do i_cel = 1, Grid % cells_n_cells(c1)
+    do i_cel = Grid % cells_i_cells(c1),  &
+               Grid % cells_n_cells(c1)
+
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
-      end if
+
+      b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
+
     end do
 
     b(c1) = b_tmp

@@ -40,6 +40,7 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
@@ -60,38 +61,39 @@
     b_tmp = b(c1)
 
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbour
+               grid_cells_n_cells(c1)
+
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
 
-        w1 = grid_f(s)
-        if(c1.gt.c2) w1 = 1.0 - w1
-        w2 = 1.0 - w1
+      w1 = grid_f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
 
-        ! Derivatives at the face
-        phix_f = w1 * flow_phi_x(c1) + w2 * flow_phi_x(c2)
-        phiy_f = w1 * flow_phi_y(c1) + w2 * flow_phi_y(c2)
-        phiz_f = w1 * flow_phi_z(c1) + w2 * flow_phi_z(c2)
+      ! Derivatives at the face
+      phix_f = w1 * flow_phi_x(c1) + w2 * flow_phi_x(c2)
+      phiy_f = w1 * flow_phi_y(c1) + w2 * flow_phi_y(c2)
+      phiz_f = w1 * flow_phi_z(c1) + w2 * flow_phi_z(c2)
 
-        ! Value of the coefficient at the cel face
-        coef_f = w1 * coef(c1) + w2 * coef(c2)
+      ! Value of the coefficient at the cel face
+      coef_f = w1 * coef(c1) + w2 * coef(c2)
 
-        f_ex = coef_f * (  phix_f * grid_sx(s)   &
-                         + phiy_f * grid_sy(s)   &
-                         + phiz_f * grid_sz(s))
-        f_im = coef_f * fc(s)              &
-             * (  phix_f * grid_dx(s)    &
-                + phiy_f * grid_dy(s)    &
-                + phiz_f * grid_dz(s) )
+      f_ex = coef_f * (  phix_f * grid_sx(s)   &
+                       + phiy_f * grid_sy(s)   &
+                       + phiz_f * grid_sz(s))
+      f_im = coef_f * fc(s)              &
+           * (  phix_f * grid_dx(s)    &
+              + phiy_f * grid_dy(s)    &
+              + phiz_f * grid_dz(s) )
 
-        if(c1.gt.c2) then
-          f_ex = -f_ex
-          f_im = -f_im
-        end if
-
-        b_tmp = b_tmp + f_ex - f_im
+      if(c1.gt.c2) then
+        f_ex = -f_ex
+        f_im = -f_im
       end if
+
+      b_tmp = b_tmp + f_ex - f_im
+
     end do
   !$acc end loop
 

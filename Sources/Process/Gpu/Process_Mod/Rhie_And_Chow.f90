@@ -115,6 +115,7 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
@@ -124,12 +125,11 @@
 
     b_tmp = b(c1)
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbour
+               grid_cells_n_cells(c1)
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
-      end if
+      b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
     end do
   !$acc end loop
 

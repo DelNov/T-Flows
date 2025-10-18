@@ -19,7 +19,7 @@
 
   ! GPU access to Grid members
   integer, contiguous, pointer :: grid_faces_c(:,:)
-  integer, contiguous, pointer :: grid_cells_n_cells(:)
+  integer, contiguous, pointer :: grid_cells_n_cells(:), grid_cells_i_cells(:)
   integer, contiguous, pointer :: grid_cells_c(:,:)
   integer, contiguous, pointer :: grid_cells_f(:,:)
   integer                      :: grid_n_regions,  grid_n_bnd_regions

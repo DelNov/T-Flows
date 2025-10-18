@@ -101,6 +101,9 @@
     ! Number of cells surrounding each cell
     integer, allocatable :: cells_n_cells(:)  !! number of cells around cell
 
+    ! First inside cell surrounding each cell
+    integer, allocatable :: cells_i_cells(:)  !! first inside cell around cell
+
     ! Cells' nodes, faces, and neigboring cells
     integer, allocatable :: cells_n(:,:)  !! list of cells' nodes
     integer, allocatable :: cells_f(:,:)  !! list of cells' faces

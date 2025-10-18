@@ -130,28 +130,27 @@
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
 
-    do i_cel = 1, Grid % cells_n_cells(c1)
+    do i_cel = Grid % cells_i_cells(c1),  &  ! first inside cell
+               Grid % cells_n_cells(c1)
+
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
 
-      if(c2 .gt. 0) then
+      w1 = Grid % f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
 
-        w1 = Grid % f(s)
-        if(c1.gt.c2) w1 = 1.0 - w1
-        w2 = 1.0 - w1
+      a12 = (w1 * visc_eff(c1) + w2 * visc_eff(c2)) * fc(s)
+      a21 = a12
 
-        a12 = (w1 * visc_eff(c1) + w2 * visc_eff(c2)) * fc(s)
-        a21 = a12
-
-        if(c1 .lt. c2) then
-          val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a21
-        end if
-
-        ! Update only diaginal at c1 to avoid race conditions
-        val(dia(c1)) = val(dia(c1)) + a12
-
+      if(c1 .lt. c2) then
+        val(pos(1,s)) = -a12
+        val(pos(2,s)) = -a21
       end if
+
+      ! Update only diaginal at c1 to avoid race conditions
+      val(dia(c1)) = val(dia(c1)) + a12
+
     end do
 
   end do
@@ -165,36 +164,34 @@
     !$tf-acc loop begin
     do c1 = Cells_In_Domain()  ! all present
 
-      do i_cel = 1, Grid % cells_n_cells(c1)
+      do i_cel = Grid % cells_i_cells(c1),  &  ! first inside neighbour
+                 Grid % cells_n_cells(c1)
         c2 = Grid % cells_c(i_cel, c1)
         s  = Grid % cells_f(i_cel, c1)
         fl = Flow % v_flux % n(s)
 
-        if(c2 .gt. 0) then
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
 
-          w1 = Grid % f(s)
-          if(c1.gt.c2) w1 = 1.0 - w1
-          w2 = 1.0 - w1
+        cfs = w1 * dens(c1) + w2 * dens(c2)
+        a12 = 0.0
+        a21 = 0.0
 
-          cfs = w1 * dens(c1) + w2 * dens(c2)
-          a12 = 0.0
-          a21 = 0.0
-
-          if(c1 .lt. c2) then
-            if(fl > 0.0) a21 = a21 + fl * cfs
-            if(fl < 0.0) a12 = a12 - fl * cfs
-            val(pos(1,s)) = val(pos(1,s)) - a12
-            val(pos(2,s)) = val(pos(2,s)) - a21
-          end if
-
-          if(c1 .gt. c2) then
-            if(fl > 0.0) a12 = a12 + fl * cfs
-          end if
-
-          ! Update only diaginal at c1 to avoid race conditions
-          val(dia(c1)) = val(dia(c1)) + a12
-
+        if(c1 .lt. c2) then
+          if(fl > 0.0) a21 = a21 + fl * cfs
+          if(fl < 0.0) a12 = a12 - fl * cfs
+          val(pos(1,s)) = val(pos(1,s)) - a12
+          val(pos(2,s)) = val(pos(2,s)) - a21
         end if
+
+        if(c1 .gt. c2) then
+          if(fl > 0.0) a12 = a12 + fl * cfs
+        end if
+
+        ! Update only diaginal at c1 to avoid race conditions
+        val(dia(c1)) = val(dia(c1)) + a12
+
       end do
 
     end do

@@ -60,7 +60,7 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
-    if(c2 .gt. 0) then
+    if(c2 .gt. 0) then  ! can't avoid this check
 
       ! This is correct only on uniform grids
       dx_c1 = Grid % dx(s)

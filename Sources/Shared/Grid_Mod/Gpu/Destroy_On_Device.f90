@@ -23,6 +23,7 @@
 
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % faces_c)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_n_cells)
+  call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_i_cells)
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_c)
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_f)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % xc)
