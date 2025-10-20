@@ -270,10 +270,14 @@
         cross(c2) = cross(c2) - f_ex + f_im - f_stress * Flow % density(c2)
       end if
 
+      ! Set matrix coefficients m12 and m21 assuming there is no blending
+      m12 = m0
+      m21 = m0
+
       ! Blend system matrix if desired to do so
       if(ui % blend_matrix) then
-        m12 = m0 - min(v_flux % n(s), 0.0) * Flow % density(c1)
-        m21 = m0 + max(v_flux % n(s), 0.0) * Flow % density(c2)
+        m12 = m12 - min(v_flux % n(s), 0.0) * Flow % density(c1)
+        m21 = m21 + max(v_flux % n(s), 0.0) * Flow % density(c2)
       end if
 
       ! Fill the system matrix
