@@ -1,15 +1,15 @@
 !==============================================================================!
-  program Parabolic
+  program Parabolic_Channel
 !------------------------------------------------------------------------------!
 !   Creates a parabolic velocity profile useful for laminar inflows            !
 !                                                                              !
-!   Compile with: gfortran -o Parabolic Parabolic.f90                          !
+!   Compile with: gfortran -o Parabolic_Channel Parabolic_Channel.f90          !
 !------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   real          :: x_s, x_e, bulk
   integer       :: n, i
-  real          :: x_l, x_r, x_c, y_l, y_r, y_c, dx, lx, integral, area
+  real          :: x_l, x_r, y_l, y_r, y_c, dx, lx, integral, area
   character(80) :: arg
 !==============================================================================!
 
@@ -26,7 +26,7 @@
   else
     print '(a)', '# You failed to invoke the program properly.'
     print '(a)', '# Correct invocation:'
-    print '(a)', './Parabolic  x_start  x_end  bulk_velocity  n_points'
+    print '(a)', './Parabolic_Channel  x_start  x_end  bulk_velocity  n_points'
     stop
   end if
 
@@ -43,9 +43,11 @@
   area     = 0.0
   integral = 0.0
   do i = 1, n
+
     ! x_l and x_r are in range -0.5 -> +0.5
-    x_l  = -0.5 + real((i-1))/real(n-1)  ! x left
-    x_r  = -0.5 + real( i   )/real(n-1)  ! x rigth
+    x_l = -0.5 + real((i-1))/real(n-1)  ! x left
+    x_r = -0.5 + real( i   )/real(n-1)  ! x rigth
+
     y_l = (1.0 - x_l ** 2 / 0.25) * bulk *  1.5
     y_r = (1.0 - x_r ** 2 / 0.25) * bulk *  1.5
 
