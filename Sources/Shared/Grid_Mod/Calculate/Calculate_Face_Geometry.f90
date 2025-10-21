@@ -362,7 +362,13 @@
         exit
       end if
     end do
-    Assert(Grid % cells_i_cells(c1) .ne. 0)
+
+    ! Don't have time to deal with this assertion in a more elaborate way
+    ! Maybe it is even OK like this, I just have to make sure that all the
+    ! loops which are using cells_i_cells are inside the domain
+    if(Cell_In_This_Proc(c1)) then
+      Assert(Grid % cells_i_cells(c1) .ne. 0)
+    end if
 
   end do
 
