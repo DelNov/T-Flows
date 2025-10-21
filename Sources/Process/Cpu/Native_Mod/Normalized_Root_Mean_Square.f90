@@ -1,12 +1,8 @@
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Nat, ni, r, A, x, norm)
+  real function Normalized_Root_Mean_Square(Nat, ni, r, A)
 !------------------------------------------------------------------------------!
-!>  The Root_Mean_Square function calculates the root mean square (RMS) of a
-!>  given vector 'r'.  This implementation computes RMS with normalization
-!>  normalizing it with entries from the matrix 'A', values of unknown 'x'
-!>  or optional parameter 'norm'.  It takes the sum of squares of the vector
-!>  elements, computes their global sum in a parallel computing environment,
-!>  and then takes the square root of the resulting sum.
+!>  The Normalized_Root_Mean_Square function calculates the root mean square
+!>  (RMS) of a given vector 'r', normalized with matrix A diagonal.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,8 +10,6 @@
   integer,                   intent(in) :: ni    !! number of uknowns
   real,                      intent(in) :: r(:)  !! input vector
   type(Matrix_Type), target, intent(in) :: A     !! system matrix
-  real,                      intent(in) :: x(:)  !! unknown vector
-  real,            optional, intent(in) :: norm  !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   real                          :: rms, x_max, x_min, x_max_min
   integer                       :: i

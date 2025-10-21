@@ -90,7 +90,7 @@
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
+  bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A)
 
   if(bnrm2 < tol) then
     iter = 0
@@ -105,7 +105,7 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
   if(res < tol) then
     iter = 0
@@ -210,7 +210,7 @@
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
     if(res < tol) goto 1
 

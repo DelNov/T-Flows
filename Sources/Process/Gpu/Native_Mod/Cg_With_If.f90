@@ -48,7 +48,7 @@
   ! Scalar over diagonal (to take the mystery out: computes d_inv)
   call Linalg % Sca_O_Dia(ni, d_inv, 1.0, A)
 
-  bnrm2 = Linalg % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
+  bnrm2 = Linalg % Normalized_Root_Mean_Square(ni, b(1:nt), A)
 
   if(bnrm2 < tol) then
     iter = 0
@@ -62,7 +62,7 @@
   call Linalg % Vec_P_Sca_X_Vec(ni, r(1:ni), b(1:ni), -1.0, q(1:ni))
 
   ! Check first residual
-  res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt))
+  res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A)
 
   if(res < tol) then
     iter = 0
@@ -131,7 +131,7 @@
     !--------------------!
     !   Check residual   !
     !--------------------!
-    res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A, x(1:nt))
+    res = Linalg % Normalized_Root_Mean_Square(ni, r(1:nt), A)
 
     if(res .lt. tol) goto 1
 
