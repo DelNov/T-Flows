@@ -132,9 +132,9 @@
     end if    ! pressure
   end do      ! regions
 
-  call Grid % Save_Debug_Vtu(append = "bp",      &
-                             inside_cell = b,    &
-                             inside_name = "bp")
+  ! call Grid % Save_Debug_Vtu(append = "bp",       &
+  !                            inside_cell = b,     &
+  !                            inside_name = "bp")
 
   Flow % vol_res = 0.0
   do c = Cells_In_Domain()
