@@ -45,12 +45,9 @@
         c1 = Grid % faces_c(1,s)
         c2 = Grid % faces_c(2,s)
 
-        dx = Grid % xc(c2) - Grid % xc(c1)
-        dy = Grid % yc(c2) - Grid % yc(c1)
-        dz = Grid % zc(c2) - Grid % zc(c1)
-        phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * dx  &
-                                  + Flow % phi_y(c1) * dy  &
-                                  + Flow % phi_z(c1) * dz
+        phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * Grid % dx(s)  &
+                                  + Flow % phi_y(c1) * Grid % dy(s)  &
+                                  + Flow % phi_z(c1) * Grid % dz(s)
       end do
       !$tf-acc loop end
 

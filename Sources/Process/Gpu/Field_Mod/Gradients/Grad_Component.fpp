@@ -13,7 +13,7 @@
   logical, optional, intent(in)          :: boundary_updated
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c1, c2, s, i_cel, reg
-  real    :: dphi, dx, dy, dz, phii_tmp
+  real    :: dphi, phii_tmp
 !-----------------------------[Local parameters]-------------------------------!
   integer, dimension(3,3), parameter :: MAP = reshape((/ 1, 4, 5,  &
                                                          4, 2, 6,  &
