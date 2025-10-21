@@ -44,9 +44,7 @@
 # endif
 
   ! Set singularity to the matrix
-  if(.not. Flow % has_pressure) then
-    call Linalg % Set_Singular(Grid % n_cells, Flow % Nat % A)
-  end if
+  call Linalg % Set_Singular(Grid % n_cells, Flow % Nat % A)
 
   !------------------------!
   !   Call linear solver   !
@@ -89,24 +87,28 @@
   !---------------------------------------------------------------!
   !   Shift the pressure field so that the median value is zero   !
   !---------------------------------------------------------------!
-  p_max = -HUGE
-  p_min = +HUGE
+  if(.not. Flow % has_pressure) then
 
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present
-    p_max = max(p_max, Flow % p % n(c))
-    p_min = min(p_min, Flow % p % n(c))
-  end do
-  !$tf-acc loop end
+    p_max = -HUGE
+    p_min = +HUGE
 
-  call Global % Max_Real(p_max)
-  call Global % Min_Real(p_min)
+    !$tf-acc loop begin
+    do c = Cells_In_Domain()  ! all present
+      p_max = max(p_max, Flow % p % n(c))
+      p_min = min(p_min, Flow % p % n(c))
+    end do
+    !$tf-acc loop end
 
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present
-    Flow % p % n(c) = Flow % p % n(c) - 0.5 * (p_max + p_min)
-  end do
-  !$tf-acc loop end
+    call Global % Max_Real(p_max)
+    call Global % Min_Real(p_min)
+
+    !$tf-acc loop begin
+    do c = Cells_In_Domain()  ! all present
+      Flow % p % n(c) = Flow % p % n(c) - 0.5 * (p_max + p_min)
+    end do
+    !$tf-acc loop end
+
+  end if
 
   ! Update buffers for presssure over all processors
   call Grid % Exchange_Cells_Real(Flow % p % n)

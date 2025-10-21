@@ -126,21 +126,15 @@
   !-----------------------------!
   !   Then the boundary faces   !
   !-----------------------------!
-
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW   .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-       Grid % region % type(reg) .eq. PRESSURE .or.  &
-       Grid % region % type(reg) .eq. CONVECT) then
 
-      !$tf-acc loop begin
-      do s = Faces_In_Region(reg)  ! all present
-        c1 = Grid % faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - Flow % v_flux % n(s)
-      end do
-      !$tf-acc loop end
+    !$tf-acc loop begin
+    do s = Faces_In_Region(reg)  ! all present
+      c1 = Grid % faces_c(1,s)  ! inside cell
+      b(c1) = b(c1) - Flow % v_flux % n(s)
+    end do
+    !$tf-acc loop end
 
-    end if
   end do
 
   !$tf-acc loop begin
@@ -148,6 +142,20 @@
     b(c) = b(c) / (Grid % vol(c) / dt)
   end do
   !$tf-acc loop end
+
+  ! Exclude cells close to pressure boundary
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)  ! inside cell
+        b(c1) = 0.0
+      end do
+      !$tf-acc loop end
+
+    end if
+  end do
 
 # if T_FLOWS_DEBUG == 1
   call Grid % Save_Debug_Vtu("bp_1",               &

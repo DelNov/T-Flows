@@ -3,7 +3,7 @@
 !==============================================================================!
 
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Lin, n, b, A, c)
+  real function Normalized_Root_Mean_Square(Lin, n, b, A)
 !------------------------------------------------------------------------------!
 !>  Front-end for calculation sqrt(vector^2 over matrix diagonal^2 operation).
 !------------------------------------------------------------------------------!
@@ -15,7 +15,6 @@
   integer, intent(in)       :: n     !! size of vectors
   real                      :: b(n)  !! vector
   type(Sparse_Type), target :: A     !! matrix
-  real                      :: c(n)  !! vector
 !-----------------------------------[Locals]-----------------------------------!
   integer, pointer :: a_dia(:)
   real,    pointer :: a_val(:)

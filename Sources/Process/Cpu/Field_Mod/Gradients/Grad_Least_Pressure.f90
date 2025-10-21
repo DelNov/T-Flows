@@ -47,7 +47,12 @@
                                 + p % y(c1) * Grid % dy(s)  &
                                 + p % z(c1) * Grid % dz(s)
         end do  ! faces
-      end if    ! boundary not pressure
+      else
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
+          p % n(c2) = 0.0
+        end do  ! faces
+      end if    ! boundary is pressure or not
     end do      ! regions
 
     ! Compute individual gradients without refreshing buffers

@@ -168,28 +168,22 @@
   !-----------------------------!
   !   Then the boundary faces   !
   !-----------------------------!
-
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW   .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-       Grid % region % type(reg) .eq. PRESSURE .or.  &
-       Grid % region % type(reg) .eq. CONVECT) then
 
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - flow_v_flux_n(s)
-      end do
-      !$acc end parallel
+    !$acc parallel loop  &
+    !$acc present(  &
+    !$acc   grid_region_f_face,  &
+    !$acc   grid_region_l_face,  &
+    !$acc   grid_faces_c,  &
+    !$acc   b,  &
+    !$acc   flow_v_flux_n   &
+    !$acc )
+    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      c1 = grid_faces_c(1,s)  ! inside cell
+      b(c1) = b(c1) - flow_v_flux_n(s)
+    end do
+    !$acc end parallel
 
-    end if
   end do
 
   !$acc parallel loop independent  &
@@ -203,6 +197,26 @@
     b(c) = b(c) / (grid_vol(c) / dt)
   end do
   !$acc end parallel
+
+  ! Exclude cells close to pressure boundary
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   b   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)  ! inside cell
+        b(c1) = 0.0
+      end do
+      !$acc end parallel
+
+    end if
+  end do
 
 # if T_FLOWS_DEBUG == 1
   call Grid % Save_Debug_Vtu("bp_1",               &

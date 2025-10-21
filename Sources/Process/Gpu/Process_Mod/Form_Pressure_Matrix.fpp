@@ -33,7 +33,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  integer                        :: s, c1, c2, c, i_cel, i, nz
+  integer                        :: s, c1, c2, c, i_cel, i, nz, reg
   real                           :: a12, w1, w2
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -85,6 +85,18 @@
 
   end do
   !$tf-acc loop end
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1, s)
+        a12 = fc(s) * Flow % v_m(c1)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$tf-acc loop end
+    end if
+  end do
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

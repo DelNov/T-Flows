@@ -37,7 +37,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  integer                        :: s, c1, c2, c, i_cel, i, nz
+  integer                        :: s, c1, c2, c, i_cel, i, nz, reg
   real                           :: a12, w1, w2
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -108,6 +108,27 @@
 
   end do
   !$acc end parallel
+
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   fc,  &
+      !$acc   flow_v_m,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
+        c1 = grid_faces_c(1, s)
+        a12 = fc(s) * flow_v_m(c1)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+    end if
+  end do
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

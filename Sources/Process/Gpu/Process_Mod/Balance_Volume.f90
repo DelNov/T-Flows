@@ -108,7 +108,7 @@
       !$acc   grid_s,  &
       !$acc   flow_v_flux_n   &
       !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
         area_in = area_in + grid_s(s)
         vol_in  = vol_in  - flow_v_flux_n(s)
       end do
@@ -127,7 +127,7 @@
       !$acc   grid_s,  &
       !$acc   flow_v_flux_n   &
       !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
         area_out = area_out + grid_s(s)
         vol_out  = vol_out  + flow_v_flux_n(s)
       end do

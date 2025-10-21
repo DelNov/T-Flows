@@ -162,6 +162,21 @@
       end do
       !$acc end parallel
 
+    else if(Grid % region % type(reg) .eq. PRESSURE) then
+
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   b   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
+        b(c1) = 0.0
+      end do
+      !$acc end parallel
+
     end if
   end do
 

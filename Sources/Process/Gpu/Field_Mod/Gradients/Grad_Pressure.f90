@@ -51,31 +51,51 @@
     !--------------------------------------!
     do reg = Boundary_Regions()
 
-      phi_n => phi % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   phi_n,  &
-      !$acc   flow_phi_x,  &
-      !$acc   grid_dx,  &
-      !$acc   flow_phi_y,  &
-      !$acc   grid_dy,  &
-      !$acc   flow_phi_z,  &
-      !$acc   grid_dz   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)
-        c1 = grid_faces_c(1,s)
-        c2 = grid_faces_c(2,s)
+      if(Grid % region % type(reg) .ne. PRESSURE) then
 
-        phi_n(c2) = phi_n(c1) + flow_phi_x(c1) * grid_dx(s)  &
-                                  + flow_phi_y(c1) * grid_dy(s)  &
-                                  + flow_phi_z(c1) * grid_dz(s)
-      end do
-      !$acc end parallel
+        phi_n => phi % n
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   phi_n,  &
+        !$acc   flow_phi_x,  &
+        !$acc   grid_dx,  &
+        !$acc   flow_phi_y,  &
+        !$acc   grid_dy,  &
+        !$acc   flow_phi_z,  &
+        !$acc   grid_dz   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)
+          c1 = grid_faces_c(1,s)
+          c2 = grid_faces_c(2,s)
 
-    end do  ! regions
+          phi_n(c2) = phi_n(c1) + flow_phi_x(c1) * grid_dx(s)  &
+                                    + flow_phi_y(c1) * grid_dy(s)  &
+                                    + flow_phi_z(c1) * grid_dz(s)
+        end do
+        !$acc end parallel
+
+      else
+
+        phi_n => phi % n
+        !$acc parallel loop  &
+        !$acc present(  &
+        !$acc   grid_region_f_face,  &
+        !$acc   grid_region_l_face,  &
+        !$acc   grid_faces_c,  &
+        !$acc   phi_n   &
+        !$acc )
+        do s = grid_region_f_face(reg), grid_region_l_face(reg)
+          c2 = grid_faces_c(2,s)
+          phi_n(c2) = 0.0
+        end do
+        !$acc end parallel
+
+      end if  ! pressure or not
+
+    end do    ! regions
 
     !---------------------------------------------------------------!
     !   Compute pressure gradients again with extrapolated values   !

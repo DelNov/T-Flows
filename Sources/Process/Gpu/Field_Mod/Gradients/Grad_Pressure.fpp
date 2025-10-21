@@ -40,18 +40,31 @@
     !--------------------------------------!
     do reg = Boundary_Regions()
 
-      !$tf-acc loop begin
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
+      if(Grid % region % type(reg) .ne. PRESSURE) then
 
-        phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * Grid % dx(s)  &
-                                  + Flow % phi_y(c1) * Grid % dy(s)  &
-                                  + Flow % phi_z(c1) * Grid % dz(s)
-      end do
-      !$tf-acc loop end
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
 
-    end do  ! regions
+          phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * Grid % dx(s)  &
+                                    + Flow % phi_y(c1) * Grid % dy(s)  &
+                                    + Flow % phi_z(c1) * Grid % dz(s)
+        end do
+        !$tf-acc loop end
+
+      else
+
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
+          phi % n(c2) = 0.0
+        end do
+        !$tf-acc loop end
+
+      end if  ! pressure or not
+
+    end do    ! regions
 
     !---------------------------------------------------------------!
     !   Compute pressure gradients again with extrapolated values   !

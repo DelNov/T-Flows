@@ -76,7 +76,7 @@
     if(Grid % region % type(reg) .eq. INFLOW) then
 
       !$tf-acc loop begin
-      do s = Faces_In_Region(reg)  ! all present
+      do s = Faces_In_Region(reg)
         area_in = area_in + Grid % s(s)
         vol_in  = vol_in  - Flow % v_flux % n(s)
       end do
@@ -89,7 +89,7 @@
        Grid % region % type(reg) .eq. CONVECT) then
 
       !$tf-acc loop begin
-      do s = Faces_In_Region(reg)  ! all present
+      do s = Faces_In_Region(reg)
         area_out = area_out + Grid % s(s)
         vol_out  = vol_out  + Flow % v_flux % n(s)
       end do

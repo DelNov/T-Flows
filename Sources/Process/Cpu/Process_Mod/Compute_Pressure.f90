@@ -47,7 +47,7 @@
   type(Matrix_Type), pointer :: A               ! pressure matrix
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  integer                    :: s, c, c1, c2
+  integer                    :: s, c, c1, c2, reg
   real                       :: p_max, p_min, dt, a12
 !------------------------------------------------------------------------------!
 !
@@ -145,6 +145,19 @@
     end if
   end do
 
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        b(c1) = 0.0
+      end do  ! faces
+    end if    ! pressure
+  end do      ! regions
+
+  ! call Grid % Save_Debug_Vtu(append = "bp",      &
+  !                            inside_cell = b,    &
+  !                            inside_name = "bp")
+
   ! Volume balance reporting
   call Flow % Report_Vol_Balance(Sol, Iter % Current())
 
@@ -194,9 +207,7 @@
                         ' (solver for pressure)')
 
   ! Set singularity to the matrix
-  if(.not. Flow % has_pressure) then
-    call Sol % Set_Singular(pp)
-  end if
+  call Sol % Set_Singular(pp)
 
   ! Call linear solver
   call Sol % Run(A, pp, b)
@@ -231,13 +242,15 @@
   !------------------------------------!
   !   Normalize the pressure field     !
   !------------------------------------!
-  p_max  = maxval(p % n(1:Grid % n_cells))
-  p_min  = minval(p % n(1:Grid % n_cells))
+  if(.not. Flow % has_pressure) then
+    p_max  = maxval(p % n(1:Grid % n_cells))
+    p_min  = minval(p % n(1:Grid % n_cells))
 
-  call Global % Max_Real(p_max)
-  call Global % Min_Real(p_min)
+    call Global % Max_Real(p_max)
+    call Global % Min_Real(p_min)
 
-  p % n(:) = p % n(:) - 0.5*(p_max+p_min)
+    p % n(:) = p % n(:) - 0.5*(p_max+p_min)
+  end if
 
   ! User function
   call User_Mod_End_Of_Compute_Pressure(Flow, Vof, Sol)
