@@ -11,7 +11,7 @@
   type(Grid_Type),           intent(in)    :: Grid  !! grid object
   type(Var_Type),    target                :: phi   !! pressure (correction)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, iter
+  integer :: c, c1, c2, iter, s, reg
   real    :: dx, dy, dz
 !==============================================================================!
 
@@ -49,31 +49,36 @@
     !--------------------------------------!
     !   Extrapolate values to boundaries   !
     !--------------------------------------!
+    do reg = Boundary_Regions()
 
-    phi_n => phi % n
-    !$acc parallel loop independent  &
-    !$acc present(  &
-    !$acc   grid_region_f_cell,  &
-    !$acc   grid_region_l_cell,  &
-    !$acc   grid_cells_c,  &
-    !$acc   grid_xc,  &
-    !$acc   grid_yc,  &
-    !$acc   grid_zc,  &
-    !$acc   phi_n,  &
-    !$acc   flow_phi_x,  &
-    !$acc   flow_phi_y,  &
-    !$acc   flow_phi_z   &
-    !$acc )
-    do c2 = grid_region_f_cell(1), grid_region_l_cell(grid_n_bnd_regions)  ! all present
-      c1 = grid_cells_c(1,c2)
-      dx = grid_xc(c2) - grid_xc(c1)
-      dy = grid_yc(c2) - grid_yc(c1)
-      dz = grid_zc(c2) - grid_zc(c1)
-      phi_n(c2) = phi_n(c1) + flow_phi_x(c1) * dx  &
-                                + flow_phi_y(c1) * dy  &
-                                + flow_phi_z(c1) * dz
-    end do
-    !$acc end parallel
+      phi_n => phi % n
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   grid_xc,  &
+      !$acc   grid_yc,  &
+      !$acc   grid_zc,  &
+      !$acc   phi_n,  &
+      !$acc   flow_phi_x,  &
+      !$acc   flow_phi_y,  &
+      !$acc   flow_phi_z   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
+        c1 = grid_faces_c(1,s)
+        c2 = grid_faces_c(2,s)
+
+        dx = grid_xc(c2) - grid_xc(c1)
+        dy = grid_yc(c2) - grid_yc(c1)
+        dz = grid_zc(c2) - grid_zc(c1)
+        phi_n(c2) = phi_n(c1) + flow_phi_x(c1) * dx  &
+                                  + flow_phi_y(c1) * dy  &
+                                  + flow_phi_z(c1) * dz
+      end do
+      !$acc end parallel
+
+    end do  ! regions
 
     !---------------------------------------------------------------!
     !   Compute pressure gradients again with extrapolated values   !
