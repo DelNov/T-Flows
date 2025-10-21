@@ -14,8 +14,3 @@
 # define O_Print if(First_Proc()) print
 # define A_Print print
 
-!-----------------------------------------------------------------!
-!   Simplified face value - before true implementation kicks in   !
-!-----------------------------------------------------------------!
-# define Face_Value(S, A, B) 0.5 * ((A) + (B))
-

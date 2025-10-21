@@ -8,7 +8,7 @@
   type(Field_Type), target :: Flow
   integer                  :: comp
 !-----------------------------------[Locals]-----------------------------------!
-  real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:)
+  real, contiguous, pointer :: b(:), fc(:), ui_n(:), visc(:), dens(:)
   real                      :: m12
   integer                   :: reg, s, c, c1, c2
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -21,6 +21,7 @@
   b    => Flow % Nat % b
   fc   => Flow % Nat % A % fc
   visc => Flow % viscosity
+  dens => Flow % density
 
   if(comp .eq. 1) ui_n => Flow % u % n
   if(comp .eq. 2) ui_n => Flow % v % n
@@ -37,8 +38,14 @@
   !$tf-acc loop end
 
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL .or.  &
-       Grid % region % type(reg) .eq. INFLOW) then
+    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
+       Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. CONVECT) then
+
+      !--------------------------!
+      !   Viscous contribution   !
+      !--------------------------!
 
       !$tf-acc loop begin
       do s = Faces_In_Region(reg)  ! all present
@@ -48,6 +55,21 @@
         b(c1) = b(c1) + m12 * ui_n(c2)
       end do
       !$tf-acc loop end
+
+      !--------------------------!
+      !   Blended contribution   !
+      !--------------------------!
+
+      if(Flow % u % blend_matrix) then
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)  ! all present
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+          m12 = -min(Flow % v_flux % n(s), 0.0) * dens(c1)
+          b(c1) = b(c1) + m12 * ui_n(c2)
+        end do
+        !$tf-acc loop end
+      end if
 
     end if
   end do

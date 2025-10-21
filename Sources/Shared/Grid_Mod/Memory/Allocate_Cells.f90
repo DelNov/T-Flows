@@ -88,6 +88,11 @@
     call Enlarge % Array_Int(Grid % cells_n_cells, i=(/-nb_m,nc_m/))
   end if
 
+  ! Process is going to need this
+  if(PROGRAM_NAME(1:6) .eq. 'Proces') then
+    call Enlarge % Array_Int(Grid % cells_i_cells, i=(/-nb_m,nc_m/))
+  end if
+
   ! Boundary condition region in a given direction
   ! (These go up to 6 because they are needed for
   !  non-polyhedral meshes creted in Gambit/Gmsh)

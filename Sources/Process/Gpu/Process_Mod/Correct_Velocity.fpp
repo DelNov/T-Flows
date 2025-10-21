@@ -18,8 +18,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
-  real                      :: a12, b_tmp, max_abs_val
-  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
+  real                      :: a12, b_tmp, vol_res, w1, w2
+  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f, dt
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -34,6 +34,7 @@
   fc   => Flow % Nat % A % fc
   dens => Flow % density
   visc => Flow % viscosity
+  dt   =  Flow % dt
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'PP')
@@ -76,7 +77,10 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
 
-    a12 = -fc(s) * Face_Value(s, Flow % v_m(c1), Flow % v_m(c2))
+    w1 = Grid % f(s)
+    w2 = 1.0 - w1
+
+    a12 = -fc(s) * (w1 * Flow % v_m(c1) + w2 * Flow % v_m(c2))
 
     Flow % v_flux % n(s) = Flow % v_flux % n(s)  &
                          + (Flow % pp % n(c2) - Flow % pp % n(c1)) * a12
@@ -104,12 +108,14 @@
   do c1 = Cells_In_Domain()  ! all present
 
     b_tmp = b(c1)
-    do i_cel = 1, Grid % cells_n_cells(c1)
+    do i_cel = Grid % cells_i_cells(c1),  &
+               Grid % cells_n_cells(c1)
+
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
-      end if
+
+      b_tmp = b_tmp - Flow % v_flux % n(s) * merge(1,-1, c1.lt.c2)
+
     end do
 
     b(c1) = b_tmp
@@ -120,16 +126,31 @@
   !-----------------------------!
   !   Then the boundary faces   !
   !-----------------------------!
-
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW .or.  &
-       Grid % region % type(reg) .eq. CONVECT) then
+
+    !$tf-acc loop begin
+    do s = Faces_In_Region(reg)  ! all present
+      c1 = Grid % faces_c(1,s)  ! inside cell
+      b(c1) = b(c1) - Flow % v_flux % n(s)
+    end do
+    !$tf-acc loop end
+
+  end do
+
+  !$tf-acc loop begin
+  do c = Cells_In_Domain_And_Buffers()
+    b(c) = b(c) / (Grid % vol(c) / dt)
+  end do
+  !$tf-acc loop end
+
+  ! Exclude cells close to pressure boundary
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
 
       !$tf-acc loop begin
       do s = Faces_In_Region(reg)  ! all present
         c1 = Grid % faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - Flow % v_flux % n(s)
+        b(c1) = 0.0
       end do
       !$tf-acc loop end
 
@@ -145,15 +166,16 @@
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
-  max_abs_val = 0.0
+  vol_res = 0.0
   !$tf-acc loop begin
   do c = Cells_In_Domain()  ! all present
-    max_abs_val = max(max_abs_val, abs(b(c)))
+    vol_res = max(vol_res, abs(b(c)))
   end do
   !$tf-acc loop end
+  Flow % vol_res = vol_res
 
   ! Find maximum volume balance error over all processors
-  call Global % Max_Real(max_abs_val)
+  call Global % Max_Real(Flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -167,7 +189,10 @@
     c1 = Grid % faces_c(1, s)
     c2 = Grid % faces_c(2, s)
 
-    nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
+    w1 = Grid % f(s)
+    w2 = 1.0 - w1
+
+    nu_f = w1 * visc(c1)/dens(c1) + w2 * visc(c2)/dens(c2)
 
     cfl_t   = abs(Flow % v_flux % n(s)) * Flow % dt / (fc(s) * Grid % d(s)**2)
     pe_t    = abs(Flow % v_flux % n(s)) / fc(s) / nu_f
@@ -186,8 +211,8 @@
   !-------------------------------!
   !@ Use this for REPORT_VOLUME_BALANCE somehow?
   !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
-  !@                       'after correction: ', max_abs_val
-  call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
+  !@                       'after correction: ', Flow % vol_res
+  call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
 
   call Profiler % Stop('Correct_Velocity')
 

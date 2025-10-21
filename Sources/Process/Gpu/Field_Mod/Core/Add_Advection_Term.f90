@@ -18,11 +18,12 @@
   real                      :: coef(-Grid % n_bnd_cells:Grid % n_cells)
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:)
-  real                      :: b_tmp, coef_phi1, coef_phi2, coef_f, phi_c
+  real                      :: advect, upwind
+  real                      :: coef_phi1, coef_phi2, coef_f, phi_c
   real                      :: fl, dx, dy, dz, blend_1, blend_2, blend_3
-  real                      :: phi_luds_1, phi_luds_2
+  real                      :: w1, w2, phi_luds_1, phi_luds_2
   integer                   :: s, c1, c2, i_cel, reg
-  integer                   :: m10_c1c2, m01_c1c2
+  integer                   :: m10_c1c2, m01_c1c2, c
 !==============================================================================!
 
   call Profiler % Start('Add_Advection_Term')
@@ -36,6 +37,75 @@
   blend_1 =  phi % blends(1)
   blend_2 =  phi % blends(2)
   blend_3 =  phi % blends(3)
+
+  !-------------------------------------------!
+  !                                           !
+  !   Advection terms on the boundary cells   !
+  !                                           !
+  !-------------------------------------------!
+  do reg = Boundary_Regions()
+
+    phi_n => phi % n
+    !$acc parallel loop  &
+    !$acc present(  &
+    !$acc   grid_region_f_face,  &
+    !$acc   grid_region_l_face,  &
+    !$acc   grid_faces_c,  &
+    !$acc   b,  &
+    !$acc   coef,  &
+    !$acc   phi_n,  &
+    !$acc   flow_v_flux_n   &
+    !$acc )
+    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      c1 = grid_faces_c(1,s)   ! inside cell
+      c2 = grid_faces_c(2,s)   ! boundary cell
+
+      ! Compute advection term (volume-conservative form)
+      b(c1) = b(c1) - coef(c1) * phi_n(c2) * flow_v_flux_n(s)
+    end do
+    !$acc end parallel
+
+  end do
+
+  !----------------------------------------!
+  !                                        !
+  !   Upwind terms on the boundary cells   !
+  !                                        !
+  !----------------------------------------!
+  if(phi % blend_matrix) then
+
+    do reg = Boundary_Regions()
+
+      phi_n => phi % n
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   b,  &
+      !$acc   flow_v_flux_n,  &
+      !$acc   coef,  &
+      !$acc   phi_n   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
+        c2 = grid_faces_c(2,s)   ! boundary cell
+
+        ! Store upwinded part of the advection term
+        ! (Sign is opposite from above, you
+        !  are subtracting the upwinded part)
+        if(flow_v_flux_n(s) .lt. 0) then   ! from c2 to c1
+          b(c1) = b(c1) + coef(c1) * phi_n(c2) * flow_v_flux_n(s)
+        else
+          b(c1) = b(c1) + coef(c1) * phi_n(c1) * flow_v_flux_n(s)
+        end if
+
+      end do
+      !$acc end parallel
+
+    end do
+
+  end if
 
   !-------------------------------------------!
   !                                           !
@@ -58,10 +128,12 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
   !$acc   flow_v_flux_n,  &
+  !$acc   grid_f,  &
   !$acc   phi_n,  &
   !$acc   coef,  &
   !$acc   grid_dx,  &
@@ -72,73 +144,77 @@
   !$acc   flow_phi_z   &
   !$acc )
   do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present (this wasn't independent)
-    b_tmp = b(c1)
+    advect = b(c1)
 
+    ! Browse through inside neihbours
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbor
+               grid_cells_n_cells(c1)
 
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
       fl = flow_v_flux_n(s)
 
-      if(c2 .gt. 0) then
+      w1 = grid_f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
 
-        !--------------------!
-        !   Centered value   !
-        !--------------------!
-        phi_c = Face_Value(s, phi_n(c1), phi_n(c2))
+      !--------------------!
+      !   Centered value   !
+      !--------------------!
+      phi_c = w1 * phi_n(c1) + w2 * phi_n(c2)
 
-        ! Value of the coefficient at the cel face
-        coef_f = Face_Value(s, coef(c1), coef(c2))
+      ! Value of the coefficient at the cel face
+      coef_f = w1 * coef(c1) + w2 * coef(c2)
 
-        !-----------------------------------------------!
-        !   Linear upwind differencing scheme (LUDS)    !
-        !-----------------------------------------------!
+      !-----------------------------------------------!
+      !   Linear upwind differencing scheme (LUDS)    !
+      !-----------------------------------------------!
 
-        ! Assume flow is zero at the face (highly unlikely)
-        phi_luds_1 = phi_c
-        phi_luds_2 = phi_c
+      ! Assume flow is zero at the face (highly unlikely)
+      phi_luds_1 = phi_c
+      phi_luds_2 = phi_c
 
-        if(fl .ne. 0.0) then
-          dx = grid_dx(s)
-          dy = grid_dy(s)
-          dz = grid_dz(s)
+      if(fl .ne. 0.0) then
+        dx = grid_dx(s)
+        dy = grid_dy(s)
+        dz = grid_dz(s)
 
-          phi_luds_1 = phi_n(c1)               &
-                     + (  flow_phi_x(c1) * dx  &
-                        + flow_phi_y(c1) * dy  &
-                        + flow_phi_z(c1) * dz ) * merge(+.5,-.5, c1.lt.c2)
-          phi_luds_2 = phi_n(c2)               &
-                     - (  flow_phi_x(c2) * dx  &
-                        + flow_phi_y(c2) * dy  &
-                        + flow_phi_z(c2) * dz ) * merge(+.5,-.5, c1.lt.c2)
-        end if
-
-        ! Coefficient multiplied with blended variable
-        coef_phi1 = coef_f * (  blend_1 * phi_c        &
-                              + blend_2 * phi_n(c1)  &
-                              + blend_3 * phi_luds_1)
-        coef_phi2 = coef_f * (  blend_1 * phi_c        &
-                              + blend_2 * phi_n(c2)  &
-                              + blend_3 * phi_luds_2)
-
-        !-----------------------!
-        !   Update the source   !
-        !-----------------------!
-
-        ! Avoid too many (well, two too many) merge commands
-        m10_c1c2 = merge(1,0, c1.lt.c2)
-        m01_c1c2 = merge(0,1, c1.lt.c2)
-
-        b_tmp = b_tmp - coef_phi1 * max(fl,0.0) * m10_c1c2
-        b_tmp = b_tmp - coef_phi2 * min(fl,0.0) * m10_c1c2
-        b_tmp = b_tmp + coef_phi2 * max(fl,0.0) * m01_c1c2
-        b_tmp = b_tmp + coef_phi1 * min(fl,0.0) * m01_c1c2
+        phi_luds_1 = phi_n(c1)               &
+                   + (  flow_phi_x(c1) * dx  &
+                      + flow_phi_y(c1) * dy  &
+                      + flow_phi_z(c1) * dz ) * merge(+.5,-.5, c1.lt.c2)
+        phi_luds_2 = phi_n(c2)               &
+                   - (  flow_phi_x(c2) * dx  &
+                      + flow_phi_y(c2) * dy  &
+                      + flow_phi_z(c2) * dz ) * merge(+.5,-.5, c1.lt.c2)
       end if
+
+      ! Coefficient multiplied with blended variable
+      coef_phi1 = coef_f * (  blend_1 * phi_c        &
+                            + blend_2 * phi_n(c1)  &
+                            + blend_3 * phi_luds_1)
+      coef_phi2 = coef_f * (  blend_1 * phi_c        &
+                            + blend_2 * phi_n(c2)  &
+                            + blend_3 * phi_luds_2)
+
+      !-----------------------!
+      !   Update the source   !
+      !-----------------------!
+
+      ! Avoid too many (well, two too many) merge commands
+      m10_c1c2 = merge(1,0, c1.lt.c2)
+      m01_c1c2 = merge(0,1, c1.lt.c2)
+
+      advect = advect - coef_phi1 * max(fl,0.0) * m10_c1c2
+      advect = advect - coef_phi2 * min(fl,0.0) * m10_c1c2
+      advect = advect + coef_phi2 * max(fl,0.0) * m01_c1c2
+      advect = advect + coef_phi1 * min(fl,0.0) * m01_c1c2
+
     end do
   !$acc end loop
 
-    b(c1) = b_tmp
+    b(c1) = advect
   end do
   !$acc end parallel
 
@@ -155,114 +231,54 @@
     !$acc   grid_region_f_cell,  &
     !$acc   grid_region_l_cell,  &
     !$acc   b,  &
+    !$acc   grid_cells_i_cells,  &
     !$acc   grid_cells_n_cells,  &
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
     !$acc   flow_v_flux_n,  &
+    !$acc   grid_f,  &
     !$acc   coef,  &
     !$acc   phi_n   &
     !$acc )
     do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present (this wasn't independent)
-      b_tmp = b(c1)
+      upwind = b(c1)
 
     !$acc loop seq
-      do i_cel = 1, grid_cells_n_cells(c1)
+      do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbour
+                 grid_cells_n_cells(c1)
 
         c2 = grid_cells_c(i_cel, c1)
         s  = grid_cells_f(i_cel, c1)
         fl = flow_v_flux_n(s)
 
-        if(c2 .gt. 0) then
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
 
-          ! Value of the coefficient at the cel face
-          coef_f = Face_Value(s, coef(c1), coef(c2))
+        ! Value of the coefficient at the cel face
+        coef_f = w1 * coef(c1) + w2 * coef(c2)
 
-          ! Coefficient multiplied with variable, with upwind blending
-          coef_phi1 = coef_f * phi_n(c1)
-          coef_phi2 = coef_f * phi_n(c2)
+        ! Coefficient multiplied with variable, with upwind blending
+        coef_phi1 = coef_f * phi_n(c1)
+        coef_phi2 = coef_f * phi_n(c2)
 
-          ! Avoid too many (well, two too many) merge commands
-          m10_c1c2 = merge(1,0, c1.lt.c2)
-          m01_c1c2 = merge(0,1, c1.lt.c2)
+        ! Avoid too many (well, two too many) merge commands
+        m10_c1c2 = merge(1,0, c1.lt.c2)
+        m01_c1c2 = merge(0,1, c1.lt.c2)
 
-          b_tmp = b_tmp + coef_phi1 * max(fl,0.0) * m10_c1c2
-          b_tmp = b_tmp + coef_phi2 * min(fl,0.0) * m10_c1c2
-          b_tmp = b_tmp - coef_phi2 * max(fl,0.0) * m01_c1c2
-          b_tmp = b_tmp - coef_phi1 * min(fl,0.0) * m01_c1c2
-        end if
+        upwind = upwind + coef_phi1 * max(fl,0.0) * m10_c1c2
+        upwind = upwind + coef_phi2 * min(fl,0.0) * m10_c1c2
+        upwind = upwind - coef_phi2 * max(fl,0.0) * m01_c1c2
+        upwind = upwind - coef_phi1 * min(fl,0.0) * m01_c1c2
+
       end do
     !$acc end loop
 
-      b(c1) = b_tmp
+      b(c1) = upwind
     end do
     !$acc end parallel
 
   end if
-
-  !-------------------------------------------!
-  !                                           !
-  !   Browse through all the boundary cells   !
-  !      (This can be accelerted on GPU)      !
-  !                                           !
-  !-------------------------------------------!
-  do reg = Boundary_Regions()
-
-    !--------------------------------------------------------------------!
-    !   Inflow and convective depend on boundary values since they are   !
-    !   either given (inflow) or meticulously worked out (convective)    !
-    !--------------------------------------------------------------------!
-    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
-       Grid % region % type(reg) .eq. CONVECT) then
-
-      phi_n => phi % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   coef,  &
-      !$acc   phi_n,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-        c1 = grid_faces_c(1,s)   ! inside cell
-        c2 = grid_faces_c(2,s)   ! boundary cell
-
-        ! Just plain upwind here
-        b(c1) = b(c1) - coef(c1) * phi_n(c2) * flow_v_flux_n(s)
-      end do
-      !$acc end parallel
-
-    end if
-
-    !---------------------------------------------!
-    !   Outflow is just a vanishing derivative,   !
-    !   use the value from the inside             !
-    !---------------------------------------------!
-    if(Grid % region % type(reg) .eq. OUTFLOW) then
-
-      phi_n => phi % n
-      !$acc parallel loop  &
-      !$acc present(  &
-      !$acc   grid_region_f_face,  &
-      !$acc   grid_region_l_face,  &
-      !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   coef,  &
-      !$acc   phi_n,  &
-      !$acc   flow_v_flux_n   &
-      !$acc )
-      do s = grid_region_f_face(reg), grid_region_l_face(reg)
-        c1 = grid_faces_c(1,s)  ! inside cell
-
-        ! Just plain upwind here
-        b(c1) = b(c1) - coef(c1) * phi_n(c1) * flow_v_flux_n(s)
-      end do
-      !$acc end parallel
-
-    end if
-  end do
 
   call Profiler % Stop('Add_Advection_Term')
 

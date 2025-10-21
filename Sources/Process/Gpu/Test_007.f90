@@ -158,7 +158,7 @@
         call Process % Compute_Energy(Grid(1), Flow(1), Turb(1))
       end if
 
-      call Process % Update_Boundary_Values(Grid(1), Flow(1), 'ALL')
+      call Process % Update_Boundary_Values(Grid(1), Flow(1), Turb(1), 'ALL')
 
       ! End of the current iteration
       call Info % Iter_Print(1)

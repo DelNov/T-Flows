@@ -172,7 +172,7 @@
     Assert(A % pos(1,s) .ge. A % row(c1))
     Assert(A % pos(1,s) .le. A % row(c1+1)-1)
 
-    if(c2 .gt. 0) then
+    if(c2 .gt. 0) then  ! can't avoid this
       Assert(A % pos(2,s) .ge. A % row(c2))
       Assert(A % pos(2,s) .le. A % row(c2+1)-1)
     end if

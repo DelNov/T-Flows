@@ -475,18 +475,6 @@
   !----------------------------------------------------------------------!
   !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !
   !----------------------------------------------------------------------!
-  ! Update on July 17, 2021: I have some reservations about this part, since
-  ! there was another bug fix when computing fluxes in the meanwhile (check:
-  ! 90f77a1c8bd4ca05330a4435ed6321782ef00199).  This balancing also caused a
-  ! bug when loading backup file (also check "Compute_Pressure" as well as
-  ! "Backup_Mod/Load and Backup_Mod/Save" procedures)
-  !
-  ! Update on February 27, 2022: I have also added "has_outflow_boundary"
-  ! to be able to tell PETSc if matrix for pressure is singular.  Shall
-  ! it also be included in this test?
-  !
-  ! Update on June 2, 2022: Unified all outlet boundaries into one
-  ! to be able to tell PETSc if matrix for pressure is singular
   Flow % has_pressure = .false.
   if(n_pressure > 0) Flow % has_pressure = .true.
 

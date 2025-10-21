@@ -1,14 +1,12 @@
 !==============================================================================!
-  subroutine Cg(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Cg(Nat, A, x, b, prec, miter, niter, tol, fin_res)
 !------------------------------------------------------------------------------!
 !>  The Cg subroutine implements the Conjugate Gradient (CG) method for solving
 !>  linear systems in both sequential and parallel computing environments.
 !>  It solves the system Ax = b, where 'A' is a matrix, 'x' is the unknown
 !>  vector, and 'b' is the right-hand side vector.  The CG method is iterative
 !>  and continues until the solution converges within a specified tolerance or
-!>  the maximum number of iterations (miter) is reached.  This subroutine also
-!>  supports optional normalization of the system (via 'norm'), which can
-!>  enhance the numerical stability and convergence behavior. Preconditioning
+!>  the maximum number of iterations (miter) is reached.  Preconditioning
 !>  is applied to improve convergence, with the type specified by 'prec'.
 !>  The subroutine updates 'niter' with the actual number of iterations
 !>  performed and 'fin_res' with the final residual value.  To avoid memory
@@ -28,7 +26,6 @@
   integer,                    intent(out)   :: niter    !! performed iterations
   real,                       intent(in)    :: tol      !! solver tolerance
   real,                       intent(out)   :: fin_res  !! achieved residual
-  real,             optional, intent(in)    :: norm     !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb
@@ -36,7 +33,8 @@
   integer                      :: i, j, k, iter
   real                         :: sum_a, fn
   integer                      :: sum_n
-  real,    contiguous, pointer :: p1(:), q1(:), r1(:), d(:), d_inv(:)
+  real,    contiguous, pointer :: p1(:), q1(:), r1(:)
+  real,    contiguous, pointer :: d(:), d_inv(:)
   real,    contiguous, pointer :: a_val(:)
   integer, contiguous, pointer :: a_col(:), a_row(:), a_dia(:)
 !==============================================================================!
@@ -92,11 +90,7 @@
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  if(.not. present(norm)) then
-    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
-  else
-    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
-  end if
+  bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A)
 
   if(bnrm2 < tol) then
     iter = 0
@@ -111,7 +105,7 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
   if(res < tol) then
     iter = 0
@@ -207,11 +201,7 @@
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    if(.not. present(norm)) then
-      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
-    else
-      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
-    end if
+    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
     if(res < tol) goto 1
 
@@ -238,12 +228,14 @@
   !-----------------------------!
   !   De-normalize the system   !
   !-----------------------------!
+  !$omp parallel do private(i, j) shared(a_row, a_val, b, fn)
   do i = 1, nt
     do j = a_row(i), a_row(i+1)-1
       a_val(j) = a_val(j) / fn
     end do
     b(i) = b(i) / fn
   end do
+  !$omp end parallel do
 
   fin_res = res
   niter   = iter

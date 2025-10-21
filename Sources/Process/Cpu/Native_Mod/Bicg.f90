@@ -1,14 +1,12 @@
 !==============================================================================!
-  subroutine Bicg(Nat, A, x, b, prec, miter, niter, tol, fin_res, norm)
+  subroutine Bicg(Nat, A, x, b, prec, miter, niter, tol, fin_res)
 !------------------------------------------------------------------------------!
 !>  The Bicg subroutine implements the Bi-Conjugate Gradient (CG) method for
 !>  solving linear systems in sequential and parallel computing environments.
 !>  It solves the system Ax = b, where 'A' is a matrix, 'x' is the unknown
 !>  vector, and 'b' is the right-hand side vector.  The BiCG method is iterative
 !>  and continues until the solution converges within a specified tolerance or
-!>  the maximum number of iterations (miter) is reached.  This subroutine also
-!>  supports optional normalization of the system (via 'norm'), which can
-!>  enhance the numerical stability and convergence behavior. Preconditioning
+!>  the maximum number of iterations (miter) is reached.  Preconditioning
 !>  is applied to improve convergence, with the type specified by 'prec'.
 !>  The subroutine updates 'niter' with the actual number of iterations
 !>  performed and 'fin_res' with the final residual value.  To avoid memory
@@ -28,7 +26,6 @@
   integer,                    intent(out)   :: niter    !! performed iterations
   real,                       intent(in)    :: tol      !! solver tolerance
   real,                       intent(out)   :: fin_res  !! achieved residual
-  real,             optional, intent(in)    :: norm     !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),     pointer :: Grid
   integer                      :: nt, ni, nb
@@ -93,11 +90,7 @@
   !    This is quite tricky point.    !
   !   What if bnrm2 is very small ?   !
   !-----------------------------------!
-  if(.not. present(norm)) then
-    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt))
-  else
-    bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A, x(1:nt), norm)
-  end if
+  bnrm2 = Nat % Normalized_Root_Mean_Square(ni, b(1:nt), A)
 
   if(bnrm2 < tol) then
     iter = 0
@@ -112,7 +105,7 @@
   !--------------------------------!
   !   Calculate initial residual   !
   !--------------------------------!
-  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
+  res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
   if(res < tol) then
     iter = 0
@@ -217,11 +210,7 @@
     !-----------------------!
     !   Check convergence   !
     !-----------------------!
-    if(.not. present(norm)) then
-      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt))
-    else
-      res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A, x(1:nt), norm)
-    end if
+    res = Nat % Normalized_Root_Mean_Square(ni, r1(1:nt), A)
 
     if(res < tol) goto 1
 

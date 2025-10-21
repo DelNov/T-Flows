@@ -23,6 +23,7 @@
 
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % faces_c)
   call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_n_cells)
+  call Gpu % Vector_Int_Destroy_On_Device(Grid % cells_i_cells)
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_c)
   call Gpu % Matrix_Int_Destroy_On_Device(Grid % cells_f)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % xc)
@@ -34,6 +35,7 @@
   call Gpu % Vector_Real_Destroy_On_Device(Grid % sx)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % sy)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % sz)
+  call Gpu % Vector_Real_Destroy_On_Device(Grid % f)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % s)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % d)
   call Gpu % Vector_Real_Destroy_On_Device(Grid % vol)

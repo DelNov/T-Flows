@@ -37,8 +37,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  integer                        :: s, c1, c2, c, i_cel, i, nz
-  real                           :: a12
+  integer                        :: s, c1, c2, c, i_cel, i, nz, reg
+  real                           :: a12, w1, w2
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -72,9 +72,11 @@
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   fc,  &
   !$acc   flow_v_m,  &
   !$acc   val,  &
@@ -84,35 +86,49 @@
   do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbour
+               grid_cells_n_cells(c1)
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        a12 = fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
-        if(c1 .lt. c2) then
-          val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a12
-        end if
-        val(dia(c1)) = val(dia(c1)) + a12
+
+      w1 = grid_f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
+
+      a12 = fc(s) * (w1 * flow_v_m(c1) + w2 * flow_v_m(c2))
+
+      if(c1 .lt. c2) then
+        val(pos(1,s)) = -a12
+        val(pos(2,s)) = -a12
       end if
+      val(dia(c1)) = val(dia(c1)) + a12
+
     end do
   !$acc end loop
 
   end do
   !$acc end parallel
 
-  ! De-singularize the system matrix ... just like this, ad-hoc
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   val,  &
-  !$acc   dia   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    val(dia(c)) = val(dia(c)) * (1.0 + MILI)
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   fc,  &
+      !$acc   flow_v_m,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)
+        c1 = grid_faces_c(1, s)
+        a12 = fc(s) * flow_v_m(c1)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+    end if
   end do
-  !$acc end parallel
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

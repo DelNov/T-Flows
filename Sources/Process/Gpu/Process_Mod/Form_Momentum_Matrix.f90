@@ -6,9 +6,24 @@
   subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Momentum matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An alias for density is defined
+!     - Effective viscosity is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Viscous coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Viscous coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)           :: Process
+  class(Process_Type)                 :: Process
   type(Grid_Type), intent(in), target :: Grid
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
@@ -19,9 +34,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
+  integer,   contiguous, pointer :: row(:)
   real,      contiguous, pointer :: dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  real                           :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -37,10 +53,17 @@
   val => Flow % Nat % A % val
   dia => Flow % Nat % A % dia
   pos => Flow % Nat % A % pos
+  row => Flow % Nat % A % row
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
   Assert(urf > 0.0)
+
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
 
   !------------------------!
   !   Initialize density   !
@@ -61,23 +84,6 @@
     visc_eff(c) = flow_viscosity(c)
   end do
   !$acc end parallel
-
-  do reg = Boundary_Regions()
-    !$acc parallel loop  &
-    !$acc present(  &
-    !$acc   grid_region_f_face,  &
-    !$acc   grid_region_l_face,  &
-    !$acc   grid_faces_c,  &
-    !$acc   visc_eff,  &
-    !$acc   flow_viscosity   &
-    !$acc )
-    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-      c1 = grid_faces_c(1,s)   ! inside cell
-      c2 = grid_faces_c(2,s)   ! boundary cell
-      visc_eff(c1) = flow_viscosity(c1)
-    end do
-    !$acc end parallel
-  end do
 
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
@@ -113,25 +119,7 @@
         !$acc )
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
           visc_eff(c1) = turb_vis_w(c1)
-        end do
-        !$acc end parallel
-
-      else
-
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   turb_vis_t   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_t(c1)
         end do
         !$acc end parallel
 
@@ -141,7 +129,9 @@
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$acc parallel loop independent  &
@@ -153,23 +143,25 @@
   end do
   !$acc end parallel
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !----------------------------------------------!
+  !   Viscosity coefficients inside the domain   !
+  !----------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   visc_eff,  &
   !$acc   fc,  &
   !$acc   val,  &
@@ -179,24 +171,27 @@
   do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &  ! first inside cell
+               grid_cells_n_cells(c1)
+
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
 
-      if(c2 .gt. 0) then
+      w1 = grid_f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
 
-        a12 = Face_Value(s, visc_eff(c1), visc_eff(c2)) * fc(s)
-        a21 = a12
+      a12 = (w1 * visc_eff(c1) + w2 * visc_eff(c2)) * fc(s)
+      a21 = a12
 
-        if(c1 .lt. c2) then
-          val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a21
-        end if
-
-        ! Update only diaginal at c1 to avoid race conditions
-        val(dia(c1)) = val(dia(c1)) + a12
-
+      if(c1 .lt. c2) then
+        val(pos(1,s)) = -a12
+        val(pos(2,s)) = -a21
       end if
+
+      ! Update only diaginal at c1 to avoid race conditions
+      val(dia(c1)) = val(dia(c1)) + a12
+
     end do
   !$acc end loop
 
@@ -212,10 +207,12 @@
     !$acc present(  &
     !$acc   grid_region_f_cell,  &
     !$acc   grid_region_l_cell,  &
+    !$acc   grid_cells_i_cells,  &
     !$acc   grid_cells_n_cells,  &
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
     !$acc   flow_v_flux_n,  &
+    !$acc   grid_f,  &
     !$acc   dens,  &
     !$acc   val,  &
     !$acc   pos,  &
@@ -224,32 +221,34 @@
     do c1 = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
 
     !$acc loop seq
-      do i_cel = 1, grid_cells_n_cells(c1)
+      do i_cel = grid_cells_i_cells(c1),  &  ! first inside neighbour
+                 grid_cells_n_cells(c1)
         c2 = grid_cells_c(i_cel, c1)
         s  = grid_cells_f(i_cel, c1)
         fl = flow_v_flux_n(s)
 
-        if(c2 .gt. 0) then
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
 
-          cfs = Face_Value(s, dens(c1), dens(c2))
-          a12 = 0.0
-          a21 = 0.0
+        cfs = w1 * dens(c1) + w2 * dens(c2)
+        a12 = 0.0
+        a21 = 0.0
 
-          if(c1 .lt. c2) then
-            if(fl > 0.0) a21 = a21 + fl * cfs
-            if(fl < 0.0) a12 = a12 - fl * cfs
-            val(pos(1,s)) = val(pos(1,s)) - a12
-            val(pos(2,s)) = val(pos(2,s)) - a21
-          end if
-
-          if(c1 .gt. c2) then
-            if(fl > 0.0) a12 = a12 + fl * cfs
-          end if
-
-          ! Update only diaginal at c1 to avoid race conditions
-          val(dia(c1)) = val(dia(c1)) + a12
-
+        if(c1 .lt. c2) then
+          if(fl > 0.0) a21 = a21 + fl * cfs
+          if(fl < 0.0) a12 = a12 - fl * cfs
+          val(pos(1,s)) = val(pos(1,s)) - a12
+          val(pos(2,s)) = val(pos(2,s)) - a21
         end if
+
+        if(c1 .gt. c2) then
+          if(fl > 0.0) a12 = a12 + fl * cfs
+        end if
+
+        ! Update only diaginal at c1 to avoid race conditions
+        val(dia(c1)) = val(dia(c1)) + a12
+
       end do
     !$acc end loop
 
@@ -258,66 +257,66 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
-  if(Turb % model .eq. NO_TURBULENCE_MODEL) then
+  !--------------------------------------------!
+  !   Viscous coefficients on the boundaries   !
+  !--------------------------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
+
+      !$acc parallel loop  &
+      !$acc present(  &
+      !$acc   grid_region_f_face,  &
+      !$acc   grid_region_l_face,  &
+      !$acc   grid_faces_c,  &
+      !$acc   visc_eff,  &
+      !$acc   fc,  &
+      !$acc   val,  &
+      !$acc   dia   &
+      !$acc )
+      do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+        c1 = grid_faces_c(1,s)   ! inside cell
+        a12 = visc_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$acc end parallel
+     end if  ! boundary condition
+  end do    ! regions
+
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
+  if(Flow % u % blend_matrix) then
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
+      if(Grid % region % type(reg) .eq. INFLOW) then
 
         !$acc parallel loop  &
         !$acc present(  &
         !$acc   grid_region_f_face,  &
         !$acc   grid_region_l_face,  &
         !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   fc,  &
+        !$acc   flow_v_flux_n,  &
         !$acc   val,  &
-        !$acc   dia   &
+        !$acc   dia,  &
+        !$acc   dens   &
         !$acc )
         do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
           c1 = grid_faces_c(1,s)   ! inside cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$acc end parallel
-      end if  ! boundary condition
-    end do    ! regions
-  else        ! turbulence model
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
-
-        !$acc parallel loop  &
-        !$acc present(  &
-        !$acc   grid_region_f_face,  &
-        !$acc   grid_region_l_face,  &
-        !$acc   grid_faces_c,  &
-        !$acc   visc_eff,  &
-        !$acc   fc,  &
-        !$acc   val,  &
-        !$acc   dia   &
-        !$acc )
-        do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
-          c1 = grid_faces_c(1,s)   ! inside cell
-          c2 = grid_faces_c(2,s)   ! boundary cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
+          fl = flow_v_flux_n(s)
+          val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * dens(c1)
         end do
         !$acc end parallel
 
-      end if  ! boundary condition
-    end do    ! region
-  end if      ! turbulence model
+      end if
+    end do
+  end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$acc parallel loop independent  &
     !$acc present(  &

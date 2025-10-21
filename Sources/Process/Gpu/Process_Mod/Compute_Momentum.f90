@@ -38,6 +38,7 @@
   dia => Flow % Nat % A % dia
   b   => Flow % Nat % b
 
+  ! Old values (o) and older than old (oo)
   if(comp .eq. 1) then
     ui    => Flow % u
     ui_n  => Flow % u % n
@@ -155,9 +156,14 @@
   call Flow % Nat % Cg(ui_n(1:Grid % n_cells),  &
                        ui % miter, ui % niter,  &
                        ui % tol,   ui % res)
+
   call Profiler % Stop('CG_for_Momentum')
 
   call Info % Iter_Fill_At(1, comp, ui % name, ui % res, ui % niter)
+
+  if(comp .eq. 3) then
+    call Process % Update_Boundary_Values(Grid, Flow, Turb, 'MOMENTUM')
+  end if
 
   call Work % Disconnect_Real_Cell(visc_eff)
 

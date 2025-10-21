@@ -2,6 +2,20 @@
   subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb,  &
                                 cond_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Energy matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for density times capacity is defined
+!     - Effective conductivty is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Conductivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Conductivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                   :: Process
@@ -17,7 +31,7 @@
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens_capa(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  real                           :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -36,9 +50,15 @@
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
+  Assert(urf > 0.0)
+
   call Work % Connect_Real_Cell(dens_capa)
 
-  Assert(urf > 0.0)
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
 
   !--------------------------------------------------------------------------!
   !   Initialize density times thermal capacity and effective conductivity   !
@@ -65,13 +85,15 @@
   if(Turb % model .ne. NO_TURBULENCE_MODEL) then
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
-      cond_eff(c) = cond_eff(c) + turb_vis_t(c) / 0.9  ! hard-coded Pr_t
+      cond_eff(c) = cond_eff(c) + Turb % vis_t(c) / 0.9  ! hard-coded Pr_t
     end do
     !$tf-acc loop end
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$tf-acc loop begin
@@ -80,15 +102,15 @@
   end do
   !$tf-acc loop end
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients inside the domain   !
+  !-------------------------------------------------!
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
@@ -99,7 +121,11 @@
 
       if(c2 .gt. 0) then
 
-        a12 = Face_Value(s, cond_eff(c1), cond_eff(c2)) * fc(s)
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = (w1 * cond_eff(c1) + w2 * cond_eff(c2)) * fc(s)
         a21 = a12
 
         if(c1 .lt. c2) then
@@ -131,7 +157,11 @@
 
         if(c2 .gt. 0) then
 
-          cfs = Face_Value(s, dens_capa(c1), dens_capa(c2))
+          w1 = Grid % f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
+          cfs = w1 * dens_capa(c1) + w2 * dens_capa(c2)
           a12 = 0.0
           a21 = 0.0
 
@@ -157,9 +187,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients on the boundaries   !
+  !-------------------------------------------------!
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
@@ -175,6 +205,9 @@
     end if
   end do
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(Flow % t % blend_matrix) then
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. INFLOW) then
@@ -191,11 +224,11 @@
     end do
   end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$tf-acc loop begin
     do c = Cells_In_Domain()  ! all present, was independent

@@ -2,6 +2,21 @@
   subroutine Form_Scalars_Matrix(Process, Grid, Flow, Turb,  &
                                  diff_eff, sc, urf, dt)
 !------------------------------------------------------------------------------!
+!   Scalars matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for effective diffusivity is defined, but without turbulent
+!       parts yet
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Diffusivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Diffusivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                  :: Process
@@ -18,7 +33,7 @@
   real,    contiguous, pointer :: val(:), fc(:)
   integer, contiguous, pointer :: dia(:), pos(:,:)
   integer                      :: c, s, c1, c2, i_cel, reg, nz, i
-  real                         :: a12, a21, fl, cfs
+  real                         :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -40,6 +55,12 @@
 
   Assert(urf > 0.0)
 
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
+
   !-----------------------------------------------------------!
   !   Start by copying molecular viscosity to the effective   !
   !-----------------------------------------------------------!
@@ -50,7 +71,9 @@
   !$tf-acc loop end
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$tf-acc loop begin
@@ -59,15 +82,15 @@
   end do
   !$tf-acc loop end
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients inside the domain   !
+  !------------------------------------------------!
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
@@ -78,7 +101,11 @@
 
       if(c2 .gt. 0) then
 
-        a12 = Face_Value(s, diff_eff(c1), diff_eff(c2)) * fc(s)
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = (w1 * diff_eff(c1) + w2 * diff_eff(c2)) * fc(s)
         a21 = a12
 
         if(c1 .lt. c2) then
@@ -110,7 +137,11 @@
 
         if(c2 .gt. 0) then
 
-          cfs = Face_Value(s, Flow % density(c1), Flow % density(c2))
+          w1 = Grid % f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
+          cfs = w1 * Flow % density(c1) + w2 * Flow % density(c2)
           a12 = 0.0
           a21 = 0.0
 
@@ -136,9 +167,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients on the boundaries   !
+  !------------------------------------------------!
 
   !$tf-acc loop begin
   do s = Faces_At_Boundaries()  ! all present
@@ -152,6 +183,9 @@
   end do
   !$tf-acc loop end
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(phi % blend_matrix) then
 
     !$tf-acc loop begin

@@ -42,7 +42,7 @@
   type(Matrix_Type), pointer :: A               ! pressure matrix
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
-  integer                    :: c, c1, c2, s
+  integer                    :: c, c1, c2, s, reg
   real                       :: cfl_t, pe_t, dens_f, visc_f, dt
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -95,7 +95,6 @@
     end if
   end do
 
-
   ! User function
   call User_Mod_End_Of_Correct_Velocity(Flow, Vof, Sol)
 
@@ -122,6 +121,20 @@
   do c = Cells_In_Domain_And_Buffers()
     b(c) = b(c) / (Grid % vol(c) / dt)
   end do
+
+  ! Exclude cells close to pressure boundary
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        b(c1) = 0.0
+      end do  ! faces
+    end if    ! pressure
+  end do      ! regions
+
+  ! call Grid % Save_Debug_Vtu(append = "bp",       &
+  !                            inside_cell = b,     &
+  !                            inside_name = "bp")
 
   Flow % vol_res = 0.0
   do c = Cells_In_Domain()

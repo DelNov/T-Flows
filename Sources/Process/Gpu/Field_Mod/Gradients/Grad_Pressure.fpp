@@ -7,7 +7,7 @@
   type(Grid_Type),           intent(in)    :: Grid  !! grid object
   type(Var_Type),    target                :: phi   !! pressure (correction)
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, c1, c2, iter
+  integer :: c, c1, c2, iter, s, reg
   real    :: dx, dy, dz
 !==============================================================================!
 
@@ -38,18 +38,33 @@
     !--------------------------------------!
     !   Extrapolate values to boundaries   !
     !--------------------------------------!
+    do reg = Boundary_Regions()
 
-    !$tf-acc loop begin
-    do c2 = Cells_At_Boundaries()  ! all present
-      c1 = Grid % cells_c(1,c2)
-      dx = Grid % xc(c2) - Grid % xc(c1)
-      dy = Grid % yc(c2) - Grid % yc(c1)
-      dz = Grid % zc(c2) - Grid % zc(c1)
-      phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * dx  &
-                                + Flow % phi_y(c1) * dy  &
-                                + Flow % phi_z(c1) * dz
-    end do
-    !$tf-acc loop end
+      if(Grid % region % type(reg) .ne. PRESSURE) then
+
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+
+          phi % n(c2) = phi % n(c1) + Flow % phi_x(c1) * Grid % dx(s)  &
+                                    + Flow % phi_y(c1) * Grid % dy(s)  &
+                                    + Flow % phi_z(c1) * Grid % dz(s)
+        end do
+        !$tf-acc loop end
+
+      else
+
+        !$tf-acc loop begin
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
+          phi % n(c2) = 0.0
+        end do
+        !$tf-acc loop end
+
+      end if  ! pressure or not
+
+    end do    ! regions
 
     !---------------------------------------------------------------!
     !   Compute pressure gradients again with extrapolated values   !

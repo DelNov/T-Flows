@@ -333,6 +333,12 @@
   call Global % Sum_Real(bulk % vol_in)
   call Global % Sum_Real(area)
 
+  !----------------------------------------------------------------------!
+  !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !
+  !----------------------------------------------------------------------!
+  Flow % has_pressure = .false.
+  if(n_pressure > 0) Flow % has_pressure = .true.
+
   !----------------------!
   !   Initializes time   !
   !----------------------!

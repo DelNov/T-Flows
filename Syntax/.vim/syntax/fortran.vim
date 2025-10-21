@@ -167,10 +167,12 @@ endif
 syn keyword fortranIO  access blank direct exist fmt form formatted iostat named
 syn keyword fortranIO  nextrec number opened rec recl sequential status unformatted unit
 
-syn keyword fortranIntrinsicR		alog alog10 amax0 amax1 amin0 amin1 amod cabs ccos cexp clog csin csqrt dabs dacos dasin datan datan2 dcos dcosh ddim dexp dint dlog dlog10 dmax1 dmin1 dmod dnint dsign dsin dsinh dsqrt dtan dtanh float iabs idim idint idnint ifix isign max0 max1 min0 min1 sngl
+syn keyword fortranIntrinsicR		alog alog10 amax0 amax1 amin0 amin1 amod cabs ccos cexp clog csin csqrt dabs dacos dasin datan datan2 dcos dcosh ddim
+syn keyword fortranIntrinsicR		dexp dint dlog dlog10 dmax1 dmin1 dmod dnint dsign dsin dsinh dsqrt dtan dtanh float iabs idim idint idnint ifix isign max0 max1 min0 min1 sngl
 
 " Intrinsics provided by some vendors
-syn keyword fortranExtraIntrinsic	algama cdabs cdcos cdexp cdlog cdsin cdsqrt cqabs cqcos cqexp cqlog cqsin cqsqrt dcmplx dconjg derf derfc dfloat dgamma dimag dlgama iqint qabs qacos qasin qatan qatan2 qcmplx qconjg qcos qcosh qdim qerf qerfc qexp qgamma qimag qlgama qlog qlog10 qmax1 qmin1 qmod qnint qsign qsin qsinh qsqrt qtan qtanh
+syn keyword fortranExtraIntrinsic	algama cdabs cdcos cdexp cdlog cdsin cdsqrt cqabs cqcos cqexp cqlog cqsin cqsqrt dcmplx dconjg derf derfc dfloat dgamma dimag dlgama iqint
+syn keyword fortranExtraIntrinsic	qabs qacos qasin qatan qatan2 qcmplx qconjg qcos qcosh qdim qerf qerfc qexp qgamma qimag qlgama qlog qlog10 qmax1 qmin1 qmod qnint qsign qsin qsinh qsqrt qtan qtanh
 
 syn keyword fortranKeyword   abs acos aimag aint anint asin atan atan2 char cmplx conjg cos cosh exp
 syn keyword fortranKeyword   ichar index int log log10 max min nint sign sin sinh sqrt tan tanh
@@ -447,8 +449,8 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A M C Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
   syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
-  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type       Sparse_Type
-  syn keyword fortranObjectTflows  Gpu            Amg            Sparse
+  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type       Sparse_Type    Linalg_Type
+  syn keyword fortranObjectTflows  Gpu            Amg            Sparse         Linalg
   syn keyword fortranTypeTflows    Var_Type
   syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
@@ -501,7 +503,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     grid_dx  grid_dy  grid_dz
   syn keyword fortranGPUTflows     grid_sx  grid_sy  grid_sz
   syn keyword fortranGPUTflows     grid_xc  grid_yc  grid_zc
-  syn keyword fortranGPUTflows     grid_d  grid_s  grid_vol  grid_wall_dist
+  syn keyword fortranGPUTflows     grid_f, grid_d  grid_s  grid_vol  grid_wall_dist
   syn keyword fortranGPUTflows     flow_density  flow_capacity
   syn keyword fortranGPUTflows     flow_viscosity  flow_conductivity
   syn keyword fortranGPUTflows     flow_diffusivity

@@ -352,6 +352,24 @@
     ! Sort cell's neighbours and carry faces along
     call Sort % Int_Carry_Int(Grid % cells_c(1:n, c1),  &
                               Grid % cells_f(1:n, c1))
+
+    ! Find the first "inside" cell
+    Grid % cells_i_cells(c1) = 0
+    do i_cel = 1, Grid % cells_n_cells(c1)
+      c2 = Grid % cells_c(i_cel, c1)
+      if(c2 .gt. 0) then
+        Grid % cells_i_cells(c1) = i_cel
+        exit
+      end if
+    end do
+
+    ! Don't have time to deal with this assertion in a more elaborate way
+    ! Maybe it is even OK like this, I just have to make sure that all the
+    ! loops which are using cells_i_cells are inside the domain
+    if(Cell_In_This_Proc(c1)) then
+      Assert(Grid % cells_i_cells(c1) .ne. 0)
+    end if
+
   end do
 
   !-------------------------------------!

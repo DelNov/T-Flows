@@ -20,10 +20,12 @@
 
   call Gpu % Matrix_Int_Copy_To_Device(Grid % faces_c)
   call Gpu % Vector_Int_Copy_To_Device(Grid % cells_n_cells)
+  call Gpu % Vector_Int_Copy_To_Device(Grid % cells_i_cells)
   call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_c)
   call Gpu % Matrix_Int_Copy_To_Device(Grid % cells_f)
   grid_faces_c       => Grid % faces_c
   grid_cells_n_cells => Grid % cells_n_cells
+  grid_cells_i_cells => Grid % cells_i_cells
   grid_cells_c       => Grid % cells_c
   grid_cells_f       => Grid % cells_f
   call Gpu % Vector_Real_Copy_To_Device(Grid % xc)
@@ -44,8 +46,10 @@
   grid_sx  => Grid % sx
   grid_sy  => Grid % sy
   grid_sz  => Grid % sz
+  call Gpu % Vector_Real_Copy_To_Device(Grid % f)
   call Gpu % Vector_Real_Copy_To_Device(Grid % s)
   call Gpu % Vector_Real_Copy_To_Device(Grid % d)
+  grid_f   => Grid % f
   grid_s   => Grid % s
   grid_d   => Grid % d
   call Gpu % Vector_Real_Copy_To_Device(Grid % vol)

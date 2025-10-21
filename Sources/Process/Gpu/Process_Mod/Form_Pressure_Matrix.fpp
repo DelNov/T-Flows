@@ -33,8 +33,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
-  integer                        :: s, c1, c2, c, i_cel, i, nz
-  real                           :: a12
+  integer                        :: s, c1, c2, c, i_cel, i, nz, reg
+  real                           :: a12, w1, w2
   real, allocatable              :: work(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -64,28 +64,39 @@
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
 
-    do i_cel = 1, Grid % cells_n_cells(c1)
+    do i_cel = Grid % cells_i_cells(c1),  &  ! first inside neighbour
+               Grid % cells_n_cells(c1)
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        a12 = fc(s) * Face_Value(s, Flow % v_m(c1), Flow % v_m(c2))
-        if(c1 .lt. c2) then
-          val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a12
-        end if
-        val(dia(c1)) = val(dia(c1)) + a12
+
+      w1 = Grid % f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
+
+      a12 = fc(s) * (w1 * Flow % v_m(c1) + w2 * Flow % v_m(c2))
+
+      if(c1 .lt. c2) then
+        val(pos(1,s)) = -a12
+        val(pos(2,s)) = -a12
       end if
+      val(dia(c1)) = val(dia(c1)) + a12
+
     end do
 
   end do
   !$tf-acc loop end
 
-  ! De-singularize the system matrix ... just like this, ad-hoc
-  !$tf-acc loop begin
-  do c = Cells_In_Domain()  ! all present
-    val(dia(c)) = val(dia(c)) * (1.0 + MILI)
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1, s)
+        a12 = fc(s) * Flow % v_m(c1)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$tf-acc loop end
+    end if
   end do
-  !$tf-acc loop end
 
 # if T_FLOWS_DEBUG == 1
   allocate(work(Grid % n_cells));  work(:) = 0.0

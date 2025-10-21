@@ -22,8 +22,8 @@
 !-----------------------------------[Locals]-----------------------------------!
   real, contiguous, pointer :: b(:), fc(:), pp_x(:), pp_y(:), pp_z(:)
   real, contiguous, pointer :: visc(:), dens(:)
-  real                      :: a12, b_tmp, max_abs_val
-  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f
+  real                      :: a12, b_tmp, vol_res, w1, w2
+  real                      :: cfl_max, pe_max, cfl_t, pe_t, nu_f, dt
   integer                   :: c, s, c1, c2, i_cel, reg
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -38,6 +38,7 @@
   fc   => Flow % Nat % A % fc
   dens => Flow % density
   visc => Flow % viscosity
+  dt   =  Flow % dt
 
   ! Check if you have pressure gradients at hand and then set aliases properly
   Assert(Flow % stores_gradients_of .eq. 'PP')
@@ -91,6 +92,7 @@
   !$acc   grid_region_f_face,  &
   !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
+  !$acc   grid_f,  &
   !$acc   fc,  &
   !$acc   flow_v_m,  &
   !$acc   flow_v_flux_n,  &
@@ -100,7 +102,10 @@
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
-    a12 = -fc(s) * Face_Value(s, flow_v_m(c1), flow_v_m(c2))
+    w1 = grid_f(s)
+    w2 = 1.0 - w1
+
+    a12 = -fc(s) * (w1 * flow_v_m(c1) + w2 * flow_v_m(c2))
 
     flow_v_flux_n(s) = flow_v_flux_n(s)  &
                          + (flow_pp_n(c2) - flow_pp_n(c1)) * a12
@@ -134,6 +139,7 @@
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b,  &
+  !$acc   grid_cells_i_cells,  &
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
@@ -143,12 +149,14 @@
 
     b_tmp = b(c1)
   !$acc loop seq
-    do i_cel = 1, grid_cells_n_cells(c1)
+    do i_cel = grid_cells_i_cells(c1),  &
+               grid_cells_n_cells(c1)
+
       c2 = grid_cells_c(i_cel, c1)
       s  = grid_cells_f(i_cel, c1)
-      if(c2 .gt. 0) then
-        b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
-      end if
+
+      b_tmp = b_tmp - flow_v_flux_n(s) * merge(1,-1, c1.lt.c2)
+
     end do
   !$acc end loop
 
@@ -160,23 +168,50 @@
   !-----------------------------!
   !   Then the boundary faces   !
   !-----------------------------!
-
   do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. INFLOW  .or.  &
-       Grid % region % type(reg) .eq. OUTFLOW .or.  &
-       Grid % region % type(reg) .eq. CONVECT) then
+
+    !$acc parallel loop  &
+    !$acc present(  &
+    !$acc   grid_region_f_face,  &
+    !$acc   grid_region_l_face,  &
+    !$acc   grid_faces_c,  &
+    !$acc   b,  &
+    !$acc   flow_v_flux_n   &
+    !$acc )
+    do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
+      c1 = grid_faces_c(1,s)  ! inside cell
+      b(c1) = b(c1) - flow_v_flux_n(s)
+    end do
+    !$acc end parallel
+
+  end do
+
+  !$acc parallel loop independent  &
+  !$acc present(  &
+  !$acc   grid_region_f_cell,  &
+  !$acc   grid_region_l_cell,  &
+  !$acc   b,  &
+  !$acc   grid_vol   &
+  !$acc )
+  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions+1)
+    b(c) = b(c) / (grid_vol(c) / dt)
+  end do
+  !$acc end parallel
+
+  ! Exclude cells close to pressure boundary
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. PRESSURE) then
 
       !$acc parallel loop  &
       !$acc present(  &
       !$acc   grid_region_f_face,  &
       !$acc   grid_region_l_face,  &
       !$acc   grid_faces_c,  &
-      !$acc   b,  &
-      !$acc   flow_v_flux_n   &
+      !$acc   b   &
       !$acc )
       do s = grid_region_f_face(reg), grid_region_l_face(reg)  ! all present
         c1 = grid_faces_c(1,s)  ! inside cell
-        b(c1) = b(c1) - flow_v_flux_n(s)
+        b(c1) = 0.0
       end do
       !$acc end parallel
 
@@ -192,20 +227,21 @@
   !------------------------------------------------------------------!
   !   Find the cell with the maximum volume imbalance and print it   !
   !------------------------------------------------------------------!
-  max_abs_val = 0.0
-  !$acc parallel loop independent reduction(max: max_abs_val)  &
+  vol_res = 0.0
+  !$acc parallel loop independent reduction(max: vol_res)  &
   !$acc present(  &
   !$acc   grid_region_f_cell,  &
   !$acc   grid_region_l_cell,  &
   !$acc   b   &
   !$acc )
   do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    max_abs_val = max(max_abs_val, abs(b(c)))
+    vol_res = max(vol_res, abs(b(c)))
   end do
   !$acc end parallel
+  Flow % vol_res = vol_res
 
   ! Find maximum volume balance error over all processors
-  call Global % Max_Real(max_abs_val)
+  call Global % Max_Real(Flow % vol_res)
 
   !------------------------------!
   !   Calculate the CFL number   !
@@ -219,6 +255,7 @@
   !$acc   grid_region_f_face,  &
   !$acc   grid_region_l_face,  &
   !$acc   grid_faces_c,  &
+  !$acc   grid_f,  &
   !$acc   visc,  &
   !$acc   dens,  &
   !$acc   flow_v_flux_n,  &
@@ -229,7 +266,10 @@
     c1 = grid_faces_c(1, s)
     c2 = grid_faces_c(2, s)
 
-    nu_f = Face_Value(s, (visc(c1)/dens(c1)), (visc(c2)/dens(c2)))
+    w1 = grid_f(s)
+    w2 = 1.0 - w1
+
+    nu_f = w1 * visc(c1)/dens(c1) + w2 * visc(c2)/dens(c2)
 
     cfl_t   = abs(flow_v_flux_n(s)) * Flow % dt / (fc(s) * grid_d(s)**2)
     pe_t    = abs(flow_v_flux_n(s)) / fc(s) / nu_f
@@ -248,8 +288,8 @@
   !-------------------------------!
   !@ Use this for REPORT_VOLUME_BALANCE somehow?
   !@ O_Print '(a,es12.3)', ' # Max. volume balance error '//  &
-  !@                       'after correction: ', max_abs_val
-  call Info % Iter_Fill_At(1, 5, 'dum', max_abs_val)
+  !@                       'after correction: ', Flow % vol_res
+  call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
 
   call Profiler % Stop('Correct_Velocity')
 

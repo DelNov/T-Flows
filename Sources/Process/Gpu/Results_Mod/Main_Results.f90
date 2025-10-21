@@ -74,6 +74,7 @@
       call Results % Save_Vtu_Fields(Grid(d), Flow(d), Turb(d),      &
                                      plot_inside=.false., domain=d)
 
+      call User_Mod_Save_Results(Grid(d), Flow(d), Turb(d))
     end do  ! through domains
   end if
 

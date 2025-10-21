@@ -19,7 +19,7 @@
 
   ! GPU access to Grid members
   integer, contiguous, pointer :: grid_faces_c(:,:)
-  integer, contiguous, pointer :: grid_cells_n_cells(:)
+  integer, contiguous, pointer :: grid_cells_n_cells(:), grid_cells_i_cells(:)
   integer, contiguous, pointer :: grid_cells_c(:,:)
   integer, contiguous, pointer :: grid_cells_f(:,:)
   integer                      :: grid_n_regions,  grid_n_bnd_regions
@@ -28,7 +28,7 @@
   real,    contiguous, pointer :: grid_dx(:), grid_dy(:), grid_dz(:)
   real,    contiguous, pointer :: grid_sx(:), grid_sy(:), grid_sz(:)
   real,    contiguous, pointer :: grid_xc(:), grid_yc(:), grid_zc(:)
-  real,    contiguous, pointer :: grid_d(:), grid_s(:)
+  real,    contiguous, pointer :: grid_f(:), grid_d(:), grid_s(:)
   real,    contiguous, pointer :: grid_vol(:), grid_wall_dist(:)
 
   ! Access to Flow members

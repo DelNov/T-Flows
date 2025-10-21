@@ -6,6 +6,21 @@
   subroutine Form_Scalars_Matrix(Process, Grid, Flow, Turb,  &
                                  diff_eff, sc, urf, dt)
 !------------------------------------------------------------------------------!
+!   Scalars matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for effective diffusivity is defined, but without turbulent
+!       parts yet
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Diffusivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Diffusivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                  :: Process
@@ -22,7 +37,7 @@
   real,    contiguous, pointer :: val(:), fc(:)
   integer, contiguous, pointer :: dia(:), pos(:,:)
   integer                      :: c, s, c1, c2, i_cel, reg, nz, i
-  real                         :: a12, a21, fl, cfs
+  real                         :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -44,6 +59,12 @@
 
   Assert(urf > 0.0)
 
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
+
   !-----------------------------------------------------------!
   !   Start by copying molecular viscosity to the effective   !
   !-----------------------------------------------------------!
@@ -60,7 +81,9 @@
   !$acc end parallel
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$acc parallel loop independent  &
@@ -72,15 +95,15 @@
   end do
   !$acc end parallel
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients inside the domain   !
+  !------------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
@@ -89,6 +112,7 @@
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   diff_eff,  &
   !$acc   fc,  &
   !$acc   val,  &
@@ -104,7 +128,11 @@
 
       if(c2 .gt. 0) then
 
-        a12 = Face_Value(s, diff_eff(c1), diff_eff(c2)) * fc(s)
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = (w1 * diff_eff(c1) + w2 * diff_eff(c2)) * fc(s)
         a21 = a12
 
         if(c1 .lt. c2) then
@@ -135,6 +163,7 @@
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
     !$acc   flow_v_flux_n,  &
+    !$acc   grid_f,  &
     !$acc   flow_density,  &
     !$acc   val,  &
     !$acc   pos,  &
@@ -150,7 +179,11 @@
 
         if(c2 .gt. 0) then
 
-          cfs = Face_Value(s, flow_density(c1), flow_density(c2))
+          w1 = grid_f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
+          cfs = w1 * flow_density(c1) + w2 * flow_density(c2)
           a12 = 0.0
           a21 = 0.0
 
@@ -177,9 +210,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !------------------------------------------------!
+  !   Diffusivity coefficients on the boundaries   !
+  !------------------------------------------------!
 
   phi_bnd_cond_type => phi % bnd_cond_type
   !$acc parallel loop  &
@@ -204,6 +237,9 @@
   end do
   !$acc end parallel
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(phi % blend_matrix) then
 
     phi_bnd_cond_type => phi % bnd_cond_type

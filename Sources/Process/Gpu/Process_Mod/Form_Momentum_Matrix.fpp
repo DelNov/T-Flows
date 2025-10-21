@@ -2,9 +2,24 @@
   subroutine Form_Momentum_Matrix(Process, Grid, Flow, Turb,  &
                                   visc_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Momentum matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An alias for density is defined
+!     - Effective viscosity is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Viscous coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Viscous coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Entries for pressure matrix are stored
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
-  class(Process_Type)           :: Process
+  class(Process_Type)                 :: Process
   type(Grid_Type), intent(in), target :: Grid
   type(Field_Type),            target :: Flow
   type(Turb_Type),             target :: Turb
@@ -15,9 +30,10 @@
 !-----------------------------------[Locals]-----------------------------------!
   real,      contiguous, pointer :: val(:), fc(:)
   integer,   contiguous, pointer :: dia(:), pos(:,:)
+  integer,   contiguous, pointer :: row(:)
   real,      contiguous, pointer :: dens(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  real                           :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -33,10 +49,17 @@
   val => Flow % Nat % A % val
   dia => Flow % Nat % A % dia
   pos => Flow % Nat % A % pos
+  row => Flow % Nat % A % row
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
   Assert(urf > 0.0)
+
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
 
   !------------------------!
   !   Initialize density   !
@@ -52,16 +75,6 @@
   end do
   !$tf-acc loop end
 
-  do reg = Boundary_Regions()
-    !$tf-acc loop begin
-    do s = Faces_In_Region(reg)  ! all present
-      c1 = Grid % faces_c(1,s)   ! inside cell
-      c2 = Grid % faces_c(2,s)   ! boundary cell
-      visc_eff(c1) = Flow % viscosity(c1)
-    end do
-    !$tf-acc loop end
-  end do
-
   !-------------------------------------------------------------!
   !   If there is a turbulence model, add turbulent viscosity   !
   !-------------------------------------------------------------!
@@ -70,7 +83,7 @@
     ! Inside the domain, add turbulent viscosity
     !$tf-acc loop begin
     do c = Cells_In_Domain_And_Buffers()
-      visc_eff(c) = visc_eff(c) + turb_vis_t(c)
+      visc_eff(c) = visc_eff(c) + Turb % vis_t(c)
     end do
     !$tf-acc loop end
 
@@ -83,18 +96,7 @@
         !$tf-acc loop begin
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_w(c1)
-        end do
-        !$tf-acc loop end
-
-      else
-
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          visc_eff(c1) = turb_vis_t(c1)
+          visc_eff(c1) = Turb % vis_w(c1)
         end do
         !$tf-acc loop end
 
@@ -104,7 +106,9 @@
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$tf-acc loop begin
@@ -113,37 +117,40 @@
   end do
   !$tf-acc loop end
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !----------------------------------------------!
+  !   Viscosity coefficients inside the domain   !
+  !----------------------------------------------!
 
   !$tf-acc loop begin
   do c1 = Cells_In_Domain()  ! all present
 
-    do i_cel = 1, Grid % cells_n_cells(c1)
+    do i_cel = Grid % cells_i_cells(c1),  &  ! first inside cell
+               Grid % cells_n_cells(c1)
+
       c2 = Grid % cells_c(i_cel, c1)
       s  = Grid % cells_f(i_cel, c1)
 
-      if(c2 .gt. 0) then
+      w1 = Grid % f(s)
+      if(c1.gt.c2) w1 = 1.0 - w1
+      w2 = 1.0 - w1
 
-        a12 = Face_Value(s, visc_eff(c1), visc_eff(c2)) * fc(s)
-        a21 = a12
+      a12 = (w1 * visc_eff(c1) + w2 * visc_eff(c2)) * fc(s)
+      a21 = a12
 
-        if(c1 .lt. c2) then
-          val(pos(1,s)) = -a12
-          val(pos(2,s)) = -a21
-        end if
-
-        ! Update only diaginal at c1 to avoid race conditions
-        val(dia(c1)) = val(dia(c1)) + a12
-
+      if(c1 .lt. c2) then
+        val(pos(1,s)) = -a12
+        val(pos(2,s)) = -a21
       end if
+
+      ! Update only diaginal at c1 to avoid race conditions
+      val(dia(c1)) = val(dia(c1)) + a12
+
     end do
 
   end do
@@ -157,32 +164,34 @@
     !$tf-acc loop begin
     do c1 = Cells_In_Domain()  ! all present
 
-      do i_cel = 1, Grid % cells_n_cells(c1)
+      do i_cel = Grid % cells_i_cells(c1),  &  ! first inside neighbour
+                 Grid % cells_n_cells(c1)
         c2 = Grid % cells_c(i_cel, c1)
         s  = Grid % cells_f(i_cel, c1)
         fl = Flow % v_flux % n(s)
 
-        if(c2 .gt. 0) then
+        w1 = Grid % f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
 
-          cfs = Face_Value(s, dens(c1), dens(c2))
-          a12 = 0.0
-          a21 = 0.0
+        cfs = w1 * dens(c1) + w2 * dens(c2)
+        a12 = 0.0
+        a21 = 0.0
 
-          if(c1 .lt. c2) then
-            if(fl > 0.0) a21 = a21 + fl * cfs
-            if(fl < 0.0) a12 = a12 - fl * cfs
-            val(pos(1,s)) = val(pos(1,s)) - a12
-            val(pos(2,s)) = val(pos(2,s)) - a21
-          end if
-
-          if(c1 .gt. c2) then
-            if(fl > 0.0) a12 = a12 + fl * cfs
-          end if
-
-          ! Update only diaginal at c1 to avoid race conditions
-          val(dia(c1)) = val(dia(c1)) + a12
-
+        if(c1 .lt. c2) then
+          if(fl > 0.0) a21 = a21 + fl * cfs
+          if(fl < 0.0) a12 = a12 - fl * cfs
+          val(pos(1,s)) = val(pos(1,s)) - a12
+          val(pos(2,s)) = val(pos(2,s)) - a21
         end if
+
+        if(c1 .gt. c2) then
+          if(fl > 0.0) a12 = a12 + fl * cfs
+        end if
+
+        ! Update only diaginal at c1 to avoid race conditions
+        val(dia(c1)) = val(dia(c1)) + a12
+
       end do
 
     end do
@@ -190,48 +199,48 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
-  if(Turb % model .eq. NO_TURBULENCE_MODEL) then
+  !--------------------------------------------!
+  !   Viscous coefficients on the boundaries   !
+  !--------------------------------------------!
+  do reg = Boundary_Regions()
+    if(Grid % region % type(reg) .eq. WALL    .or.  &
+       Grid % region % type(reg) .eq. WALLFL  .or.  &
+       Grid % region % type(reg) .eq. INFLOW) then
+
+      !$tf-acc loop begin
+      do s = Faces_In_Region(reg)  ! all present
+        c1 = Grid % faces_c(1,s)   ! inside cell
+        a12 = visc_eff(c1) * fc(s)
+        val(dia(c1)) = val(dia(c1)) + a12
+      end do
+      !$tf-acc loop end
+     end if  ! boundary condition
+  end do    ! regions
+
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
+  if(Flow % u % blend_matrix) then
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
+      if(Grid % region % type(reg) .eq. INFLOW) then
 
         !$tf-acc loop begin
         do s = Faces_In_Region(reg)  ! all present
           c1 = Grid % faces_c(1,s)   ! inside cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
-        end do
-        !$tf-acc loop end
-      end if  ! boundary condition
-    end do    ! regions
-  else        ! turbulence model
-    do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. WALL    .or.  &
-         Grid % region % type(reg) .eq. WALLFL  .or.  &
-         Grid % region % type(reg) .eq. INFLOW) then
-
-        !$tf-acc loop begin
-        do s = Faces_In_Region(reg)  ! all present
-          c1 = Grid % faces_c(1,s)   ! inside cell
-          c2 = Grid % faces_c(2,s)   ! boundary cell
-          a12 = visc_eff(c1) * fc(s)
-          val(dia(c1)) = val(dia(c1)) + a12
+          fl = Flow % v_flux % n(s)
+          val(dia(c1)) = val(dia(c1)) - min(fl, 0.0) * dens(c1)
         end do
         !$tf-acc loop end
 
-      end if  ! boundary condition
-    end do    ! region
-  end if      ! turbulence model
+      end if
+    end do
+  end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$tf-acc loop begin
     do c = Cells_In_Domain()  ! all present, was independent

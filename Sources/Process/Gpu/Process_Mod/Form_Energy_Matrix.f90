@@ -6,6 +6,20 @@
   subroutine Form_Energy_Matrix(Process, Grid, Flow, Turb,  &
                                 cond_eff, urf, dt)
 !------------------------------------------------------------------------------!
+!   Energy matrix is formed in the following steps:
+!
+!   * Physical properties setup
+!     - An array for density times capacity is defined
+!     - Effective conductivty is computed as the sum of laminar and turbulent
+!   * Matrix is initialized to zero
+!   * Matrix coefficients are computed
+!     - Conductivity coefficients inside the domain first
+!     - Upwind blending coefficients in the domain follow
+!     - Conductivity coefficients on the boundary
+!     - Upwind blending coefficients on the boundary
+!   * Diagonal matrix entry for the unsteady term is formed next
+!   * Matrix is under-relaxed
+!------------------------------------------------------------------------------!
   implicit none
 !------------------------------------------------------------------------------!
   class(Process_Type)                   :: Process
@@ -21,7 +35,7 @@
   integer,   contiguous, pointer :: dia(:), pos(:,:)
   real,      contiguous, pointer :: dens_capa(:)
   integer                        :: c, s, c1, c2, i_cel, reg, nz, i
-  real                           :: a12, a21, fl, cfs
+  real                           :: a12, a21, fl, cfs, w1, w2
 # if T_FLOWS_DEBUG == 1
   real, allocatable :: temp(:)
 # endif
@@ -40,9 +54,15 @@
   fc  => Flow % Nat % A % fc
   nz  =  Flow % Nat % A % nonzeros
 
+  Assert(urf > 0.0)
+
   call Work % Connect_Real_Cell(dens_capa)
 
-  Assert(urf > 0.0)
+  !-------------------------------!
+  !                               !
+  !   Physical properties setup   !
+  !                               !
+  !-------------------------------!
 
   !--------------------------------------------------------------------------!
   !   Initialize density times thermal capacity and effective conductivity   !
@@ -94,7 +114,9 @@
   end if
 
   !---------------------------------------!
+  !                                       !
   !   Initialize matrix entries to zero   !
+  !                                       !
   !---------------------------------------!
 
   !$acc parallel loop independent  &
@@ -106,15 +128,15 @@
   end do
   !$acc end parallel
 
-  !--------------------------------------------------!
-  !                                                  !
-  !   Compute neighbouring coefficients over cells   !
-  !                                                  !
-  !--------------------------------------------------!
+  !---------------------------------------!
+  !                                       !
+  !   Compute neighbouring coefficients   !
+  !                                       !
+  !---------------------------------------!
 
-  !------------------------------------!
-  !   Coefficients inside the domain   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients inside the domain   !
+  !-------------------------------------------------!
 
   !$acc parallel loop independent  &
   !$acc present(  &
@@ -123,6 +145,7 @@
   !$acc   grid_cells_n_cells,  &
   !$acc   grid_cells_c,  &
   !$acc   grid_cells_f,  &
+  !$acc   grid_f,  &
   !$acc   cond_eff,  &
   !$acc   fc,  &
   !$acc   val,  &
@@ -138,7 +161,11 @@
 
       if(c2 .gt. 0) then
 
-        a12 = Face_Value(s, cond_eff(c1), cond_eff(c2)) * fc(s)
+        w1 = grid_f(s)
+        if(c1.gt.c2) w1 = 1.0 - w1
+        w2 = 1.0 - w1
+
+        a12 = (w1 * cond_eff(c1) + w2 * cond_eff(c2)) * fc(s)
         a21 = a12
 
         if(c1 .lt. c2) then
@@ -169,6 +196,7 @@
     !$acc   grid_cells_c,  &
     !$acc   grid_cells_f,  &
     !$acc   flow_v_flux_n,  &
+    !$acc   grid_f,  &
     !$acc   dens_capa,  &
     !$acc   val,  &
     !$acc   pos,  &
@@ -184,7 +212,11 @@
 
         if(c2 .gt. 0) then
 
-          cfs = Face_Value(s, dens_capa(c1), dens_capa(c2))
+          w1 = grid_f(s)
+          if(c1.gt.c2) w1 = 1.0 - w1
+          w2 = 1.0 - w1
+
+          cfs = w1 * dens_capa(c1) + w2 * dens_capa(c2)
           a12 = 0.0
           a21 = 0.0
 
@@ -211,9 +243,9 @@
 
   end if
 
-  !------------------------------------!
-  !   Coefficients on the boundaries   !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !   Conductivity coefficients on the boundaries   !
+  !-------------------------------------------------!
   do reg = Boundary_Regions()
     if(Grid % region % type(reg) .eq. WALL    .or.  &
        Grid % region % type(reg) .eq. INFLOW) then
@@ -238,6 +270,9 @@
     end if
   end do
 
+  !---------------------------------------!
+  !   Upwind blending on the boundaries   !
+  !---------------------------------------!
   if(Flow % t % blend_matrix) then
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. INFLOW) then
@@ -263,11 +298,11 @@
     end do
   end if
 
-  !------------------------------------!
-  !                                    !
-  !   Take care of the unsteady term   !
-  !                                    !
-  !------------------------------------!
+  !-------------------------------------------------!
+  !                                                 !
+  !   Diagonal matrix entry for the unsteady term   !
+  !                                                 !
+  !-------------------------------------------------!
   if(present(dt)) then
     !$acc parallel loop independent  &
     !$acc present(  &

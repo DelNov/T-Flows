@@ -1,12 +1,8 @@
 !==============================================================================!
-  real function Normalized_Root_Mean_Square(Nat, ni, r, A, x, norm)
+  real function Normalized_Root_Mean_Square(Nat, ni, r, A)
 !------------------------------------------------------------------------------!
-!>  The Root_Mean_Square function calculates the root mean square (RMS) of a
-!>  given vector 'r'.  This implementation computes RMS with normalization
-!>  normalizing it with entries from the matrix 'A', values of unknown 'x'
-!>  or optional parameter 'norm'.  It takes the sum of squares of the vector
-!>  elements, computes their global sum in a parallel computing environment,
-!>  and then takes the square root of the resulting sum.
+!>  The Normalized_Root_Mean_Square function calculates the root mean square
+!>  (RMS) of a given vector 'r', normalized with matrix A diagonal.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -14,8 +10,6 @@
   integer,                   intent(in) :: ni    !! number of uknowns
   real,                      intent(in) :: r(:)  !! input vector
   type(Matrix_Type), target, intent(in) :: A     !! system matrix
-  real,                      intent(in) :: x(:)  !! unknown vector
-  real,            optional, intent(in) :: norm  !! normalization factor
 !-----------------------------------[Locals]-----------------------------------!
   real                          :: rms, x_max, x_min, x_max_min
   integer                       :: i
@@ -38,41 +32,7 @@
   !$omp end parallel do
 
   call Global % Sum_Real(rms)
-  rms = sqrt(rms)
 
-  ! Normalize it with absolute values of the unknown
-  if(.not. present(norm)) then
-    x_min = +HUGE
-    x_max = -HUGE
-    !$omp parallel do private(i) shared(x)  &
-    !$omp reduction(max : x_max)            &
-    !$omp reduction(min : x_min)
-    do i = 1, ni
-      x_min = min(x_min, x(i))
-      x_max = max(x_max, x(i))
-    end do
-    !$omp end parallel do
-  else
-    x_min = 0.0
-    x_max = norm
-  endif
-  call Global % Min_Real(x_min)
-  call Global % Max_Real(x_max)
-
-  ! Create a plateau for very small sources and values
-  !if( (x_max-x_min) < NANO .and. rms < NANO ) then
-  !  rms = PICO
-  !else
-  !  rms = rms / (x_max - x_min + TINY)
-  !end if
-
-  ! avoid roundoff error and divided-by-zero
-  ! don't do rms = rms / (x_max - x_min + TINY)
-  ! because e.g. 1.0 - 1.0 + 1e-30 = 0.0
-  x_max_min = x_max - x_min
-  x_max_min = max (x_max_min, TINY)
-  rms = rms / x_max_min
-
-  Normalized_Root_Mean_Square = rms
+  Normalized_Root_Mean_Square = sqrt(rms)
 
   end function

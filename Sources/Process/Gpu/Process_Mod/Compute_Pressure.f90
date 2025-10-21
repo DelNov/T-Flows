@@ -38,13 +38,17 @@
   !---------------------------------------------------------------!
   !   Insert proper source (volume source) to pressure equation   !
   !---------------------------------------------------------------!
-  call Process % Insert_Volume_Source_For_Pressure(Flow, Grid)
+  call Process % Balance_Volume(Flow, Grid)
+  call Process % Rhie_And_Chow (Flow, Grid)
 
 # if T_FLOWS_DEBUG == 1
     call Grid % Save_Debug_Vtu("bp_0",                &
                                inside_name="vol_src", &
                                inside_cell=b)
 # endif
+
+  ! Set singularity to the matrix
+  call Linalg % Set_Singular(Grid % n_cells, Flow % Nat % A)
 
   !------------------------!
   !   Call linear solver   !
@@ -93,34 +97,38 @@
   !---------------------------------------------------------------!
   !   Shift the pressure field so that the median value is zero   !
   !---------------------------------------------------------------!
-  p_max = -HUGE
-  p_min = +HUGE
+  if(.not. Flow % has_pressure) then
 
-  !$acc parallel loop independent reduction(max: p_max) reduction(min: p_min)  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_p_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    p_max = max(p_max, flow_p_n(c))
-    p_min = min(p_min, flow_p_n(c))
-  end do
-  !$acc end parallel
+    p_max = -HUGE
+    p_min = +HUGE
 
-  call Global % Max_Real(p_max)
-  call Global % Min_Real(p_min)
+    !$acc parallel loop independent reduction(max: p_max) reduction(min: p_min)  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   flow_p_n   &
+    !$acc )
+    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+      p_max = max(p_max, flow_p_n(c))
+      p_min = min(p_min, flow_p_n(c))
+    end do
+    !$acc end parallel
 
-  !$acc parallel loop independent  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_p_n   &
-  !$acc )
-  do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
-    flow_p_n(c) = flow_p_n(c) - 0.5 * (p_max + p_min)
-  end do
-  !$acc end parallel
+    call Global % Max_Real(p_max)
+    call Global % Min_Real(p_min)
+
+    !$acc parallel loop independent  &
+    !$acc present(  &
+    !$acc   grid_region_f_cell,  &
+    !$acc   grid_region_l_cell,  &
+    !$acc   flow_p_n   &
+    !$acc )
+    do c = grid_region_f_cell(grid_n_regions), grid_region_l_cell(grid_n_regions)  ! all present
+      flow_p_n(c) = flow_p_n(c) - 0.5 * (p_max + p_min)
+    end do
+    !$acc end parallel
+
+  end if
 
   ! Update buffers for presssure over all processors
   call Grid % Exchange_Cells_Real(Flow % p % n)

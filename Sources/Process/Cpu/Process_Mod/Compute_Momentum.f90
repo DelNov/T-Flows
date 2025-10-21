@@ -56,8 +56,7 @@
   real, contiguous,  pointer :: fi(:), p_i(:), cell_fi(:), st_i(:)
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
-  real                       :: vel_max, dt
-  real                       :: m0, m12, m21
+  real                       :: m0, m12, m21, dt
   real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
@@ -197,13 +196,6 @@
     M % val(:) = 0.0
     b      (:) = 0.0
 
-    ! Calculate velocity magnitude for normalization
-    vel_max = MICRO
-    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
-      vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
-    end do
-    call Global % Max_Real(vel_max)
-
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
       if(Iter % Current() .eq. 1) then
@@ -224,6 +216,7 @@
     !   Advection   !
     !               !
     !---------------!
+
     call Numerics_Mod_Advection_Term(ui, Flow % density, v_flux % n, fi)
 
     !---------------!
@@ -269,10 +262,14 @@
         cross(c2) = cross(c2) - f_ex + f_im - f_stress * Flow % density(c2)
       end if
 
+      ! Set matrix coefficients m12 and m21 assuming there is no blending
+      m12 = m0
+      m21 = m0
+
       ! Blend system matrix if desired to do so
       if(ui % blend_matrix) then
-        m12 = m0 - min(v_flux % n(s), 0.0) * Flow % density(c1)
-        m21 = m0 + max(v_flux % n(s), 0.0) * Flow % density(c2)
+        m12 = m12 - min(v_flux % n(s), 0.0) * Flow % density(c1)
+        m21 = m21 + max(v_flux % n(s), 0.0) * Flow % density(c2)
       end if
 
       ! Fill the system matrix
@@ -285,8 +282,8 @@
         ! Outflow is not included because it was causing problems
         if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.  &
            (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.  &
-           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.  &
-           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)) then
+           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL)  .or.  &
+           (Grid % Bnd_Cond_Type(c2) .eq. CONVECT)) then
            ! (Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW) ) then
           M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
           fi(c1) = fi(c1) + m12 * ui % n(c2)
@@ -391,7 +388,7 @@
                             ' (solver for momentum)')
 
       ! Call linear solver
-      call Sol % Run(M, ui, b, norm = vel_max)
+      call Sol % Run(M, ui, b)
 
       call Profiler % Stop(String % First_Upper(ui % solver)  //  &
                            ' (solver for momentum)')
