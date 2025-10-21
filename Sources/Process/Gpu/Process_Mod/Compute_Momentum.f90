@@ -18,7 +18,7 @@
   real,      contiguous, pointer :: val(:)
   integer,   contiguous, pointer :: dia(:)
   real,      contiguous, pointer :: b(:), visc_eff(:)
-  real                           :: vel_max, urf
+  real                           :: urf
   integer                        :: c
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -37,24 +37,6 @@
   val => Flow % Nat % A % val
   dia => Flow % Nat % A % dia
   b   => Flow % Nat % b
-
-  ! Calculate velocity magnitude for normalization
-  vel_max = MICRO
-  !$acc parallel loop independent reduction(max: vel_max)  &
-  !$acc present(  &
-  !$acc   grid_region_f_cell,  &
-  !$acc   grid_region_l_cell,  &
-  !$acc   flow_u_n,  &
-  !$acc   flow_v_n,  &
-  !$acc   flow_w_n   &
-  !$acc )
-  do c = grid_region_f_cell(1), grid_region_l_cell(grid_n_regions+1)
-    vel_max = max(vel_max, sqrt(  flow_u_n(c)**2  &
-                                + flow_v_n(c)**2  &
-                                + flow_w_n(c)**2))
-  end do
-  !$acc end parallel
-  call Global % Max_Real(vel_max)
 
   ! Old values (o) and older than old (oo)
   if(comp .eq. 1) then
@@ -173,8 +155,7 @@
   call Profiler % Start('CG_for_Momentum')
   call Flow % Nat % Cg(ui_n(1:Grid % n_cells),  &
                        ui % miter, ui % niter,  &
-                       ui % tol,   ui % res,    &
-                       norm = vel_max)
+                       ui % tol,   ui % res)
 
   call Profiler % Stop('CG_for_Momentum')
 

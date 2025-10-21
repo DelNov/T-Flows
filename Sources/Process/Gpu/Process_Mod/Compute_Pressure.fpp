@@ -10,7 +10,7 @@
   real,    contiguous, pointer :: val(:)
   real,    contiguous, pointer :: b(:)
   integer, contiguous, pointer :: row(:), col(:)
-  real                         :: urf, p_max, p_min, p_nor, p_nor_c
+  real                         :: urf, p_max, p_min
   integer                      :: c, call_type
   integer, save                :: call_count = 0
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -25,30 +25,6 @@
   col => Flow % Nat % A % col
   b   => Flow % Nat % b
   urf =  Flow % pp % urf
-
-  !--------------------------------------------------!
-  !   Find the value for normalization of pressure   !
-  !--------------------------------------------------!
-
-  ! From control file
-  call Control % Normalization_For_Pressure_Solver(p_nor_c)
-
-  ! Calculate pressure magnitude for normalization of pressure solution
-  p_max = -HUGE
-  p_min = +HUGE
-  !$tf-acc loop begin
-  do c = Cells_In_Domain_And_Buffers()
-    p_max = max(p_max, Flow % p % n(c))
-    p_min = min(p_min, Flow % p % n(c))
-  end do
-  !$tf-acc loop end
-  call Global % Max_Real(p_max)
-  call Global % Min_Real(p_min)
-  ! Normalize pressure with the maximum of pressure difference,
-  ! value defined in control file and pressure drops.
-  p_nor = max( (p_max-p_min), p_nor_c, abs(Flow % bulk % p_drop_x),  &
-                                       abs(Flow % bulk % p_drop_y),  &
-                                       abs(Flow % bulk % p_drop_z) )
 
   !-----------------------------------------------!
   !   Discretize the pressure Poisson equations   !
@@ -79,8 +55,7 @@
     call Profiler % Start('CG_for_Pressure')
     call Flow % Nat % Cg(Flow % pp % n(1:Grid % n_cells),       &
                          Flow % pp % miter, Flow % pp % niter,  &
-                         Flow % pp % tol,   Flow % pp % res,    &
-                         norm = p_nor)
+                         Flow % pp % tol,   Flow % pp % res)
     call Profiler % Stop('CG_for_Pressure')
   else if(Flow % pp % solver .eq. 'rs_amg') then
     call Profiler % Start('AMG_for_Pressure')

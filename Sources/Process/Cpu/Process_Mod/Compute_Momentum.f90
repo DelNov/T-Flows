@@ -56,8 +56,7 @@
   real, contiguous,  pointer :: fi(:), p_i(:), cell_fi(:), st_i(:)
   integer                    :: s, c, c1, c2, i
   real                       :: f_ex, f_im, f_stress
-  real                       :: vel_max, dt
-  real                       :: m0, m12, m21
+  real                       :: m0, m12, m21, dt
   real                       :: vis_eff
   real                       :: ui_i_f, ui_j_f, ui_k_f, uj_i_f, uk_i_f
   real                       :: grav_i, p_drop_i
@@ -196,13 +195,6 @@
     f_stress   = 0.0  ! this is presumably not needed
     M % val(:) = 0.0
     b      (:) = 0.0
-
-    ! Calculate velocity magnitude for normalization
-    vel_max = MICRO
-    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
-      vel_max = max(vel_max, sqrt(ui % n(c)**2 + uj % n(c)**2 + uk % n(c)**2))
-    end do
-    call Global % Max_Real(vel_max)
 
     ! Old values (o) and older than old (oo)
     if(.not. Flow % inside_piso_loop) then
@@ -396,7 +388,7 @@
                             ' (solver for momentum)')
 
       ! Call linear solver
-      call Sol % Run(M, ui, b, norm = vel_max)
+      call Sol % Run(M, ui, b)
 
       call Profiler % Stop(String % First_Upper(ui % solver)  //  &
                            ' (solver for momentum)')

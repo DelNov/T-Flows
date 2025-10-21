@@ -3,8 +3,7 @@
                           solver, prec,  &  ! strings
                           A, x, b,       &  ! the whole system
                           miter, niter,  &  ! iterations
-                          tol, fin_res,  &  ! tolerance, residual
-                          norm)             ! normalization
+                          tol, fin_res)     ! tolerance, residual
 !------------------------------------------------------------------------------!
 !>  Solve_Native is a decision-making subroutine in the Native_Mod module that
 !>  determines which native linear solver to use based on user preferences.
@@ -26,14 +25,13 @@
   integer,            intent(out)   :: niter    !! performed
   real,               intent(in)    :: tol      !! target tolerance
   real,               intent(out)   :: fin_res  !! final (achieved) residual
-  real,     optional, intent(in)    :: norm     !! normalization factor
 !==============================================================================!
 
   ! Call the desired linear solver to solve the equations
   if(solver .eq. 'bicg') then
-    call Nat % Bicg(A, x, b, prec, miter, niter, tol, fin_res, norm)
+    call Nat % Bicg(A, x, b, prec, miter, niter, tol, fin_res)
   else if(solver .eq. 'cg') then
-    call Nat % Cg  (A, x, b, prec, miter, niter, tol, fin_res, norm)
+    call Nat % Cg  (A, x, b, prec, miter, niter, tol, fin_res)
   else
     call Message % Error(64, 'Unknown native solver: '//trim(solver)  //  &
                              '. This error is critical, exiting! '    //  &

@@ -38,34 +38,7 @@
   !$omp end parallel do
 
   call Global % Sum_Real(rms)
-  rms = sqrt(rms)
 
-  ! Normalize it with absolute values of the unknown
-  if(.not. present(norm)) then
-    x_min = +HUGE
-    x_max = -HUGE
-    !$omp parallel do private(i) shared(x)  &
-    !$omp reduction(max : x_max)            &
-    !$omp reduction(min : x_min)
-    do i = 1, ni
-      x_min = min(x_min, x(i))
-      x_max = max(x_max, x(i))
-    end do
-    !$omp end parallel do
-  else
-    x_min = 0.0
-    x_max = norm
-  endif
-  call Global % Min_Real(x_min)
-  call Global % Max_Real(x_max)
-
-  ! Avoid roundoff error and divided-by-zero
-  ! don't do rms = rms / (x_max - x_min + TINY)
-  ! because e.g. 1.0 - 1.0 + 1e-30 = 0.0
-  x_max_min = x_max - x_min
-  x_max_min = max (x_max_min, TINY)
-  rms = rms / x_max_min
-
-  Normalized_Root_Mean_Square = rms
+  Normalized_Root_Mean_Square = sqrt(rms)
 
   end function

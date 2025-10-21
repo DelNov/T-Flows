@@ -48,7 +48,7 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2
-  real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
+  real                       :: p_max, p_min, dt, a12
 !------------------------------------------------------------------------------!
 !
 !   The form of equations which are being solved:
@@ -97,25 +97,6 @@
   !--------------------------------------------------!
   !   Find the value for normalization of pressure   !
   !--------------------------------------------------!
-
-  ! From control file
-  call Control % Normalization_For_Pressure_Solver(p_nor_c)
-
-  ! Calculate pressure magnitude for normalization of pressure solution
-  p_max = -HUGE
-  p_min = +HUGE
-  do c = Cells_In_Domain_And_Buffers()
-    p_max = max(p_max, p % n(c))
-    p_min = min(p_min, p % n(c))
-  end do
-  call Global % Max_Real(p_max)
-  call Global % Min_Real(p_min)
-
-  ! Normalize pressure with the maximum of pressure difference, 
-  ! value defined in control file and pressure drops.
-  p_nor = max( (p_max-p_min), p_nor_c, abs(bulk % p_drop_x),  &
-                                       abs(bulk % p_drop_y),  &
-                                       abs(bulk % p_drop_z) )
 
   ! Initialize matrix and right hand side
   b       = 0.0
@@ -218,7 +199,7 @@
   end if
 
   ! Call linear solver
-  call Sol % Run(A, pp, b, norm = p_nor)
+  call Sol % Run(A, pp, b)
 
   ! Remove singularity from the matrix
   if(.not. Flow % has_pressure) then
