@@ -1,4 +1,0 @@
-Case to check MPI communication.
-
-User function sets some values, saves them before and after refreshing the
-buffers, thus allowing to visualize if communication went well.

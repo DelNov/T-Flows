@@ -1,3 +1,0 @@
-This case was derived from Rod_Bundle_Hexahedral, but it is simple laminar,
-not a full-fledged LES like that case.  This is essantially to check Convert
-and Divide and sequential / parallel runs

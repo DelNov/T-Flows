@@ -1,3 +1,0 @@
-# launch python_matplotlib_script.py as:
-python python_matplotlib_script.py DAT_FILE_WITH_RESULTS_MACRO PNG_FILE_WITH_RESULTS_MACRO 1 2 3 4
-# All arguments are mandatory

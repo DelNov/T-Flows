@@ -1,8 +1,0 @@
-Numbering of domains:
-
-1 - left
-2 - middle
-3 - right
-
-Different K and Ra numbers are in sub-directories K_0.1, K_1.0
-and K_10.0, and in their sub-directories Ra_10e3 and Ra_10e5.

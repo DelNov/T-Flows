@@ -1,5 +1,0 @@
-This is a coarser variant of the rising bubble case Mijail was using.
-
-.geo file will create a tetrahedral mesh.
-
-.dom, clearly enough, will create a hexahedral.

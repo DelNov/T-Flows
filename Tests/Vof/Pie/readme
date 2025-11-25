@@ -1,5 +1,0 @@
-Compile from here, i.e.:
-
-make DIR_CASE=../../Tests/Vof/Pie
-
-Then run from each individual's case directory.

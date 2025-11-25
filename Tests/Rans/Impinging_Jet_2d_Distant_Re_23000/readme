@@ -1,7 +1,0 @@
-This directory contains files needed to run computation of impinging jet
-of Re = 23 000 and nozzle-to-plate distance 2D. The results are compared 
-to experiments of Baughn and Shimizu 1989. 
-In the folder you will find two scripts, one for mesh conversion from
-gambit neu format to T-FlowS format, and another for  
-spliting mesh into 2 sub-domains for parallel execution. Number of sub-domains
-can be easily changed by editing the script.  

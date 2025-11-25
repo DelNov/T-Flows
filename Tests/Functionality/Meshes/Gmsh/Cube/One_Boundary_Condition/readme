@@ -1,2 +1,0 @@
-If one boundary condition spans across sharp edges, the dual mesh is bad.
-I mean, looks bad because boundary faces are folded around sharp edges.

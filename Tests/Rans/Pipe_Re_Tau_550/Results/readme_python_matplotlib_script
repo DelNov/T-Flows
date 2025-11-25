@@ -1,2 +1,0 @@
-# launch python_matplotlib_script.py as:
-python python_matplotlib_script.py ../pipe_full-ts007200-res-plus.dat 1 2 3 4 5 ../pipe_full-ts007200-res.dat 1 2

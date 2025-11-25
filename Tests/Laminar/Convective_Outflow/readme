@@ -1,4 +1,0 @@
-convective.geo is the default geometry, flow aligned with x coordinate.
-
-convective_rot_z.geo is geometry rotated by 30 degrees in the z plane to
-test the implementation of coordinate invariant Convective_Outflow.

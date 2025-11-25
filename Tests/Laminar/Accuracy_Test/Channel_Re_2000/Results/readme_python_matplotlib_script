@@ -1,4 +1,0 @@
-# launch python_matplotlib_script.py as:
-python python_matplotlib_script.py PNG_FILE_WITH_RESULTS_MACRO
-# PNG_FILE_WITH_RESULTS_MACRO can be ommited.
-# In this script outputs "results.png"

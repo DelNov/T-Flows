@@ -1,8 +1,0 @@
-This folder contains input files for channel flow RANS computations.
-
-In the folder you will find a script that can be used to do mesh conversion from
-gambit neu format to T-FlowS format.
-
-Please note that 3th BC marker is denoting periodic face in x direction,
-4th BC marker is denoting periodic face in y direction, 1 is wall and 2
-is symmetry. This information is needed for running NEU2TFlowS program.
