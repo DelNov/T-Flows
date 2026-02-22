@@ -140,7 +140,7 @@
   end if
 
   ! Compute helping variable
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
   end do
 
@@ -248,20 +248,27 @@
       A % val(A % pos(1,s)) = A % val(A % pos(1,s)) - a12
       A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
     else if(c2 .lt. 0) then
-      ! Outflow is included because of the flux
-      ! corrections which also affects velocities
+
+      ! Conditions which are always of Dirichlet type
       if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. INFLOW) .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. CONVECT) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-        b(c1)  = b(c1)  + a12 * t % n(c2)
-      ! In case of wallflux 
+        b(c1) = b(c1) + a12 * t % n(c2)
+
+      ! Ambient when it is inflow (see the v_flux check)
+      else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. AMBIENT  &
+              .and. v_flux % n(s) .lt. 0.0) then
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+        b(c1) = b(c1) + a12 * t % n(c2)  ! t % n(c2) is ambient value here
+
       else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALLFL) then
         b(c1) = b(c1) + Grid % s(s) * t % q(c2)
-      end if
-    end if
 
-  end do  ! through sides
+
+      end if  ! boundary condition type
+    end if    ! c2 .lt. 0
+  end do      ! through faces
 
   ! heat sink or source due to mass transfer
   if(Flow % mass_transfer_model == LEE) then
@@ -294,7 +301,7 @@
   !   Inertial terms   !
   !                    !
   !--------------------!
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()
     cap_dens(c) = Flow % capacity(c) * Flow % density(c)
     if(Flow % mass_transfer_model .ne. NO_MASS_TRANSFER) then
       if(Vof % fun % n(c) > 0.5) then

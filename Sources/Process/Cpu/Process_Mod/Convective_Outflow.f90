@@ -3,30 +3,6 @@
 !------------------------------------------------------------------------------!
 !>  This subroutine implements convective outlflow condition from A. Bottaro.
 !------------------------------------------------------------------------------!
-!   Functionality                                                              !
-!                                                                              !
-!   * Initialization: Sets up pointers and aliases for grid, flow field,       !
-!     turbulence, and multiphase variables. Prepares for boundary value        !
-!     extrapolation based on the simulation timestep.                          !
-!   * Momentum extrapolation: Depending on the simulation timestep, updates    !
-!     the momentum variables (u, v, w) at outflow boundaries using either a    !
-!     direct extrapolation or a convective method.                             !
-!   * Turbulence variables: Updates turbulence quantities like kinetic energy, !
-!     dissipation, and stress tensors at convective outflow boundaries based   !
-!     on the turbulence model (K-epsilon, Spalart-Allmaras, RSM, etc.).        !
-!   * Scalar variables: For simulations with scalar transport, extrapolates    !
-!     scalar variables at outflow boundaries using a similar approach as       !
-!     momentum variables.                                                      !
-!   * Energy variables: In simulations involving heat transfer, updates        !
-!     temperature at outflow boundaries, considering the flow's bulk velocity  !
-!     and temperature gradients.                                               !
-!   * Boundary condition handling: Applies different extrapolation strategies  !
-!     depending on whether the simulation timestep is before or after a        !
-!     specified threshold (BEGIN). This allows for finer control over boundary !
-!     value updates during the simulation.                                     !
-!   * Performance monitoring: Monitors the subroutine's performance, aiding    !
-!     in optimizing simulation efficiency and accuracy.                        !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)         :: Process  !! parent class
@@ -37,11 +13,9 @@
   integer, parameter :: BEGIN = 12
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
-  type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, t, phi, vis
-  type(Var_Type),  pointer :: kin, eps, zeta, f22, t2
+  type(Var_Type),  pointer :: kin, eps, zeta, f22, t2, omega
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  type(Face_Type), pointer :: v_flux
   integer                  :: c1, c2, s, sc, reg
   real                     :: nx, ny, nz, bulk_vel, phi_n, dt
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -49,16 +23,15 @@
 !==============================================================================!
 
   ! Take aliases
-  Grid   => Flow % pnt_grid
-  bulk   => Flow % bulk
-  v_flux => Flow % v_flux
-  dt     =  Flow % dt
+  Grid => Flow % pnt_grid
+  dt   =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
   call Turb % Alias_Stresses    (uu, vv, ww, uv, uw, vw)
   call Turb % Alias_T2          (t2)
   call Turb % Alias_Vis         (vis)
+  omega => Turb % omega
 
   !------------------------------------------------!
   !   Compute bulk velocity via a user function.   !
@@ -244,6 +217,61 @@
           end do  ! face
         end if    ! boundary condition
       end do      ! region
+
+    end if    ! Time % Curr_Dt() > BEGIN
+
+  end if
+
+  !-----------------------!
+  !   K-omega-sst model   !
+  !-----------------------!
+  if(Turb % model .eq. K_OMEGA_SST) then
+
+    if(Time % Curr_Dt() > BEGIN) then
+
+      call Flow % Grad_Variable(kin)
+      call Flow % Grad_Variable(omega)
+      if(Flow % heat_transfer) then
+        call Flow % Grad_Variable(t2)
+      end if
+
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+            call Grid % Face_Normal(s, nx, ny, nz)
+
+            phi_n = kin % x(c1) * nx + kin % y(c1) * ny + kin % z(c1) * nz
+            kin % n(c2) = kin % n(c2) - bulk_vel * phi_n * dt
+
+            phi_n = omega % x(c1) * nx + omega % y(c1) * ny + omega % z(c1) * nz
+            omega % n(c2) = omega % n(c2) - bulk_vel * phi_n * dt
+
+            if(Flow % heat_transfer) then
+              phi_n = t2 % x(c1) * nx + t2 % y(c1) * ny + t2 % z(c1) * nz
+              t2 % n(c2) = t2 % n(c2) - bulk_vel * phi_n * dt
+            end if
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
+
+    else      ! Time % Curr_Dt() <= BEGIN
+
+      do reg = Boundary_Regions()
+        if(Grid % region % type(reg) .eq. CONVECT) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
+            kin   % n(c2) = kin   % n(c1)
+            omega % n(c2) = omega % n(c1)
+            if(Flow % heat_transfer) then
+              t2 % n(c2) = t2 % n(c1)
+            end if
+          end do    ! face
+        end if      ! boundary condition
+      end do        ! region
 
     end if    ! Time % Curr_Dt() > BEGIN
 

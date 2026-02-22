@@ -13,7 +13,7 @@
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w
-  type(Var_Type),    pointer :: vis
+  type(Var_Type),    pointer :: vis, omega
   real, contiguous,  pointer :: flux(:)
   type(Matrix_Type), pointer :: A
   real, contiguous,  pointer :: b(:)
@@ -24,6 +24,7 @@
   real                       :: phi_x_f, phi_y_f, phi_z_f
   real                       :: dt
   real                       :: visc_f, pr_t1, pr_t2, pr_1, pr_2
+  real                       :: sigma_eff, sig1, sig2, f1c1, f1c2
   real, contiguous,  pointer :: cross(:)
 !------------------------------------------------------------------------------!
 !                                                                              !
@@ -42,11 +43,12 @@
   call Work % Connect_Real_Cell(cross)
 
   ! Take aliases
-  Flow => Turb % pnt_flow
-  Grid => Flow % pnt_grid
-  vis  => Turb % vis
-  flux => Flow % v_flux % n
-  dt   =  Flow % dt
+  Flow  => Turb % pnt_flow
+  Grid  => Flow % pnt_grid
+  vis   => Turb % vis
+  omega => Turb % omega
+  flux  => Flow % v_flux % n
+  dt    =  Flow % dt
   call Flow % Alias_Momentum(u, v, w)
   call Sol % Alias_Native   (A, b)
 
@@ -87,12 +89,32 @@
     c1 = Grid % faces_c(1,s)
     c2 = Grid % faces_c(2,s)
 
+    !----------------------------------------------------------!
+    !   Effective diffusion sigma (SST blending, if enabled)   !
+    !----------------------------------------------------------!
+    sigma_eff = phi % sigma
+    if(Turb % model .eq. K_OMEGA_SST) then
+      if(phi % name .eq. 'KIN') then
+        f1c1 = Turb % sst_f1(c1)
+        f1c2 = Turb % sst_f1(c2)
+        sig1 = f1c1 * Turb % sig_k1 + (1.0 - f1c1) * Turb % sig_k2
+        sig2 = f1c2 * Turb % sig_k1 + (1.0 - f1c2) * Turb % sig_k2
+        sigma_eff = Grid % fw(s) * sig1 + (1.0-Grid % fw(s)) * sig2
+      else if(phi % name .eq. 'OMG' .or. phi % name .eq. 'OME') then
+        f1c1 = Turb % sst_f1(c1)
+        f1c2 = Turb % sst_f1(c2)
+        sig1 = f1c1 * Turb % sig_w1 + (1.0 - f1c1) * Turb % sig_w2
+        sig2 = f1c2 * Turb % sig_w1 + (1.0 - f1c2) * Turb % sig_w2
+        sigma_eff = Grid % fw(s) * sig1 + (1.0-Grid % fw(s)) * sig2
+      end if
+    end if
+
     visc_f =        Grid % fw(s)  * Flow % viscosity(c1)   &
            + (1.0 - Grid % fw(s)) * Flow % viscosity(c2)
 
     vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)   &
                      + (1.0-Grid % fw(s)) * Turb % vis_t(c2))  &
-                     / phi % sigma
+                     / sigma_eff
 
     if(phi % name .eq. 'T2') then
       pr_t1 = Turb % Prandtl_Turb(c1)
@@ -105,7 +127,7 @@
 
       vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)  / pr_t1  &
                        + (1.0-Grid % fw(s)) * Turb % vis_t(c2)) / pr_t2  &
-                       / phi % sigma
+                       / sigma_eff
     end if
 
     if(Turb % model .eq. SPALART_ALLMARAS .or.                          &
@@ -113,12 +135,13 @@
       vis_eff = visc_f                                                  &
               + (    Grid % fw(s)  * vis % n(c1) * Flow % density(c1)   &
               + (1.0-Grid % fw(s)) * vis % n(c2) * Flow % density(c2))  &
-              / phi % sigma
+              / sigma_eff
+
 
     if(Turb % model .eq. HYBRID_LES_RANS) then
       vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t_eff(c1)   &
                        + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2))  &
-                       / phi % sigma
+                       / sigma_eff
     end if
     phi_x_f = Grid % fw(s) * phi % x(c1) + (1.0-Grid % fw(s)) * phi % x(c2)
     phi_y_f = Grid % fw(s) * phi % y(c1) + (1.0-Grid % fw(s)) * phi % y(c2)
@@ -126,6 +149,7 @@
 
     if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
        Turb % model .eq. HYBRID_LES_RANS .or.  &
+       Turb % model .eq. K_OMEGA_SST     .or.  &
        Turb % model .eq. K_EPS) then
       if(c2 < 0 .and. phi % name .eq. 'KIN') then
         if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
@@ -178,14 +202,20 @@
       A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
     else if(c2 < 0) then
 
-      ! Outflow is not included because it was causing problems
+      ! Conditions which are always of Dirichlet type
       if((Grid % Bnd_Cond_Type(c2) .eq. INFLOW)  .or.   &
          (Grid % Bnd_Cond_Type(c2) .eq. WALL)    .or.   &
-         (Grid % Bnd_Cond_Type(c2) .eq. PRESSURE).or.   &
          (Grid % Bnd_Cond_Type(c2) .eq. CONVECT) .or.   &
          (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
+
+      ! Ambient when it is inflow (see the flux check)
+      else if(Var_Mod_Bnd_Cond_Type(phi, c2) .eq. AMBIENT  &
+              .and. flux(s) .lt. 0.0) then
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+        b(c1)  = b(c1) + a12 * phi % n(c2)  ! phi % n(c2) is ambient value here
+
       end if
 
     end if  ! if c2 < 0
@@ -212,6 +242,14 @@
   if(Turb % model .eq. K_EPS) then
     if(phi % name .eq. 'KIN') call Turb % Src_Kin_K_Eps(Sol)
     if(phi % name .eq. 'EPS') call Turb % Src_Eps_K_Eps(Sol)
+    if(Flow % heat_transfer) then
+      if(phi % name .eq. 'T2')  call Turb % Src_T2(Sol)
+    end if
+  end if
+
+  if(Turb % model .eq. K_OMEGA_SST) then
+    if(phi % name .eq. 'KIN') call Turb % Src_Kin_K_Omega_Sst(Sol)
+    if(phi % name .eq. 'OMG') call Turb % Src_Omg_K_Omega_Sst(Sol)
     if(Flow % heat_transfer) then
       if(phi % name .eq. 'T2')  call Turb % Src_T2(Sol)
     end if
@@ -263,7 +301,7 @@
     end do
   end if
 
-  ! Set the lower limit of epsilon 
+  ! Set the lower limit of epsilon
   if(phi % name .eq. 'EPS') then
     do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = max(phi % n(c), 1.0e-10)
@@ -273,6 +311,7 @@
   ! Print info on the screen
   if(Turb % model .eq. K_EPS        .or.  &
      Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. K_OMEGA_SST  .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
     if(phi % name .eq. 'KIN')  &
       call Info % Iter_Fill_At(3, 1, phi % name, phi % res, phi % niter)
@@ -284,6 +323,8 @@
       if(phi % name .eq. 'T2')  &
       call Info % Iter_Fill_At(3, 5, phi % name, phi % res, phi % niter)
     end if
+    if(phi % name .eq. 'OMG')  &
+      call Info % Iter_Fill_At(3, 2, phi % name, phi % res, phi % niter)
   end if
 
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &

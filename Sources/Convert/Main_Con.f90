@@ -36,10 +36,6 @@
   use Convert_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include '../Shared/Probe_1d_Nodes.h90'
-  end interface
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG    = .false.
   logical, parameter :: SAVE_CAS = .false.
@@ -261,9 +257,6 @@
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain
       call Grid(g) % Write_Template_Control_File()
-
-      ! Create 1D file (used for channel or pipe flow)
-      call Probe_1d_Nodes(Grid(g))
     end if
 
   end do

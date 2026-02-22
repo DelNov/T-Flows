@@ -126,6 +126,60 @@
 
   end if ! K_EPS
 
+  !-----------------!
+  !   K-omega-sst   !
+  !-----------------!
+  if(Turb % model .eq. K_OMEGA_SST) then
+    call Var_Mod_Create_Solution(Turb % kin,   A, 'KIN', '')
+    call Var_Mod_Create_Solution(Turb % omega, A, 'OMG', '')
+
+    ! Other turbulent quantities
+    allocate(Turb % vis_t  (-nb:nc));  Turb % vis_t   = 0.
+    allocate(Turb % vis_w  (-nb:nc));  Turb % vis_w   = 0.  ! wall visc
+    allocate(Turb % p_kin  (-nb:nc));  Turb % p_kin   = 0.
+    allocate(Turb % t_scale(-nb:nc));  Turb % t_scale = 0.
+
+    ! Reynolds stresses
+    call Var_Mod_Create_New_Only(Turb % uu, Grid, 'UU')
+    call Var_Mod_Create_New_Only(Turb % vv, Grid, 'VV')
+    call Var_Mod_Create_New_Only(Turb % ww, Grid, 'WW')
+    call Var_Mod_Create_New_Only(Turb % uv, Grid, 'UV')
+    call Var_Mod_Create_New_Only(Turb % uw, Grid, 'UW')
+    call Var_Mod_Create_New_Only(Turb % vw, Grid, 'VW')
+
+    if(Flow % heat_transfer) then
+      call Var_Mod_Create_Solution(Turb % t2, A, 'T2', '')
+      call Var_Mod_Create_New_Only(Turb % ut, Grid, 'UT')
+      call Var_Mod_Create_New_Only(Turb % vt, Grid, 'VT')
+      call Var_Mod_Create_New_Only(Turb % wt, Grid, 'WT')
+      allocate(Turb % con_w(-nb:nc));  Turb % con_w = 0.
+      allocate(Turb % p_t2 (-nb:nc));  Turb % p_t2  = 0.
+    end if ! Flow % heat_transfer
+
+    ! Turbulent statistics; if needed
+    if(Turb % statistics) then
+
+      ! Time-averaged velocities (and temperature)
+      allocate(Turb % u_mean(-nb:nc));  Turb % u_mean = 0.
+      allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
+      allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
+      allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
+      if(Flow % heat_transfer) then
+        allocate(Turb % t_mean (-nb:nc));  Turb % t_mean  = 0.
+        allocate(Turb % q_mean (-nb:nc));  Turb % q_mean  = 0.
+        allocate(Turb % t2_mean(-nb:nc));  Turb % t2_mean = 0.
+        allocate(Turb % ut_mean(-nb:nc));  Turb % ut_mean = 0.
+        allocate(Turb % vt_mean(-nb:nc));  Turb % vt_mean = 0.
+        allocate(Turb % wt_mean(-nb:nc));  Turb % wt_mean = 0.
+      end if
+
+      ! Time-averaged modeled quantities
+      allocate(Turb % kin_mean(-nb:nc))  ;  Turb % kin_mean   = 0.
+      allocate(Turb % omega_mean(-nb:nc));  Turb % omega_mean = 0.
+    end if
+  end if
+
+
   !------------------!
   !   K-eps-zeta-f   !
   !------------------!

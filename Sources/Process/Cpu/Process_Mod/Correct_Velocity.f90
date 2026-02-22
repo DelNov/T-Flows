@@ -43,7 +43,7 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: c, c1, c2, s, reg
-  real                       :: cfl_t, pe_t, dens_f, visc_f, dt
+  real                       :: cfl_t, pe_t, dens_f, visc_f, dt, max_diff
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -132,10 +132,6 @@
     end if    ! pressure
   end do      ! regions
 
-  ! call Grid % Save_Debug_Vtu(append = "bp",       &
-  !                            inside_cell = b,     &
-  !                            inside_name = "bp")
-
   Flow % vol_res = 0.0
   do c = Cells_In_Domain()
     Flow % vol_res = max(Flow % vol_res, abs(b(c)))
@@ -169,11 +165,29 @@
   call Global % Max_Real(Flow % cfl_max)
   call Global % Max_Real(Flow % pe_max)
 
-  if(Flow % p_m_coupling == SIMPLE) then
-    call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
-  else
-    if(Flow % i_corr == Flow % n_piso_corrections) then
-      call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
+  call Info % Iter_Fill_At(1, 5, 'dum', Flow % vol_res)
+
+  if(Flow % has_ambient .and. .not. Flow % reached_ambient_pressure) then
+
+    ! At boundaries, p asymptotically reaches pp
+    max_diff = -HUGE
+    do reg = Boundary_Regions()
+      if(Grid % region % type(reg) .eq. AMBIENT) then
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
+          max_diff = max(max_diff, abs(p % n(c2) - pp % n(c2)))
+        end do
+      end if
+    end do
+
+    ! Once pressure at boundaries reaches the value prescribed in control
+    ! file, which was up to no in pp, the pp can go back to its usual mode
+    ! (from zero to one) and serve only to close the continuity equation.
+    if(max_diff .lt. pp % tol) then
+      do c = Cells_In_Domain_And_Buffers()
+        pp % n(c) = 0.0
+      end do
+      Flow % reached_ambient_pressure = .true.
     end if
   end if
 

@@ -95,18 +95,6 @@
       procedure          :: Connect_Real_Cell
       procedure          :: Connect_Real_Face
       procedure          :: Connect_Real_Node
-      procedure          :: Safe_Connect_Int_Cell
-      procedure          :: Safe_Connect_Int_Face
-      procedure          :: Safe_Connect_Int_Node
-      procedure          :: Safe_Connect_Real_Cell
-      procedure          :: Safe_Connect_Real_Face
-      procedure          :: Safe_Connect_Real_Node
-      procedure          :: Unsafe_Connect_Int_Cell
-      procedure          :: Unsafe_Connect_Int_Face
-      procedure          :: Unsafe_Connect_Int_Node
-      procedure          :: Unsafe_Connect_Real_Cell
-      procedure          :: Unsafe_Connect_Real_Face
-      procedure          :: Unsafe_Connect_Real_Node
       procedure          :: Disconnect_Int_Cell
       procedure          :: Disconnect_Int_Face
       procedure          :: Disconnect_Int_Node
@@ -136,18 +124,6 @@
 #   include "Work_Mod/Connect_Real_Cell.f90"
 #   include "Work_Mod/Connect_Real_Face.f90"
 #   include "Work_Mod/Connect_Real_Node.f90"
-#   include "Work_Mod/Safe/Connect_Int_Cell.f90"
-#   include "Work_Mod/Safe/Connect_Int_Face.f90"
-#   include "Work_Mod/Safe/Connect_Int_Node.f90"
-#   include "Work_Mod/Safe/Connect_Real_Cell.f90"
-#   include "Work_Mod/Safe/Connect_Real_Face.f90"
-#   include "Work_Mod/Safe/Connect_Real_Node.f90"
-#   include "Work_Mod/Unsafe/Connect_Int_Cell.f90"
-#   include "Work_Mod/Unsafe/Connect_Int_Face.f90"
-#   include "Work_Mod/Unsafe/Connect_Int_Node.f90"
-#   include "Work_Mod/Unsafe/Connect_Real_Cell.f90"
-#   include "Work_Mod/Unsafe/Connect_Real_Face.f90"
-#   include "Work_Mod/Unsafe/Connect_Real_Node.f90"
 #   include "Work_Mod/Disconnect_Int_Cell.f90"
 #   include "Work_Mod/Disconnect_Int_Face.f90"
 #   include "Work_Mod/Disconnect_Int_Node.f90"

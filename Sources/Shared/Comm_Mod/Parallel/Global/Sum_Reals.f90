@@ -3,10 +3,7 @@
                                phi_05, phi_06, phi_07, phi_08)
 !------------------------------------------------------------------------------!
 !>  The subroutine Sum_Reals in a parallel computing framework calculates
-!>  the global sum of up to eight real values across all processors. This
-!>  subroutine is vital in scenarios where an aggregate sum of distributed
-!>  real value is required for decision-making, post-processing or further
-!>  computational tasks.
+!>  the global sum of up to eight real values across all processors.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -22,8 +19,6 @@
 !-----------------------------------[Locals]-----------------------------------!
   real    :: phi(8)  ! watch out: hard-coded size
   integer :: n
-!------------------------[Avoid unused parent warning]-------------------------!
-  Unused(Global)
 !==============================================================================!
 
   n = 1;  phi(n) = phi_01

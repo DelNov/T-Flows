@@ -15,6 +15,8 @@
   allocate(Work % r_cell(r) % array(-Work % max_nb : Work % max_nc))
   Work % r_cell(r) % array(:) = 0.0
 
-  call Gpu % Vector_Real_Create_On_Device(Work % r_cell(r) % array)
+  call Gpu % Vector_Real_Copy_To_Device(lbound(Work % r_cell(r) % array,1),  &
+                                        ubound(Work % r_cell(r) % array,1),  &
+                                               Work % r_cell(r) % array)
 
   end subroutine

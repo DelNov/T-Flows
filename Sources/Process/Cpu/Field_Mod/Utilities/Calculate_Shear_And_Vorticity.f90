@@ -46,7 +46,7 @@
   call Flow % Grad_Variable(Flow % v)
   call Flow % Grad_Variable(Flow % w)
 
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()
     Flow % shear(c) = u % x(c)**2                     &
                     + v % y(c)**2                     &
                     + w % z(c)**2                     &

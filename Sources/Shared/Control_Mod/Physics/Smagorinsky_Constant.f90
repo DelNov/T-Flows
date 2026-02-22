@@ -10,6 +10,6 @@
   logical,   optional :: verbose  !! controls output verbosity
 !==============================================================================!
 
-  call Control % Read_Real_Item('SMAGORINSKY_CONSTANT', 0.17, val, verbose)
+  call Control % Read_Real_Item('SMAGORINSKY_CONSTANT', 0.1, val, verbose)
 
   end subroutine

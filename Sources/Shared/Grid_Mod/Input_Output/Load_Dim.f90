@@ -149,6 +149,17 @@
   read(fu) Grid % per_y
   read(fu) Grid % per_z
 
+  Assert(Grid % n_x_planes .ge. 0)
+  Assert(Grid % n_y_planes .ge. 0)
+  Assert(Grid % n_z_planes .ge. 0)
+
+  call File % Buffered_Read_Real_Array(fu,  &
+                                   Grid % x_coord_plane(1:Grid % n_x_planes))
+  call File % Buffered_Read_Real_Array(fu,  &
+                                   Grid % y_coord_plane(1:Grid % n_y_planes))
+  call File % Buffered_Read_Real_Array(fu,  &
+                                   Grid % z_coord_plane(1:Grid % n_z_planes))
+
   close(fu)
 
   call Profiler % Stop('Load_Dim')

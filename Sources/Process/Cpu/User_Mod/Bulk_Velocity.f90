@@ -9,11 +9,9 @@
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   type(Field_Type), target :: Flow
-  real                     :: bulk_vel
+  real,        intent(out) :: bulk_vel
 !-----------------------------------[Locals]-----------------------------------!
-! type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
-  real                     :: velocity_in, velocity_out
 !==============================================================================!
 
   ! Take alias
@@ -24,10 +22,7 @@
 
   ! By default, assume all outflow is defined as convective
   if(bulk % area_in > TINY) then
-    velocity_in  = bulk % vol_in / bulk % area_in
-    velocity_out = bulk % vol_in / bulk % area_out
-
-    bulk_vel = velocity_out
+    bulk_vel = bulk % vol_in / bulk % area_out
   end if
 
   end subroutine

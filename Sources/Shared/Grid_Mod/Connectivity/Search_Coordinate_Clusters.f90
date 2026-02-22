@@ -94,9 +94,15 @@
     orphan(nf:nl) = .false.
   end if
 
-  !-----------------------------------------!
-  !   Browse three cooordinate directions   !
-  !-----------------------------------------!
+  !-------------------------------------------------------------------!
+  !   Cluster coordinates per direction (x/y/z) using Approx_Real     !
+  !- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -!
+  !   For each direction i = 1..3:                                    !
+  !     - scan all non-orphan entities (nodes or cells)               !
+  !     - group nearly-equal coordinates into clusters                !
+  !     - record cluster coordinate (representative) and frequency    !
+  !     - stop counting if MAX_CLUSTERS is exceeded (too irregular)   !
+  !-------------------------------------------------------------------!
   do i = 1, 3
 
     ! Browse through all the nodes or cells (including boundary cells)
@@ -162,9 +168,10 @@
     if(nz > MAX_CLUSTERS) nz = -1
   end if
 
-  !-----------------------------------------!
-  !   Browse three cooordinate directions   !
-  !-----------------------------------------!
+  !------------------------------------------------------------------!
+  !   Decide homogeneity per direction from cluster_vis uniformity   !
+  !   Optionally "regularize" nodal coordinates to uniform spacing   !
+  !------------------------------------------------------------------!
   do i = 1, 3
 
     ! If diriection didn't fail
@@ -237,5 +244,41 @@
   end do        ! coordinate directions
   print '(a)', ' #------------------------------------------------------'
 
+  !--------------------------------------------!
+  !   Store homogeneous directions into grid   !
+  !--------------------------------------------!
+  if(nodal) then
+    do i = 1, 3
+
+      n = n_xyz(i)
+
+      ! If diriection is homogeneous
+      if(n .le. MAX_CLUSTERS) then
+        if(i .eq. 1) then
+          Grid % n_x_planes = n
+          call Sort % Real_Array(cluster_xyz(1:n,i))
+          call Enlarge % Array_Real(Grid % x_coord_plane, i=(/1,n/))
+          Grid % x_coord_plane(1:n) = cluster_xyz(1:n,i)
+        end if
+        if(i .eq. 2) then
+          Grid % n_y_planes = n
+          call Sort % Real_Array(cluster_xyz(1:n,i))
+          call Enlarge % Array_Real(Grid % y_coord_plane, i=(/1,n/))
+          Grid % y_coord_plane(1:n) = cluster_xyz(1:n,i)
+        end if
+        if(i .eq. 3) then
+          Grid % n_z_planes = n
+          call Sort % Real_Array(cluster_xyz(1:n,i))
+          call Enlarge % Array_Real(Grid % z_coord_plane, i=(/1,n/))
+          Grid % z_coord_plane(1:n) = cluster_xyz(1:n,i)
+        end if
+      else
+        if(i .eq. 1)  Grid % n_x_planes = 0
+        if(i .eq. 2)  Grid % n_y_planes = 0
+        if(i .eq. 3)  Grid % n_z_planes = 0
+      end if
+
+    end do  ! i = 1, 3
+  end if    ! nodal
 
   end subroutine

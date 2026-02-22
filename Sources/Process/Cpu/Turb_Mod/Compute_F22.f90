@@ -122,6 +122,13 @@
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
 
+      ! Ambient when it is inflow (see v_flux check)
+      if( (Grid % Bnd_Cond_Type(c2) .eq. AMBIENT  &
+           .and. Flow % v_flux % n(s) .gt. 0.0)) then
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+        b(c1) = b(c1) + a12 * phi % n(c2)
+      end if
+
       ! Wall and wall flux; solid walls in any case
       if( (Grid % Bnd_Cond_Type(c2) .eq. WALL).or.       &
           (Grid % Bnd_Cond_Type(c2) .eq. WALLFL) ) then

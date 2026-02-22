@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Run(Sol, A, phi, b)
+  subroutine Run(Sol, A, phi, b, norm)
 !------------------------------------------------------------------------------!
 !>  The Run subroutine within the Solver_Mod module is the best example on how
 !>  encapsulation of decision-making process for branching between native
@@ -15,6 +15,8 @@
   type(Matrix_Type)  :: A                                  !! T-Flows matrix
   type(Var_Type)     :: phi                                !! unknown variable
   real               :: b(Sol % Nat % pnt_grid % n_cells)  !! source vector
+  real, optional     :: norm                               !! normalization
+                                                           !! factor
 !==============================================================================!
 
   ! Call linear solver to solve the equations
@@ -27,7 +29,8 @@
                                   phi % miter,   &  !! maximum iterations
                                   phi % niter,   &  !! performed iterations
                                   phi % tol,     &  !! target tolerance
-                                  phi % res)        !! final/achieved residual
+                                  phi % res,     &  !! final/achieved residual
+                                  norm)             !! normalization factor
   else
     call phi % Pet % Solve_Petsc(phi % solver,   &  !! solver's name
                                  phi % prec,     &  !! preconditioner's name

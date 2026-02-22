@@ -2,70 +2,427 @@
 # Dependencies for: ./Turb_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Turb_Mod.o:\
-Turb_Mod/*.f90 \
+Turb_Mod/Y_Plus_Rough_Walls.f90 \
+Turb_Mod/Wall_Function.f90 \
+Turb_Mod/Vis_T_Wale.f90 \
+Turb_Mod/Vis_T_Tensorial.f90 \
+Turb_Mod/Vis_T_Subgrid.f90 \
+Turb_Mod/Vis_T_Spalart_Allmaras.f90 \
+Turb_Mod/Vis_T_K_Eps_Zeta_F.f90 \
+Turb_Mod/Vis_T_K_Eps.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Rans.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Prandtl.f90 \
+Turb_Mod/Vis_T_Dynamic.f90 \
+Turb_Mod/U_Plus_Log_Law.f90 \
+Turb_Mod/Time_And_Length_Scale.f90 \
+Turb_Mod/Tau_Wall_Log_Law.f90 \
+Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Vis_Spalart_Allmaras.f90 \
+Turb_Mod/Src_T2.f90 \
+Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Kin_K_Eps.f90 \
+Turb_Mod/Src_F22_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps.f90 \
+Turb_Mod/Roughness_Coeff.f90 \
+Turb_Mod/Prandtl_Turb.f90 \
+Turb_Mod/Monin_Obukov_Thermal.f90 \
+Turb_Mod/Monin_Obukov_Momentum.f90 \
+Turb_Mod/Main_Turb.f90 \
+Turb_Mod/Les.f90 \
+Turb_Mod/Init_Turb.f90 \
+Turb_Mod/Face_Vis.f90 \
+Turb_Mod/Face_Stress.f90 \
+Turb_Mod/Face_Diff_and_Stress.f90 \
+Turb_Mod/Face_Cond_And_Stress.f90 \
+Turb_Mod/Ebf_Scalar.f90 \
+Turb_Mod/Ebf_Momentum.f90 \
+Turb_Mod/Create_Turb.f90 \
+Turb_Mod/Const_Spalart_Allmaras.f90 \
+Turb_Mod/Const_Les.f90 \
+Turb_Mod/Const_K_Eps_Zeta_F.f90 \
+Turb_Mod/Const_K_Eps.f90 \
+Turb_Mod/Compute_Variable.f90 \
+Turb_Mod/Compute_F22.f90 \
+Turb_Mod/Calculate_Stress.f90 \
+Turb_Mod/Calculate_Scalar_Flux.f90 \
+Turb_Mod/Calculate_Mean.f90 \
+Turb_Mod/Calculate_Heat_Flux.f90 \
+Turb_Mod/Calculate_Deltas.f90 \
+Turb_Mod/Beta_Scalar.f90 \
+Turb_Mod/Alias_Vis.f90 \
+Turb_Mod/Alias_T2.f90 \
+Turb_Mod/Alias_Stresses.f90 \
+Turb_Mod/Alias_K_Eps_Zeta_F.f90 \
+Turb_Mod/Alias_K_Eps.f90 \
+Turb_Mod/Alias_Heat_Fluxes.f90 \
+Iter_Mod/Set_Tol.f90 \
+Iter_Mod/Set_Min.f90 \
+Iter_Mod/Set_Max.f90 \
 $(DIR_OBJECT)/Iter_Mod.o \
-Iter_Mod/*.f90 \
+Iter_Mod/Needs_More_Iterations.f90 \
+Iter_Mod/Max_Fields_Residual.f90 \
+Iter_Mod/Get_Tol.f90 \
+Iter_Mod/Get_Min.f90 \
+Iter_Mod/Get_Max.f90 \
+Iter_Mod/Current.f90 \
+Info_Mod/Time_To_Exit.f90 \
+Info_Mod/Time_Start.f90 \
+Info_Mod/Time_Print.f90 \
+Info_Mod/Time_Fill.f90 \
+Info_Mod/Start_Info.f90 \
 $(DIR_OBJECT)/Info_Mod.o \
-Info_Mod/*.f90 
+Info_Mod/Iter_Start.f90 \
+Info_Mod/Iter_Print.f90 \
+Info_Mod/Iter_Fill_Scalar_At.f90 \
+Info_Mod/Iter_Fill.f90 \
+Info_Mod/Iter_Fill_At.f90 \
+Info_Mod/Bulk_Start.f90 \
+Info_Mod/Bulk_Print.f90 \
+Info_Mod/Bulk_Fill.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Matrix_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Matrix_Mod.o:\
-Matrix_Mod/*/readme \
-Matrix_Mod/*/*.f90 \
-Matrix_Mod/*.f90 \
+Matrix_Mod/Unused/readme \
+Matrix_Mod/Unused/Create_Matrix.f90 \
+Matrix_Mod/Create_Matrix.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vector_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vector_Mod.o:\
-Vector_Mod/*.f90 \
+Vector_Mod/Allocate.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Backup_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Backup_Mod.o:\
+User_Mod/Types.f90 \
+User_Mod/Source.f90 \
+User_Mod/Save_Swarm.f90 \
+User_Mod/Save_Results.f90 \
 $(DIR_OBJECT)/User_Mod.o \
-User_Mod/*.f90 \
-Backup_Mod/*.f90 
+User_Mod/Interface_Exchange.f90 \
+User_Mod/Insert_Particles.f90 \
+User_Mod/Initialize_Variables.f90 \
+User_Mod/Get_User_Field_For_Saving.f90 \
+User_Mod/Force.f90 \
+User_Mod/End_Of_Time_Step.f90 \
+User_Mod/End_Of_Simulation.f90 \
+User_Mod/End_Of_Iteration.f90 \
+User_Mod/End_Of_Correct_Velocity.f90 \
+User_Mod/End_Of_Compute_Vof.f90 \
+User_Mod/End_Of_Compute_Scalar.f90 \
+User_Mod/End_Of_Compute_Pressure.f90 \
+User_Mod/End_Of_Compute_Momentum.f90 \
+User_Mod/End_Of_Compute_Energy.f90 \
+User_Mod/Bulk_Velocity.f90 \
+User_Mod/Beginning_Of_Time_Step.f90 \
+User_Mod/Beginning_Of_Simulation.f90 \
+User_Mod/Beginning_Of_Iteration.f90 \
+User_Mod/Beginning_Of_Correct_Velocity.f90 \
+User_Mod/Beginning_Of_Compute_Vof.f90 \
+User_Mod/Beginning_Of_Compute_Scalar.f90 \
+User_Mod/Beginning_Of_Compute_Pressure.f90 \
+User_Mod/Beginning_Of_Compute_Momentum.f90 \
+User_Mod/Beginning_Of_Compute_Energy.f90 \
+User_Mod/Before_Exit.f90 \
+Backup_Mod/Time_To_Save_Backup.f90 \
+Backup_Mod/Save_Variable.f90 \
+Backup_Mod/Save_Swarm.f90 \
+Backup_Mod/Save_Real.f90 \
+Backup_Mod/Save_Real_Array.f90 \
+Backup_Mod/Save_Log.f90 \
+Backup_Mod/Save_Log_Array.f90 \
+Backup_Mod/Save_Int.f90 \
+Backup_Mod/Save_Int_Array.f90 \
+Backup_Mod/Save_Face_Real.f90 \
+Backup_Mod/Save.f90 \
+Backup_Mod/Save_Cell_Real.f90 \
+Backup_Mod/Load_Variable.f90 \
+Backup_Mod/Load_Swarm.f90 \
+Backup_Mod/Load_Real.f90 \
+Backup_Mod/Load_Real_Array.f90 \
+Backup_Mod/Load_Log.f90 \
+Backup_Mod/Load_Log_Array.f90 \
+Backup_Mod/Load_Int.f90 \
+Backup_Mod/Load_Int_Array.f90 \
+Backup_Mod/Load_Face_Real.f90 \
+Backup_Mod/Load.f90 \
+Backup_Mod/Load_Cell_Real.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Var_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Var_Mod.o:\
-Var_Mod/*.f90 \
+Var_Mod/Destroy_Solution.f90 \
+Var_Mod/Destroy_New_Only.f90 \
+Var_Mod/Create_Solution.f90 \
+Var_Mod/Create_New_Only.f90 \
+Var_Mod/Bnd_Cond_Type.f90 \
+Var_Mod/Bnd_Cond_Name.f90 \
+Petsc_Mod/True/Solve_Petsc.f90 \
+Petsc_Mod/True/Destroy_Petsc.f90 \
+Petsc_Mod/True/Create_Petsc.f90 \
 $(DIR_OBJECT)/Petsc_Mod.o \
-Petsc_Mod/*/*.f90 
+Petsc_Mod/Fake/Solve_Petsc.f90 \
+Petsc_Mod/Fake/Destroy_Petsc.f90 \
+Petsc_Mod/Fake/Create_Petsc.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Face_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Face_Mod.o:\
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-Face_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 \
+Face_Mod/Allocate.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Front_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Front_Mod.o:\
 $(DIR_OBJECT)/Vert_Mod.o \
-Vert_Mod/*.f90 \
+Vert_Mod/Intialize_Vert.f90 \
 $(DIR_OBJECT)/Side_Mod.o \
 $(DIR_SHARED)/Isoap_Mod/readme \
 $(DIR_OBJECT)/Isoap_Mod.o \
-$(DIR_SHARED)/Isoap_Mod/*.f90 \
+$(DIR_SHARED)/Isoap_Mod/Main_Isoap.f90 \
+$(DIR_SHARED)/Isoap_Mod/Isopol.f90 \
+$(DIR_SHARED)/Isoap_Mod/Extract_Iso_Polygons.f90 \
+Front_Mod/Save_Debug_Front_Vtu.f90 \
 Front_Mod/readme \
-Front_Mod/*.f90 \
+Front_Mod/Print_Front_Statistics.f90 \
+Front_Mod/Place_Front_At_Value.f90 \
+Front_Mod/Mark_Cells_And_Faces.f90 \
+Front_Mod/Initialize_Front.f90 \
+Front_Mod/Find_Vertex_Elements.f90 \
+Front_Mod/Find_Sides.f90 \
+Front_Mod/Find_Front_Elements.f90 \
+Front_Mod/Compute_Distance_Function_And_Vof.f90 \
+Front_Mod/Compress_Front_Vertices.f90 \
+Front_Mod/Clean.f90 \
+Front_Mod/Check_Elements.f90 \
+Front_Mod/Calculate_Element_Normals.f90 \
+Front_Mod/Calculate_Element_Centroids.f90 \
+Front_Mod/Allocate_Front.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 \
 $(DIR_OBJECT)/Elem_Mod.o \
-Elem_Mod/*.f90 
+Elem_Mod/Initialize_Elem.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Surf_Mod/Place_Surf_At_Value.f90
@@ -76,317 +433,2129 @@ $(DIR_OBJECT)/Place_Surf_At_Value.o:
 # Dependencies for: ./Vof_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vof_Mod.o:\
-Vof_Mod/*/*.f90 \
+Vof_Mod/Utilities/Update_Physical_Properties.f90 \
+Vof_Mod/Utilities/Surface_Tension_Force.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Estimate.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90 \
+Vof_Mod/Utilities/Interpolate_Var_To_Face_With_Jump.f90 \
+Vof_Mod/Utilities/Grad_Variable_With_Jump.f90 \
+Vof_Mod/Utilities/Grad_Variable_With_Front.f90 \
+Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90 \
+Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90 \
+Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90 \
+Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90 \
+Vof_Mod/Curvature/Smooth_Vof_And_Compute_Surface_Normals.f90 \
+Vof_Mod/Curvature/Smooth_Scalar.f90 \
+Vof_Mod/Curvature/Smooth_Curvature.f90 \
+Vof_Mod/Curvature/Curvature_Csf.f90 \
+Vof_Mod/Core/Solve_System.f90 \
+Vof_Mod/Core/Predict_Beta.f90 \
+Vof_Mod/Core/Max_Courant_Number.f90 \
+Vof_Mod/Core/Main_Vof.f90 \
+Vof_Mod/Core/Initialize_From_Stl.f90 \
+Vof_Mod/Core/Discretize.f90 \
+Vof_Mod/Core/Create_Vof.f90 \
+Vof_Mod/Core/Correct_Beta.f90 \
+Vof_Mod/Core/Compute_Vof.f90 \
+Turb_Mod/Y_Plus_Rough_Walls.f90 \
+Turb_Mod/Wall_Function.f90 \
+Turb_Mod/Vis_T_Wale.f90 \
+Turb_Mod/Vis_T_Tensorial.f90 \
+Turb_Mod/Vis_T_Subgrid.f90 \
+Turb_Mod/Vis_T_Spalart_Allmaras.f90 \
+Turb_Mod/Vis_T_K_Eps_Zeta_F.f90 \
+Turb_Mod/Vis_T_K_Eps.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Rans.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Prandtl.f90 \
+Turb_Mod/Vis_T_Dynamic.f90 \
+Turb_Mod/U_Plus_Log_Law.f90 \
+Turb_Mod/Time_And_Length_Scale.f90 \
+Turb_Mod/Tau_Wall_Log_Law.f90 \
+Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Vis_Spalart_Allmaras.f90 \
+Turb_Mod/Src_T2.f90 \
+Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Kin_K_Eps.f90 \
+Turb_Mod/Src_F22_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps.f90 \
+Turb_Mod/Roughness_Coeff.f90 \
+Turb_Mod/Prandtl_Turb.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
+Turb_Mod/Monin_Obukov_Thermal.f90 \
+Turb_Mod/Monin_Obukov_Momentum.f90 \
+Turb_Mod/Main_Turb.f90 \
+Turb_Mod/Les.f90 \
+Turb_Mod/Init_Turb.f90 \
+Turb_Mod/Face_Vis.f90 \
+Turb_Mod/Face_Stress.f90 \
+Turb_Mod/Face_Diff_and_Stress.f90 \
+Turb_Mod/Face_Cond_And_Stress.f90 \
+Turb_Mod/Ebf_Scalar.f90 \
+Turb_Mod/Ebf_Momentum.f90 \
+Turb_Mod/Create_Turb.f90 \
+Turb_Mod/Const_Spalart_Allmaras.f90 \
+Turb_Mod/Const_Les.f90 \
+Turb_Mod/Const_K_Eps_Zeta_F.f90 \
+Turb_Mod/Const_K_Eps.f90 \
+Turb_Mod/Compute_Variable.f90 \
+Turb_Mod/Compute_F22.f90 \
+Turb_Mod/Calculate_Stress.f90 \
+Turb_Mod/Calculate_Scalar_Flux.f90 \
+Turb_Mod/Calculate_Mean.f90 \
+Turb_Mod/Calculate_Heat_Flux.f90 \
+Turb_Mod/Calculate_Deltas.f90 \
+Turb_Mod/Beta_Scalar.f90 \
+Turb_Mod/Alias_Vis.f90 \
+Turb_Mod/Alias_T2.f90 \
+Turb_Mod/Alias_Stresses.f90 \
+Turb_Mod/Alias_K_Eps_Zeta_F.f90 \
+Turb_Mod/Alias_K_Eps.f90 \
+Turb_Mod/Alias_Heat_Fluxes.f90 \
+Surf_Mod/Swap_Side.f90 \
+Surf_Mod/Split_Element.f90 \
+Surf_Mod/Smooth_Surf.f90 \
+Surf_Mod/Relax_Topology.f90 \
+Surf_Mod/Relax_Geometry.f90 \
+Surf_Mod/Refine.f90 \
 Surf_Mod/readme \
+Surf_Mod/Place_Surf_At_Value.f90 \
 $(DIR_OBJECT)/Surf_Mod.o \
-Surf_Mod/*.f90 \
+Surf_Mod/Initialize_Surf.f90 \
+Surf_Mod/Improve_Mesh_Quality.f90 \
+Surf_Mod/Handle_6_Points.f90 \
+Surf_Mod/Handle_5_Points.f90 \
+Surf_Mod/Handle_4_Points.f90 \
+Surf_Mod/Handle_3_Points.f90 \
+Surf_Mod/Find_Surf_Elements.f90 \
+Surf_Mod/Find_Boundaries.f90 \
 Surf_Mod/Edge_Numbering.h90 \
+Surf_Mod/Distribute_Smooth.f90 \
+Surf_Mod/Distribute_Mesh.f90 \
+Surf_Mod/Distribute_Cell_Coords.f90 \
+Surf_Mod/Compress_Surf_Vertices.f90 \
+Surf_Mod/Clean.f90 \
+Surf_Mod/Check_Side.f90 \
+Surf_Mod/Calculate_Curvatures_From_Verts.f90 \
+Surf_Mod/Calculate_Curvatures_From_Elems.f90 \
+Surf_Mod/Calculate_Curvatures_From_Edges.f90 \
+Surf_Mod/Allocate_Surf.f90 \
+Surf_Mod/Advance_Vertices.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Binary.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Ascii.f90 \
 $(DIR_OBJECT)/Stl_Mod.o \
-$(DIR_SHARED)/Stl_Mod/*.f90 
+$(DIR_SHARED)/Stl_Mod/N_Facets.f90 \
+$(DIR_SHARED)/Stl_Mod/Facets_Vert_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Normal.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Body.f90 \
+$(DIR_SHARED)/Stl_Mod/Create_From_File.f90 \
+$(DIR_SHARED)/Stl_Mod/Allocate_Stl.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Native_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Native_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Work_Mod/Finalize_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
 $(DIR_OBJECT)/Vector_Mod.o \
-Vector_Mod/*.f90 \
-Native_Mod/*.f90 \
-Matrix_Mod/*/readme \
+Vector_Mod/Allocate.f90 \
+Native_Mod/Solve_Native.f90 \
+Native_Mod/Root_Mean_Square.f90 \
+Native_Mod/Residual_Vector.f90 \
+Native_Mod/Prec_Solve.f90 \
+Native_Mod/Prec_Form.f90 \
+Native_Mod/Normalized_Root_Mean_Square.f90 \
+Native_Mod/Create_Native.f90 \
+Native_Mod/Cg.f90 \
+Native_Mod/Bicg.f90 \
+Matrix_Mod/Unused/readme \
+Matrix_Mod/Unused/Create_Matrix.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*/*.f90 \
-Matrix_Mod/*.f90 \
+Matrix_Mod/Create_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Flow_Rates.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Expansion_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Schmidt_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Prandtl_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulence_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Surface.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Front.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Thermal_Conductivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Subgrid_Scale_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Diameter.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Surface_Tension.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Smagorinsky_Constant.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Saturation_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Rough_Walls.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Roughness_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Pressure_Drops.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Potential_Initialization.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Point_For_Monitoring_Planes.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Viscosities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Densities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Conductivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Capacities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Particle_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Phases.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Domains.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Monin_Obukov.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Max_Particles.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Transfer_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Lee_Model_Coefficients.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Latent_Heat.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Interface_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Transfer.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Capacity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Gravitational_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Extrapolate_Temperature_Exp.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Dynamic_Viscosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Buoyancy.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Bulk_Velocities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Angular_Velocity_Vector.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Step.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Integration_Scheme.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Skewness_Correction_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Report_Volume_Balance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Pressure_Momentum_Coupling.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Time_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Piso_Corrections.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Min_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Courant_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gu_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Choi_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blend_System_Matrices.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Potential.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Preconditioner_For_System_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Max_Threads.f90 \
+$(DIR_SHARED)/Control_Mod/Linear_Solvers.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Wall_Time_Max_Hours.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Swarm_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_Units.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_At_Boundaries.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Condition.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Results_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Problem_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Backup_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Root.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Domain.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Similar_Warning.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Two_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Three_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_One_Key.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Root_File.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Domain_File.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Interface_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Interface_Mod.o:\
+Turb_Mod/Y_Plus_Rough_Walls.f90 \
+Turb_Mod/Wall_Function.f90 \
+Turb_Mod/Vis_T_Wale.f90 \
+Turb_Mod/Vis_T_Tensorial.f90 \
+Turb_Mod/Vis_T_Subgrid.f90 \
+Turb_Mod/Vis_T_Spalart_Allmaras.f90 \
+Turb_Mod/Vis_T_K_Eps_Zeta_F.f90 \
+Turb_Mod/Vis_T_K_Eps.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Rans.f90 \
+Turb_Mod/Vis_T_Hybrid_Les_Prandtl.f90 \
+Turb_Mod/Vis_T_Dynamic.f90 \
+Turb_Mod/U_Plus_Log_Law.f90 \
+Turb_Mod/Time_And_Length_Scale.f90 \
+Turb_Mod/Tau_Wall_Log_Law.f90 \
+Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Vis_Spalart_Allmaras.f90 \
+Turb_Mod/Src_T2.f90 \
+Turb_Mod/Src_Kin_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Kin_K_Eps.f90 \
+Turb_Mod/Src_F22_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps_Zeta_F.f90 \
+Turb_Mod/Src_Eps_K_Eps.f90 \
+Turb_Mod/Roughness_Coeff.f90 \
+Turb_Mod/Prandtl_Turb.f90 \
 $(DIR_OBJECT)/Turb_Mod.o \
-Turb_Mod/*.f90 \
+Turb_Mod/Monin_Obukov_Thermal.f90 \
+Turb_Mod/Monin_Obukov_Momentum.f90 \
+Turb_Mod/Main_Turb.f90 \
+Turb_Mod/Les.f90 \
+Turb_Mod/Init_Turb.f90 \
+Turb_Mod/Face_Vis.f90 \
+Turb_Mod/Face_Stress.f90 \
+Turb_Mod/Face_Diff_and_Stress.f90 \
+Turb_Mod/Face_Cond_And_Stress.f90 \
+Turb_Mod/Ebf_Scalar.f90 \
+Turb_Mod/Ebf_Momentum.f90 \
+Turb_Mod/Create_Turb.f90 \
+Turb_Mod/Const_Spalart_Allmaras.f90 \
+Turb_Mod/Const_Les.f90 \
+Turb_Mod/Const_K_Eps_Zeta_F.f90 \
+Turb_Mod/Const_K_Eps.f90 \
+Turb_Mod/Compute_Variable.f90 \
+Turb_Mod/Compute_F22.f90 \
+Turb_Mod/Calculate_Stress.f90 \
+Turb_Mod/Calculate_Scalar_Flux.f90 \
+Turb_Mod/Calculate_Mean.f90 \
+Turb_Mod/Calculate_Heat_Flux.f90 \
+Turb_Mod/Calculate_Deltas.f90 \
+Turb_Mod/Beta_Scalar.f90 \
+Turb_Mod/Alias_Vis.f90 \
+Turb_Mod/Alias_T2.f90 \
+Turb_Mod/Alias_Stresses.f90 \
+Turb_Mod/Alias_K_Eps_Zeta_F.f90 \
+Turb_Mod/Alias_K_Eps.f90 \
+Turb_Mod/Alias_Heat_Fluxes.f90 \
+$(DIR_SHARED)/Profiler_Mod/Update_By_Rank.f90 \
+$(DIR_SHARED)/Profiler_Mod/Stop.f90 \
+$(DIR_SHARED)/Profiler_Mod/Statistics.f90 \
+$(DIR_SHARED)/Profiler_Mod/Start.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
-Interface_Mod/*.f90 \
+Interface_Mod/Exchange.f90 \
+Interface_Mod/Create.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Flow_Rates.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Expansion_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Schmidt_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Prandtl_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulence_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Surface.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Front.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Thermal_Conductivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Subgrid_Scale_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Diameter.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Surface_Tension.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Smagorinsky_Constant.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Saturation_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Rough_Walls.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Roughness_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Pressure_Drops.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Potential_Initialization.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Point_For_Monitoring_Planes.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Viscosities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Densities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Conductivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Capacities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Particle_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Phases.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Domains.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Monin_Obukov.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Max_Particles.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Transfer_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Lee_Model_Coefficients.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Latent_Heat.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Interface_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Transfer.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Capacity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Gravitational_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Extrapolate_Temperature_Exp.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Dynamic_Viscosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Buoyancy.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Bulk_Velocities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Angular_Velocity_Vector.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Step.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Integration_Scheme.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Skewness_Correction_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Report_Volume_Balance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Pressure_Momentum_Coupling.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Time_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Piso_Corrections.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Min_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Courant_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gu_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Choi_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blend_System_Matrices.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Potential.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Preconditioner_For_System_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Max_Threads.f90 \
+$(DIR_SHARED)/Control_Mod/Linear_Solvers.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Wall_Time_Max_Hours.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Swarm_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_Units.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_At_Boundaries.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Condition.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Results_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Problem_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Backup_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Root.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Domain.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Similar_Warning.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Two_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Three_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_One_Key.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Root_File.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Domain_File.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Time_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Time_Mod.o:\
-Time_Mod/*.f90 \
+Time_Mod/Set_Time.f90 \
+Time_Mod/Set_Last_Dt.f90 \
+Time_Mod/Set_First_Dt.f90 \
+Time_Mod/Set_Curr_Dt.f90 \
+Time_Mod/Needs_More_Steps.f90 \
+Time_Mod/Last_Dt.f90 \
+Time_Mod/Increase_Time.f90 \
+Time_Mod/Get_Time.f90 \
+Time_Mod/First_Dt.f90 \
+Time_Mod/Curr_Dt.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Solver_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Solver_Mod.o:\
 $(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-Solver_Mod/*.f90 
+Var_Mod/Destroy_Solution.f90 \
+Var_Mod/Destroy_New_Only.f90 \
+Var_Mod/Create_Solution.f90 \
+Var_Mod/Create_New_Only.f90 \
+Var_Mod/Bnd_Cond_Type.f90 \
+Var_Mod/Bnd_Cond_Name.f90 \
+Solver_Mod/Set_Singular.f90 \
+Solver_Mod/Run.f90 \
+Solver_Mod/Remove_Singular.f90 \
+Solver_Mod/Linear_Solvers_Code.f90 \
+Solver_Mod/End.f90 \
+Solver_Mod/Create_Solver.f90 \
+Solver_Mod/Alias_Native.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Elem_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Elem_Mod.o:\
-Elem_Mod/*.f90 
+Elem_Mod/Initialize_Elem.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Bulk_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Bulk_Mod.o:\
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
-Bulk_Mod/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 \
+Bulk_Mod/Print_Areas.f90 \
+Bulk_Mod/Monitoring_Planes_Areas.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Iter_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Iter_Mod.o:\
-Iter_Mod/*.f90 \
+Iter_Mod/Set_Tol.f90 \
+Iter_Mod/Set_Min.f90 \
+Iter_Mod/Set_Max.f90 \
+Iter_Mod/Needs_More_Iterations.f90 \
+Iter_Mod/Max_Fields_Residual.f90 \
+Iter_Mod/Get_Tol.f90 \
+Iter_Mod/Get_Min.f90 \
+Iter_Mod/Get_Max.f90 \
+Iter_Mod/Current.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Monitor_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Monitor_Mod.o:\
-Monitor_Mod/*.f90 \
+Monitor_Mod/Write_Vars.f90 \
+Monitor_Mod/Initialize.f90 \
+Monitor_Mod/Finalize.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vert_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vert_Mod.o:\
-Vert_Mod/*.f90 \
+Vert_Mod/Intialize_Vert.f90 \
 $(DIR_OBJECT)/Point_Mod.o \
-Point_Mod/*.f90 
+Point_Mod/Initialize_Point.f90 \
+Point_Mod/Find_Nearest_Node.f90 \
+Point_Mod/Find_Nearest_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Numerics_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Numerics_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Work_Mod/Finalize_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
 $(DIR_OBJECT)/Var_Mod.o \
-Var_Mod/*.f90 \
-Numerics_Mod/*.f90 \
-Matrix_Mod/*/readme \
+Var_Mod/Destroy_Solution.f90 \
+Var_Mod/Destroy_New_Only.f90 \
+Var_Mod/Create_Solution.f90 \
+Var_Mod/Create_New_Only.f90 \
+Var_Mod/Bnd_Cond_Type.f90 \
+Var_Mod/Bnd_Cond_Name.f90 \
+Numerics_Mod/Under_Relax.f90 \
+Numerics_Mod/Time_Integration_Scheme_Code.f90 \
+Numerics_Mod/Pressure_Momentum_Coupling_Code.f90 \
+Numerics_Mod/Min_Max.f90 \
+Numerics_Mod/Inertial_Term.f90 \
+Numerics_Mod/Gradient_Method_Code.f90 \
+Numerics_Mod/Advection_Term.f90 \
+Numerics_Mod/Advection_Scheme.f90 \
+Numerics_Mod/Advection_Scheme_Code.f90 \
+Matrix_Mod/Unused/readme \
+Matrix_Mod/Unused/Create_Matrix.f90 \
 $(DIR_OBJECT)/Matrix_Mod.o \
-Matrix_Mod/*/*.f90 \
-Matrix_Mod/*.f90 
+Matrix_Mod/Create_Matrix.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Process_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Process_Mod.o:\
+Results_Mod/Var_Name.f90 \
+Results_Mod/Time_To_Save_Swarm.f90 \
+Results_Mod/Time_To_Save_Results.f90 \
+Results_Mod/Save_Vtu_Vector_Real.f90 \
+Results_Mod/Save_Vtu_Tensor_9_Real.f90 \
+Results_Mod/Save_Vtu_Tensor_6_Real.f90 \
+Results_Mod/Save_Vtu_Swarm.f90 \
+Results_Mod/Save_Vtu_Surf.f90 \
+Results_Mod/Save_Vtu_Scalar_Real.f90 \
+Results_Mod/Save_Vtu_Scalar_Int.f90 \
+Results_Mod/Save_Vtu_Header_Int.f90 \
+Results_Mod/Save_Vtu_Front.f90 \
+Results_Mod/Save_Vtu_Fields.f90 \
 $(DIR_OBJECT)/Results_Mod.o \
-Results_Mod/*.f90 \
+Results_Mod/Main_Results.f90 \
+Read_Controls_Mod/Solvers.f90 \
+Read_Controls_Mod/Physical_Properties.f90 \
+Read_Controls_Mod/Physical_Models.f90 \
+Read_Controls_Mod/Petsc_Solvers.f90 \
 $(DIR_OBJECT)/Read_Controls_Mod.o \
-Read_Controls_Mod/*.f90 \
-Process_Mod/*.f90 \
+Read_Controls_Mod/Numerical_Schemes.f90 \
+Read_Controls_Mod/Native_Solvers.f90 \
+Read_Controls_Mod/Iterations.f90 \
+Read_Controls_Mod/Boundary_Conditions.f90 \
+Process_Mod/Update_Boundary_Values.f90 \
+Process_Mod/Save_Debug.f90 \
+Process_Mod/Rhie_And_Chow.f90 \
+Process_Mod/Piso_Algorithm.f90 \
+Process_Mod/Logo_Pro.f90 \
+Process_Mod/Initialize_Variables.f90 \
+Process_Mod/Correct_Velocity.f90 \
+Process_Mod/Convective_Outflow.f90 \
+Process_Mod/Compute_Scalar.f90 \
+Process_Mod/Compute_Pressure.f90 \
+Process_Mod/Compute_Momentum.f90 \
+Process_Mod/Compute_Momentum_Explicit.f90 \
+Process_Mod/Compute_Energy.f90 \
+Process_Mod/Balance_Volume.f90 \
+Monitor_Mod/Write_Vars.f90 \
 $(DIR_OBJECT)/Monitor_Mod.o \
-Monitor_Mod/*.f90 
+Monitor_Mod/Initialize.f90 \
+Monitor_Mod/Finalize.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Info_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Info_Mod.o:\
-Info_Mod/*.f90 \
+Info_Mod/Time_To_Exit.f90 \
+Info_Mod/Time_Start.f90 \
+Info_Mod/Time_Print.f90 \
+Info_Mod/Time_Fill.f90 \
+Info_Mod/Start_Info.f90 \
+Info_Mod/Iter_Start.f90 \
+Info_Mod/Iter_Print.f90 \
+Info_Mod/Iter_Fill_Scalar_At.f90 \
+Info_Mod/Iter_Fill.f90 \
+Info_Mod/Iter_Fill_At.f90 \
+Info_Mod/Bulk_Start.f90 \
+Info_Mod/Bulk_Print.f90 \
+Info_Mod/Bulk_Fill.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Eddies_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Eddies_Mod.o:\
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
 $(DIR_OBJECT)/Field_Mod.o \
-Field_Mod/*/*.f90 \
-Eddies_Mod/*.f90 
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 \
+Eddies_Mod/Superimpose.f90 \
+Eddies_Mod/Place_Eddy.f90 \
+Eddies_Mod/Gather_Bnd_Cells.f90 \
+Eddies_Mod/Create.f90 \
+Eddies_Mod/Advance.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Petsc_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Petsc_Mod.o:\
-Petsc_Mod/*/*.f90 \
+Petsc_Mod/True/Solve_Petsc.f90 \
+Petsc_Mod/True/Destroy_Petsc.f90 \
+Petsc_Mod/True/Create_Petsc.f90 \
+Petsc_Mod/Fake/Solve_Petsc.f90 \
+Petsc_Mod/Fake/Destroy_Petsc.f90 \
+Petsc_Mod/Fake/Create_Petsc.f90 \
+Native_Mod/Solve_Native.f90 \
+Native_Mod/Root_Mean_Square.f90 \
+Native_Mod/Residual_Vector.f90 \
+Native_Mod/Prec_Solve.f90 \
+Native_Mod/Prec_Form.f90 \
 $(DIR_OBJECT)/Native_Mod.o \
-Native_Mod/*.f90 
+Native_Mod/Normalized_Root_Mean_Square.f90 \
+Native_Mod/Create_Native.f90 \
+Native_Mod/Cg.f90 \
+Native_Mod/Bicg.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Particle_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Particle_Mod.o:\
+Vof_Mod/Utilities/Update_Physical_Properties.f90 \
+Vof_Mod/Utilities/Surface_Tension_Force.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Vof_Source.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Pressure_Source.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Estimate.f90 \
+Vof_Mod/Utilities/Mass_Transfer_Added_Volume.f90 \
+Vof_Mod/Utilities/Interpolate_Var_To_Face_With_Jump.f90 \
+Vof_Mod/Utilities/Grad_Variable_With_Jump.f90 \
+Vof_Mod/Utilities/Grad_Variable_With_Front.f90 \
+Vof_Mod/Utilities/Grad_Component_No_Refresh_With_Front.f90 \
+Vof_Mod/Utilities/Get_Gas_And_Liquid_Phase.f90 \
+Vof_Mod/Utilities/Extrapolate_Normal_To_Front.f90 \
+Vof_Mod/Utilities/Calculate_Grad_Matrix_With_Front.f90 \
 $(DIR_OBJECT)/Vof_Mod.o \
-Vof_Mod/*/*.f90 \
-Particle_Mod/*.f90 
+Vof_Mod/Curvature/Smooth_Vof_And_Compute_Surface_Normals.f90 \
+Vof_Mod/Curvature/Smooth_Scalar.f90 \
+Vof_Mod/Curvature/Smooth_Curvature.f90 \
+Vof_Mod/Curvature/Curvature_Csf.f90 \
+Vof_Mod/Core/Solve_System.f90 \
+Vof_Mod/Core/Predict_Beta.f90 \
+Vof_Mod/Core/Max_Courant_Number.f90 \
+Vof_Mod/Core/Main_Vof.f90 \
+Vof_Mod/Core/Initialize_From_Stl.f90 \
+Vof_Mod/Core/Discretize.f90 \
+Vof_Mod/Core/Create_Vof.f90 \
+Vof_Mod/Core/Correct_Beta.f90 \
+Vof_Mod/Core/Compute_Vof.f90 \
+Particle_Mod/Insert_At.f90 \
+Particle_Mod/Initialize_Particle.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./User_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/User_Mod.o:\
-User_Mod/*.f90 \
+User_Mod/Types.f90 \
+User_Mod/Source.f90 \
+User_Mod/Save_Swarm.f90 \
+User_Mod/Save_Results.f90 \
+User_Mod/Interface_Exchange.f90 \
+User_Mod/Insert_Particles.f90 \
+User_Mod/Initialize_Variables.f90 \
+User_Mod/Get_User_Field_For_Saving.f90 \
+User_Mod/Force.f90 \
+User_Mod/End_Of_Time_Step.f90 \
+User_Mod/End_Of_Simulation.f90 \
+User_Mod/End_Of_Iteration.f90 \
+User_Mod/End_Of_Correct_Velocity.f90 \
+User_Mod/End_Of_Compute_Vof.f90 \
+User_Mod/End_Of_Compute_Scalar.f90 \
+User_Mod/End_Of_Compute_Pressure.f90 \
+User_Mod/End_Of_Compute_Momentum.f90 \
+User_Mod/End_Of_Compute_Energy.f90 \
+User_Mod/Bulk_Velocity.f90 \
+User_Mod/Beginning_Of_Time_Step.f90 \
+User_Mod/Beginning_Of_Simulation.f90 \
+User_Mod/Beginning_Of_Iteration.f90 \
+User_Mod/Beginning_Of_Correct_Velocity.f90 \
+User_Mod/Beginning_Of_Compute_Vof.f90 \
+User_Mod/Beginning_Of_Compute_Scalar.f90 \
+User_Mod/Beginning_Of_Compute_Pressure.f90 \
+User_Mod/Beginning_Of_Compute_Momentum.f90 \
+User_Mod/Beginning_Of_Compute_Energy.f90 \
+User_Mod/Before_Exit.f90 \
+Swarm_Mod/Trap_Particle.f90 \
+Swarm_Mod/Sgs_Fukagata.f90 \
+Swarm_Mod/Sgs_Discrete_Random_Walk.f90 \
+Swarm_Mod/Print_Swarm_Statistics.f90 \
+Swarm_Mod/Particle_Time_Scale.f90 \
+Swarm_Mod/Particle_Forces.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/*.f90 \
+Swarm_Mod/Move_Trapped.f90 \
+Swarm_Mod/Move_Particle.f90 \
+Swarm_Mod/Grad_Modeled_Flow.f90 \
+Swarm_Mod/Exchange_Particles.f90 \
+Swarm_Mod/Create_Swarm.f90 \
+Swarm_Mod/Check_Periodicity.f90 \
+Swarm_Mod/Calculate_Particles_Mean.f90 \
+Swarm_Mod/Bounce_Particle.f90 \
+Swarm_Mod/Advance_Particles.f90 \
+$(DIR_SHARED)/Porosity_Mod/Set_Porosity_In_Cells.f90 \
 $(DIR_OBJECT)/Porosity_Mod.o \
-$(DIR_SHARED)/Porosity_Mod/*.f90 \
+$(DIR_SHARED)/Porosity_Mod/Create_Porosity.f90 \
 $(DIR_OBJECT)/Interface_Mod.o \
-Interface_Mod/*.f90 
+Interface_Mod/Exchange.f90 \
+Interface_Mod/Create.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Results_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Results_Mod.o:\
-Results_Mod/*.f90 \
+Results_Mod/Var_Name.f90 \
+Results_Mod/Time_To_Save_Swarm.f90 \
+Results_Mod/Time_To_Save_Results.f90 \
+Results_Mod/Save_Vtu_Vector_Real.f90 \
+Results_Mod/Save_Vtu_Tensor_9_Real.f90 \
+Results_Mod/Save_Vtu_Tensor_6_Real.f90 \
+Results_Mod/Save_Vtu_Swarm.f90 \
+Results_Mod/Save_Vtu_Surf.f90 \
+Results_Mod/Save_Vtu_Scalar_Real.f90 \
+Results_Mod/Save_Vtu_Scalar_Int.f90 \
+Results_Mod/Save_Vtu_Header_Int.f90 \
+Results_Mod/Save_Vtu_Front.f90 \
+Results_Mod/Save_Vtu_Fields.f90 \
+Results_Mod/Main_Results.f90 \
+Backup_Mod/Time_To_Save_Backup.f90 \
+Backup_Mod/Save_Variable.f90 \
+Backup_Mod/Save_Swarm.f90 \
+Backup_Mod/Save_Real.f90 \
+Backup_Mod/Save_Real_Array.f90 \
+Backup_Mod/Save_Log.f90 \
+Backup_Mod/Save_Log_Array.f90 \
+Backup_Mod/Save_Int.f90 \
+Backup_Mod/Save_Int_Array.f90 \
+Backup_Mod/Save_Face_Real.f90 \
+Backup_Mod/Save.f90 \
+Backup_Mod/Save_Cell_Real.f90 \
 $(DIR_OBJECT)/Backup_Mod.o \
-Backup_Mod/*.f90 
+Backup_Mod/Load_Variable.f90 \
+Backup_Mod/Load_Swarm.f90 \
+Backup_Mod/Load_Real.f90 \
+Backup_Mod/Load_Real_Array.f90 \
+Backup_Mod/Load_Log.f90 \
+Backup_Mod/Load_Log_Array.f90 \
+Backup_Mod/Load_Int.f90 \
+Backup_Mod/Load_Int_Array.f90 \
+Backup_Mod/Load_Face_Real.f90 \
+Backup_Mod/Load.f90 \
+Backup_Mod/Load_Cell_Real.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Read_Controls_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Read_Controls_Mod.o:\
+Swarm_Mod/Trap_Particle.f90 \
+Swarm_Mod/Sgs_Fukagata.f90 \
+Swarm_Mod/Sgs_Discrete_Random_Walk.f90 \
+Swarm_Mod/Print_Swarm_Statistics.f90 \
+Swarm_Mod/Particle_Time_Scale.f90 \
+Swarm_Mod/Particle_Forces.f90 \
 $(DIR_OBJECT)/Swarm_Mod.o \
-Swarm_Mod/*.f90 \
-Read_Controls_Mod/*.f90 \
+Swarm_Mod/Move_Trapped.f90 \
+Swarm_Mod/Move_Particle.f90 \
+Swarm_Mod/Grad_Modeled_Flow.f90 \
+Swarm_Mod/Exchange_Particles.f90 \
+Swarm_Mod/Create_Swarm.f90 \
+Swarm_Mod/Check_Periodicity.f90 \
+Swarm_Mod/Calculate_Particles_Mean.f90 \
+Swarm_Mod/Bounce_Particle.f90 \
+Swarm_Mod/Advance_Particles.f90 \
+Read_Controls_Mod/Solvers.f90 \
+Read_Controls_Mod/Physical_Properties.f90 \
+Read_Controls_Mod/Physical_Models.f90 \
+Read_Controls_Mod/Petsc_Solvers.f90 \
+Read_Controls_Mod/Numerical_Schemes.f90 \
+Read_Controls_Mod/Native_Solvers.f90 \
+Read_Controls_Mod/Iterations.f90 \
+Read_Controls_Mod/Boundary_Conditions.f90 \
+Eddies_Mod/Superimpose.f90 \
+Eddies_Mod/Place_Eddy.f90 \
 $(DIR_OBJECT)/Eddies_Mod.o \
-Eddies_Mod/*.f90 
+Eddies_Mod/Gather_Bnd_Cells.f90 \
+Eddies_Mod/Create.f90 \
+Eddies_Mod/Advance.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Main_Pro.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Main_Pro.o:\
+Process_Mod/Update_Boundary_Values.f90 \
+Process_Mod/Save_Debug.f90 \
+Process_Mod/Rhie_And_Chow.f90 \
+Process_Mod/Piso_Algorithm.f90 \
 $(DIR_OBJECT)/Process_Mod.o \
-Process_Mod/*.f90 \
+Process_Mod/Logo_Pro.f90 \
+Process_Mod/Initialize_Variables.f90 \
+Process_Mod/Correct_Velocity.f90 \
+Process_Mod/Convective_Outflow.f90 \
+Process_Mod/Compute_Scalar.f90 \
+Process_Mod/Compute_Pressure.f90 \
+Process_Mod/Compute_Momentum.f90 \
+Process_Mod/Compute_Momentum_Explicit.f90 \
+Process_Mod/Compute_Energy.f90 \
+Process_Mod/Balance_Volume.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Update_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Update_On_Host.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Copy_To_Device.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-$(DIR_SHARED)/Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Copy_To_Device.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Field_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Field_Mod.o:\
+Time_Mod/Set_Time.f90 \
+Time_Mod/Set_Last_Dt.f90 \
+Time_Mod/Set_First_Dt.f90 \
+Time_Mod/Set_Curr_Dt.f90 \
 $(DIR_OBJECT)/Time_Mod.o \
-Time_Mod/*.f90 \
+Time_Mod/Needs_More_Steps.f90 \
+Time_Mod/Last_Dt.f90 \
+Time_Mod/Increase_Time.f90 \
+Time_Mod/Get_Time.f90 \
+Time_Mod/First_Dt.f90 \
+Time_Mod/Curr_Dt.f90 \
+Solver_Mod/Set_Singular.f90 \
+Solver_Mod/Run.f90 \
+Solver_Mod/Remove_Singular.f90 \
 $(DIR_OBJECT)/Solver_Mod.o \
-Solver_Mod/*.f90 \
+Solver_Mod/Linear_Solvers_Code.f90 \
+Solver_Mod/End.f90 \
+Solver_Mod/Create_Solver.f90 \
+Solver_Mod/Alias_Native.f90 \
+Numerics_Mod/Under_Relax.f90 \
+Numerics_Mod/Time_Integration_Scheme_Code.f90 \
+Numerics_Mod/Pressure_Momentum_Coupling_Code.f90 \
 $(DIR_OBJECT)/Numerics_Mod.o \
-Numerics_Mod/*.f90 \
-Field_Mod/*/*.f90 \
+Numerics_Mod/Min_Max.f90 \
+Numerics_Mod/Inertial_Term.f90 \
+Numerics_Mod/Gradient_Method_Code.f90 \
+Numerics_Mod/Advection_Term.f90 \
+Numerics_Mod/Advection_Scheme.f90 \
+Numerics_Mod/Advection_Scheme_Code.f90 \
+Field_Mod/Utilities/Volume_Average.f90 \
+Field_Mod/Utilities/U_Tan.f90 \
+Field_Mod/Utilities/Schmidt_Numb.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Stop.f90 \
+Field_Mod/Utilities/Report_Vol_Balance_Start.f90 \
+Field_Mod/Utilities/Report_Vol_Balance.f90 \
+Field_Mod/Utilities/Prandtl_Numb.f90 \
+Field_Mod/Utilities/Potential_Initialization.f90 \
+Field_Mod/Utilities/Compute_Wall_Distance.f90 \
+Field_Mod/Utilities/Calculate_Shear_And_Vorticity.f90 \
+Field_Mod/Utilities/Calculate_Courant_In_Cells.f90 \
+Field_Mod/Utilities/Calculate_Bulk_Fluxes.f90 \
+Field_Mod/Utilities/Buoyancy_Forces.f90 \
+Field_Mod/Utilities/Alias_Momentum.f90 \
+Field_Mod/Utilities/Alias_Energy.f90 \
+Field_Mod/Utilities/Adjust_P_Drops.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Linear.f90 \
+Field_Mod/Interpolations/Interpolate_To_Faces_Harmonic.f90 \
+Field_Mod/Interpolations/Interpolate_Cells_To_Nodes.f90 \
+Field_Mod/Gradients/Grad_Variable.f90 \
+Field_Mod/Gradients/Grad_Three_Components_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Pressure.f90 \
+Field_Mod/Gradients/Grad_Least_Variable.f90 \
+Field_Mod/Gradients/Grad_Least_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss_Variable.f90 \
+Field_Mod/Gradients/Grad_Gauss_Pressure.f90 \
+Field_Mod/Gradients/Grad_Gauss.f90 \
+Field_Mod/Gradients/Grad.f90 \
+Field_Mod/Gradients/Grad_Component_No_Refresh.f90 \
+Field_Mod/Gradients/Grad_Component.f90 \
+Field_Mod/Gradients/Calculate_Grad_Matrix.f90 \
+Field_Mod/Core/Create_Field.f90 \
 $(DIR_OBJECT)/Face_Mod.o \
-Face_Mod/*.f90 \
+Face_Mod/Allocate.f90 \
+Bulk_Mod/Print_Areas.f90 \
 $(DIR_OBJECT)/Bulk_Mod.o \
-Bulk_Mod/*.f90 
+Bulk_Mod/Monitoring_Planes_Areas.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Swarm_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Swarm_Mod.o:\
-Swarm_Mod/*.f90 \
+Swarm_Mod/Trap_Particle.f90 \
+Swarm_Mod/Sgs_Fukagata.f90 \
+Swarm_Mod/Sgs_Discrete_Random_Walk.f90 \
+Swarm_Mod/Print_Swarm_Statistics.f90 \
+Swarm_Mod/Particle_Time_Scale.f90 \
+Swarm_Mod/Particle_Forces.f90 \
+Swarm_Mod/Move_Trapped.f90 \
+Swarm_Mod/Move_Particle.f90 \
+Swarm_Mod/Grad_Modeled_Flow.f90 \
+Swarm_Mod/Exchange_Particles.f90 \
+Swarm_Mod/Create_Swarm.f90 \
+Swarm_Mod/Check_Periodicity.f90 \
+Swarm_Mod/Calculate_Particles_Mean.f90 \
+Swarm_Mod/Bounce_Particle.f90 \
+Swarm_Mod/Advance_Particles.f90 \
 $(DIR_OBJECT)/Particle_Mod.o \
-Particle_Mod/*.f90 
+Particle_Mod/Insert_At.f90 \
+Particle_Mod/Initialize_Particle.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Surf_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Surf_Mod.o:\
+Surf_Mod/Swap_Side.f90 \
+Surf_Mod/Split_Element.f90 \
+Surf_Mod/Smooth_Surf.f90 \
+Surf_Mod/Relax_Topology.f90 \
+Surf_Mod/Relax_Geometry.f90 \
+Surf_Mod/Refine.f90 \
 Surf_Mod/readme \
-Surf_Mod/*.f90 \
+Surf_Mod/Place_Surf_At_Value.f90 \
+Surf_Mod/Initialize_Surf.f90 \
+Surf_Mod/Improve_Mesh_Quality.f90 \
+Surf_Mod/Handle_6_Points.f90 \
+Surf_Mod/Handle_5_Points.f90 \
+Surf_Mod/Handle_4_Points.f90 \
+Surf_Mod/Handle_3_Points.f90 \
+Surf_Mod/Find_Surf_Elements.f90 \
+Surf_Mod/Find_Boundaries.f90 \
 Surf_Mod/Edge_Numbering.h90 \
+Surf_Mod/Distribute_Smooth.f90 \
+Surf_Mod/Distribute_Mesh.f90 \
+Surf_Mod/Distribute_Cell_Coords.f90 \
+Surf_Mod/Compress_Surf_Vertices.f90 \
+Surf_Mod/Clean.f90 \
+Surf_Mod/Check_Side.f90 \
+Surf_Mod/Calculate_Curvatures_From_Verts.f90 \
+Surf_Mod/Calculate_Curvatures_From_Elems.f90 \
+Surf_Mod/Calculate_Curvatures_From_Edges.f90 \
+Surf_Mod/Allocate_Surf.f90 \
+Surf_Mod/Advance_Vertices.f90 \
+Front_Mod/Save_Debug_Front_Vtu.f90 \
 Front_Mod/readme \
+Front_Mod/Print_Front_Statistics.f90 \
+Front_Mod/Place_Front_At_Value.f90 \
 $(DIR_OBJECT)/Front_Mod.o \
-Front_Mod/*.f90 
+Front_Mod/Mark_Cells_And_Faces.f90 \
+Front_Mod/Initialize_Front.f90 \
+Front_Mod/Find_Vertex_Elements.f90 \
+Front_Mod/Find_Sides.f90 \
+Front_Mod/Find_Front_Elements.f90 \
+Front_Mod/Compute_Distance_Function_And_Vof.f90 \
+Front_Mod/Compress_Front_Vertices.f90 \
+Front_Mod/Clean.f90 \
+Front_Mod/Check_Elements.f90 \
+Front_Mod/Calculate_Element_Normals.f90 \
+Front_Mod/Calculate_Element_Centroids.f90 \
+Front_Mod/Allocate_Front.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Point_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Point_Mod.o:\
-Point_Mod/*.f90 \
+Point_Mod/Initialize_Point.f90 \
+Point_Mod/Find_Nearest_Node.f90 \
+Point_Mod/Find_Nearest_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Comm_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Comm_Mod.o:\
 $(DIR_OBJECT)/Const_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Comm_Mod/Shared/This_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Sequential_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Parallel_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/N_Procs.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/First_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/End_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/End_Parallel.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./String_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/String_Mod.o:\
-$(DIR_SHARED)/String_Mod/*.f90 
+$(DIR_SHARED)/String_Mod/To_Upper_Case.f90 \
+$(DIR_SHARED)/String_Mod/To_Lower_Case.f90 \
+$(DIR_SHARED)/String_Mod/First_Upper.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Message_Mod.o:\
+$(DIR_SHARED)/Tokenizer_Mod/Parse.f90 \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
-$(DIR_SHARED)/Message_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/Warning.f90 \
+$(DIR_SHARED)/Message_Mod/Thin_Line.f90 \
+$(DIR_SHARED)/Message_Mod/Thick_Line.f90 \
+$(DIR_SHARED)/Message_Mod/Frameless.f90 \
+$(DIR_SHARED)/Message_Mod/Framed.f90 \
+$(DIR_SHARED)/Message_Mod/Error.f90 \
+$(DIR_SHARED)/Message_Mod/Dashed_Line.f90 \
 $(DIR_OBJECT)/Const_Mod.o \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Profiler_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Profiler_Mod.o:\
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
+$(DIR_SHARED)/Profiler_Mod/Update_By_Rank.f90 \
+$(DIR_SHARED)/Profiler_Mod/Stop.f90 \
+$(DIR_SHARED)/Profiler_Mod/Statistics.f90 \
+$(DIR_SHARED)/Profiler_Mod/Start.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Flow_Rates.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Expansion_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Schmidt_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Prandtl_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulence_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Surface.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Front.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Thermal_Conductivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Subgrid_Scale_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Diameter.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Surface_Tension.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Smagorinsky_Constant.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Saturation_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Rough_Walls.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Roughness_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Pressure_Drops.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Potential_Initialization.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Point_For_Monitoring_Planes.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Viscosities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Densities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Conductivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Capacities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Particle_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Phases.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Domains.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Monin_Obukov.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Max_Particles.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Transfer_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Lee_Model_Coefficients.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Latent_Heat.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Interface_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Transfer.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Capacity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Gravitational_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Extrapolate_Temperature_Exp.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Dynamic_Viscosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Buoyancy.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Bulk_Velocities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Angular_Velocity_Vector.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 \
-$(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Step.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Integration_Scheme.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Skewness_Correction_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Report_Volume_Balance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Pressure_Momentum_Coupling.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Time_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Piso_Corrections.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Min_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Courant_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gu_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Choi_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blend_System_Matrices.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Potential.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Preconditioner_For_System_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Max_Threads.f90 \
+$(DIR_SHARED)/Control_Mod/Linear_Solvers.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Wall_Time_Max_Hours.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Swarm_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_Units.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_At_Boundaries.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Condition.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Results_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Problem_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Backup_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Root.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Domain.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Similar_Warning.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Two_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Three_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_One_Key.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Root_File.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Domain_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/This_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Sequential_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Parallel_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/N_Procs.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/First_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/End_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/End_Parallel.f90 \
+$(DIR_OBJECT)/Comm_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_1d_Cells.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Probe_1d_Cells.o:\
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 \
+$(DIR_SHARED)/File_Mod/Single_Word_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Single_Int_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Set_Name.f90 \
+$(DIR_SHARED)/File_Mod/Read_Line.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Ascii.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
+$(DIR_SHARED)/File_Mod/Line_Length.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Unix_Format.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Binary_Format.f90 \
+$(DIR_SHARED)/File_Mod/Endian.f90 \
+$(DIR_SHARED)/File_Mod/Delete.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Real_Array.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Int_Array.f90 \
+$(DIR_SHARED)/File_Mod/Append_For_Writing_Ascii.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Tokenizer_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
-$(DIR_SHARED)/Tokenizer_Mod/*.f90 \
+$(DIR_SHARED)/Tokenizer_Mod/Parse.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Metis_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Metis_Mod.o:\
-$(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_SHARED)/Metis_Mod/Create_Metis.f90 \
+$(DIR_SHARED)/Metis_Mod/Call_Metis.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Control_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Control_Mod.o:\
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 \
+$(DIR_SHARED)/File_Mod/Single_Word_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Single_Int_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Set_Name.f90 \
+$(DIR_SHARED)/File_Mod/Read_Line.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Ascii.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
+$(DIR_SHARED)/File_Mod/Line_Length.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Unix_Format.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Binary_Format.f90 \
+$(DIR_SHARED)/File_Mod/Endian.f90 \
+$(DIR_SHARED)/File_Mod/Delete.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Real_Array.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Int_Array.f90 \
+$(DIR_SHARED)/File_Mod/Append_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Flow_Rates.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Expansion_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Schmidt_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Prandtl_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulence_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Surface.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Front.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Thermal_Conductivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Subgrid_Scale_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Diameter.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Surface_Tension.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Smagorinsky_Constant.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Saturation_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Rough_Walls.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Roughness_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Pressure_Drops.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Potential_Initialization.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Point_For_Monitoring_Planes.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Viscosities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Densities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Conductivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Capacities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Particle_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Phases.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Domains.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Monin_Obukov.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Max_Particles.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Transfer_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Lee_Model_Coefficients.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Latent_Heat.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Interface_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Transfer.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Capacity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Gravitational_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Extrapolate_Temperature_Exp.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Dynamic_Viscosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Buoyancy.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Bulk_Velocities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Angular_Velocity_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Step.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Integration_Scheme.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Skewness_Correction_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Report_Volume_Balance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Pressure_Momentum_Coupling.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Time_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Piso_Corrections.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Min_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Courant_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gu_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Choi_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blend_System_Matrices.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Potential.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Preconditioner_For_System_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Max_Threads.f90 \
+$(DIR_SHARED)/Control_Mod/Linear_Solvers.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Wall_Time_Max_Hours.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Swarm_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_Units.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_At_Boundaries.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Condition.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Results_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Problem_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Backup_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Root.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Domain.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Similar_Warning.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Two_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Three_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_One_Key.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Root_File.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Domain_File.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Region_Mod.f90
@@ -398,7 +2567,25 @@ $(DIR_OBJECT)/Const_Mod.o
 # Dependencies for: ./Math_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Math_Mod.o:\
-$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
@@ -406,127 +2593,841 @@ $(DIR_OBJECT)/Const_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Porosity_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Work_Mod/Finalize_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Binary.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Ascii.f90 \
 $(DIR_OBJECT)/Stl_Mod.o \
-$(DIR_SHARED)/Stl_Mod/*.f90 \
-$(DIR_SHARED)/Porosity_Mod/*.f90 \
+$(DIR_SHARED)/Stl_Mod/N_Facets.f90 \
+$(DIR_SHARED)/Stl_Mod/Facets_Vert_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Normal.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Body.f90 \
+$(DIR_SHARED)/Stl_Mod/Create_From_File.f90 \
+$(DIR_SHARED)/Stl_Mod/Allocate_Stl.f90 \
+$(DIR_SHARED)/Porosity_Mod/Set_Porosity_In_Cells.f90 \
+$(DIR_SHARED)/Porosity_Mod/Create_Porosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Flow_Rates.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Volume_Expansion_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Schmidt_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Scalar_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Prandtl_Number.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulent_Heat_Flux_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Turbulence_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Surface.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Track_Front.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Thermal_Conductivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Subgrid_Scale_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Diameter.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Swarm_Coefficient_Of_Restitution.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Surface_Tension.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Turb_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Statistics.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Starting_Time_Step_For_Swarm_Computation.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Smagorinsky_Constant.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Scalars_Diffusivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Saturation_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Rough_Walls.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Roughness_Coefficient.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Temperature.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Reference_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Pressure_Drops.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Potential_Initialization.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Point_For_Monitoring_Planes.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Viscosities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Densities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Conductivities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Phase_Capacities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Particle_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Swarm_Sub_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Phases.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Number_Of_Domains.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Monin_Obukov.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Max_Particles.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Transfer_Model.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Mass_Density.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Lee_Model_Coefficients.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Latent_Heat.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Interface_Tracking.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Hybrid_Les_Rans_Switch.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Transfer.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Heat_Capacity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Gravitational_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Extrapolate_Temperature_Exp.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Dynamic_Viscosity.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Buoyancy.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Bulk_Velocities.f90 \
+$(DIR_SHARED)/Control_Mod/Physics/Angular_Velocity_Vector.f90 \
 $(DIR_OBJECT)/Control_Mod.o \
-$(DIR_SHARED)/Control_Mod/*/*.f90 \
-$(DIR_SHARED)/Control_Mod/*.f90 
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Simple_Algorithm.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Tolerance_For_Gauss_Gradients.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Step.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Time_Integration_Scheme.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Skewness_Correction_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Simple_Underrelaxation_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Report_Volume_Balance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Pressure_Momentum_Coupling.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Time_Steps.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Number_Of_Piso_Corrections.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Min_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Substep_Cycles_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Smooth_Cycles_Curvature_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Simple_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Courant_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Max_Correction_Cycles_Beta_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gu_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Gradient_Method_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Choi_Correction.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blend_System_Matrices.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Blending_Coefficients_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Numerics/Advection_Scheme_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Tolerance_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Wall_Distance.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Vof.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Turbulence.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Scalars.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Pressure.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Potential.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Momentum.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Solver_For_Energy.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Preconditioner_For_System_Matrix.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Normalization_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Wall_Distance_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Vof_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Turbulence_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Scalars_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Pressure_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Potential_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Momentum_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Native/Max_Iterations_For_Energy_Solver.f90 \
+$(DIR_SHARED)/Control_Mod/Max_Threads.f90 \
+$(DIR_SHARED)/Control_Mod/Linear_Solvers.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Wall_Time_Max_Hours.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Swarm_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_Units.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Results_At_Boundaries.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Initial_Condition.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Save_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Results_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Problem_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Initial_Solution_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Load_Backup_Name.f90 \
+$(DIR_SHARED)/Control_Mod/Input_Output/Backup_Save_Interval.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Root.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Switch_To_Domain.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Similar_Warning.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Real_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Keyless_Strings_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Int_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Real_Vector.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item_On.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Read_Char_Item.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Two_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_Three_Keys.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Position_At_One_Key.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Root_File.f90 \
+$(DIR_SHARED)/Control_Mod/Basic_Functions/Open_Domain_File.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Isoap_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Isoap_Mod.o:\
+$(DIR_SHARED)/Polyhedron_Mod/Plot_Polyhedron_Vtk.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Pick_A_Test_Case.f90 \
 $(DIR_OBJECT)/Polyhedron_Mod.o \
-$(DIR_SHARED)/Polyhedron_Mod/*.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_3.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_2.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_1.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Extract_From_Grid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Zigzagcell.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Tetrahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Sicosahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Sdodecahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Scube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Pentapyramid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Nchexahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Icosahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Hollowedcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_From_Polyhedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Drilledcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Dodecahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Distortedcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Cutcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Cube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Complexcell.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Face_Centroid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Cell_Volume.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Cell_Centroid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Allocate_Polyhedron.f90 \
+$(DIR_SHARED)/Iso_Polygons_Mod/Plot_Iso_Polygons_Vtk.f90 \
 $(DIR_OBJECT)/Iso_Polygons_Mod.o \
-$(DIR_SHARED)/Iso_Polygons_Mod/*.f90 \
+$(DIR_SHARED)/Iso_Polygons_Mod/Allocate_Iso_Polygons.f90 \
 $(DIR_SHARED)/Isoap_Mod/readme \
-$(DIR_SHARED)/Isoap_Mod/*.f90 
+$(DIR_SHARED)/Isoap_Mod/Main_Isoap.f90 \
+$(DIR_SHARED)/Isoap_Mod/Isopol.f90 \
+$(DIR_SHARED)/Isoap_Mod/Extract_Iso_Polygons.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Stl_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Stl_Mod.o:\
-$(DIR_SHARED)/Stl_Mod/*.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Binary.f90 \
+$(DIR_SHARED)/Stl_Mod/Read_Stl_Ascii.f90 \
+$(DIR_SHARED)/Stl_Mod/N_Facets.f90 \
+$(DIR_SHARED)/Stl_Mod/Facets_Vert_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Normal.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Coords.f90 \
+$(DIR_SHARED)/Stl_Mod/Facet_Body.f90 \
+$(DIR_SHARED)/Stl_Mod/Create_From_File.f90 \
+$(DIR_SHARED)/Stl_Mod/Allocate_Stl.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Probe_1d_Nodes.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Probe_1d_Nodes.o:\
+$(DIR_SHARED)/Sort_Mod/Unique_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Real_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Array.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*/*.f90 \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/Int_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Array.f90 \
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 \
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 \
+$(DIR_SHARED)/File_Mod/Single_Word_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Single_Int_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Set_Name.f90 \
+$(DIR_SHARED)/File_Mod/Read_Line.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Ascii.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
+$(DIR_SHARED)/File_Mod/Line_Length.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Unix_Format.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Binary_Format.f90 \
+$(DIR_SHARED)/File_Mod/Endian.f90 \
+$(DIR_SHARED)/File_Mod/Delete.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Real_Array.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Int_Array.f90 \
+$(DIR_SHARED)/File_Mod/Append_For_Writing_Ascii.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Grid_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Grid_Mod.o:\
+$(DIR_SHARED)/Vtk_Mod/Set_Precision.f90 \
 $(DIR_OBJECT)/Vtk_Mod.o \
-$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/Unique_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Real_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Array.f90 \
 $(DIR_OBJECT)/Sort_Mod.o \
-$(DIR_SHARED)/Sort_Mod/*/*.f90 \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/Int_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Array.f90 \
 $(DIR_OBJECT)/Region_Mod.o \
+$(DIR_SHARED)/Profiler_Mod/Update_By_Rank.f90 \
+$(DIR_SHARED)/Profiler_Mod/Stop.f90 \
+$(DIR_SHARED)/Profiler_Mod/Statistics.f90 \
+$(DIR_SHARED)/Profiler_Mod/Start.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
 $(DIR_OBJECT)/Metis_Mod.o \
-$(DIR_SHARED)/Metis_Mod/*.f90 \
+$(DIR_SHARED)/Metis_Mod/Create_Metis.f90 \
+$(DIR_SHARED)/Metis_Mod/Call_Metis.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Int.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Int.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
-$(DIR_SHARED)/Memory_Mod/*.f90 \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Int.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Update_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Update_On_Host.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Copy_To_Device.f90 \
 $(DIR_OBJECT)/Gpu_Mod.o \
-$(DIR_SHARED)/Gpu_Mod/*/*.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Copy_To_Device.f90 \
+$(DIR_SHARED)/File_Mod/Single_Word_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Single_Int_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Set_Name.f90 \
+$(DIR_SHARED)/File_Mod/Read_Line.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Ascii.f90 \
 $(DIR_OBJECT)/File_Mod.o \
-$(DIR_SHARED)/File_Mod/*.f90 
+$(DIR_SHARED)/File_Mod/Line_Length.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Unix_Format.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Binary_Format.f90 \
+$(DIR_SHARED)/File_Mod/Endian.f90 \
+$(DIR_SHARED)/File_Mod/Delete.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Real_Array.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Int_Array.f90 \
+$(DIR_SHARED)/File_Mod/Append_For_Writing_Ascii.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Polyhedron_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Polyhedron_Mod.o:\
 $(DIR_OBJECT)/Work_Mod.o \
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
-$(DIR_SHARED)/Polyhedron_Mod/*.f90 
+$(DIR_SHARED)/Work_Mod/Finalize_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Plot_Polyhedron_Vtk.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Pick_A_Test_Case.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_3.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_2.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Func_1.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Extract_From_Grid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Zigzagcell.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Tetrahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Sicosahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Sdodecahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Scube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Pentapyramid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Nchexahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Icosahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Hollowedcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_From_Polyhedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Drilledcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Dodecahedron.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Distortedcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Cutcube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Cube.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Create_Complexcell.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Face_Centroid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Cell_Volume.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Calculate_Cell_Centroid.f90 \
+$(DIR_SHARED)/Polyhedron_Mod/Allocate_Polyhedron.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Sort_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Sort_Mod.o:\
+$(DIR_SHARED)/Swap_Mod/Swap_Real.f90 \
+$(DIR_SHARED)/Swap_Mod/Swap_Int.f90 \
 $(DIR_OBJECT)/Swap_Mod.o \
-$(DIR_SHARED)/Swap_Mod/*.f90 \
-$(DIR_SHARED)/Sort_Mod/*/*.f90 \
-$(DIR_SHARED)/Sort_Mod/*.f90 \
+$(DIR_SHARED)/Sort_Mod/Unique_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Reverse_Order_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Real_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Quick/Int_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Int_By_Index.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Two_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Three_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Three_Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Two_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Real_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Real.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Carry_Int.f90 \
+$(DIR_SHARED)/Sort_Mod/Heap/Int_Array.f90 \
+$(DIR_SHARED)/Math_Mod/Triangle_Area.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Volume.f90 \
+$(DIR_SHARED)/Math_Mod/Tet_Inertia.f90 \
+$(DIR_SHARED)/Math_Mod/Smaller_Real.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Upper_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Signed_Lower_Limit.f90 \
+$(DIR_SHARED)/Math_Mod/Set_Array_Range.f90 \
+$(DIR_SHARED)/Math_Mod/Rotate_Vector.f90 \
+$(DIR_SHARED)/Math_Mod/Random_Real.f90 \
 $(DIR_OBJECT)/Math_Mod.o \
-$(DIR_SHARED)/Math_Mod/*.f90 
+$(DIR_SHARED)/Math_Mod/Invert_3x3_Matrix.f90 \
+$(DIR_SHARED)/Math_Mod/Harmonic_Mean.f90 \
+$(DIR_SHARED)/Math_Mod/Gaussian_Elimination.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Three_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Fit_Exp_Derivative_And_Two_Points.f90 \
+$(DIR_SHARED)/Math_Mod/Distance_Squared.f90 \
+$(DIR_SHARED)/Math_Mod/Distance.f90 \
+$(DIR_SHARED)/Math_Mod/Cross_Product.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_String.f90 \
+$(DIR_SHARED)/Math_Mod/Approx_Real.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Iso_Polygons_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Iso_Polygons_Mod.o:\
-$(DIR_SHARED)/Iso_Polygons_Mod/*.f90 
+$(DIR_SHARED)/Iso_Polygons_Mod/Plot_Iso_Polygons_Vtk.f90 \
+$(DIR_SHARED)/Iso_Polygons_Mod/Allocate_Iso_Polygons.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./File_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/File_Mod.o:\
+$(DIR_SHARED)/String_Mod/To_Upper_Case.f90 \
+$(DIR_SHARED)/String_Mod/To_Lower_Case.f90 \
 $(DIR_OBJECT)/String_Mod.o \
-$(DIR_SHARED)/String_Mod/*.f90 \
+$(DIR_SHARED)/String_Mod/First_Upper.f90 \
+$(DIR_SHARED)/Message_Mod/Warning.f90 \
+$(DIR_SHARED)/Message_Mod/Thin_Line.f90 \
+$(DIR_SHARED)/Message_Mod/Thick_Line.f90 \
 $(DIR_OBJECT)/Message_Mod.o \
-$(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_SHARED)/File_Mod/*.f90 
+$(DIR_SHARED)/Message_Mod/Frameless.f90 \
+$(DIR_SHARED)/Message_Mod/Framed.f90 \
+$(DIR_SHARED)/Message_Mod/Error.f90 \
+$(DIR_SHARED)/Message_Mod/Dashed_Line.f90 \
+$(DIR_SHARED)/File_Mod/Single_Word_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Single_Int_From_Keyboard.f90 \
+$(DIR_SHARED)/File_Mod/Set_Name.f90 \
+$(DIR_SHARED)/File_Mod/Read_Line.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Real4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int8_Array.f90 \
+$(DIR_SHARED)/File_Mod/Read_Binary_Int4_Array.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Writing_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Binary.f90 \
+$(DIR_SHARED)/File_Mod/Open_For_Reading_Ascii.f90 \
+$(DIR_SHARED)/File_Mod/Line_Length.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Unix_Format.f90 \
+$(DIR_SHARED)/File_Mod/Is_In_Binary_Format.f90 \
+$(DIR_SHARED)/File_Mod/Endian.f90 \
+$(DIR_SHARED)/File_Mod/Delete.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Real_Array.f90 \
+$(DIR_SHARED)/File_Mod/Buffered_Read_Int_Array.f90 \
+$(DIR_SHARED)/File_Mod/Append_For_Writing_Ascii.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Vtk_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Vtk_Mod.o:\
-$(DIR_SHARED)/Vtk_Mod/*.f90 \
+$(DIR_SHARED)/Vtk_Mod/Set_Precision.f90 \
 $(DIR_OBJECT)/Const_Mod.o 
 
 #---------------------------------------------------
 # Dependencies for: ./Swap_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Swap_Mod.o:\
-$(DIR_SHARED)/Swap_Mod/*.f90 
+$(DIR_SHARED)/Swap_Mod/Swap_Real.f90 \
+$(DIR_SHARED)/Swap_Mod/Swap_Int.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Gpu_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Gpu_Mod.o:\
+$(DIR_SHARED)/Profiler_Mod/Update_By_Rank.f90 \
+$(DIR_SHARED)/Profiler_Mod/Stop.f90 \
+$(DIR_SHARED)/Profiler_Mod/Statistics.f90 \
+$(DIR_SHARED)/Profiler_Mod/Start.f90 \
 $(DIR_OBJECT)/Profiler_Mod.o \
-$(DIR_SHARED)/Profiler_Mod/*.f90 \
 $(DIR_OBJECT)/Gpu_Pointers_Mod.o \
-$(DIR_SHARED)/Gpu_Mod/*/*.f90 
+$(DIR_SHARED)/Gpu_Mod/Vector/Update_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Update_On_Host.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Create_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Vector/Int_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Real_Copy_To_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Destroy_On_Device.f90 \
+$(DIR_SHARED)/Gpu_Mod/Matrix/Int_Copy_To_Device.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Message_Mod/Dashed_Line.f90
@@ -550,26 +3451,214 @@ $(DIR_OBJECT)/Const_Mod.o
 # Dependencies for: ./Work_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Work_Mod.o:\
-$(DIR_SHARED)/Work_Mod/*/*.f90 \
-$(DIR_SHARED)/Work_Mod/*.f90 \
+$(DIR_SHARED)/Work_Mod/Finalize_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Disconnect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Connect_Int_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Work.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
+$(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Maps_For_Backup.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Form_Cells_Comm.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Inside_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Real.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Log.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Exchange_Cells_Int.f90 \
+$(DIR_SHARED)/Grid_Mod/Parallel/Decompose.f90 \
 $(DIR_OBJECT)/Grid_Mod.o \
-$(DIR_SHARED)/Grid_Mod/*/*.f90 
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Regions.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Memory/Allocate_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Write_Template_Control_File.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Edges.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtu_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Vtk_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Debug_Vtu.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Save_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Regions_List.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Print_Grid_Statistics.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Dim.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_Cfn.f90 \
+$(DIR_SHARED)/Grid_Mod/Input_Output/Load_And_Prepare_For_Processing.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Update_Host.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Destroy_On_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Gpu/Copy_To_Device.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Search_Coordinate_Clusters.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Merge_Duplicate_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Correct_Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Check_Cells_Closure.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Are_Nodes_Twins.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Bounding_Box.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Type.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Face.f90 \
+$(DIR_SHARED)/Grid_Mod/Boundary/Bnd_Cond_Name_At_Cell.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Assert_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Assert_Mod.o:\
+$(DIR_SHARED)/Comm_Mod/Shared/This_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Sequential_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/Parallel_Run.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/N_Procs.f90 \
+$(DIR_SHARED)/Comm_Mod/Shared/First_Proc.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Sequential/Global/End_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Real_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Log_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Sendrecv_Int_Arrays.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Messaging/Exchange_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Write_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Text.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Cell_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Read_Bnd_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Write.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Open_File_Read.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Create_New_Types.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Input_Output/Close_File.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Wait.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Ints.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Sum_Int_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Start_Parallel.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Min_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Reals.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Real_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Max_Int.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/Lor_Log_Array.f90 \
+$(DIR_SHARED)/Comm_Mod/Parallel/Global/End_Parallel.f90 \
 $(DIR_OBJECT)/Comm_Mod.o \
-$(DIR_SHARED)/Comm_Mod/*/*.f90 \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 
 #---------------------------------------------------
 # Dependencies for: ./Memory_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Memory_Mod.o:\
+$(DIR_SHARED)/Message_Mod/Warning.f90 \
+$(DIR_SHARED)/Message_Mod/Thin_Line.f90 \
+$(DIR_SHARED)/Message_Mod/Thick_Line.f90 \
 $(DIR_OBJECT)/Message_Mod.o \
-$(DIR_SHARED)/Message_Mod/*.f90 \
-$(DIR_SHARED)/Memory_Mod/*.f90 \
+$(DIR_SHARED)/Message_Mod/Frameless.f90 \
+$(DIR_SHARED)/Message_Mod/Framed.f90 \
+$(DIR_SHARED)/Message_Mod/Error.f90 \
+$(DIR_SHARED)/Message_Mod/Dashed_Line.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Matrix_Int.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Test_Array_Int.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Matrix_Int.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Real.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Log.f90 \
+$(DIR_SHARED)/Memory_Mod/Array_Int.f90 \
 $(DIR_OBJECT)/Assert_Mod.o \
-$(DIR_SHARED)/Assert_Mod/*.f90 
+$(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 
 

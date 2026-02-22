@@ -65,16 +65,16 @@
          - (v13*v13 + v23*v23 + v33*v33)  &
          - ONE_THIRD * (shear2(c) - vort2(c))
 
-    s12d = s11*s12 + s12*s22 + s13*s32 + (v11*v12 + v12*v22 + v13*v32) 
-    s13d = s11*s13 + s12*s23 + s13*s33 + (v11*v13 + v12*v23 + v13*v33) 
-    s23d = s21*s13 + s22*s23 + s23*s33 + (v21*v13 + v22*v23 + v23*v33) 
+    s12d = s11*s12 + s12*s22 + s13*s32 + (v11*v12 + v12*v22 + v13*v32)
+    s13d = s11*s13 + s12*s23 + s13*s33 + (v11*v13 + v12*v23 + v13*v33)
+    s23d = s21*s13 + s22*s23 + s23*s33 + (v21*v13 + v22*v23 + v23*v33)
 
     s21d = s12d
     s31d = s13d
     s32d = s23d
 
     sijd_sijd(c) = s11d*s11d + s22d*s22d + s33d*s33d  &
-                 + s12d*s12d + s13d*s13d + s23d*s23d
+                 + 2.0*(s12d*s12d + s13d*s13d + s23d*s23d)
 
     Turb % wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )   &
               / (sqrt( abs (shear2(c)   **5) ) +        &

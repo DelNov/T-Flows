@@ -193,6 +193,21 @@
   write(fu) Grid % per_y
   write(fu) Grid % per_z
 
+  !------------------------!
+  !   Homoegenous planes   !
+  !------------------------!
+  i = 0
+  do n = 1, Grid % n_x_planes
+    i=i+1;  buffer(i) = Grid % x_coord_plane(n)
+  end do
+  do n = 1, Grid % n_y_planes
+    i=i+1;  buffer(i) = Grid % y_coord_plane(n)
+  end do
+  do n = 1, Grid % n_z_planes
+    i=i+1;  buffer(i) = Grid % z_coord_plane(n)
+  end do
+  write(fu) buffer(1:i)
+
   close(fu)
 
   call Profiler % Stop('Save_Dim')

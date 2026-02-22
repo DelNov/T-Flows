@@ -68,7 +68,7 @@
 
     call Flow % Grad_Variable(ui)
 
-  end if
+  end if  ! PISO & inside_piso_loop
 
   call Work % Disconnect_Real_Cell(sum_neigh)
 

@@ -63,4 +63,18 @@
     call Enlarge % Array_Log(Grid % node_positioned, i=(/1,nn_m/))
   end if
 
+  ! Nodal coordinates of homogeneous planes
+  Assert(Grid % n_x_planes .ge. 0)
+  Assert(Grid % n_y_planes .ge. 0)
+  Assert(Grid % n_z_planes .ge. 0)
+  if(Grid % n_x_planes .gt. 0) then
+    call Enlarge % Array_Real(Grid % x_coord_plane, i=(/1,Grid % n_x_planes/))
+  end if
+  if(Grid % n_y_planes .gt. 0) then
+    call Enlarge % Array_Real(Grid % y_coord_plane, i=(/1,Grid % n_y_planes/))
+  end if
+  if(Grid % n_z_planes .gt. 0) then
+    call Enlarge % Array_Real(Grid % z_coord_plane, i=(/1,Grid % n_z_planes/))
+  end if
+
   end subroutine

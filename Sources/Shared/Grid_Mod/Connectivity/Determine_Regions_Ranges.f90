@@ -119,6 +119,7 @@
   end do
 
   if(DEBUG) then
+    write(1000+This_Proc(), '(a,a)')   ' # File: ', __FILE__
     write(1000+This_Proc(), '(a,a)')  ' # Cell ranges from ', PROGRAM_NAME
     do reg = All_Regions()
       siz = Grid % region % l_cell(reg) - Grid % region % f_cell(reg) + 1

@@ -25,32 +25,32 @@
 " from .vimrc: " Everything else:
 " from .vimrc: " :highlight Normal  ctermfg=Yellow
 " from .vimrc: "----------------------------------------------------------------
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Keyords should be Fortran commands
 " from .vimrc: highlight fortranKeyword ctermfg=Yellow
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Ghost numbers are not desirable, mark them red
 " from .vimrc: highlight fortranNumber ctermfg=Red
 " from .vimrc: highlight fortranFloat  ctermfg=Red
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Constants are better than ghost numbers, mark them blue ...
 " from .vimrc: " ... they are safer, they are in effect former ghost numbers
 " from .vimrc: highlight fortranConstant ctermfg=Blue
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Continuation lines.  I like them visible and a bit psychedelic
 " from .vimrc: highlight fortranContinueMark ctermfg=Magenta
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: highlight fortranString ctermfg=Gray
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Operators ... I don't know, maybe the same as keywords
 " from .vimrc: highlight fortranOperator ctermfg=Yellow
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Just Comment didn't work, fortranComment did
 " from .vimrc: highlight fortranComment ctermfg=LightBlue
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " Try to over-ride Fortran objects in T-Flows
 " from .vimrc: highlight fortranObjectTflows cterm=Bold ctermfg=Green
-" from .vimrc: 
+" from .vimrc:
 " from .vimrc: " MPI calls in T-Flows - they are few and far in between, yet dangerous
 " from .vimrc: highlight fortranMpiTflows ctermfg=Red
 "---------------------------------------------------------------------[T-Flows]-
@@ -380,19 +380,9 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      HUGE  TINY  HUGE_INT  EULER  PI
   syn keyword fortranConstant      ONE_THIRD  TWO_THIRDS  ONE_SIXTH
   syn keyword fortranConstant      MD  MAX_VARS_INTERFACE  MAX_TURBULENT_PLANES
-  syn keyword fortranConstant      GROWTH_MARGIN
-  syn keyword fortranConstant      AMG_MAX_LEVELS  AMG_MAX_LEVELS  AMG_RUN_ALL_FOUR_STAGES  AMG_INITIALIZE_SOLVE_AND_REPORT AMG_SOLVE_AND_REPORT  AMG_JUST_REPORT
-  syn keyword fortranConstant      AMG_SINGULAR_MATRIX  AMG_NON_SINGULAR_MATRIX  AMG_SYMMETRIC_MATRIX  AMG_NON_SYMMETRIC_MATRIX
-  syn keyword fortranConstant      AMG_SOLVER_GS  AMG_SOLVER_CG  AMG_SOLVER_BICG
-  syn keyword fortranConstant      AMG_SUCCESS  AMG_ERR_DIM_A_TOO_SMALL  AMG_ERR_DIM_IA_TOO_SMALL  AMG_ERR_DIM_JA_TOO_SMALL  AMG_ERR_DIM_U_TOO_SMALL
-  syn keyword fortranConstant      AMG_ERR_DIM_F_TOO_SMALL  AMG_ERR_DIM_ICG_TOO_SMALL  AMG_ERR_MISSING_A_ENTRY  AMG_ERR_MATRIX_INVALID
-  syn keyword fortranConstant      AMG_ERR_DIAG_NOT_FIRST  AMG_ERR_DIAG_NOT_POSITIVE  AMG_ERR_IA_POINTER_INVALID  AMG_ERR_JA_POINTER_INVALID
-  syn keyword fortranConstant      AMG_ERR_ISWTCH_INVALID  AMG_ERR_LEVELX_INVALID  AMG_ERR_TRANSPOSE_MISSING  AMG_ERR_INTERP_MISSING
-  syn keyword fortranConstant      AMG_ERR_CG_CORRECTION_UNDEF  AMG_ERR_YALE_FACTOR_FAIL  AMG_WARN_YALE_STORAGE_A  AMG_WARN_YALE_STORAGE_JA
-  syn keyword fortranConstant      AMG_WARN_CG_STORAGE_U  AMG_BIG_INTEGER  AMG_L_RATIO
-  syn keyword fortranConstant      AMG_RELAX_F_POINTS  AMG_RELAX_FULL_GS  AMG_RELAX_C_POINTS  AMG_RELAX_MULTICOLOR
-  syn keyword fortranConstant      AMG_V_CYCLE  AMG_V_STAR_CYCLE  AMG_F_CYCLE   AMG_W_CYCLE  AMG_NO_CG_STEPS  AMG_ONE_CG_STEP  AMG_FULL_CG
-  syn keyword fortranConstant      AMG_PERFORM_ALL_CYCLES  AMG_STOP_IF_RES_LT_EPS  AMG_STOP_IF_RES_LT_EPS_F  AMG_STOP_IF_RES_LT_EPS_UD
+  syn keyword fortranConstant      GROWTH_MARGIN  MAX_SCALARS
+  syn keyword fortranConstant      AMGX_QUIET  AMGX_LOUD  AMGX_FIRST_CALL  AMGX_FINAL_CALL  AMGX_MATRIX_SAME  AMGX_MATRIX_CHANGED
+
 
 " Constants from Tokenizer_Mod
   syn keyword fortranConstant      MAX_TOKENS
@@ -408,13 +398,13 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      LEAST_SQUARES  GAUSS_THEOREM
 " Constants from Turb_Mod
   syn keyword fortranConstant      NO_TURBULENCE_MODEL  DNS  LES_SMAGORINSKY  LES_DYNAMIC
-  syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  SPALART_ALLMARAS  DES_SPALART
+  syn keyword fortranConstant      LES_WALE  LES_TVM  K_EPS  K_EPS_ZETA_F  SPALART_ALLMARAS  DES_SPALART  K_OMEGA_SST
   syn keyword fortranConstant      HYBRID_LES_RANS HYBRID_LES_PRANDTL  SGDH  GGDH  AFM  A_POW  B_POW
   syn keyword fortranConstant      SWITCH_DISTANCE  SWITCH_VELOCITY  THERMALLY_DRIVEN  DENSITY_DRIVEN  NO_BUOYANCY
 " Constants from Swarm_Mod
   syn keyword fortranConstant      BROWNIAN_FUKAGATA  DISCRETE_RANDOM_WALK  N_I_VARS  N_L_VARS  N_R_VARS
 " Constants from Region_Mod
-  syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE
+  syn keyword fortranConstant      INFLOW  WALL  WALLFL  OUTFLOW  SYMMETRY  CONVECT  PRESSURE  AMBIENT
   syn keyword fortranConstant      INSIDE  BUFFER  PERIODIC_X  PERIODIC_Y  PERIODIC_Z  UNDEFINED
 " Constants from Solver_Mod and other related modules
   syn keyword fortranConstant      NATIVE  PETSC  PETSC_ACTIVE  OUT_OF_ITS
@@ -449,10 +439,10 @@ if b:fortran_dialect == "f08"
   syn keyword fortranObjectTflows  A M C Mat      vector         Sol            Nat               Pet            Work_Pet  Member
   syn keyword fortranTypeTflows    Process_Type   Pattern_Type   Isoap_Type     Polyhedron_Type   Stl_Type       Iso_Polygons_Type
   syn keyword fortranObjectTflows  Process        Pat            Isoap          Polyhedron  Pol   Stl            Iso_Polygons  Iso
-  syn keyword fortranTypeTflows    Gpu_Type       Amg_Type       Sparse_Type    Linalg_Type
-  syn keyword fortranObjectTflows  Gpu            Amg            Sparse         Linalg
+  syn keyword fortranTypeTflows    Gpu_Type       Amgx_Type      Sparse_Type    Linalg_Type
+  syn keyword fortranObjectTflows  Gpu            Amgx           Sparse         Linalg  Lin
   syn keyword fortranTypeTflows    Var_Type
-  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  phi
+  syn keyword fortranObjectTflows  u  v  w  ui  uj  uk  p  pp  t  kin  eps  zeta  f22  uu  vv  ww  uv  vw  uw  ut  vt  wt  t2  vis  omega  phi
   syn keyword fortranTypeTflows    Eddy_Type  Eddies_Type  Turb_Plane_Type  Memory_Type
   syn keyword fortranObjectTflows  Eddies  Plane  Turb_Planes               Enlarge  Mem
 " Items which follow are not really objects, but I don't know where else to put them
@@ -468,13 +458,10 @@ if b:fortran_dialect == "f08"
 " Macros might need a special group of their own.
   syn keyword fortranMacroTflows   Boundary_Regions  Boundary_And_Inside_Regions  Boundary_Inside_And_Buffer_Regions
   syn keyword fortranMacroTflows   All_Regions  Faces_At_Boundaries  Faces_In_Region  Faces_In_Domain_And_At_Buffers
-  syn keyword fortranMacroTflows   All_Regions  Faces_In_Region_Gpu  Faces_In_Domain_And_At_Buffers_Gpu
   syn keyword fortranMacroTflows   Cells_In_Region  Cells_In_Domain  Cells_In_Domain_And_Buffers  Cells_In_Buffers
-  syn keyword fortranMacroTflows   Cells_At_Boundaries  Cells_At_Boundaries_In_Domain_And_Buffers
-  syn keyword fortranMacroTflows   Cells_In_Region_Gpu  Cells_In_Domain_Gpu  Cells_In_Domain_And_Buffers_Gpu  Cells_In_Buffers_Gpu
-  syn keyword fortranMacroTflows   Cells_At_Boundaries_Gpu  Cells_At_Boundaries_In_Domain_And_Buffers_Gpu
+  syn keyword fortranMacroTflows   Cells_At_Boundaries
   syn keyword fortranMacroTflows   Cell_In_This_Proc
-  syn keyword fortranMacroTflows   Assert  Unused  O_Print  A_Print  Face_Value
+  syn keyword fortranMacroTflows   Assert  Unused  O_Print  A_Print  D_Print  Face_Value
 " Finally, a few global functions which I don't really like in the code
   syn keyword fortranGlobalTflows  Adjust_Dim  Adjust_First_Dim  Swap_Int  Swap_Real  Key_Ind
 "---------------------------------------------------------------------[T-Flows]-
@@ -495,6 +482,7 @@ if b:fortran_dialect == "f08"
 "================================================[Links for OpenACC in T-Flows]=
   syn keyword fortranGPUTflows     grid_faces_c
   syn keyword fortranGPUTflows     grid_cells_n_cells
+  syn keyword fortranGPUTflows     grid_cells_i_cells
   syn keyword fortranGPUTflows     grid_cells_c
   syn keyword fortranGPUTflows     grid_cells_f
   syn keyword fortranGPUTflows     grid_n_regions  grid_n_bnd_regions
@@ -503,7 +491,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     grid_dx  grid_dy  grid_dz
   syn keyword fortranGPUTflows     grid_sx  grid_sy  grid_sz
   syn keyword fortranGPUTflows     grid_xc  grid_yc  grid_zc
-  syn keyword fortranGPUTflows     grid_f, grid_d  grid_s  grid_vol  grid_wall_dist
+  syn keyword fortranGPUTflows     grid_f  grid_d  grid_s  grid_vol  grid_wall_dist
   syn keyword fortranGPUTflows     flow_density  flow_capacity
   syn keyword fortranGPUTflows     flow_viscosity  flow_conductivity
   syn keyword fortranGPUTflows     flow_diffusivity
@@ -517,7 +505,7 @@ if b:fortran_dialect == "f08"
   syn keyword fortranGPUTflows     turb_y_plus  turb_vis_t  turb_vis_w  turb_con_w  turb_diff_w
   syn keyword fortranGPUTflows     turb_wale_v  turb_h_max  turb_h_min  turb_h_w  turb_z_o
   syn keyword fortranGPUTflows     turb_vis_n  turb_vis_o  turb_vis_oo
-  syn keyword fortranGPUTflows     phi_bnd_cond_type  phi_n  phi_o  phi_oo
+  syn keyword fortranGPUTflows     phi_bnd_cond_type  phi_n  phi_o  phi_oo  phi_q  ui_n  ui_o  ui_oo
   syn keyword fortranGPUTflows     amg_imin  amg_imax  amg_iminw  amg_imaxw  amg_nstcol
 
 " CUDA fortran

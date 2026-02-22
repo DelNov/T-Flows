@@ -68,8 +68,18 @@
       c1 = Grid % faces_c(1,s)
       c2 = Grid % faces_c(2,s)
 
+      ! This could be computed with gradient extrapolation
+      phif =      Grid % f(s)  * phi % n(c1)   &
+           + (1.0-Grid % f(s)) * phi % n(c2)
+
+      ! Compute phif with desired advection scheme
+      if(phi % adv_scheme .ne. CENTRAL) then
+        call Numerics_Mod_Advection_Scheme(phif, s, phi,  &
+                                           phi_min, phi_max, v_flux)
+      end if
+
       ! Compute advection term (volume-conservative form)
-      advect(c1) = advect(c1) - v_flux(s) * phi % n(c2) * coef(c1)
+      advect(c1) = advect(c1) - v_flux(s) * phif * coef(c1)
 
     end do  ! faces
   end do    ! regions

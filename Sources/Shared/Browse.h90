@@ -1,5 +1,9 @@
 !==============================================================================!
 !   Definition of browsing macros in T-Flows.                                  !
+!                                                                              !
+!   Note:                                                                      !
+!   * Range arrays (like f_cell, l_cell, f_face and l_face are detertimend in: !
+!     Sources/Shared/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90        !
 !------------------------------------------------------------------------------!
 
 !------------------------------!
@@ -44,13 +48,6 @@
 !   Browsing through faces   !
 !                            !
 !----------------------------!
-
-!------------------------------------------------------!
-!   These are boundary faces in all boundary regions   !
-!------------------------------------------------------!
-# define Faces_At_Boundaries()  \
-    Grid % region % f_face(1),  \
-    Grid % region % l_face(Grid % n_bnd_regions)
 
 !----------------------------------------------------------!
 !   These are boundary faces for a given boundary region   !
@@ -106,19 +103,5 @@
 !-----------------------!
 # define Cells_In_Buffers()                        \
     Grid % region % f_cell(Grid % n_regions + 1),  \
-    Grid % region % l_cell(Grid % n_regions + 1)
-
-!-----------------------------------------------!
-!   Cells at boundaries and inside the domain   !
-!-----------------------------------------------!
-# define Cells_At_Boundaries_And_In_Domain()  \
-    Grid % region % f_cell(1),                \
-    Grid % region % l_cell(Grid % n_regions)
-
-!---------------------------------------------------------------!
-!   Cells at boundaries, inside the domain and in the buffers   !
-!---------------------------------------------------------------!
-# define Cells_At_Boundaries_In_Domain_And_Buffers()  \
-    Grid % region % f_cell(1),                        \
     Grid % region % l_cell(Grid % n_regions + 1)
 

@@ -15,6 +15,8 @@
   allocate(Work % i_face(r) % array(1 : Work % max_nf))
   Work % i_face(r) % array(:) = 0
 
-  call Gpu % Vector_Int_Create_On_Device(Work % i_face(r) % array)
+  call Gpu % Vector_Int_Copy_To_Device(lbound(Work % i_face(r) % array, 1),  &
+                                       ubound(Work % i_face(r) % array, 1),  &
+                                              Work % i_face(r) % array)
 
   end subroutine

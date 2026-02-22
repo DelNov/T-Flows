@@ -125,6 +125,8 @@
       Turb % model = K_EPS
     case('K_EPS_ZETA_F')
       Turb % model = K_EPS_ZETA_F
+    case('K_OMEGA_SST')
+      Turb % model = K_OMEGA_SST
     case('LES_SMAGORINSKY')
       Turb % model = LES_SMAGORINSKY
     case('HYBRID_LES_PRANDTL')
@@ -219,6 +221,10 @@
     call Control % Smagorinsky_Constant(Turb % c_smag, .true.)
   end if
 
+  if(Turb % model .eq. K_OMEGA_SST) then
+    call Turb % Const_K_Omega_Sst()
+  end if
+
   if(Turb % model .eq. K_EPS) then
     call Turb % Const_K_Eps()
   end if
@@ -237,6 +243,10 @@
      Turb % model .eq. LES_SMAGORINSKY .or.  &
      Turb % model .eq. LES_WALE) then
     call Turb % Const_Les()
+  end if
+
+  if(Turb % model .eq. LES_WALE) then
+    call Control % Wale_Constant(Turb % c_wale, .true.)
   end if
 
   !------------------------------------!

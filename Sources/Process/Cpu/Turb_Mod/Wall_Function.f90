@@ -9,9 +9,9 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
-  type(Var_Type),   pointer :: u, v, w, t
+  type(Var_Type),   pointer :: u, v, w, t, kin
   type(Var_Type),   pointer :: vis
-  integer                   :: s, c1, c2
+  integer                   :: s, c1, c2, reg
   real                      :: u_tau, u_tan, nu
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !------------------------------[Local parameters]------------------------------!
@@ -23,6 +23,7 @@
   Flow => Turb % pnt_flow
   Grid => Flow % pnt_grid
   vis  => Turb % vis
+  kin  => Turb % kin
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
 
@@ -43,14 +44,14 @@
   !   The procedure below should be activated   !
   !   only if wall function approach is used.   !
   !---------------------------------------------!
-  do s = 1, Grid % n_faces
-    c1 = Grid % faces_c(1,s)
-    c2 = Grid % faces_c(2,s)
+  do reg = Boundary_Regions()
 
-    if(c2  < 0) then
+    if(Grid % region % type(reg) .eq. WALL .or.  &
+       Grid % region % type(reg) .eq. WALLFL) then
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
-         Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
 
         kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
 
@@ -62,12 +63,14 @@
         nu = Flow % viscosity(c1) / Flow % density(c1)
 
         ! Calculate u_tau for smooth wall
-        u_tau = (u_tan/A_POW * (nu/Grid % wall_dist(c1))**B_POW) &
-                ** (1.0/(1.0+B_POW))
-
-        ! Calculate u_tau for rough wall
-        if(z_o .gt. TINY) then
-          u_tau = u_tan * Turb % kappa / log(Grid % wall_dist(c1)/z_o)
+        if(Turb % model == K_EPS .or. Turb % model == K_EPS_ZETA_F .or. &
+           Turb % model == K_OMEGA_SST) then
+          u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
+        else
+          u_tau = Turb % U_Tau_Log_Law(u_tan,                &
+                                       Grid % wall_dist(c1), &
+                                       kin_vis,              &
+                                       z_o)
         end if
 
         ! Calculate u_tau according to Monin-Obukov Similarity Theory
@@ -93,13 +96,11 @@
         ebf = Turb % Ebf_Momentum(c1)
 
         if(Turb % y_plus(c1) < 3.0) then
-          Turb % vis_w(c1) = Turb % vis_t(c1) + Flow % viscosity(c1)
+          Turb % vis_w(c1) = Flow % viscosity(c1)
         else
-
           Turb % vis_w(c1) =    Turb % y_plus(c1) * Flow % viscosity(c1)  &
                            / (  Turb % y_plus(c1) * exp(-1.0 * ebf)       &
                               + u_plus * exp(-1.0/ebf) + TINY)
-
         end if
 
         if(Flow % heat_transfer) then
@@ -107,8 +108,8 @@
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
           beta = Turb % Beta_Scalar(pr, pr_t)
           ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions"
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
           if(z_o .gt. TINY) then
             beta = 0.0
           end if
@@ -133,8 +134,8 @@
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
           beta = Turb % Beta_Scalar(sc, sc_t)
           ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer: New
-          ! temperature inlet profile consistent with wall functions"
+          ! "CFD simulation of the near-neutral atmospheric boundary layer:
+          ! New temperature inlet profile consistent with wall functions"
           if(z_o .gt. TINY) then
             beta = 0.0
           end if
@@ -153,12 +154,16 @@
           end if
         end if  ! n_scalars > 0
 
-      end if  ! Grid % Bnd_Cond_Type(c2) .eq. WALL or WALLFL
-    end if    ! c2 < 0
+      end do
+    end if      ! Grid % region % type(reg) .eq. WALL
   end do
 
   call Grid % Exchange_Cells_Real(Turb % vis_w)
-  if(Flow % n_scalars > 0) call Grid % Exchange_Cells_Real(Turb % diff_w)
-  if(Flow % heat_transfer) call Grid % Exchange_Cells_Real(Turb % con_w)
+  if(Flow % n_scalars > 0) then
+    call Grid % Exchange_Cells_Real(Turb % diff_w)
+  end if
+  if(Flow % heat_transfer) then
+    call Grid % Exchange_Cells_Real(Turb % con_w)
+  end if
 
   end subroutine

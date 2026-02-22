@@ -75,8 +75,7 @@
 !==============================================================================!
 
   ! Give some sign
-  if(First_Proc())  &
-    print '(a)', ' # Reading info about discretization schemes'
+  O_Print '(a)', ' # Reading info about discretization schemes'
 
   ! Take alias
   Grid => Flow % pnt_grid
@@ -204,7 +203,8 @@
   !------------------------------!
   !   All turbuelnt quantities   !
   !------------------------------!
-  do i = 1, 12
+  do i = 1, 13
+    nullify(tq)
     if(i .eq.  1) tq => Turb % kin
     if(i .eq.  2) tq => Turb % eps
     if(i .eq.  3) tq => Turb % zeta
@@ -217,15 +217,18 @@
     if(i .eq. 10) tq => Turb % uv
     if(i .eq. 11) tq => Turb % uw
     if(i .eq. 12) tq => Turb % vw
-    call Control % Advection_Scheme_For_Turbulence            (name)
-    tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
-    call Control % Time_Integration_Scheme                    (name)
-    tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
-    call Control % Blending_Coefficients_For_Turbulence       (tq % blends)
-    call Control % Simple_Underrelaxation_For_Turbulence      (tq % urf)
-    call Control % Gradient_Method_For_Turbulence             (name)
-    tq % grad_method = Numerics_Mod_Gradient_Method_Code      (name)
-    call Control % Blend_System_Matrices(tq % blend_matrix, .false.)
+    if(i .eq. 12) tq => Turb % omega
+    if(associated(tq)) then
+      call Control % Advection_Scheme_For_Turbulence            (name)
+      tq % adv_scheme = Numerics_Mod_Advection_Scheme_Code      (name)
+      call Control % Time_Integration_Scheme                    (name)
+      tq % td_scheme = Numerics_Mod_Time_Integration_Scheme_Code(name)
+      call Control % Blending_Coefficients_For_Turbulence       (tq % blends)
+      call Control % Simple_Underrelaxation_For_Turbulence      (tq % urf)
+      call Control % Gradient_Method_For_Turbulence             (name)
+      tq % grad_method = Numerics_Mod_Gradient_Method_Code      (name)
+      call Control % Blend_System_Matrices(tq % blend_matrix, .false.)
+    end if
   end do
 
   end subroutine

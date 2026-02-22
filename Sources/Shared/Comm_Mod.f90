@@ -132,6 +132,7 @@
       procedure :: Start_Parallel
       procedure :: Sum_Int
       procedure :: Sum_Int_Array
+      procedure :: Sum_Ints
       procedure :: Sum_Real
       procedure :: Sum_Real_Array
       procedure :: Sum_Reals
@@ -204,6 +205,7 @@
 #   include "Comm_Mod/Parallel/Global/Min_Int.f90"
 #   include "Comm_Mod/Parallel/Global/Sum_Int.f90"
 #   include "Comm_Mod/Parallel/Global/Sum_Int_Array.f90"
+#   include "Comm_Mod/Parallel/Global/Sum_Ints.f90"
 #   include "Comm_Mod/Parallel/Global/Sum_Real.f90"
 #   include "Comm_Mod/Parallel/Global/Sum_Real_Array.f90"
 #   include "Comm_Mod/Parallel/Global/Sum_Reals.f90"
@@ -255,6 +257,7 @@
 #   include "Comm_Mod/Sequential/Global/Min_Int.f90"
 #   include "Comm_Mod/Sequential/Global/Sum_Int.f90"
 #   include "Comm_Mod/Sequential/Global/Sum_Int_Array.f90"
+#   include "Comm_Mod/Sequential/Global/Sum_Ints.f90"
 #   include "Comm_Mod/Sequential/Global/Sum_Real.f90"
 #   include "Comm_Mod/Sequential/Global/Sum_Real_Array.f90"
 #   include "Comm_Mod/Sequential/Global/Sum_Reals.f90"

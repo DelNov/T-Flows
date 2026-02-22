@@ -64,7 +64,6 @@
       procedure :: Backup_Save_Interval
       procedure :: Results_Save_Interval
       procedure :: Swarm_Save_Interval
-      procedure :: Profiler_Info
 
       ! Unclassified as of yet
       procedure :: Linear_Solvers
@@ -156,6 +155,7 @@
       procedure :: Mass_Density
       procedure :: Thermal_Conductivity
       procedure :: Scalars_Diffusivity
+      procedure :: Scalars_Diffusivities
       procedure :: Interface_Tracking
       procedure :: Particle_Tracking
       procedure :: Mass_Transfer_Model
@@ -170,6 +170,7 @@
       procedure :: Rough_Walls
       procedure :: Monin_Obukov
       procedure :: Smagorinsky_Constant
+      procedure :: Wale_Constant
       procedure :: Turbulence_Model
       procedure :: Turbulent_Prandtl_Number
       procedure :: Turbulent_Schmidt_Number
@@ -248,9 +249,6 @@
 #   include "Control_Mod/Input_Output/Backup_Save_Interval.f90"
 #   include "Control_Mod/Input_Output/Results_Save_Interval.f90"
 #   include "Control_Mod/Input_Output/Swarm_Save_Interval.f90"
-
-    ! Profiler
-#   include "Control_Mod/Input_Output/Profiler_Info.f90"
 
     !--------------------!
     !   Linear solvers   !  (native (from T-Flows) or PETSc)
@@ -367,6 +365,7 @@
 #   include "Control_Mod/Physics/Mass_Density.f90"
 #   include "Control_Mod/Physics/Thermal_Conductivity.f90"
 #   include "Control_Mod/Physics/Scalars_Diffusivity.f90"
+#   include "Control_Mod/Physics/Scalars_Diffusivities.f90"
 
     ! Multiphase flow
 #   include "Control_Mod/Physics/Interface_Tracking.f90"
@@ -387,6 +386,7 @@
 #   include "Control_Mod/Physics/Roughness_Coefficient.f90"
 #   include "Control_Mod/Physics/Rough_Walls.f90"
 #   include "Control_Mod/Physics/Smagorinsky_Constant.f90"
+#   include "Control_Mod/Physics/Wale_Constant.f90"
 #   include "Control_Mod/Physics/Turbulence_Model.f90"
 #   include "Control_Mod/Physics/Turbulent_Prandtl_Number.f90"
 #   include "Control_Mod/Physics/Turbulent_Schmidt_Number.f90"

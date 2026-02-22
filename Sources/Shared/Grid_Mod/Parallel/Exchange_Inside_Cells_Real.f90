@@ -32,7 +32,7 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)           :: Grid    !! computational grid
   real, intent(inout)        :: phi(1:Grid % n_cells)
-    !! real array defined over boundary and internal cells to be exchanged
+            !! real array defined over boundary internal cells to be exchanged
   character(len=*), optional :: caller  !! string to log call's necessity
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: ln, c1, c2, len_s, len_r, sub

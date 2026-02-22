@@ -11,12 +11,12 @@
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
-  type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2
+  type(Var_Type),    pointer :: kin, eps, ut, vt, wt, t2, omega
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s, reg
   real                       :: kin_vis, p_t2_wall, ebf, u_tau
-  real                       :: ut_sgdh, vt_sgdh, wt_sgdh, z_o
+  real                       :: ut_sgdh, vt_sgdh, wt_sgdh, z_o, eps_eff
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -40,6 +40,7 @@
   call Turb % Alias_Heat_Fluxes(ut, vt, wt)
   call Turb % Alias_T2         (t2)
   call Sol % Alias_Native      (A, b)
+  omega => Turb % omega
 
   !-----------------------------------------!
   !   Compute the sources in all the cells  !
@@ -73,8 +74,15 @@
     b(c) = b(c) + Turb % p_t2(c) * Grid % vol(c)
 
   ! Negative contribution
+
+    if (Turb % model == K_OMEGA_SST) then
+      eps_eff = Turb % beta_star * kin % n(c) * omega % n(c)
+    else
+      eps_eff = eps % n(c)
+    end if
+
     A % val(A % dia(c)) = A % val(A % dia(c)) +  &
-         2.0 * Flow % density(c) * eps % n(c)  &
+         2.0 * Flow % density(c) * eps_eff  &
              / (kin % n(c) + TINY) * Grid % vol(c)
 
   end do

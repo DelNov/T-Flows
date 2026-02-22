@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
 
 !==============================================================================!
   program Generate_Prog
@@ -33,10 +34,6 @@
   use Generate_Mod
 !------------------------------------------------------------------------------!
   implicit none
-!---------------------------------[Interfaces]---------------------------------!
-  interface
-    include '../Shared/Probe_1d_Nodes.h90'
-  end interface
 !-----------------------------------[Locals]-----------------------------------!
   type(Domain_Type)  :: Dom       ! domain to be used
   type(Grid_Type)    :: Grid      ! Grid which will be generated
@@ -101,6 +98,13 @@
   end do
   ! Similar note is in Convert, also called Note #1
 
+  !-----------------------------------------!
+  !   Check and store homogeneity of the    !
+  !   grid in three coordinate directions   !
+  !-----------------------------------------!
+  call Grid % Search_Coordinate_Clusters(nodal           = .true.,   &
+                                         enforce_uniform = .false.)
+
   !------------------------------!
   !   Save data for processing   !
   !------------------------------!
@@ -126,14 +130,6 @@
 
   ! Create a template control file for this domain
   call Grid % Write_Template_Control_File()
-
-  ! Check homogeneity of the grid in three coordinate directions
-  ! Here, in generator, there is no sense to enforce uniformity
-  call Grid % Search_Coordinate_Clusters(nodal           = .true.,   &
-                                         enforce_uniform = .false.)
-
-  ! Save the 1d probe (good for the channel flow)
-  call Probe_1d_Nodes(Grid)
 
   ! Write something on the screen
   call Generate % Print_Generate_Statistics(Grid)

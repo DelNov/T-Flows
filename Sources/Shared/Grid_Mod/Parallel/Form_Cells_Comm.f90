@@ -38,7 +38,7 @@
   integer, allocatable :: cells_near_buffers(:)
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
-  integer, allocatable :: need_cell(:,:), from_proc(:,:)
+  integer, allocatable :: need_cell(:), from_proc(:)
   integer, allocatable :: send_sort(:), recv_sort(:)
   integer, allocatable :: glo(:)  ! used for checking the communication
   logical, allocatable :: node_in_buffer(:)
@@ -99,6 +99,22 @@
     Grid % Comm % n_buff_cells = Grid % Comm % n_buff_cells + 1
   end do
 
+  if(DEBUG) then
+    write(2000+This_Proc(), '(a,a)')   ' # File: ', __FILE__
+    write(2000+This_Proc(), '(a,a)')   ' # Global cell numbers ', PROGRAM_NAME
+    write(2000+This_Proc(), '(a,i9)')  ' # n_cells                ',  &
+      Grid % n_cells
+    write(2000+This_Proc(), '(a,i9)')  ' # n_buff_cells           ',  &
+      Grid % Comm % n_buff_cells
+    write(2000+This_Proc(), '(a,i9)')  ' # n_cells - n_buff_cells ',  &
+      Grid % n_cells - Grid % Comm % n_buff_cells
+    do c = 1, Grid % n_cells - Grid % Comm % n_buff_cells
+      write(2000+This_Proc(),'(3i9)')  c,                          &
+                                       Grid % Comm % cell_glo(c),  &
+                                       Grid % Comm % cell_proc(c)
+    end do
+  end if
+
   !------------------------!
   !   Count buffer faces   !
   !------------------------!
@@ -146,8 +162,8 @@
   !--------------------------------------------------!
   n_max_buff_cells = Grid % Comm % n_buff_cells
   call Global % Max_Int(n_max_buff_cells)
-  allocate(need_cell(n_max_buff_cells, N_Procs()));  need_cell(:,:) = 0
-  allocate(from_proc(n_max_buff_cells, N_Procs()));  from_proc(:,:) = 0
+  allocate(need_cell(n_max_buff_cells * N_Procs()));  need_cell(:) = 0
+  allocate(from_proc(n_max_buff_cells * N_Procs()));  from_proc(:) = 0
 
   !-------------------------------------------!
   !   Store global number of cells you need   !
@@ -157,20 +173,18 @@
   do c = Cells_In_Buffers()
     Assert(.not. Cell_In_This_Proc(c))
     i_cel = i_cel + 1
-    need_cell(i_cel, This_Proc()) = Grid % Comm % cell_glo(c)
-    from_proc(i_cel, This_Proc()) = Grid % Comm % cell_proc(c)
+    need_cell(i_cel + (This_Proc()-1)*n_max_buff_cells)  &
+      = Grid % Comm % cell_glo(c)
+    from_proc(i_cel + (This_Proc()-1)*n_max_buff_cells)  &
+      = Grid % Comm % cell_proc(c)
   end do
 
   !----------------------------------------------!
   !   Inform all processors about needed cells   !
   !   and from which processor are they needed   !
   !----------------------------------------------!
-  need_cell = reshape(need_cell, (/n_max_buff_cells*N_Procs(), 1/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells*N_Procs(), 1/))
   call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), need_cell)
   call Global % Sum_Int_Array(n_max_buff_cells*N_Procs(), from_proc)
-  need_cell = reshape(need_cell, (/n_max_buff_cells, N_Procs()/))
-  from_proc = reshape(from_proc, (/n_max_buff_cells, N_Procs()/))
 
   !---------------------------------------------------------------------!
   !   Form send_buff_cnt from the information in the matrix from_proc   !
@@ -179,7 +193,7 @@
   do sub = 1, N_Procs()
     if(sub .ne. This_Proc()) then
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. This_Proc()) then
+        if(from_proc(i_cel + (sub-1)*n_max_buff_cells) .eq. This_Proc()) then
           send_buff_cnt(This_Proc(), sub) = send_buff_cnt(This_Proc(), sub) + 1
         end if
       end do
@@ -196,6 +210,11 @@
   Assert(send_buff_cnt(This_Proc(), This_Proc()) .eq. 0)
 
   if(DEBUG) then
+    ! On 2025.11.24, I discovered that Nvidia's Fortran has difficulties
+    ! with the "reshape" function and had to replace it with one-dimensional
+    ! arrays in a crucial part of this subroutine.  Here, since it is only a
+    ! debugging portion of the code it is not critical, but it one should
+    ! keep in mind that usage of reshape is fragile.
     send_buff_cnt = reshape(send_buff_cnt, (/N_Procs()*N_Procs(), 1/))
     recv_buff_cnt = reshape(recv_buff_cnt, (/N_Procs()*N_Procs(), 1/))
     call Global % Sum_Int_Array(N_Procs()*N_Procs(), send_buff_cnt)
@@ -256,17 +275,18 @@
 
       !------------------------------------------!
       !   Form send_cells from the information   !
-      !   in matrices from_proc and need_cell    !
+      !    in vectors from_proc and need_cell    !
       !------------------------------------------!
 
       cnt = 0
       send_cells(:) = 0
       do i_cel = 1, n_max_buff_cells
-        if(from_proc(i_cel, sub) .eq. This_Proc()) then
+        if(from_proc(i_cel + (sub-1)*n_max_buff_cells) .eq. This_Proc()) then
           do j_cel = 1, n_cells_near_buffers
             c = cells_near_buffers(j_cel)
-            if(Grid % Comm % cell_glo(c) .eq. need_cell(i_cel, sub)) then
-              send_cells(c) = sub                                  ! identify
+            if(Grid % Comm % cell_glo(c)  &
+               .eq. need_cell(i_cel + (sub-1)*n_max_buff_cells)) then
+              send_cells(c) = sub  ! identify
               cnt = cnt + 1
               goto 1
             end if

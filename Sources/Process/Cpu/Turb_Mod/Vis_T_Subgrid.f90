@@ -71,9 +71,9 @@
   else if(Turb % model .eq. LES_WALE) then
     do c = Cells_In_Domain_And_Buffers()
       lf = Grid % vol(c)**ONE_THIRD
-      Turb % vis_t(c) = Flow % density(c)  &
-                      * (lf*lf)            &  ! delta^2
-                      * (0.5*0.5)          &  ! cs^2
+      Turb % vis_t(c) = Flow % density(c)                &
+                      * (lf*lf)                          &  ! delta^2
+                      * (Turb % c_wale * Turb % c_wale)  &  ! cs^2
                       * Turb % wale_v(c)
     end do
   end if

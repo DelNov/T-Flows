@@ -15,6 +15,8 @@
   allocate(Work % i_node(r) % array(1 : Work % max_nn))
   Work % i_node(r) % array(:) = 0
 
-  call Gpu % Vector_Int_Create_On_Device(Work % i_node(r) % array)
+  call Gpu % Vector_Int_Copy_To_Device(lbound(Work % i_node(r) % array, 1),  &
+                                       ubound(Work % i_node(r) % array, 1),  &
+                                              Work % i_node(r) % array)
 
   end subroutine

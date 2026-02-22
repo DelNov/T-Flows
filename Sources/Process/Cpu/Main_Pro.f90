@@ -13,47 +13,6 @@
 !>  every step of the simulation is executed correctly and in synchronization
 !>  with other parts of the code.
 !------------------------------------------------------------------------------!
-!   Functionality                                                              !
-!                                                                              !
-!   * Initialization:                                                          !
-!     - Sets up profiler for performance tracking.                             !
-!     - Initializes control file names for the root and individual domains.    !
-!     - Initializes time and backup-related variables.                         !
-!     - Starts parallel execution if necessary.                                !
-!     - Displays the program logo.                                             !
-!   * Control file processing:                                                 !
-!     - Opens and reads control files for root and domain-specific settings.   !
-!     - Initializes Info_Mod for managing information and logging.             !
-!     Grid and field preparation:                                              !
-!     - Loads and prepares grids for each domain.                              !
-!     - Allocates memory for working arrays, essential for RSM models.         !
-!     - Sets up time steps and reads control information for physical models.  !
-!   * Memory allocation for variables:                                         !
-!     - Allocates memory for flow fields, turbulence, VOF, swarms, and solvers.!
-!     - Initializes numerical schemes and boundary conditions.                 !
-!   * Interface creation and backup loading:                                   !
-!     - Creates interfaces between domains.                                    !
-!     - Loads backup files if directed and initializes variables accordingly.  !
-!   * Time loop setup:                                                         !
-!     - Sets intervals for backup and results saving.                          !
-!     - Computes wall distance and performs potential initialization.          !
-!   * Main time loop:                                                          !
-!     - Iteratively processes each time step.                                  !
-!     - Handles turbulence models, interface tracking, and                     !
-!       Lagrangian particle tracking model.                                    !
-!     - Executes the PISO algorithm for pressure-velocity coupling.            !
-!     - Updates boundary values and solves for energy and scalar fields.       !
-!     - Manages data exchange between domains.                                 !
-!     - Performs post-iteration tasks, including user-defined functions.       !
-!   * Result saving and exiting:                                               !
-!     - Saves results at specified intervals.                                  !
-!     - Checks for exit conditions based on time or external signals.          !
-!     - Calls user functions at the end of the simulation.                     !
-!   * Finalization:                                                            !
-!     - Closes monitoring files and performs final user function calls.        !
-!     - Finalizes work arrays, profiler and solvers.                           !
-!     - Ends parallel execution and exits the program.                         !
-!------------------------------------------------------------------------------!
 !---------------------------------[Modules]------------------------------------!
   use Process_Mod
   use Gpu_Mod
@@ -194,6 +153,8 @@
       call Process % Initialize_Variables(Flow(d), Turb(d),  &
                                           Vof(d), Swarm(d), Sol(d))
     end if
+    call User_Mod_Initialize_Variables(Flow(d), Turb(d),   &
+                                       Vof(d), Swarm(d), Sol(d))
 
     if(Flow(d) % with_interface) then
       if (read_backup(d))  then
@@ -396,7 +357,6 @@
 
       ! Calculate mean values
       call Turb(d) % Calculate_Mean(n_stat_t)
-      call User_Mod_Calculate_Mean(Turb(d), n_stat_t)
 
       ! Adjust pressure drops to keep the mass fluxes constant
       call Flow(d) % Adjust_P_Drops()

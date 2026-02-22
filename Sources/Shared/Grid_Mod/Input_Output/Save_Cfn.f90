@@ -250,6 +250,16 @@
   write(fu) ns_sub
   write(fu) Grid % n_bnd_regions  ! number of bounary conditions
 
+  !------------------------!
+  !   Homoegenous planes   !
+  !------------------------!
+  Assert(Grid % n_x_planes .ge. 0)
+  Assert(Grid % n_y_planes .ge. 0)
+  Assert(Grid % n_z_planes .ge. 0)
+  write(fu) Grid % n_x_planes
+  write(fu) Grid % n_y_planes
+  write(fu) Grid % n_z_planes
+
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
   !-------------------------------------!

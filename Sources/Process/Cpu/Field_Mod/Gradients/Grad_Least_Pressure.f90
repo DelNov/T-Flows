@@ -38,7 +38,12 @@
 
     ! Extrapolation to boundaries
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .ne. PRESSURE) then
+      if(Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c2 = Grid % faces_c(2,s)
+          p % n(c2) = 0.0
+        end do  ! faces
+      else if(Grid % region % type(reg) .ne. AMBIENT) then
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
@@ -48,11 +53,11 @@
                                 + p % z(c1) * Grid % dz(s)
         end do  ! faces
       else
-        do s = Faces_In_Region(reg)
-          c2 = Grid % faces_c(2,s)
-          p % n(c2) = 0.0
-        end do  ! faces
-      end if    ! boundary is pressure or not
+        ! This was used for checking
+        ! do s = Faces_In_Region(reg)
+        !   c2 = Grid % faces_c(2,s)
+        ! end do
+      end if    ! pressure, ambient or other
     end do      ! regions
 
     ! Compute individual gradients without refreshing buffers

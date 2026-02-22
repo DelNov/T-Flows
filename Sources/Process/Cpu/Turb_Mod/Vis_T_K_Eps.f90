@@ -68,98 +68,11 @@
     Turb % vis_t(c) = f_mu * Turb % c_mu * Flow % density(c) * kin % n(c)**2  &
                       / (eps % n(c) + TINY)
   end do
-  call Grid % Exchange_Cells_Real(Turb % vis_t)
 
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .eq. WALL .or.  &
-       Grid % region % type(reg) .eq. WALLFL) then
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        Assert(c2 < 0)
-
-        kin_vis =  Flow % viscosity(c1) / Flow % density(c1)
-
-        ! Set up roughness coefficient
-        z_o = Turb % Roughness_Coeff(c1, c2)
-
-        ! Compute tangential velocity component
-        u_tan = Flow % U_Tan(s)
-
-        u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
-
-        Turb % y_plus(c1) = Turb % Y_Plus_Rough_Walls(   &
-                                   u_tau,                &
-                                   Grid % wall_dist(c1), &
-                                   kin_vis,              &
-                                   z_o)
-
-        Turb % tau_wall(c1) = Turb % Tau_Wall_Log_Law(              &
-                                              Flow % density(c1),   &
-                                              u_tau,                &
-                                              u_tan,                &
-                                              Grid % wall_dist(c1), &
-                                              Turb % y_plus(c1),    &
-                                              z_o)
-
-        ebf = Turb % Ebf_Momentum(c1)
-
-        u_plus = Turb % U_Plus_Log_Law(               &
-                               Grid % wall_dist(c1),  &
-                               Turb % y_plus(c1),     &
-                               z_o)
-
-        if(Turb % y_plus(c1) < 3.0) then
-          Turb % vis_w(c1) = Turb % vis_t(c1) + Flow % viscosity(c1)
-        else
-
-          if(Turb % y_plus(c1) < 11.3 ) then
-            ebf = 0.00001
-          end if
-
-          Turb % vis_w(c1) =    Turb % y_plus(c1) * Flow % viscosity(c1)  &
-                           / (  Turb % y_plus(c1) * exp(-1.0 * ebf)       &
-                                         + u_plus * exp(-1.0 / ebf) + TINY)
-
-        end if
-
-        if(Flow % heat_transfer) then
-          pr   = Flow % Prandtl_Numb(c1)
-          pr_t = Turb % Prandtl_Turb(c1)
-          beta = Turb % Beta_Scalar(pr, pr_t)
-          ! According to Toparlar et al. 2019 paper
-          ! "CFD simulation of the near-neutral atmospheric boundary layer:
-          ! New temperature inlet profile consistent with wall functions"
-
-          if(z_o .gt. TINY) then
-            beta = 0.0
-          end if
-
-          ebf = Turb % Ebf_Scalar(c1, pr)
-          Turb % con_w(c1) =    Turb % y_plus(c1)                         &
-                              * Flow % viscosity(c1)                      &
-                              * Flow % capacity(c1)                       &
-                      / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
-                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
-        end if
-
-        if(Flow % n_scalars .gt. 0) then
-          sc   = Flow % Schmidt_Numb(c1)            ! laminar Schmidt number
-          beta = Turb % Beta_Scalar(sc, sc_t)
-          ebf  = Turb % Ebf_Scalar(c1, pr)
-          if(z_o .gt. TINY) then
-            beta = 0.0
-          end if
-          Turb % diff_w(c1) =  Turb % y_plus(c1)                    &
-               * (Flow % viscosity(c1)/Flow % density(c1))          &
-               / (  Turb % y_plus(c1) * sc * exp(-1.0 * ebf)        &
-                  + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
-        end if
-
-      end do    ! faces in regions
-    end if      ! region is WALL or WALLFL
-  end do        ! through regions
+  !-------------------!
+  !   Wall function   !
+  !-------------------+
+  call Turb % Wall_Function()
 
   call Grid % Exchange_Cells_Real(Turb % vis_w)
   if(Flow % heat_transfer) then
@@ -168,5 +81,7 @@
   if(Flow % n_scalars > 0) then
     call Grid % Exchange_Cells_Real(Turb % diff_w)
   end if
+
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
 
   end subroutine
