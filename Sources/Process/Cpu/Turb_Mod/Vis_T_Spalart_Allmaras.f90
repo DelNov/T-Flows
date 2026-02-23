@@ -44,12 +44,8 @@
   call Turb % Wall_Function()
 
   call Grid % Exchange_Cells_Real(Turb % vis_w)
-  if(Flow % n_scalars > 0) then
-    call Grid % Exchange_Cells_Real(Turb % diff_w)
-  end if
-  if(Flow % heat_transfer) then
-    call Grid % Exchange_Cells_Real(Turb % con_w)
-  end if
+  if(Flow % n_scalars > 0)  call Grid % Exchange_Cells_Real(Turb % diff_w)
+  if(Flow % heat_transfer)  call Grid % Exchange_Cells_Real(Turb % con_w)
 
   call Grid % Exchange_Cells_Real(Turb % vis_t)
 
