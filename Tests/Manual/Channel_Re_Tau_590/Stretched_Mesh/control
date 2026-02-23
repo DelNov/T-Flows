@@ -11,7 +11,7 @@
 # Time stepping
 #---------------
   TIME_STEP                  1.0
-  NUMBER_OF_TIME_STEPS     2800
+  NUMBER_OF_TIME_STEPS     1800
   RESULTS_SAVE_INTERVAL     600
   BACKUP_SAVE_INTERVAL      600
 
@@ -39,10 +39,10 @@
 #----------------------------------------
 # Physical models
 #----------------------------------------
-  TURBULENCE_MODEL       k_eps_zeta_f
+#  TURBULENCE_MODEL       k_eps_zeta_f
 #  TURBULENCE_MODEL       k_eps
 #  TURBULENCE_MODEL       k_omega_sst 
-#  TURBULENCE_MODEL       spalart_allmaras  
+  TURBULENCE_MODEL       spalart_allmaras  
 
 #----------------------
 # Numerical parameters
@@ -68,14 +68,14 @@
   TOLERANCE_FOR_PRESSURE_SOLVER      1.e-6
   TOLERANCE_FOR_TURBULENCE_SOLVER    1.e-6
   TOLERANCE_FOR_ENERGY_SOLVER        1.e-6
-  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-6
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
 
 #--------------------
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u    t     kin    eps    zeta   f22    omg  vis 
-    VALUES              1.0  20.0  1.0e-2 1.0e-3 1.0e-1 6.6e-3 1.0  0.0001
+    VARIABLES           u    t     kin    eps    zeta   f22    omg    vis 
+    VALUES              1.0  20.0  1.0e-2 1.0e-3 1.0e-1 6.6e-3 0.001  0.0001
 
 #---------------------
 # Boundary conditions
