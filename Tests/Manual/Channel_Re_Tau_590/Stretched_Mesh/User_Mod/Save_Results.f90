@@ -18,7 +18,7 @@
   type(Bulk_Type), pointer :: bulk
   type(Var_Type),  pointer :: u, v, w, kin, eps, zeta, f22, omega
   integer                  :: n_prob, i, c, count, n_points, fu
-  character(SL)            :: coord_name, res_name
+  character(SL)            :: res_name, res_name_plus
   real, allocatable        :: z_p(:), u_p(:), uw_p(:),                    &
                               kin_p(:), eps_p(:), f22_p(:),               &
                               zeta_p(:), omg_p(:),                        &
