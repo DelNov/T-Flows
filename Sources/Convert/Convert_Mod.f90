@@ -38,7 +38,6 @@
       procedure          :: Find_Inside_Faces
       procedure          :: Find_Parents
       procedure          :: Guess_Format
-      procedure          :: Insert_Buildings
       procedure          :: Load_Fluent
       procedure          :: Load_Forrest
       procedure          :: Load_Gambit
@@ -172,7 +171,6 @@
 #   include "Convert_Mod/Find_Inside_Faces.f90"
 #   include "Convert_Mod/Find_Parents.f90"
 #   include "Convert_Mod/Guess_Format.f90"
-#   include "Convert_Mod/Insert_Buildings.f90"
 #   include "Convert_Mod/Load_Fluent.f90"
 #   include "Convert_Mod/Load_Forrest.f90"
 #   include "Convert_Mod/Load_Gambit.f90"
