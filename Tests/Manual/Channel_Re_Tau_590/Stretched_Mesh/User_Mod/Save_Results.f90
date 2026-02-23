@@ -16,17 +16,17 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Bulk_Type), pointer :: bulk
-  type(Var_Type),  pointer :: u, v, w, kin, eps, zeta, f22, omega
-  integer                  :: n_prob, i, c, count, n_points, fu
-  character(SL)            :: res_name, res_name_plus
+  type(Var_Type),  pointer :: u, v, w, kin, eps, zeta, f22, omega, t
+  integer                  :: n_prob, i, c, count, n_points, fu, c1, c2, s
+  character(SL)            :: res_name
   real, allocatable        :: z_p(:), u_p(:), uw_p(:),                    &
                               kin_p(:), eps_p(:), f22_p(:),               &
                               zeta_p(:), omg_p(:),                        &
-                              y_plus_p(:), vis_t_p(:), ind(:), wall_p(:)
+                              y_plus_p(:), t_p(:), ind(:), wall_p(:)
   integer, allocatable     :: n_p(:), n_count(:)
-  real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p
+  real                     :: ubulk, error, re, cf_dean, cf, pr, u_tau_p, t_tau
   real                     :: dens_const, visc_const
-  real                     :: capa_const, cond_const
+  real                     :: capa_const, cond_const, t_wall
   logical                  :: there
 !==============================================================================!
 
@@ -38,6 +38,7 @@
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
+  call Flow % Alias_Energy  (t)   
   omega => Turb % omega
 
   ! Read constant physical properties from control file
@@ -49,14 +50,10 @@
   ubulk    = bulk % flux_x / bulk % area_x
   n_points = 0
 
-
   ! Set file names to save results                                               
   call File % Set_Name(res_name,                      &                          
                        time_step = Time % Curr_Dt(),  &                          
                        extension = '-res.dat')                                   
-  call File % Set_Name(res_name_plus,                 &                          
-                       time_step = Time % Curr_Dt(),  &                          
-                       extension = '-res-plus.dat')                              
                                                                                  
   ! Number of probes in cell rows                                                
   n_prob = Grid % n_z_planes - 1                  
@@ -70,7 +67,7 @@
   allocate(kin_p   (n_prob));  kin_p    = 0.0
   allocate(eps_p   (n_prob));  eps_p    = 0.0
   allocate(uw_p    (n_prob));  uw_p     = 0.0
-  allocate(vis_t_p (n_prob));  vis_t_p  = 0.0
+  allocate(t_p (n_prob));      t_p      = 0.0
   allocate(f22_p   (n_prob));  f22_p    = 0.0
   allocate(omg_p   (n_prob));  omg_p    = 0.0
   allocate(zeta_p  (n_prob));  zeta_p   = 0.0
@@ -90,7 +87,6 @@
         wall_p  (i) = wall_p  (i) + Grid % wall_dist(c)
         u_p     (i) = u_p     (i) + u % n(c)
         uw_p    (i) = uw_p    (i) + Turb % vis_t(c) * (u % z(c) + w % x(c))
-        vis_t_p (i) = vis_t_p (i) + Turb % vis_t(c) / visc_const
         y_plus_p(i) = y_plus_p(i) + Turb % y_plus(c)
         if(Turb % model == K_EPS_ZETA_F) then
           kin_p   (i) = kin_p   (i) + kin % n(c)
@@ -104,6 +100,7 @@
           kin_p   (i) = kin_p   (i) + kin % n(c)
           omg_p   (i) = omg_p   (i) + omega % n(c)
         end if 
+        if(Flow % heat_transfer) t_p (i) = t_p (i) + t  % n(c)     
 
         n_count(i) = n_count(i) + 1
       end if
@@ -118,7 +115,7 @@
       eps_p   (i) = eps_p   (i) / n_count(i)
       omg_p   (i) = omg_p   (i) / n_count(i)
       uw_p    (i) = uw_p    (i) / n_count(i)
-      vis_t_p (i) = vis_t_p (i) / n_count(i)
+      t_p (i)     = t_p (i)     / n_count(i)
       f22_p   (i) = f22_p   (i) / n_count(i)
       zeta_p  (i) = zeta_p  (i) / n_count(i)
       y_plus_p(i) = y_plus_p(i) / n_count(i)
@@ -138,6 +135,30 @@
     u_tau_p =  sqrt( (visc_const*sqrt(u_p(1)**2)         &
                                       / wall_p(1))       &
                                       / dens_const)
+  end if
+
+  if(Flow % heat_transfer) then
+    t_wall = 0.0
+    t_tau     = Flow % heat_flux / (dens_const * capa_const * u_tau_p)
+    do s = 1, Grid % n_faces                                                     
+      c1 = Grid % faces_c(1,s)                                                   
+      c2 = Grid % faces_c(2,s)                                                   
+      if(c2  < 0) then                                                           
+        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &                           
+            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then                           
+                                                                                 
+          t_wall  = t_wall + t % n(c2)                                           
+          n_points = n_points + 1                                                
+        end if                                                                   
+      end if                                                                     
+    end do                                                                       
+                                                                                 
+    call Global % Sum_Real(t_wall)                                               
+    call Global % Sum_Int(n_points)                                              
+                                                                                 
+    call Global % Wait                                                           
+                                                                                 
+    t_wall  = t_wall / n_points    
   end if
 
   !----------------------------------------!
@@ -173,6 +194,7 @@
     eps_p (i) = eps_p(i)*visc_const / (u_tau_p**4*dens_const)
     uw_p  (i) = uw_p (i) / (u_tau_p**2 * dens_const)
     f22_p (i) = f22_p(i) * visc_const / u_tau_p**2
+    if(Flow % heat_transfer) t_p (i) = (t_wall - t_p(i)) / t_tau
   end do
 
   if(Turb % model == K_EPS_ZETA_F) then
@@ -187,7 +209,7 @@
                                  uw_p(i),     &  !  5
                                  f22_p(i),    &  !  6
                                  zeta_p(i),   &  !  7
-                                 vis_t_p(i)      !  8
+                                 t_p(i)          !  8
       end if
     end do
   else if(Turb % model == K_EPS) then
@@ -200,7 +222,7 @@
                                  kin_p(i),    &  !  3
                                  eps_p(i),    &  !  4
                                  uw_p(i),     &  !  5
-                                 vis_t_p(i)      !  6
+                                 t_p(i)          !  6
       end if
     end do
   else if(Turb % model == K_OMEGA_SST) then
@@ -213,15 +235,16 @@
                                  kin_p(i),    &  !  3
                                  omg_p(i),    &  !  4
                                  uw_p(i),     &  !  5
-                                 vis_t_p(i)      !  6
+                                 t_p(i)          !  6
       end if
     end do
   else 
     write(fu,'(a)') '#  1:z,  2:u' 
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
-        write(fu,'(2es15.5e3)')  wall_p(i),   &  !  1
-                                 u_p(i)          !  2
+        write(fu,'(3es15.5e3)')  wall_p(i),   &  !  1
+                                 u_p(i),      &  !  2
+                                 t_p(i)          !  3
       end if
     end do
   end if
