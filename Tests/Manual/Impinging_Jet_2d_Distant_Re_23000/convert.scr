@@ -1,0 +1,20 @@
+# Full grid name
+jet.neu
+
+# Create dual grid?
+no
+
+# Geometric scaling
+skip
+
+# Boundary cell centers' positions
+2
+
+# Periodicity
+skip
+
+# Wall distance
+1 2
+
+# Probe 1d
+z
