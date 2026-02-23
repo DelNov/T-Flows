@@ -40,16 +40,15 @@
   ! Time integration parameters
   integer, parameter :: LINEAR        = 40129
   integer, parameter :: PARABOLIC     = 40151
-  integer, parameter :: RUNGE_KUTTA_3 = 40153
 
   ! Algorithms for pressure velocity coupling
-  integer, parameter :: SIMPLE = 40163
-  integer, parameter :: PISO   = 40169
-  integer, parameter :: CHOI   = 40177
+  integer, parameter :: SIMPLE = 40153
+  integer, parameter :: PISO   = 40163
+  integer, parameter :: CHOI   = 40169
 
   ! Gradient computation algorithms
-  integer, parameter :: LEAST_SQUARES = 40189
-  integer, parameter :: GAUSS_THEOREM = 40193
+  integer, parameter :: LEAST_SQUARES = 40177
+  integer, parameter :: GAUSS_THEOREM = 40189
 
   contains
 

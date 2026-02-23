@@ -49,14 +49,14 @@
                                                         !! object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
-  type(Var_Type),  pointer :: u, v, w, t, p, fun
-  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),  pointer :: u, v, w, t, p, pp, fun
+  type(Var_Type),  pointer :: kin, eps, f22, zeta, vis, t2, omega
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),  pointer :: scalar(:)
   real,            pointer :: z_o(:)
   integer                  :: c,m,l,k,i,bc,n_points,nks,nvs,sc,c1,c2,s,fu
   character(SL)            :: name_prof(128)
-  real                     :: wi, dist_min, x, y, z, xp, dist
+  real                     :: wi, dist_min, x, y, z, xp, rx, ry, rz, dist
   real, allocatable        :: prof(:,:)
   logical                  :: here
   character(SL)            :: bc_type_name, try_str
@@ -83,8 +83,10 @@
   Grid   => Flow % pnt_grid
   t      => Flow % t
   p      => Flow % p
+  pp     => Flow % pp
   scalar => Flow % scalar
   vis    => Turb % vis
+  omega  => Turb % omega
   t2     => Turb % t2
   z_o    => Turb % z_o
   fun    => Vof % fun
@@ -104,8 +106,8 @@
   !        of types specified, and also extract their names        !
   !----------------------------------------------------------------!
   types_per_reg(:) = 0
-  types_file(:)      = .false.
-  c_types            = 0
+  types_file(:)    = .false.
+  c_types          = 0
 
   do bc = Boundary_Regions()
     call Control % Position_At_Two_Keys('BOUNDARY_CONDITION',      &
@@ -198,6 +200,9 @@
       else if( bc_type_name .eq. 'PRESSURE') then
         bc_type_tag = PRESSURE
         Grid % region % type(bc) = PRESSURE
+      else if( bc_type_name .eq. 'AMBIENT') then
+        bc_type_tag = AMBIENT
+        Grid % region % type(bc) = AMBIENT
       else
         call Message % Error(72,                                            &
                  'Unknown boundary condition type: '//trim(bc_type_name)//  &
@@ -323,6 +328,15 @@
             end if
           end if
 
+          if(Turb % model .eq. K_OMEGA_SST) then                                 
+            i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = vals(i)      
+            i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = vals(i)      
+            Turb % y_plus(c) = 1.1                                               
+            if(Flow % heat_transfer) then                                        
+              i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)       
+            end if                                                               
+          end if      
+
           if(Turb % model .eq. SPALART_ALLMARAS .or.  &
              Turb % model .eq. DES_SPALART) then
             i = Key_Ind('VIS',  keys, nks); if(i > 0) vis % b(c) = vals(i)
@@ -373,8 +387,6 @@
         if(keys(1) .eq. 'X' .and. keys(2) .eq. 'Y' .or.  &
            keys(1) .eq. 'X' .and. keys(2) .eq. 'Z' .or.  &
            keys(1) .eq. 'Y' .and. keys(2) .eq. 'Z') then
-
-STOP
 
           ! Set the closest point
           do c = Cells_In_Region(bc)
@@ -485,6 +497,14 @@ STOP
               end if
             end if
 
+            if(Turb % model .eq. K_OMEGA_SST) then                               
+              i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = prof(k,i)  
+              i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = prof(k,i)  
+              if(Flow % heat_transfer) then                                      
+                i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)    
+              end if                                                             
+            end if    
+
             if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                Turb % model .eq. DES_SPALART) then
               i = Key_Ind('VIS', keys, nks); if(i > 0) vis % b(c) = prof(k,i)
@@ -508,35 +528,39 @@ STOP
               x  = prof(m,i)
               xp = prof(m+1,i)
 
+              rx = sqrt(Grid % yc(c)**2 + Grid % zc(c)**2)
+              ry = sqrt(Grid % xc(c)**2 + Grid % zc(c)**2)
+              rz = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2)
+
               ! Compute the weight factors
               if( keys(1) .eq. 'X' .and.  &
                   Grid % xc(c) >= x .and. Grid % xc(c) <= xp ) then
-                wi = ( xp - Grid % xc(c) ) / (xp - x)
+                wi = (xp - Grid % xc(c)) / (xp - x)
                 here = .true.
               else if( keys(1) .eq. 'Y' .and.  &
                        Grid % yc(c) >= x .and. Grid % yc(c) <= xp ) then
-                wi = ( xp - Grid % yc(c) ) / (xp - x)
+                wi = (xp - Grid % yc(c)) / (xp - x)
                 here = .true.
               else if( keys(1) .eq. 'Z' .and.  &
                        Grid % zc(c) >= x .and. Grid % zc(c) <= xp ) then
-                wi = ( xp - Grid % zc(c) ) / (xp - x)
+                wi = (xp - Grid % zc(c)) / (xp - x)
                 here = .true.
 
-              ! Beware; for cylindrical coordinates you have "inversion"
-              else if( (keys(1) .eq. 'RX' .and.  &
-                   sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
-                   sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
+              ! Beware; for cylindrical coordinates we had "inversion"
+              else if( keys(1) .eq. 'RX' .and.       &
+                       (rx <= xp .and. rx >= x .or.  &
+                        rx >= xp .and. rx <= x) ) then
+                wi = (xp - rx) / (xp - x)
                 here = .true.
-              else if( (keys(1) .eq. 'RY' .and.  &
-                   sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
-                   sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
+              else if( keys(1) .eq. 'RY' .and.       &
+                       (ry <= xp .and. ry >= x .or.  &
+                        ry >= xp .and. ry <= x) ) then
+                wi = (xp - rz) / (xp - x)
                 here = .true.
-              else if( (keys(1) .eq. 'RZ' .and.  &
-                   sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) >= xp .and.       &
-                   sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) ) / (xp-x)
+              else if( keys(1) .eq. 'RZ' .and.       &
+                       (rz <= xp .and. rz >= x .or.  &
+                        rz >= xp .and. rz <= x) ) then
+                wi = (xp - rz) / (xp-x)
                 here = .true.
 
               ! Wall distance too
@@ -592,35 +616,39 @@ STOP
               x  = prof(m,i)
               xp = prof(m+1,i)
 
+              rx = sqrt(Grid % yc(c)**2 + Grid % zc(c)**2)
+              ry = sqrt(Grid % xc(c)**2 + Grid % zc(c)**2)
+              rz = sqrt(Grid % xc(c)**2 + Grid % yc(c)**2)
+
               ! Compute the weight factors
               if( keys(1) .eq. 'X' .and.  &
                   Grid % xc(c) >= x .and. Grid % xc(c) <= xp ) then
-                wi = ( xp - Grid % xc(c) ) / (xp - x)
+                wi = (xp - Grid % xc(c)) / (xp - x)
                 here = .true.
               else if( keys(1) .eq. 'Y' .and.  &
                        Grid % yc(c) >= x .and. Grid % yc(c) <= xp ) then
-                wi = ( xp - Grid % yc(c) ) / (xp - x)
+                wi = (xp - Grid % yc(c)) / (xp - x)
                 here = .true.
               else if( keys(1) .eq. 'Z' .and.  &
                        Grid % zc(c) >= x .and. Grid % zc(c) <= xp ) then
-                wi = ( xp - Grid % zc(c) ) / (xp - x)
+                wi = (xp - Grid % zc(c)) / (xp - x)
                 here = .true.
 
-              ! Beware; for cylindrical coordinates you have "inversion"
-              else if( (keys(1) .eq. 'RX' .and.  &
-                   sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
-                   sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % yc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
+              ! Beware; for cylindrical coordinates we had "inversion"
+              else if( keys(1) .eq. 'RX' .and.       &
+                       (rx <= xp .and. rx >= x .or.  &
+                        rx >= xp .and. rx <= x) ) then
+                wi = (xp - rx) / (xp - x)
                 here = .true.
-              else if( (keys(1) .eq. 'RY' .and.  &
-                   sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) >= xp .and.       &
-                   sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % zc(c)**2) ) / (xp-x)
+              else if( keys(1) .eq. 'RY' .and.       &
+                       (ry <= xp .and. ry >= x .or.  &
+                        ry >= xp .and. ry <= x) ) then
+                wi = (xp - rz) / (xp - x)
                 here = .true.
-              else if( (keys(1) .eq. 'RZ' .and.  &
-                   sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) >= xp .and.       &
-                   sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) <= x) ) then
-                wi = ( xp - sqrt(Grid % xc(c)**2 + Grid % yc(c)**2) ) / (xp-x)
+              else if( keys(1) .eq. 'RZ' .and.       &
+                       (rz <= xp .and. rz >= x .or.  &
+                        rz >= xp .and. rz <= x) ) then
+                wi = (xp - rz) / (xp-x)
                 here = .true.
 
               ! Wall distance too
@@ -719,6 +747,21 @@ STOP
 
                 end if
 
+                ! For turbulence models                                          
+                if(Turb % model .eq. K_OMEGA_SST) then                           
+                                                                                  
+                  i = Key_Ind('KIN',keys,nks)                                    
+                  if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)      
+                                                                                 
+                  i = Key_Ind('OMG',keys,nks)                                    
+                  if(i > 0) omega % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)    
+                                                                                  
+                  if(Flow % heat_transfer) then                                  
+                    i = Key_Ind('T2',keys,nks)                                   
+                    if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)     
+                  end if                                                         
+                end if            
+
                 if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                    Turb % model .eq. DES_SPALART) then
                   i = Key_Ind('VIS',keys,nks)
@@ -780,10 +823,10 @@ STOP
   do bc = Boundary_Regions()
     do c = Cells_In_Region(bc)
 
-      u % n(c) = u % b(c)
-      v % n(c) = v % b(c)
-      w % n(c) = w % b(c)
-      p % n(c) = p % b(c)
+      u  % n(c) = u % b(c)
+      v  % n(c) = v % b(c)
+      w  % n(c) = w % b(c)
+      pp % n(c) = p % b(c)  ! used with ambient boundary conditions
 
       if(Flow % heat_transfer) then
         t % n(c) = t % b(c)
@@ -815,6 +858,14 @@ STOP
           t2 % n(c) = t2 % b(c)
         end if
       end if
+
+      if(Turb % model .eq. K_OMEGA_SST) then                                     
+        kin % n(c)   = kin % b(c)                                                
+        omega % n(c) = omega % b(c)                                              
+        if(Flow % heat_transfer) then                                            
+          t2 % n(c) = t2 % b(c)                                                  
+        end if                                                                   
+      end if     
 
       if(Turb % model .eq. SPALART_ALLMARAS .or.  &
          Turb % model .eq. DES_SPALART) then

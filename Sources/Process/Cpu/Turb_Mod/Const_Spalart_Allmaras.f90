@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Const_Spalart_Allmaras(Turb)
 !------------------------------------------------------------------------------!
-!   Initializes constants for Spalar-Allmaras and DES turbulence models.       ! 
+!   Initializes constants for Spalar-Allmaras and DES turbulence models.       !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -10,15 +10,23 @@
 
   Turb % vis % sigma = TWO_THIRDS
 
-  Turb % kappa = 0.41
-  Turb % e_log = 8.34
-  Turb % c_b1  = 0.1355
-  Turb % c_b2  = 0.622
-  Turb % c_v1  = 7.1
-  Turb % c_w1  = Turb % c_b1 / Turb % kappa**2  &
-               + (1 + Turb % c_b2) / Turb % vis % sigma
-  Turb % c_w2  = 0.3
-  Turb % c_w3  = 2.0
+  Turb % c_des  = 0.65
+  Turb % c_mu   = 0.09
+  Turb % c_mu_d = 0.22
+  Turb % c_mu25 = sqrt(sqrt(Turb % c_mu))
+  Turb % c_mu75 = Turb % c_mu25**3
+  Turb % kappa  = 0.41
+  Turb % e_log  = 8.34
+  Turb % c_b1   = 0.1355
+  Turb % c_b2   = 0.622
+  Turb % c_v1   = 7.1
+  Turb % c_w1   = Turb % c_b1 / Turb % kappa**2  &
+                + (1 + Turb % c_b2) / Turb % vis % sigma
+  Turb % c_w2   = 0.3
+  Turb % c_w3   = 2.0
+
+  Turb % c_t3  = 1.2
+  Turb % c_t4  = 0.5
 
   Turb % c_mu_theta5 = 0.35
   Turb % kappa_theta = 0.38  ! von Karman constant for temperature

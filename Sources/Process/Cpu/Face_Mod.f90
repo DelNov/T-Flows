@@ -27,6 +27,13 @@
     real, allocatable :: o(:)    !! old value of the variable
     real, allocatable :: oo(:)   !! older than old value
     real, allocatable :: avg(:)  !! average guessed value, guessed value
+
+    ! Pointer to the device (Fortran view for OpenACC)
+    real, pointer :: n_dev(:)
+
+    ! CUDA device pointer handle
+    type(c_ptr) :: n_dev_c
+
   end type
 
   contains

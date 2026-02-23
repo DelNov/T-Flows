@@ -19,7 +19,7 @@
     O_Print '(a)', ' # Copying grid (wall distance) back to the host'
 # endif
 
-  call Gpu % Vector_Update_Host(Grid % wall_dist)
+  call Gpu % Vector_Real_Update_On_Host(Grid % wall_dist)
 
   end subroutine
 

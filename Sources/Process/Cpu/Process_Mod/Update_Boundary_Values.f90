@@ -51,7 +51,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
-  type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2
+  type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2, omega
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
   real                     :: dt_dn
@@ -62,9 +62,10 @@
   call Profiler % Start('Update_Boundary_Values')
 
   ! Take aliases
-  Grid => Flow % pnt_grid
-  vis  => Turb % vis
-  fun  => Vof % fun
+  Grid  => Flow % pnt_grid
+  vis   => Turb % vis
+  fun   => Vof % fun
+  omega => Turb % omega
   call Flow % Alias_Momentum    (u, v, w)
   call Flow % Alias_Energy      (t)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
@@ -94,8 +95,9 @@
     ! On the boundary perform the extrapolation
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+         Grid % region % type(reg) .eq. SYMMETRY .or.  &
          Grid % region % type(reg) .eq. PRESSURE .or.  &
-         Grid % region % type(reg) .eq. SYMMETRY) then
+         Grid % region % type(reg) .eq. AMBIENT) then
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
@@ -125,9 +127,9 @@
       if(c2 < 0) then
 
         if( Grid % Bnd_Cond_Type(c2) .eq. OUTFLOW  .or.    &
-            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.    &
+            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY .or.    &
             Grid % Bnd_Cond_Type(c2) .eq. CONVECT  .or.    &
-            Grid % Bnd_Cond_Type(c2) .eq. SYMMETRY ) then
+            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE ) then
           fun % n(c2) = fun % n(c1)
         end if
       end if ! c2 < 0
@@ -152,8 +154,8 @@
 
         ! Regions outflow, pressure or symmetry
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. PRESSURE .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY) then
+           Grid % region % type(reg) .eq. SYMMETRY .or.  &
+           Grid % region % type(reg) .eq. PRESSURE) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
@@ -179,14 +181,39 @@
 
         ! Regions outflow, pressure or symmetry
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. PRESSURE .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY) then
+           Grid % region % type(reg) .eq. SYMMETRY .or.  &
+           Grid % region % type(reg) .eq. PRESSURE) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
 
             kin % n(c2) = kin % n(c1)
             eps % n(c2) = eps % n(c1)
+            if(Flow % heat_transfer) then
+              t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+        end if    ! boundary condition
+      end do      ! regions
+    end if        ! turbulence model
+
+    !-----------------!
+    !   K-omega-sst   !
+    !-----------------!
+    if(Turb % model .eq. K_OMEGA_SST) then
+
+      do reg = Boundary_Regions()
+
+        ! Regions outflow, pressure or symmetry
+        if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+           Grid % region % type(reg) .eq. SYMMETRY .or.  &
+           Grid % region % type(reg) .eq. PRESSURE) then
+          do s = Faces_In_Region(reg)
+            c1 = Grid % faces_c(1,s)
+            c2 = Grid % faces_c(2,s)
+
+            kin % n(c2)   = kin % n(c1)
+            omega % n(c2) = omega % n(c1)
             if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
             end if
@@ -205,8 +232,8 @@
 
         ! Regions outflow, pressure or symmetry
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. PRESSURE .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY) then
+           Grid % region % type(reg) .eq. SYMMETRY .or.  &
+           Grid % region % type(reg) .eq. PRESSURE) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
@@ -248,6 +275,7 @@
            Turb % model .eq. LES_WALE        .or.  &
            Turb % model .eq. SPALART_ALLMARAS.or.  &
            Turb % model .eq. DES_SPALART     .or.  &
+           Turb % model .eq. K_OMEGA_SST     .or.  &
            Turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
@@ -276,8 +304,8 @@
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.    &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY .or.    &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE ) then
           t % n(c2) = t % n(c1)
         end if
 
@@ -368,8 +396,8 @@
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.    &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY .or.    &
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE ) then
           t % n(c2) = t % n(c1)
         end if
 
@@ -408,6 +436,7 @@
              Turb % model .eq. HYBRID_LES_RANS  .or.  &
              Turb % model .eq. SPALART_ALLMARAS .or.  &
              Turb % model .eq. DES_SPALART      .or.  &
+             Turb % model .eq. K_OMEGA_SST      .or.  &
              Turb % model .eq. K_EPS) then
 
             if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
@@ -430,8 +459,8 @@
           end if ! Turb. models
 
           if( Var_Mod_Bnd_Cond_Type(phi,c2) .eq. OUTFLOW .or.     &
-              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .or.    &
-              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY ) then
+              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY .or.    &
+              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE ) then
             phi % n(c2) = phi % n(c1)
           end if
 

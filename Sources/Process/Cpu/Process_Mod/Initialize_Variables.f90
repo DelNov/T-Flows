@@ -6,48 +6,6 @@
 !>  Therefore, any variable initialized here and needed post-restart should be !
 !>  stored in the backup file.                                                 !
 !------------------------------------------------------------------------------!
-!   Functionality                                                              !
-!                                                                              !
-!   * Initialization and setup                                                 !
-!     - The subroutine begins by setting up the necessary local variables,     !
-!       pointers, and default values for initial conditions. It also includes  !
-!       module User_Mod for potential user-defined initialization routines.    !
-!     - Aliases are set up for grid, bulk properties, velocity flux,           !
-!       turbulence model variables, and others. This helps in accessing these  !
-!       elements more efficiently throughout the subroutine.                   !
-!     - The subroutine checks for the presence of initial condition            !
-!       definitions in the control file and proceeds accordingly.              !
-!   * Initial conditions from file                                             !
-!     - If initial conditions are specified in a file, the subroutine reads    !
-!       the file and assigns values to variables such as velocity components,  !
-!       temperature, scalar quantities, turbulent quantities, etc., based on   !
-!       the data provided in the file.                                         !
-!     - This includes handling of complex initial conditions like profiles     !
-!       along planes or lines, necessitating spatial interpolations.           !
-!   * Initial conditions from control file                                     !
-!     - If initial conditions are not specified in a file, the subroutine      !
-!       reads them directly from the control file. This includes setting       !
-!       default values for various variables like velocity components,         !
-!       temperature, turbulence model parameters, etc.                         !
-!     - Each variable is initialized across the computational grid, taking     !
-!       into account its specific requirements and boundary conditions.        !
-!   * Additional initializations                                               !
-!     - The subroutine handles the initialization of volume fractions for      !
-!       multiphase flows (VOF model) and sets up initial conditions for the    !
-!       swarm model if used.                                                   !
-!     - It also initializes the boundary fluxes and computes bulk properties   !
-!       like inflow volume, identifying different types of boundary faces      !
-!       (inflow, outflow, walls, etc.).                                        !
-!     - A check is performed to determine if the simulation has pressure       !
-!       outflow boundaries, impacting the setup of the pressure matrix in the  !
-!       solver.                                                                !
-!   * Final preparations and checks                                            !
-!     - The subroutine concludes with final preparations, including time       !
-!       initialization and reporting of initialized variables and boundary     !
-!       face counts.                                                           !
-!     - A user-modifiable routine User_Mod_Initialize_Variables is called at   !
-!       the end, allowing for custom initializations as needed.                !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Process_Type)        :: Process  !! parent class
@@ -60,13 +18,13 @@
   type(Grid_Type),  pointer :: Grid
   type(Bulk_Type),  pointer :: bulk
   type(Var_Type),   pointer :: u, v, w, t, phi
-  type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2, omega
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type),  pointer :: v_flux
   real,             pointer :: u_mean(:), v_mean(:), w_mean(:)
   integer                   :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                   :: n_wall, n_inflow, n_outflow, n_symmetry,  &
-                               n_heated_wall, n_pressure, n_convect
+                               n_heated_wall, n_pressure, n_ambient, n_convect
   character(SL)             :: keys(128)
   character(SL)             :: keys_file(128)
   character(SL)             :: vals(0:128)   ! note that they start from zero!
@@ -81,7 +39,7 @@
   character(3) :: t_def   = '0.0',  t2_def   = '0.0',  phi_def = '0.0'
   character(3) :: vf_def  = '0.0'
   character(3) :: kin_def = '0.0',  eps_def  = '0.0',  f22_def = '0.0'
-  character(3) :: vis_def = '0.0',  zeta_def = '0.0'
+  character(3) :: vis_def = '0.0',  zeta_def = '0.0',  omg_def = '1.0'
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -94,6 +52,7 @@
   u_mean   => Turb % u_mean
   v_mean   => Turb % v_mean
   w_mean   => Turb % w_mean
+  omega    => Turb % omega
   call Flow % Alias_Momentum    (u, v, w)
   call Flow % Alias_Energy      (t)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
@@ -215,6 +174,17 @@
             read(kin_def,  *) prof(k, 0);  kin  % n(c) = prof(k, i)
             i = Key_Ind('EPS',  keys, nks)
             read(eps_def,  *) prof(k, 0);  eps  % n(c) = prof(k, i)
+            if(Flow % heat_transfer) then
+              i = Key_Ind('T2', keys, nks)
+              read(t2_def, *) prof(k,0);   t2 % n(c) = prof(k, i)
+            end if
+          end if
+
+          if(Turb % model .eq. K_OMEGA_SST) then
+            i = Key_Ind('KIN',  keys, nks)
+            read(kin_def,  *) prof(k, 0);  kin   % n(c) = prof(k, i)
+            i = Key_Ind('OMG',  keys, nks)
+            read(eps_def,  *) prof(k, 0);  omega % n(c) = prof(k, i)
             if(Flow % heat_transfer) then
               i = Key_Ind('T2', keys, nks)
               read(t2_def, *) prof(k,0);   t2 % n(c) = prof(k, i)
@@ -367,6 +337,25 @@
           end if
         end if
 
+        if(Turb % model .eq. K_OMEGA_SST) then
+          vals(0) = kin_def
+          read(vals(Key_Ind('KIN', keys, nks)), *)  kin % n(c)
+          kin % n(c) = max(0.01, kin % n(c))
+          vals(0) = omg_def
+          read(vals(Key_Ind('OMG', keys, nks)), *)  omega % n(c)
+          omega % n(c) = max(0.001, omega % n(c))
+          kin % o(c)  = kin % n(c)
+          kin % oo(c) = kin % n(c)
+          omega % o(c)  = omega % n(c)
+          omega % oo(c) = omega % n(c)
+          Turb % y_plus(c) = 0.001
+          if(Flow % heat_transfer) then
+            vals(0) = t2_def;  read(vals(Key_Ind('T2', keys, nks)), *) t2 % n(c)
+            t2 % o(c)  = t2 % n(c)
+            t2 % oo(c) = t2 % n(c)
+          end if
+        end if
+
         if(Turb % model .eq. K_EPS_ZETA_F .or.  &
            Turb % model .eq. HYBRID_LES_RANS) then
           vals(0) = kin_def;  read(vals(Key_Ind('KIN', keys,nks)),*) kin  % n(c)
@@ -415,8 +404,6 @@
 
   end if
 
-  call User_Mod_Initialize_Variables(Flow, Turb, Vof, Swarm, Sol)
-
   !--------------------------------!
   !      Calculate the inflow      !
   !   and initializes the v_flux   !
@@ -429,6 +416,7 @@
   n_heated_wall = 0
   n_convect     = 0
   n_pressure    = 0
+  n_ambient     = 0
 
   bulk % vol_in = 0.0
   do s = 1, Grid % n_faces
@@ -457,26 +445,32 @@
         n_convect     = n_convect     + 1
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)  &
         n_pressure    = n_pressure    + 1
+      if(Grid % Bnd_Cond_Type(c2) .eq. AMBIENT)  &
+        n_ambient     = n_ambient     + 1
     else
       v_flux % n(s) = 0.0
     end if
   end do
 
-  call Global % Sum_Int(n_wall)
-  call Global % Sum_Int(n_inflow)
-  call Global % Sum_Int(n_outflow)
-  call Global % Sum_Int(n_symmetry)
-  call Global % Sum_Int(n_heated_wall)
-  call Global % Sum_Int(n_convect)
-  call Global % Sum_Int(n_pressure)
-  call Global % Sum_Real(bulk % vol_in)
-  call Global % Sum_Real(area)
+  call Global % Sum_Ints(n_wall,         &
+                         n_inflow,       &
+                         n_outflow,      &
+                         n_symmetry,     &
+                         n_heated_wall,  &
+                         n_convect,      &
+                         n_pressure,     &
+                         n_ambient)
+  call Global % Sum_Reals(bulk % vol_in, area)
 
-  !----------------------------------------------------------------------!
-  !   This parameter, has_pressure_outlet, is used in Compute_Pressure   !
-  !----------------------------------------------------------------------!
+  !---------------------------------------------!
+  !   Parameters has_pressure and has_ambient   !
+  !---------------------------------------------!
   Flow % has_pressure = .false.
-  if(n_pressure > 0) Flow % has_pressure = .true.
+  if(n_pressure .gt. 0) Flow % has_pressure = .true.
+
+  Flow % has_ambient = .false.
+  if(n_ambient .gt. 0) Flow % has_ambient = .true.
+  Flow % reached_ambient_pressure = .false.
 
   !----------------------!
   !   Initializes time   !
@@ -500,6 +494,7 @@
     print *, '# Number of faces on the heated wall : ', n_heated_wall
     print *, '# Number of convective outflow faces : ', n_convect
     print *, '# Number of pressure outflow faces   : ', n_pressure
+    print *, '# Number of ambient faces            : ', n_ambient
     print *, '# Variables initialized !'
   end if
 

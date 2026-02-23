@@ -117,7 +117,7 @@
   !------------------------------!
   !   All turbuelnt quantities   !
   !------------------------------!
-  do i = 1, 12
+  do i = 1, 13
     if(i .eq.  1) tq => Turb % kin
     if(i .eq.  2) tq => Turb % eps
     if(i .eq.  3) tq => Turb % zeta
@@ -130,6 +130,7 @@
     if(i .eq. 10) tq => Turb % uv
     if(i .eq. 11) tq => Turb % uw
     if(i .eq. 12) tq => Turb % vw
+    if(i .eq. 13) tq => Turb % omega
     call Control % Solver_For_Turbulence               (tq % solver)
     call Control % Preconditioner_For_System_Matrix    (tq % prec)
     call Control % Tolerance_For_Turbulence_Solver     (tq % tol)

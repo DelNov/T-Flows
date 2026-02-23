@@ -12,11 +12,11 @@
   integer, parameter :: L = 16
 !-----------------------------------[Locals]-----------------------------------!
   real         :: def(3)
-  character(L) :: numb, pumb
+  character(L) :: numb
   integer      :: p
 !==============================================================================!
 
-  data def / 1.0, 0.0, 0.0 /
+  data def / 0.0, 0.0, 1.0 /
 
   call Control % Read_Real_Vector('BLENDING_COEFFICIENTS_FOR_MOMENTUM',  &
                                   3, def, val, verbose)

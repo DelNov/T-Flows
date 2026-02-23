@@ -43,41 +43,37 @@ trap 'if [ $? -ne 0 ]; then echo "\"${last_command}\" command failed with exit c
 #   Produces correct module structure   #
 #---------------------------------------#
 function module_list() {
-  # $1 - dir
+  # $1 - dir (relative or absolute)
+  local dir="$1"
+  local result
 
-  cd $1
-  # find file including soft links
-  # with _Mod
-  # remove ^./
-  # not ^.
-  # turn _Mod.f90$ to _Mod.o
-  # turn _Mod/ to #
-  # turn #abc/ to ?
-  # turn ?abc.f90$ to ?*.f90
-  # remove ^abc/
-  # turn #abc.f90$ to #*.f90$
-  # turn # to _Mod
-  # turn ? to _Mod/*/
-  # sort reverse unique
-  # delete empty line
-  local result=$(find -L . -type f -print \
-               | grep -i '_Mod' \
-               | sed  -e 's%^\.\/%%' \
-               | grep -v '^\.' \
-               | sed  -e 's%_Mod.f90$%_Mod.o%g' \
-               | sed  -e 's%_Mod/%#%' \
-               | sed  -e 's%#.*/%?%g' \
-               | sed  -e 's%\?.*f90$%?*.f90%g' \
-               | sed  -e 's%^.*/%%g' \
-               | sed  -e 's%\#.*.f90$%#*.f90%g' \
-               | sed  -e 's%\#%_Mod/%g' \
-               | sed  -e 's%\?%_Mod/*/%g'  \
-               | sort -ur \
-               | sed '/^\s*$/d')
+  # Change into target dir in a subshell so we produce paths relative to it
+  result=$(
+    cd "$dir" || return 1
+    find -L . -type f -print0 \
+    | while IFS= read -r -d '' f; do
+        # remove leading ./ if present
+        rel="${f#./}"
+        # skip entries that start with a hidden dir/file (./.something)
+        case "$rel" in
+          .* ) continue ;;
+        esac
+        # only keep files whose path contains _Mod
+        if [[ "$rel" == *"_Mod"* ]]; then
+          # if file ends with _Mod.f90 (case-insensitive), convert suffix to _Mod.o
+          if [[ "${rel,,}" =~ _mod\.f90$ ]]; then
+            echo "${rel%_Mod.f90}_Mod.o"
+          else
+            echo "$rel"
+          fi
+        fi
+      done
+  )
 
-
-  echo "$result"
+  # normalize: remove empty lines, sort unique (reverse like original)
+  printf "%s\n" "$result" | sed '/^\s*$/d' | sort -ur
 }
+
 #---------------------------------------#
 #   Produces correct module structure   #
 #---------------------------------------#

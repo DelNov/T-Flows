@@ -37,7 +37,7 @@
   else
 
     ! Take smooth variable to be the same as VOF itself
-    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+    do c = Cells_In_Domain_And_Buffers()
       Vof % smooth % n(c) = Vof % fun % n(c)
     end do
 

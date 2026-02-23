@@ -9,64 +9,6 @@
 !>  formatting and outputting a wide range of simulation data, making it
 !>  crucial for post-processing and analysis
 !------------------------------------------------------------------------------!
-!   Functionality                                                              !
-!                                                                              !
-!   * Flexible output: Capable of outputting results for both internal         !
-!     domain cells (plot_inside) and boundary cells. This flexibility allows   !
-!     users to focus on specific areas of interest in the simulation           !
-!   * Variable handling: Manages a variety of simulation variables             !
-!     including velocity, pressure, temperature, turbulent quantities, and     !
-!     more. It ensures these variables are properly formatted and written to   !
-!     the VTU file.                                                            !
-!   * Grid and cell data management: Calculates and prepares grid and cell     !
-!     data, including coordinates, connectivity, offsets, and types, which     !
-!     are essential components of the VTU format.                              !
-!   * Polyhedral cell support: Specifically handles polyhedral cells, a        !
-!     complex aspect often encountered in unstructured grid simulations.       !
-!   * Scalar and vector data writing: Incorporates functions to write both     !
-!     scalar and vector data, catering to different types of physical          !
-!     quantities in the simulation.                                            !
-!   * Integration with turbulence modeling: Seamlessly integrates with         !
-!     various turbulence models in T-Flows, ensuring that relevant turbulent   !
-!     quantities are included in the results.                                  !
-!   * Boundary condition processing: Includes special handling for boundary    !
-!     cells, enabling detailed analysis of boundary conditions and near-wall   !
-!     phenomena.                                                               !
-!   * Support for large-scale turbulence simulation statistics: Facilitates    !
-!     the output of statistical data crucial for understanding turbulence,     !
-!     particularly in large-scale simulations.                                 !
-!   * Python script generation: Generates Python scripts for extracting        !
-!     boundary conditions, enhancing post-processing capabilities with         !
-!     external tools.                                                          !
-!   * File management: Handles the creation and management of VTU and PVTU     !
-!     files, ensuring proper file structure and format for visualization       !
-!     tools.                                                                   !
-!------------------------------------------------------------------------------!
-!   Workflow                                                                   !
-!                                                                              !
-!   * Initialization: Sets up precision, aliases, grid pointers, and checks    !
-!     conditions for boundary plotting.                                        !
-!   * Buffer allocation and grid data preparation: Allocates memory for        !
-!     various buffers and prepares grid-related data, including node           !
-!     coordinates and cell connections.                                        !
-!   * File creation and header writing: Creates VTU and PVTU files, writing    !
-!     necessary headers for unstructured grid data.                            !
-!   * Data writing in two sweeps:                                              !
-!     - First sweep: Writes header information for various data types          !
-!       including nodes, cells, and results.                                   !
-!     - Second sweep: Appends actual data to the files, including              !
-!       coordinates, connectivity, offsets, types, and simulation results.     !
-!   * Results output: Outputs a wide range of simulation results, including    !
-!     physical properties, turbulence data, and specific cell data.            !
-!   * Polyhedral cells handling: Manages data specific to polyhedral cells,    !
-!     if present.                                                              !
-!   * Footer writing and file closure: Finalizes the VTU and PVTU files by     !
-!     writing footers and closing files.                                       !
-!   * Python script generation for boundary conditions: Optionally             !
-!     generates Python scripts for extracting and analyzing boundary           !
-!     conditions.                                                              !
-!   * Cleanup: Disconnects from various data buffers and stops the profiler.   !
-!------------------------------------------------------------------------------!
   implicit none
 !--------------------------------[Arguments]-----------------------------------!
   class(Results_Type), target :: Results      !! parent class
@@ -564,7 +506,7 @@
       save_03(c1) = Flow % p % z(c1) * Grid % vol(c1)
     end do
 
-    str_var = Results % Var_Name("PressureForce","[N]", units)
+    str_var = Results % Var_Name("Pressure Force","[N]", units)
     call Results % Save_Vtu_Vector_Real(trim(str_var), plot_inside,   &
                                         save_01(c_f:c_l),             &
                                         save_02(c_f:c_l),             &
@@ -667,14 +609,14 @@
                                           plot_inside,                   &
                                           Vof % curv(c_f:c_l),           &
                                           f8, f9, data_offset, run)
-      str_var = Results % Var_Name("Vof SurfaceNormals","[1]", units)
+      str_var = Results % Var_Name("Vof Surface Normals","[1]", units)
       call Results % Save_Vtu_Vector_Real(trim(str_var),                 &
                                           plot_inside,                   &
                                           Vof % nx(c_f:c_l),             &
                                           Vof % ny(c_f:c_l),             &
                                           Vof % nz(c_f:c_l),             &
                                           f8, f9, data_offset, run)
-      str_var = Results % Var_Name("Vof SurfaceTensionForce","[N]", units)
+      str_var = Results % Var_Name("Vof Surface Tension Force","[N]", units)
       call Results % Save_Vtu_Vector_Real(trim(str_var),                 &
                                           plot_inside,                   &
                                           Vof % surf_fx(c_f:c_l),        &
@@ -682,7 +624,7 @@
                                           Vof % surf_fz(c_f:c_l),        &
                                           f8, f9, data_offset, run)
       if (allocated(Vof % m_dot)) then
-        str_var = Results % Var_Name("Vof MassTransfer","[kg/m^3/s]", units)
+        str_var = Results % Var_Name("Vof Mass Transfer","[kg/m^3/s]", units)
         call Results % Save_Vtu_Scalar_Real(trim(str_var),               &
                                             plot_inside,                 &
                                             Vof % m_dot(c_f:c_l),        &
@@ -807,6 +749,22 @@
       call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
                                           Flow % vort(c_f:c_l),         &
                                           f8, f9, data_offset, run)
+    end if
+
+    if(Turb % model .eq. K_OMEGA_SST) then
+      str_var = Results % Var_Name("Turbulent Kin. Energy","[m^2/s^2]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                            Turb % kin % n(c_f:c_l),                    &
+                            f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Omega","[m^2/s^3]", units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,   &
+                            Turb % omega % n(c_f:c_l),                  &
+                            f8, f9, data_offset, run)
+      str_var = Results % Var_Name("Turb. Kin. Energy Prod.","[m^2/s^3]",  &
+                          units)
+      call Results % Save_Vtu_Scalar_Real(trim(str_var), plot_inside,      &
+                            Turb % p_kin(c_f:c_l),                         &
+                            f8, f9, data_offset, run)
     end if
 
     kin_vis_t(:) = 0.0
@@ -958,6 +916,24 @@
                                           f8, f9, data_offset, run)
     end if
 
+    !-----------------------------------!
+    !   Save fields from the User_Mod   !
+    !-----------------------------------!
+    do n = 1, 60  ! go up to 60 user field variables
+      str_var = "finished"
+      call User_Mod_Get_User_Field_For_Saving(Grid,              &
+                                              n,                 &
+                                              c_f, c_l,          &
+                                              save_01(c_f:c_l),  &
+                                              str_var)
+      if(str_var .eq. "finished") exit
+
+      call Results % Save_Vtu_Scalar_Real("User: "//trim(str_var),     &
+                                          plot_inside,                 &
+                                          save_01(c_f:c_l),            &
+                                          f8, f9, data_offset, run)
+    end do
+
     !---------------------------------------------------------------------!
     !   Variables in the first computational point, plotted at boundary   !
     !---------------------------------------------------------------------!
@@ -989,6 +965,7 @@
 
       if(Turb % model .eq. K_EPS                 .or.  &
          Turb % model .eq. K_EPS_ZETA_F          .or.  &
+         Turb % model .eq. K_OMEGA_SST           .or.  &
          Turb % model .eq. HYBRID_LES_RANS) then
 
         ! Copy internal values to boundary

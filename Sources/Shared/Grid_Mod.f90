@@ -189,7 +189,17 @@
     real,    allocatable :: weight_c2n(:,:)  !! weights for cell to node
                                              !! interpolation
 
-    ! Edge-base variables
+    ! Number of homogeneous planes in x, y and z direction (0 if none)
+    integer :: n_x_planes, n_y_planes, n_z_planes
+
+    ! Nodal coordinates of homoegenous planes sorted in increasing order
+    real, allocatable :: x_coord_plane(:)
+    real, allocatable :: y_coord_plane(:)
+    real, allocatable :: z_coord_plane(:)
+
+    !-------------------------!
+    !   Edge-base variables   !
+    !-------------------------!
     integer, allocatable :: edges_n (:,:)  !! edges' nodes
     integer, allocatable :: edges_bc(:,:)  !! edges' boundary conditions
     integer, allocatable :: edges_fb(:,:)  !! edges' faces on boundaries
@@ -288,18 +298,18 @@
 
     ! Various calculations on the grid, geometrical quantities, in essence
 #   include "Grid_Mod/Calculate/Bounding_Box.f90"
-#   include "Grid_Mod/Calculate/Calculate_Cell_Centers.f90"
-#   include "Grid_Mod/Calculate/Calculate_Cell_Inertia.f90"
-#   include "Grid_Mod/Calculate/Calculate_Cell_Volumes.f90"
-#   include "Grid_Mod/Calculate/Calculate_Face_Centers.f90"
-#   include "Grid_Mod/Calculate/Calculate_Face_Geometry.f90"
-#   include "Grid_Mod/Calculate/Calculate_Face_Interpolation.f90"
-#   include "Grid_Mod/Calculate/Calculate_Faces_Surface.f90"
-#   include "Grid_Mod/Calculate/Calculate_Face_Surfaces.f90"
-#   include "Grid_Mod/Calculate/Calculate_Global_Volumes.f90"
-#   include "Grid_Mod/Calculate/Calculate_Wall_Distance.f90"
-#   include "Grid_Mod/Calculate/Calculate_Weights_Cells_To_Nodes.f90"
-#   include "Grid_Mod/Calculate/Calculate_Weights_Nodes_To_Cells.f90"
+#   include "Grid_Mod/Calculate/Cell_Centers.f90"
+#   include "Grid_Mod/Calculate/Cell_Inertia.f90"
+#   include "Grid_Mod/Calculate/Cell_Volumes.f90"
+#   include "Grid_Mod/Calculate/Face_Centers.f90"
+#   include "Grid_Mod/Calculate/Face_Geometry.f90"
+#   include "Grid_Mod/Calculate/Face_Interpolation.f90"
+#   include "Grid_Mod/Calculate/Faces_Surface.f90"
+#   include "Grid_Mod/Calculate/Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate/Global_Volumes.f90"
+#   include "Grid_Mod/Calculate/Wall_Distance.f90"
+#   include "Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90"
+#   include "Grid_Mod/Calculate/Weights_Nodes_To_Cells.f90"
 
     ! Determination of grid connectivities
 #   include "Grid_Mod/Connectivity/Are_Nodes_Twins.f90"

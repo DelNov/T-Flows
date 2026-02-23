@@ -59,7 +59,6 @@ syn keyword controlKeyword   SAVE_RESULTS_AT_BOUNDARIES
 syn keyword controlKeyword   SAVE_RESULTS_UNITS  
 syn keyword controlKeyword   SWARM_SAVE_INTERVAL
 syn keyword controlKeyword   WALL_TIME_MAX_HOURS
-syn keyword controlKeyword   PROFILER_INFO
 " Numerics
 syn keyword controlKeyword   ADVECTION_SCHEME_FOR_ENERGY
 syn keyword controlKeyword   ADVECTION_SCHEME_FOR_MOMENTUM
@@ -186,6 +185,7 @@ syn keyword controlKeyword   ROUGHNESS_COEFFICIENT
 syn keyword controlKeyword   ROUGH_WALLS
 syn keyword controlKeyword   SATURATION_TEMPERATURE
 syn keyword controlKeyword   SCALARS_DIFFUSIVITY
+syn keyword controlKeyword   SCALARS_DIFFUSIVITIES
 syn keyword controlKeyword   SMAGORINSKY_CONSTANT
 syn keyword controlKeyword   STARTING_TIME_STEP_FOR_SWARM_COMPUTATION
 syn keyword controlKeyword   STARTING_TIME_STEP_FOR_SWARM_STATISTICS
@@ -234,14 +234,13 @@ syn match controlFloat     "-\=\d\+\.\d*\([eE][-+]\=\d\+\)\=[fl]\=\>"
 syn keyword controlIntrinsic             u  v  w  t  q  p  kin  eps  zeta  f22  vis  uu  vv  ww  uv  uw  vw  vof  vof_c_ang
 syn keyword controlIntrinsic             c_01  c_02  c_03  c_04  c_05  c_06  q_01  q_02  q_03  q_04  q_05  q_06
 syn keyword controlIntrinsic             x  y  z  rx  ry  rz
-syn keyword controlBoundaryConditon      wall  wall_flux  inflow  outflow  pressure  convective  symmetry
-syn keyword controlLinearSolvers         native  petsc  cg  bicg  incomplete_cholesky  diagonal  none  asm  hypre  rs_amg
+syn keyword controlBoundaryConditon      wall  wall_flux  inflow  outflow  pressure  convective  symmetry  ambient
+syn keyword controlLinearSolvers         native  petsc  cg  bicg  amgx  incomplete_cholesky  diagonal  none  asm  hypre  chebyshev
 syn keyword controlLinearSolvers         log  log_view
 syn keyword controlNumericalParameters   simple  piso  linear  parabolic  gauss_theorem  least_squares
 syn keyword controlNumericalParameters   central  smart  luds  quick  smart  gamma  minmod  blended  superbee  avl_smart
 syn keyword controlNumericalParameters   cicsam  upwind  stacs
 syn keyword controlNumericalParameters   yes  no
-syn keyword controlNumericalParameters   percentage  seconds
 syn keyword controlPhysicalModels        thermal  density
 syn keyword controlTurbulenceModels      k_eps_zeta_f  k_eps  les_tvm  les_wale  les_dynamic  les_smagorinsky  hybrid_les_rans  hybrid_les_prandtl
 syn keyword controlTurbulenceModels      des_spalart  spalart_allmaras  dns  rsm_hanjalic_jakirlic  rsm_manceau_hanjalic  dns  none

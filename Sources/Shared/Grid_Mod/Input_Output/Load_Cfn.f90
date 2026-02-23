@@ -128,6 +128,13 @@
   read(fu) Grid % n_shadows            ! number of shadow faces
   read(fu) Grid % n_bnd_regions        ! number of boundary conditions
 
+  !------------------------!
+  !   Homoegenous planes   !
+  !------------------------!
+  read(fu) Grid % n_x_planes
+  read(fu) Grid % n_y_planes
+  read(fu) Grid % n_z_planes
+
   !-------------------------------------!
   !   Does grid have polyhedral cells   !
   !-------------------------------------!

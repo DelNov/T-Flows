@@ -117,8 +117,14 @@
     ! Reference density (for buoyancy)
     real :: dens_ref  !! reference density, used to compute buoyancy terms
 
-    ! True if it has pressure outlets (needed for a fix in Compute_Pressure)
+    ! True if it has pressure outlets
     logical :: has_pressure  !! true if field has pressure outlet
+
+    ! True if it has ambient boundary condition
+    logical :: has_ambient   !! true if field has ambient boundary condition
+
+    ! Connected with ambient boundary conditions
+    logical :: reached_ambient_pressure
 
     !-------------------------------------------------!
     !   Associated with energy conservation eqution   !

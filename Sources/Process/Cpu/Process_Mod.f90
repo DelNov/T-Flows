@@ -45,6 +45,7 @@
       procedure :: Initialize_Variables
       procedure :: Piso_Algorithm
       procedure :: Rhie_And_Chow
+      procedure :: Save_Debug
       procedure :: Update_Boundary_Values
 
   end type
@@ -65,6 +66,7 @@
 #   include "Process_Mod/Initialize_Variables.f90"
 #   include "Process_Mod/Piso_Algorithm.f90"
 #   include "Process_Mod/Rhie_And_Chow.f90"
+#   include "Process_Mod/Save_Debug.f90"
 #   include "Process_Mod/Update_Boundary_Values.f90"
 
   end module

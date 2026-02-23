@@ -11,14 +11,14 @@
   type(Field_Type), pointer :: Flow
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w, p, t, phi
-  type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2
+  type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2, omega
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c, n, sc
   real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                                p_mean(:), t_mean(:), q_mean(:)
   real, contiguous, pointer :: kin_mean (:), eps_mean(:),  &
-                               zeta_mean(:), f22_mean(:)
+                               zeta_mean(:), f22_mean(:), omega_mean(:)
   real, contiguous, pointer :: uu_res(:), vv_res(:), ww_res(:),  &
                                uv_res(:), vw_res(:), uw_res(:)
   real, contiguous, pointer :: ut_res(:), vt_res(:), wt_res(:), t2_res(:)
@@ -29,11 +29,12 @@
   if(.not. Turb % statistics) return
 
   ! Take aliases
-  Flow => Turb % pnt_flow
-  Grid => Flow % pnt_grid
-  p    => Flow % p
-  vis  => Turb % vis
-  t2   => Turb % t2
+  Flow  => Turb % pnt_flow
+  Grid  => Flow % pnt_grid
+  p     => Flow % p
+  vis   => Turb % vis
+  t2    => Turb % t2
+  omega => Turb % omega
   call Flow % Alias_Momentum(u, v, w)
   call Flow % Alias_Energy  (t)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
@@ -64,6 +65,14 @@
     end if
   end if
 
+  if(Turb % model .eq. K_OMEGA_SST) then
+    kin_mean  => Turb % kin_mean;   omega_mean  => Turb % omega_mean
+    if(Flow % heat_transfer) then
+      ut_mean => Turb % ut_mean;  vt_mean => Turb % vt_mean
+      wt_mean => Turb % wt_mean;  t2_mean => Turb % t2_mean
+    end if
+  end if
+
   ! Resolved Reynolds stresses and heat fluxes
   uu_res => Turb % uu_res;  vv_res => Turb % vv_res;  ww_res => Turb % ww_res
   uv_res => Turb % uv_res;  vw_res => Turb % vw_res;  uw_res => Turb % uw_res
@@ -74,7 +83,7 @@
 
   if(n > -1) then
 
-    do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+    do c = Cells_In_Domain_And_Buffers()
 
       ! Mean velocities (and temperature)
       u_mean(c) = (u_mean(c) * real(n) + u % n(c)) / real(n+1)
@@ -136,6 +145,16 @@
         eps_mean (c) = (eps_mean (c) * real(n) + eps  % n(c)) / real(n+1)
         zeta_mean(c) = (zeta_mean(c) * real(n) + zeta % n(c)) / real(n+1)
         f22_mean (c) = (f22_mean (c) * real(n) + f22  % n(c)) / real(n+1)
+      end if
+
+      !-----------------------!
+      !   K-omega-sst model   !
+      !-----------------------!
+      if(Turb % model .eq. K_OMEGA_SST) then
+
+        ! Time-averaged modeled quantities
+        kin_mean(c)   = (kin_mean(c) * real(n) + kin % n(c)) / real(n+1)
+        omega_mean(c) = (omega_mean(c) * real(n) + omega % n(c)) / real(n+1)
       end if
 
       !-------------!

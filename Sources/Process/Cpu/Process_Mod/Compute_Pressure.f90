@@ -48,7 +48,7 @@
   type(Matrix_Type), pointer :: M               ! momentum matrix
   real, contiguous,  pointer :: b(:)
   integer                    :: s, c, c1, c2, reg
-  real                       :: p_max, p_min, dt, a12
+  real                       :: p_max, p_min, p_nor, p_nor_c, dt, a12
 !------------------------------------------------------------------------------!
 !
 !   The form of equations which are being solved:
@@ -98,15 +98,37 @@
   !   Find the value for normalization of pressure   !
   !--------------------------------------------------!
 
+  ! From control file
+  call Control % Normalization_For_Pressure_Solver(p_nor_c)
+
+  ! Calculate pressure magnitude for normalization of pressure solution
+  p_max = -HUGE
+  p_min = +HUGE
+  do c = Cells_In_Domain_And_Buffers()
+    p_max = max(p_max, p % n(c))
+    p_min = min(p_min, p % n(c))
+  end do
+  call Global % Max_Real(p_max)
+  call Global % Min_Real(p_min)
+
+  ! Normalize pressure with the maximum of pressure difference,
+  ! value defined in control file and pressure drops.
+  p_nor = max( (p_max-p_min), p_nor_c, abs(bulk % p_drop_x),  &
+                                       abs(bulk % p_drop_y),  &
+                                       abs(bulk % p_drop_z) )
+
   ! Initialize matrix and right hand side
   b       = 0.0
   A % val = 0.0
 
-  !-----------------------------------------!
-  !   Initialize the pressure corrections   !
-  !    (Convergence is faster with this)    !
-  !-----------------------------------------!
-  pp % n = 0.0
+  !--------------------------------------------------------------------!
+  !   Initialize pressure corrections to zero for faster convergence   !
+  !    Inside the PISO algorithm this is not just an optimization -    !
+  !       it is a fundamental requirement for correct operation.       !
+  !--------------------------------------------------------------------!
+  if(.not. Flow % has_ambient .and. .not. Flow % reached_ambient_pressure) then
+    pp % n = 0.0
+  end if
 
   !----------------------------------!
   !   Correct fluxes at boundaries   !
@@ -138,7 +160,8 @@
 
       b(c1) = b(c1) - v_flux % n(s)
 
-      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE) then
+      if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
+         Grid % Bnd_Cond_Type(c2) .eq. AMBIENT) then
         a12 = A % fc(s) * M % v_m(c1)
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
       end if
@@ -146,17 +169,24 @@
   end do
 
   do reg = Boundary_Regions()
+
     if(Grid % region % type(reg) .eq. PRESSURE) then
       do s = Faces_In_Region(reg)
         c1 = Grid % faces_c(1,s)
         b(c1) = 0.0
       end do  ! faces
     end if    ! pressure
-  end do      ! regions
 
-  ! call Grid % Save_Debug_Vtu(append = "bp",      &
-  !                            inside_cell = b,    &
-  !                            inside_name = "bp")
+    if(Grid % region % type(reg) .eq. AMBIENT) then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        c2 = Grid % faces_c(2,s)
+        a12   = A % fc(s) * M % v_m(c1)
+        b(c1) = a12 * pp % n(c2)
+      end do  ! faces
+    end if    ! ambient
+
+  end do      ! regions
 
   ! Volume balance reporting
   call Flow % Report_Vol_Balance(Sol, Iter % Current())
@@ -207,42 +237,57 @@
                         ' (solver for pressure)')
 
   ! Set singularity to the matrix
-  call Sol % Set_Singular(pp)
+  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
+    call Sol % Set_Singular(pp)
+  end if
 
   ! Call linear solver
-  call Sol % Run(A, pp, b)
+  call Sol % Run(A, pp, b, norm = p_nor)
 
   ! Remove singularity from the matrix
-  if(.not. Flow % has_pressure) then
+  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
     call Sol % Remove_Singular(pp)
   end if
 
   call Profiler % Stop(String % First_Upper(pp % solver)  //  &
                        ' (solver for pressure)')
 
-  if (Flow % p_m_coupling == SIMPLE) then
-    call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
-  else
-    if (Flow % i_corr == Flow % n_piso_corrections) then
-      call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
-    end if
-  end if
+  call Info % Iter_Fill_At(1, 4, pp % name, pp % res, pp % niter)
 
   call Flow % Grad_Pressure(pp)
 
   !-------------------------------!
   !   Update the pressure field   !
   !-------------------------------!
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
-    p % n(c) =  p % n(c) + pp % urf * pp % n(c)
-  end do
+  if(.not. Flow % has_ambient) then
+    do c = Cells_In_Domain_And_Buffers()
+      p % n(c) =  p % n(c) + pp % urf * pp % n(c)
+    end do
+  else
+    ! Pressure is still building up to values prescribed
+    ! as ambient boundary conditions in the control file
+    if(.not. Flow % reached_ambient_pressure) then
+      do c = Cells_In_Domain_And_Buffers()
+        p % n(c) = (1.0 - pp % urf) * p % n(c)  &
+                 +        pp % urf * pp % n(c)
+      end do
+    ! Pressure has reached the values prescribed as the
+    ! ambient boundary conditions in the control file,
+    ! so you can update the pressure field in the usual way
+    else
+      do c = Cells_In_Domain_And_Buffers()
+        p % n(c) =  p % n(c) + pp % urf * pp % n(c)
+      end do
+    end if
+  end if
 
   call Flow % Grad_Pressure(p)
 
-  !------------------------------------!
-  !   Normalize the pressure field     !
-  !------------------------------------!
-  if(.not. Flow % has_pressure) then
+  !---------------------------------------------------------------!
+  !   Shift the pressure field so that the median value is zero   !
+  !---------------------------------------------------------------!
+  if(.not. Flow % has_pressure .and.  &
+     .not. Flow % has_ambient) then
     p_max  = maxval(p % n(1:Grid % n_cells))
     p_min  = minval(p % n(1:Grid % n_cells))
 

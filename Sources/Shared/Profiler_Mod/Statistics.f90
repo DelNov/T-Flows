@@ -139,8 +139,8 @@
       write(line(70+indent:75+indent), '(f6.2)') percent_time
       line(77+indent:77+indent) = '%'
 
-      ! There is a cut-off at 0.01 %
-      if(percent_time > 0.01) then
+      ! A cut-off at 0.5 %
+      if(percent_time > 0.5) then
         print '(a)', trim(line)
       end if
     end do

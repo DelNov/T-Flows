@@ -38,7 +38,7 @@
   call Flow % Grad_Variable(Turb % eps)
 
   ! Array for v^2
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()
     Swarm % v2_mod(c) = sqrt(Turb % zeta % n(c) * Turb % kin % n(c))
   end do
 

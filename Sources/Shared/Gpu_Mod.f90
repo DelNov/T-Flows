@@ -16,6 +16,7 @@
 !>  Each procedure within the module is dedicated to a specific type of
 !>  data or operation, ensuring efficient interaction with the GPU.
 !----------------------------------[Modules]-----------------------------------!
+  use iso_c_binding
   use Gpu_Pointers_Mod
   use Profiler_Mod
 !------------------------------------------------------------------------------!
@@ -44,7 +45,7 @@
       procedure :: Vector_Real_Create_On_Device
       procedure :: Vector_Real_Destroy_On_Device
       procedure :: Vector_Update_Device
-      procedure :: Vector_Update_Host
+      procedure :: Vector_Real_Update_On_Host
       procedure :: Matrix_Int_Copy_To_Device
       procedure :: Matrix_Int_Destroy_On_Device
       procedure :: Matrix_Real_Copy_To_Device
@@ -64,7 +65,7 @@
 #   include "Gpu_Mod/Vector/Real_Create_On_Device.f90"
 #   include "Gpu_Mod/Vector/Real_Destroy_On_Device.f90"
 #   include "Gpu_Mod/Vector/Update_Device.f90"
-#   include "Gpu_Mod/Vector/Update_Host.f90"
+#   include "Gpu_Mod/Vector/Real_Update_On_Host.f90"
 #   include "Gpu_Mod/Matrix/Int_Copy_To_Device.f90"
 #   include "Gpu_Mod/Matrix/Int_Destroy_On_Device.f90"
 #   include "Gpu_Mod/Matrix/Real_Copy_To_Device.f90"

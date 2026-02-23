@@ -194,6 +194,20 @@
 
   end if
 
+  !------------------------!
+  !   K-omega-sst model    !
+  !------------------------!
+  if(Turb % model .eq. K_OMEGA_SST) then
+    call Backup % Save_Variable(d, vc, 'kin', Turb % kin)
+    call Backup % Save_Variable(d, vc, 'omg', Turb % omega)
+
+    call Backup % Save_Cell_Real(Grid, d, vc,'p_kin',   Turb % p_kin )
+    call Backup % Save_Cell_Real(Grid, d, vc,'y_plus',  Turb % y_plus)
+    call Backup % Save_Cell_Real(Grid, d, vc,'vis_t',   Turb % vis_t )
+    call Backup % Save_Cell_Real(Grid, d, vc,'vis_w',   Turb % vis_w )
+    call Backup % Save_Cell_Real(Grid, d, vc,'t_scale', Turb % t_scale)
+  end if
+
   !-----------------!
   !   S-A model     !
   !-----------------!

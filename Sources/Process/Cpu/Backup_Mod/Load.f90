@@ -220,6 +220,20 @@
 
   end if
 
+  !-------------------------!
+  !   K-omega-sst model     !
+  !-------------------------!
+  if(Turb % model .eq. K_OMEGA_SST) then
+    call Backup % Load_Variable(d, vc, 'kin', Flow, Turb % kin)
+    call Backup % Load_Variable(d, vc, 'omg', Flow, Turb % omega)
+
+    call Backup % Load_Cell_Real(Grid, d, vc,'p_kin',   Turb % p_kin )
+    call Backup % Load_Cell_Real(Grid, d, vc,'y_plus',  Turb % y_plus)
+    call Backup % Load_Cell_Real(Grid, d, vc,'vis_t',   Turb % vis_t )
+    call Backup % Load_Cell_Real(Grid, d, vc,'vis_w',   Turb % vis_w )
+    call Backup % Load_Cell_Real(Grid, d, vc,'t_scale', Turb % t_scale)
+  end if
+
   !-----------------!
   !   S-A model     !
   !-----------------!

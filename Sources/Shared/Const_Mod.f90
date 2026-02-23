@@ -1,3 +1,5 @@
+#include "Amgx_Shared.h"
+
 !==============================================================================!
   module Const_Mod
 !------------------------------------------------------------------------------!
@@ -58,8 +60,8 @@
 
   ! Version of the .cfn and .dim files
   ! (First four digits are the year, last two the month)
-  integer, parameter :: VERSION_CFN    = 202310  !! version of the .cfn files
-  integer, parameter :: VERSION_DIM    = 202304  !! version of the .dim files
+  integer, parameter :: VERSION_CFN    = 202512  !! version of the .cfn files
+  integer, parameter :: VERSION_DIM    = 202512  !! version of the .dim files
   integer, parameter :: VERSION_BACKUP = 202304  !! version of the backup files
 
   ! This is used when estimating how much memory is used on GPUs
@@ -109,6 +111,9 @@
   ! Maximum number of domains
   integer, parameter :: MD = 4  !! maximum number of problem domains
 
+  ! Maximum number of scalars
+  integer, parameter :: MAX_SCALARS = 36  !! maximum number of scalars
+
   ! Maximum number of variables exchanged at the interface
   integer, parameter :: MAX_VARS_INTERFACE = 9  !! maximum number of variables
                                                 !! exchanged at the interface
@@ -116,4 +121,5 @@
   ! Steps for expanding the memory in Generate
   integer, parameter :: GROWTH_MARGIN =  131072 !! steps for expanding
                                                 !! memory in Generate
+
   end module

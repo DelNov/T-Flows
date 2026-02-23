@@ -16,27 +16,28 @@
 
   ! Parameters describing turbulence model choice
   ! (Prime numbers starting from 30000)
-  integer, parameter :: NO_TURBULENCE_MODEL   = 30011
-  integer, parameter :: DNS                   = 30013
-  integer, parameter :: LES_SMAGORINSKY       = 30029
-  integer, parameter :: LES_DYNAMIC           = 30047
-  integer, parameter :: LES_WALE              = 30059
-  integer, parameter :: LES_TVM               = 30071
-  integer, parameter :: K_EPS                 = 30089
-  integer, parameter :: K_EPS_ZETA_F          = 30091
-  integer, parameter :: DES_SPALART           = 30097
-  integer, parameter :: SPALART_ALLMARAS      = 30103
-  integer, parameter :: HYBRID_LES_RANS       = 30109
-  integer, parameter :: HYBRID_LES_PRANDTL    = 30113
+  integer, parameter :: NO_TURBULENCE_MODEL = 30011
+  integer, parameter :: DNS                 = 30013
+  integer, parameter :: LES_SMAGORINSKY     = 30029
+  integer, parameter :: LES_DYNAMIC         = 30047
+  integer, parameter :: LES_WALE            = 30059
+  integer, parameter :: LES_TVM             = 30071
+  integer, parameter :: K_EPS               = 30089
+  integer, parameter :: K_EPS_ZETA_F        = 30091
+  integer, parameter :: DES_SPALART         = 30097
+  integer, parameter :: SPALART_ALLMARAS    = 30103
+  integer, parameter :: HYBRID_LES_RANS     = 30109
+  integer, parameter :: HYBRID_LES_PRANDTL  = 30113
+  integer, parameter :: K_OMEGA_SST         = 30119
 
   ! Turbulent heat flux scheme
-  integer, parameter :: SGDH = 30139
-  integer, parameter :: GGDH = 30161
-  integer, parameter :: AFM  = 30169
+  integer, parameter :: SGDH = 30133
+  integer, parameter :: GGDH = 30137
+  integer, parameter :: AFM  = 30139
 
   ! Switching criteria for hybrid LES/RANS
-  integer, parameter :: SWITCH_DISTANCE = 30181
-  integer, parameter :: SWITCH_VELOCITY = 30187
+  integer, parameter :: SWITCH_DISTANCE = 30161
+  integer, parameter :: SWITCH_VELOCITY = 30169
 
   !---------------------------!
   !                           !
@@ -61,6 +62,7 @@
     type(Var_Type) :: zeta
     type(Var_Type) :: f22
     type(Var_Type) :: vis
+    type(Var_Type) :: omega
 
     ! Reynolds stresses (needed for AFM) and turbulent heat fluxes
     type(Var_Type) :: uu, vv, ww
@@ -78,7 +80,7 @@
     ! Time averaged modeled quantities
     ! (Time averages of modeled equations)
     real, allocatable :: kin_mean(:), eps_mean(:), zeta_mean(:), f22_mean(:)
-    real, allocatable :: vis_mean(:)
+    real, allocatable :: vis_mean(:), omega_mean(:)
 
     ! Resolved Reynolds stresses and heat fluxes
     ! (This is what you compute by gathering statistics
@@ -149,6 +151,9 @@
     real, allocatable :: h_min(:)
     real, allocatable :: h_w(:)
 
+    ! Needed for K-omega-sst model
+    real, allocatable :: sst_f1(:), sst_f2(:)
+
     ! Variable for switch between RANS and LES
     real, allocatable :: alpha_l(:)  ! ratio of length scales
     real, allocatable :: alpha_u(:)  ! ratio of velocity scales
@@ -171,20 +176,21 @@
     ! For the k-eps model:
     real :: c_1e, c_2e, c_3e, c_mu, c_mu25, c_mu75
 
+    ! For the k-omega-sst model:
+    real :: a1, beta_star, beta1, beta2, gamma1, gamma2, sig_k1
+    real :: sig_k2, sig_w1, sig_w2, beta, gamma
+
     ! For the k-eps-v2f model:
     real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
 
-    ! For the Spalart-Allmaras model:
-    real :: c_b1, c_b2, c_w1, c_w2, c_w3, c_v1
-
-    ! For HJ and EBM Reynolds Stress Models:
-    real :: g1, g1_star, g2, g3, g3_star, g4, g5
+    ! For the Spalart-Allmaras and DES models:
+    real :: c_des, c_b1, c_b2, c_w1, c_w2, c_w3, c_v1, c_t3, c_t4
 
     ! For AFM turbulent flux model
     real :: afm_eta, afm_psi, c_theta
 
     ! For scale-resolving models
-    real :: c_smag
+    real :: c_smag, c_wale
 
     contains
       procedure :: Init_Turb
@@ -214,6 +220,7 @@
       procedure :: Const_K_Eps_Zeta_F
       procedure :: Const_Les
       procedure :: Const_Spalart_Allmaras
+      procedure :: Const_K_Omega_Sst
 
       ! Computation of various turbulent quantities
       procedure, private :: Compute_F22
@@ -228,6 +235,8 @@
       procedure, private :: Src_T2
       procedure, private :: Src_Vis_Spalart_Allmaras
       procedure, private :: Src_Zeta_K_Eps_Zeta_F
+      procedure, private :: Src_Kin_K_Omega_Sst
+      procedure, private :: Src_Omg_K_Omega_Sst
 
       ! Computation of turbulence viscosity
       procedure          :: Vis_T_Dynamic             ! also called from Swarm
@@ -239,6 +248,7 @@
       procedure, private :: Vis_T_Spalart_Allmaras
       procedure, private :: Vis_T_Wale
       procedure, private :: Vis_T_Tensorial
+      procedure, private :: Vis_T_K_Omega_Sst
 
       procedure, private :: Wall_Function
 
@@ -250,12 +260,16 @@
       procedure :: Y_Plus_Rough_Walls
       procedure :: Tau_Wall_Log_Law
       procedure :: U_Plus_Log_Law
+      procedure :: U_Tau_Log_Law
       procedure :: Time_And_Length_Scale
       procedure :: Roughness_Coeff
       procedure :: Monin_Obukov_Momentum
       procedure :: Monin_Obukov_Thermal
 
       procedure :: Les
+
+      ! Needed for k-omega-sst model
+      procedure :: Update_K_Omega_Sst_Fields
 
   end type
 
@@ -297,6 +311,7 @@
 #   include "Turb_Mod/Const_K_Eps_Zeta_F.f90"
 #   include "Turb_Mod/Const_Les.f90"
 #   include "Turb_Mod/Const_Spalart_Allmaras.f90"
+#   include "Turb_Mod/Const_K_Omega_Sst.f90"
 
     ! Computation of various turbulent quantities
 #   include "Turb_Mod/Compute_F22.f90"
@@ -311,6 +326,8 @@
 #   include "Turb_Mod/Src_T2.f90"
 #   include "Turb_Mod/Src_Vis_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Src_Zeta_K_Eps_Zeta_F.f90"
+#   include "Turb_Mod/Src_Kin_K_Omega_Sst.f90"
+#   include "Turb_Mod/Src_Omg_K_Omega_Sst.f90"
 
     ! Computation of turbulence viscosity
 #   include "Turb_Mod/Vis_T_Dynamic.f90"
@@ -322,6 +339,7 @@
 #   include "Turb_Mod/Vis_T_Spalart_Allmaras.f90"
 #   include "Turb_Mod/Vis_T_Wale.f90"
 #   include "Turb_Mod/Vis_T_Tensorial.f90"
+#   include "Turb_Mod/Vis_T_K_Omega_Sst.f90"
 #   include "Turb_Mod/Wall_Function.f90"
 
     ! Other subroutines ellipitic blending, turbulent Prandtl number
@@ -333,11 +351,15 @@
 #   include "Turb_Mod/Y_Plus_Rough_Walls.f90"
 #   include "Turb_Mod/Tau_Wall_Log_Law.f90"
 #   include "Turb_Mod/U_Plus_Log_Law.f90"
+#   include "Turb_Mod/U_Tau_Log_Law.f90"
 #   include "Turb_Mod/Time_And_Length_Scale.f90"
 #   include "Turb_Mod/Roughness_Coeff.f90"
 #   include "Turb_Mod/Monin_Obukov_Momentum.f90"
 #   include "Turb_Mod/Monin_Obukov_Thermal.f90"
 
 #   include "Turb_Mod/Les.f90"
+
+    ! Needed in k-omega-sst model
+#   include "Turb_Mod/Update_K_Omega_Sst_Fields.f90"
 
   end module

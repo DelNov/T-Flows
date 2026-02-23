@@ -85,7 +85,7 @@ $(info # Compiling $(PROGRAM_NAME) with $(FORTRAN) compiler                    )
 $(info #-----------------------------------------------------------------------)
 $(info # Usage:                                                                )
 $(info #   make <FORTRAN=gnu/intel/nvidia> <DEBUG=no/yes> <ASSERT=yes/no>      )
-$(info #        <FCOMP=gfortran/ifort/nvfortran/mpif90/mpiifort/...>           )
+$(info #        <FCOMP=gfortran/ifx/nvfortran/mpif90/mpiifx/...>               )
 $(info #        <PROF=no/yes> <REAL=double/single> <MPI=no/yes> <OMP=no/yes>   )
 $(info #        <SORT=heap/quick> <DIR_CASE=full_or_relative_path_to_case>     )
 $(info #        <clean>                                                        )
@@ -155,11 +155,13 @@ endif
 # Fortran == intel
 ifeq ($(FORTRAN), intel)
   ifeq ($(FCOMP),)
-    FC = ifort
+    FC = ifx
   else
     FC = $(FCOMP)
   endif
   OPT_F_COMP = -module $(DIR_MODULE) -cpp
+  CC = icpx
+  OPT_C_COMP = 
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g -traceback -check bounds
   else
@@ -181,6 +183,7 @@ ifeq ($(FORTRAN), intel)
   OPT_F_COMP_USER = $(OPT_F_COMP)
 
   $(info # Using Intel Fortran compiler with options: $(OPT_F_COMP))
+  $(info # and Intel C++ compiler with options: $(OPT_C_COMP))
 
 #------------
 #   Nvidia
@@ -193,7 +196,9 @@ else ifeq ($(FORTRAN), nvidia)
   else
     FC = $(FCOMP)
   endif
-  OPT_F_COMP = -module $(DIR_MODULE) -cpp -Mbackslash
+  OPT_F_COMP = -module $(DIR_MODULE) -cpp -Mbackslash -c++libs
+  CC = nvc++
+  OPT_C_COMP = 
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g
   else
@@ -208,6 +213,7 @@ else ifeq ($(FORTRAN), nvidia)
   OPT_F_COMP_USER = $(OPT_F_COMP)
 
   $(info # Using Nvidia Fortran compiler with options: $(OPT_F_COMP))
+  $(info # and Nvidia C++ compiler with options: $(OPT_C_COMP))
 
 #---------
 #   Gnu
@@ -221,6 +227,8 @@ else
     FC = $(FCOMP)
   endif
   OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
+  CC = g++
+  OPT_C_COMP = 
   ifeq ($(DEBUG), yes)
    OPT_F_COMP += -O0 -g -fcheck=all -Wall -Wno-integer-division
   else
@@ -240,10 +248,8 @@ else
   OPT_F_COMP_USER += -Wno-unused-variable
 
   $(info # Using GNU Fortran compiler with options: $(OPT_F_COMP))
+  $(info # and GNU C++ compiler with options: $(OPT_C_COMP))
 endif
-
-# Set initial options for C compiler - this is probably not needed
-OPT_C_COMP = -cpp
 
 #----------------------------------------------
 #   Additional options to compile with PETSc
@@ -273,7 +279,7 @@ OPT_LINK = $(OPT_F_COMP)
 ifeq ($(MPI), yes)
   ifeq ($(FCOMP),)
     ifeq ($(FORTRAN), intel)
-      FC = mpiifort
+      FC = mpiifx
     else
       FC = mpif90
     endif
@@ -393,7 +399,9 @@ SRC_F_MOD += Point_Mod.f90          \
              Read_Controls_Mod.f90  \
              Process_Mod.f90
 
-SRC_C_FUN = C_Petsc_Interface.c
+SRC_C_FUN = Petsc_Interface.cpp  \
+            Amgx_Interface.cpp   \
+            Cuda_Helpers.cpp
 
 #---------------
 #   Functions
@@ -412,7 +420,7 @@ SRC_F_FUN += Key_Ind.f90
 #----------------------------------------------------------------------
 OBJ_F_MOD = $(SRC_F_MOD:%.f90=$(DIR_OBJECT)/%.o)
 OBJ_F_FUN = $(SRC_F_FUN:%.f90=$(DIR_OBJECT)/%.o)
-OBJ_C_FUN = $(SRC_C_FUN:%.c=$(DIR_OBJECT)/%.o)
+OBJ_C_FUN = $(SRC_C_FUN:%.cpp=$(DIR_OBJECT)/%.o)
 OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN) $(OBJ_C_FUN)
 
 #---------------------------------------------------------
@@ -422,12 +430,12 @@ OBJ = $(OBJ_F_MOD) $(OBJ_F_FUN) $(OBJ_C_FUN)
 #---------------------------------------------------------
 
 # Fortran sources
-$(DIR_OBJECT)/%.o: %.f90
+$(DIR_OBJECT)/%.o: %.f90 makefile*
 	@echo $(FC) $<
 	@$(FC) $(OPT_F_COMP) $(PASS_ON) -c -o $@ $<
 
-# C functions
-$(DIR_OBJECT)/%.o: %.c
+# C++ sources
+$(DIR_OBJECT)/%.o: %.cpp makefile*
 	@echo $(CC) $<
 	@$(CC) $(OPT_C_COMP) $(PASS_ON) -c -o $@ $<
 

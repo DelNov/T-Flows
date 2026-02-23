@@ -15,7 +15,7 @@
   type(Matrix_Type), pointer :: A
   real,              pointer :: b(:)
   integer                    :: s, c, c1, c2, reg
-  real                       :: sor_11, f22hg
+  real                       :: sor_11, f22hg, l_kolm
 !------------------------------------------------------------------------------!
 !                                                                              !
 !  The form of source terms are :                                              !
@@ -65,7 +65,7 @@
   ! Source term f22hg
   do c = Cells_In_Domain()
     sor_11 = Grid % vol(c)/(Turb % l_scale(c)**2 + TINY)
-    A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11 
+    A % val(A % dia(c)) = A % val(A % dia(c)) + sor_11
   end do
 
   ! Imposing boundary condition for f22 on the wall
@@ -78,9 +78,14 @@
 
         Assert(c2 < 0)
 
+
+        ! Here we limit wall distance to Kolm. length scale to prevent
+        ! uphysical solutions
+        l_kolm      = 0.5*((Flow % viscosity(c1)/Flow % density(c1))**3  &
+                      / eps % n(c1))**0.25
         f22 % n(c2) = -2.0 * Flow % viscosity(c1)        &
                     / Flow % density(c1) * zeta % n(c1)  &
-                    / Grid % wall_dist(c1)**2
+                    / (max(Grid % wall_dist(c1), l_kolm))**2
 
         ! Fill in a source coefficients
 
