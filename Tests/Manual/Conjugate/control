@@ -1,0 +1,16 @@
+  NUMBER_OF_DOMAINS         3
+
+  NUMBER_OF_TIME_STEPS    1200
+  RESULTS_SAVE_INTERVAL     30
+
+  TIME_STEP               0.1
+
+  TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+  # Connection between hot solid and the fluid:
+  INTERFACE_CONDITION      hot_solid    fluid
+    BOUNDARY_CONDITIONS    right_wall   left_wall
+
+  # Connection between fluid and the cold solid
+  INTERFACE_CONDITION      fluid        cold_solid
+    BOUNDARY_CONDITIONS    right_wall   left_wall

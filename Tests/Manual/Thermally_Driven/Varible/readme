@@ -1,0 +1,29 @@
+Ra = delta rho * L^3 * g / (mu * alpha)
+
+For t range 10 to 30 degrees:
+
+  delta rho = 1.2474 - 1.1649 = 0.0825  kg/m3
+
+At 20 degrees (medium temperature):
+
+  g                         =    9.81        m/s^2
+  rho                       =    1.2047      kg/m^3
+  cp                        = 1006.1         J/kgK
+  mu                        =    1.8205e-5   kg/ms
+  lambda                    =    0.025596    W/mK
+  alpha (lambda / rho / cp) =    2.1118e-5   m^2/s
+
+So, for L = 1 m and g = 9.81 m/s^2;
+
+  Ra = 0.0825 * 1^3 * 9.81 / (1.8205e-5 * 2.1118e-5) = 2.105e+9
+
+To get Ra = 1e+5, L should be reduced to: ~ 0.03622 m
+To get Ra = 1e+6, L should be reduced to: ~ 0.07803 m
+To get Ra = 1e+7, L should be reduced to: ~ 0.1681  m
+To get Ra = 1e+8, L should be reduced to: ~ 0.3622  m
+
+Reference for physical properies:
+
+https://theengineeringmindset.com/properties-of-air-at-atmospheric-pressure/
+
+

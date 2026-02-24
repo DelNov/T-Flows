@@ -1,0 +1,19 @@
+# Grid name with extension
+hot_solid.msh
+
+# Dual grid?
+no
+
+# Geometrical scaling
+skip
+
+# Periodicity
+2
+skip
+
+# Wall distance
+1 2
+
+# Probe 1d
+skip
+
