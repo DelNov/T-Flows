@@ -87,7 +87,7 @@
 
   end if
 
-  if(Flow % heat_transfer.and.Turb % model.ne.NO_TURBULENCE_MODEL) then
+  if(Flow % heat_transfer .and. Turb % model .ne. NO_TURBULENCE_MODEL) then
 
     call Turb % Calculate_Stress   ()
     call Turb % Calculate_Heat_Flux()
