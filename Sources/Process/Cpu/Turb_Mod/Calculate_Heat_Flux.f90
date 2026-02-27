@@ -115,6 +115,7 @@
   !--------------------------------------!
   if(Turb % model .eq. K_EPS            .or.  &
      Turb % model .eq. K_EPS_ZETA_F     .or.  &
+     Turb % model .eq. K_OMEGA_SST      .or.  &
      Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART      .or.  &
      Turb % model .eq. HYBRID_LES_RANS) then
