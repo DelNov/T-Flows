@@ -146,23 +146,6 @@
 
   end do    ! iter
 
-  !--------------------------------------------------------------!
-  !   Refresh boundary (ghost) values using the updated gradients !
-  !--------------------------------------------------------------!
-  do reg = Boundary_Regions()
-    if(Grid % region % type(reg) .ne. AMBIENT) then
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-
-        p % n(c2) = p % n(c1) + p % x(c1) * Grid % dx(s)  &
-                              + p % y(c1) * Grid % dy(s)  &
-                              + p % z(c1) * Grid % dz(s)
-      end do  ! faces
-    end if    ! ambient or other
-  end do      ! regions
-
-
   ! Perform Gauss from gradients which are good inside obtained above
   call Flow % Grad_Gauss_Variable(p)
 
