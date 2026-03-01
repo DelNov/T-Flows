@@ -38,34 +38,30 @@
     2. [Linking T-Flows with PETSc](#link_petsc_tflows)
     3. [Using PETSc](#link_petsc_using)
 9. [Benchmark cases](#bench_cases)
-    1. [Laminar flow over a flat plate](#bench_flat_plate)
-        1. [Pre-processing](#bench_flat_plate_pre)
-        2. [Processing - running the case](#bench_flat_plate_run)
-        3. [Post-processing - visualization of results and plotting profiles](#bench_flat_plate_post)
-    2. [Conjugate heat transfer](#bench_conjugate)
+    1. [Conjugate heat transfer](#bench_conjugate)
         1. [Generating the grids](#bench_conjugate_generating)
         2. [Compiling and running](#bench_conjugate_running)
         3. [Comparison with benchmark solution](#bench_conjugate_compare)
         4. [Thing to try next](#bench_conjugate_next)
-    3. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
+    2. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
-    4. [Round impinging jet and heat transfer](#bench_cases_jet)
+    3. [Round impinging jet and heat transfer](#bench_cases_jet)
         1. [Compiling the sub-programs](#bench_cases_jet_compiling)
         2. [Converting and dividing the mesh](#bench_cases_jet_converting)
         3. [Running the simulation](#bench_case_jet_running)
         4. [Comparing against experiments](#bench_h_case_jet_comparing)
-    5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
+    4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
         3. [Comparing against experiments](#bench_cases_matrix_comparing)
-    6. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
+    5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
         3. [Running the case](#bench_cases_buble_running)
         4. [Checking the initial condition](#bench_cases_buble_checking)
         5. [Final solution and benchmarking](#bench_cases_buble_final)
-    7. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
+    6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
 
 # Introduction <a name="intro"></a>
 
@@ -702,21 +698,6 @@ problems with conjugate heat transfer.  It can be computed in two ways:
 For this case, let's compute them from here so you answer ```1 2``` to the
 above question to instruct _Convert_ which boundaries can be considered as
 solid walls.
-
-Before it ends, _Convert_ will ask you one more thing:
-```
- #===========================================
- # Creating 1d file with the node
- # coordinates in non-homogeneous directions
- #-------------------------------------------
- # Insert non-homogeneous direction
- # (x, y, z, rx, ry, rz or skip)
- # -------------------------------------------
-```
-
-which is important for computation of turbulent flows and described with some
-turbulent benchmark cases [RANS computation of a channel flow](#bench_plane_channel_rans).
-For the time being, feel free to answer with a ```skip```.
 
 #### Analyzing the outcome of _Convert_
 
@@ -1779,7 +1760,7 @@ directory which holds sources for _Process_, there is also a sub-directory calle
 ├── Beginning_Of_Iteration.f90
 ├── Beginning_Of_Simulation.f90
 ├── Beginning_Of_Time_Step.f90
-├── Calculate_Mean.f90
+├── Bulk_Velocity.f90
 ├── End_Of_Compute_Energy.f90
 ├── End_Of_Compute_Momentum.f90
 ├── End_Of_Compute_Pressure.f90
@@ -1790,6 +1771,7 @@ directory which holds sources for _Process_, there is also a sub-directory calle
 ├── End_Of_Simulation.f90
 ├── End_Of_Time_Step.f90
 ├── Force.f90
+├── Get_User_Field_For_Saving.f90
 ├── Initialize_Variables.f90
 ├── Insert_Particles.f90
 ├── Interface_Exchange.f90
@@ -2596,22 +2578,22 @@ is to be read from the file, is given in line ```VARIABLES```.  In this case,
 it will be _y_ coordinate, followed by _u_ velocities.
 
 To facilitate the prescription of this file, we placed a small utility in
-```[root]/Sources/Utilities/Parabolic.f90``` for prescribing parabolic
+```[root]/Sources/Utilities/Parabolic_Channel.f90``` for prescribing parabolic
 velocity profile, which should be compiled with, say:
 ```
-gfortran -o Parabolic Parabolic.f90
+gfortran -o Parabolic_Channel Parabolic_Channel.f90
 ```
 and can be invoked from command line with:
 ```
-./Parabolic  x_start  x_end  bulk_velocity  n_points
+./Parabolic_Channel  x_start  x_end  bulk_velocity  n_points
 ```
 Here, first and second parameter are starting and ending coordinates (not
 necessarily _x_), the desired bulk velocity and number of points over which
 you want to describe the profile.  Since we want to span the parabolic profile
 over _y_, and we know that our _y_ ranges from 0 to 4.1, we know that the
-desired bulk velocity is one, we can invoke _Parabolic_ with:
+desired bulk velocity is one, we can invoke _Parabolic_Channel_ with:
 ```
-./Parabolic  0  4.1  1  31
+./Parabolic_Channel  0  4.1  1  31
 ```
 to get (some lines are ommitted):
 ```
@@ -2645,11 +2627,11 @@ the bulk velocity.
 If you were in the case directory (```[root]/Tests/Manual/Inflows/```) you
 could have also redirect the output from profile with:
 ```
-../../../Sources/Utilities/Parabolic > profile.dat
+../../../Sources/Utilities/Parabolic_Channel > profile.dat
 ```
 
 Clearly, the profile you prescribe in this ASCII file does not have to be
-parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_.
+parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_Channel_.
 You could specify it from experimental or DNS data you have at your disposal.
 You only have to follow the format:
 - first non-comment line specifies the number of points
@@ -3490,14 +3472,6 @@ If you set the line above and T-Flows was compiled without PETSc, it will
 throw an error but also suggest a workaround.
 
 # Benchmark cases  <a name="bench_cases"></a>
-
-## Laminar flow over a flat plate <a name="bench_flat_plate"> </a>
-
-### Pre-processing <a name="bench_flat_plate_pre"> </a>
-
-### Processing - running the case <a name="bench_flat_plate_run"> </a>
-
-### Post-processing - visualization of results and plotting profiles <a name="bench_flat_plate_post"> </a>
 
 ## Conjugate heat transfer <a name="bench_conjugate"> </a>
 

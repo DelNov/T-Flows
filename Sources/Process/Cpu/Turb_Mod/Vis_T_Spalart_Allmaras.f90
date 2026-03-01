@@ -11,10 +11,8 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: vis
-  integer                   :: c, s, c1, c2
+  integer                   :: c
   real                      :: x_rat, f_v1
-  real                      :: cs, lf, u_tau, nc2, u_tan, nu
-  real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
 !------------------------------[Local parameters]------------------------------!
   real, parameter           :: A_POW = 8.3
   real, parameter           :: B_POW = 1.0/7.0

@@ -48,7 +48,7 @@
 # (it will use default) #
 #-----------------------#
  2
-   1 Kmin
+   1  Kmin
       1  lower_face
    2  Kmax
       1  upper_face

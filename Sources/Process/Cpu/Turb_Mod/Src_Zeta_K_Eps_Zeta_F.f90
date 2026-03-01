@@ -37,9 +37,9 @@
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
   call Sol % Alias_Native       (A, b)
 
-  ! Positive source term 
-  ! The first option in treating the source is making computation very 
-  ! sensitive to initial condition while the second one can lead to 
+  ! Positive source term
+  ! The first option in treating the source is making computation very
+  ! sensitive to initial condition while the second one can lead to
   ! instabilities for some cases such as Flow around cylinder. That is why we
   ! choose this particular way to the add source term.
   do c = Cells_In_Domain()
@@ -53,7 +53,7 @@
     end if
     A % val(A % dia(c)) =  A % val(A % dia(c))             &
                         + Grid % vol(c) * Turb % p_kin(c)  &
-                        / (kin % n(c) + TINY) 
+                        / (kin % n(c) + TINY)
   end do
 
   end subroutine

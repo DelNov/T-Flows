@@ -23,11 +23,8 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps
-  integer                   :: c1, c2, s, c, reg
-  real                      :: pr, beta, ebf, sc
-  real                      :: u_tan, u_tau
-  real                      :: kin_vis, u_plus, y_star, re_t, f_mu
-  real                      :: z_o
+  integer                   :: c
+  real                      :: kin_vis, y_star, re_t, f_mu
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !

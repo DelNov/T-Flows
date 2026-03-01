@@ -68,7 +68,7 @@
 
     call Turb % Time_And_Length_Scale(Grid)
 
-    call Turb % Update_K_Omega_Sst_Fields()  
+    call Turb % Update_K_Omega_Sst_Fields()
 
     call Turb % Compute_Variable(Sol, Turb % kin)
     call Turb % Compute_Variable(Sol, Turb % omega)
@@ -92,7 +92,7 @@
     call Turb % Calculate_Stress   ()
     call Turb % Calculate_Heat_Flux()
     if(Flow % buoyancy .eq. THERMALLY_DRIVEN.or.  &
-       Turb % heat_flux_model .eq. AFM)           &     
+       Turb % heat_flux_model .eq. AFM)           &
     call Turb % Compute_Variable(Sol, Turb % t2)
 
   end if

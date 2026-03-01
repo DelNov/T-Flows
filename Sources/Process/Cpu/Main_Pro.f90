@@ -212,7 +212,9 @@
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)  ! not sure if this call is needed
       call Control % Potential_Initialization(pot_init, .true.)
-      call Flow(d) % Potential_Initialisation(Sol(d), pot_init)
+      if(.not. read_backup(d)) then
+        call Flow(d) % Potential_Initialisation(Sol(d), pot_init)
+      end if
     end do
   end if
 

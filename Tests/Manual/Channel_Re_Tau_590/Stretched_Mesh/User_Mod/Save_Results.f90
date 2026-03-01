@@ -38,7 +38,7 @@
   bulk => Flow % bulk
   call Flow % Alias_Momentum(u, v, w)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
-  call Flow % Alias_Energy  (t)   
+  call Flow % Alias_Energy  (t)
   omega => Turb % omega
 
   ! Read constant physical properties from control file
@@ -50,13 +50,13 @@
   ubulk    = bulk % flux_x / bulk % area_x
   n_points = 0
 
-  ! Set file names to save results                                               
-  call File % Set_Name(res_name,                      &                          
-                       time_step = Time % Curr_Dt(),  &                          
-                       extension = '-res.dat')                                   
-                                                                                 
-  ! Number of probes in cell rows                                                
-  n_prob = Grid % n_z_planes - 1                  
+  ! Set file names to save results
+  call File % Set_Name(res_name,                      &
+                       time_step = Time % Curr_Dt(),  &
+                       extension = '-res.dat')
+
+  ! Number of probes in cell rows
+  n_prob = Grid % n_z_planes - 1
 
   !-------------------------------------------------------------------------!
   !   Allocate memory for variables to be extracted in homogeneous planes   !
@@ -79,10 +79,10 @@
   !-------------------------!
   !   Average the results   !
   !-------------------------!
-  do i = 1, n_prob  ! n_prob is in cell rows                                     
-    do c = Cells_In_Domain()                                                     
-      if(Grid % zc(c) > (Grid % z_coord_plane(i)) .and.  &                       
-         Grid % zc(c) < (Grid % z_coord_plane(i+1))) then   
+  do i = 1, n_prob  ! n_prob is in cell rows
+    do c = Cells_In_Domain()
+      if(Grid % zc(c) > (Grid % z_coord_plane(i)) .and.  &
+         Grid % zc(c) < (Grid % z_coord_plane(i+1))) then
 
         wall_p  (i) = wall_p  (i) + Grid % wall_dist(c)
         u_p     (i) = u_p     (i) + u % n(c)
@@ -99,8 +99,8 @@
         else if(Turb % model == K_OMEGA_SST) then
           kin_p   (i) = kin_p   (i) + kin % n(c)
           omg_p   (i) = omg_p   (i) + omega % n(c)
-        end if 
-        if(Flow % heat_transfer) t_p (i) = t_p (i) + t  % n(c)     
+        end if
+        if(Flow % heat_transfer) t_p (i) = t_p (i) + t  % n(c)
 
         n_count(i) = n_count(i) + 1
       end if
@@ -140,25 +140,25 @@
   if(Flow % heat_transfer) then
     t_wall = 0.0
     t_tau     = Flow % heat_flux / (dens_const * capa_const * u_tau_p)
-    do s = 1, Grid % n_faces                                                     
-      c1 = Grid % faces_c(1,s)                                                   
-      c2 = Grid % faces_c(2,s)                                                   
-      if(c2  < 0) then                                                           
-        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &                           
-            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then                           
-                                                                                 
-          t_wall  = t_wall + t % n(c2)                                           
-          n_points = n_points + 1                                                
-        end if                                                                   
-      end if                                                                     
-    end do                                                                       
-                                                                                 
-    call Global % Sum_Real(t_wall)                                               
-    call Global % Sum_Int(n_points)                                              
-                                                                                 
-    call Global % Wait                                                           
-                                                                                 
-    t_wall  = t_wall / n_points    
+    do s = 1, Grid % n_faces
+      c1 = Grid % faces_c(1,s)
+      c2 = Grid % faces_c(2,s)
+      if(c2  < 0) then
+        if( Grid % Bnd_Cond_Type(c2) .eq. WALL .or.  &
+            Grid % Bnd_Cond_Type(c2) .eq. WALLFL) then
+
+          t_wall  = t_wall + t % n(c2)
+          n_points = n_points + 1
+        end if
+      end if
+    end do
+
+    call Global % Sum_Real(t_wall)
+    call Global % Sum_Int(n_points)
+
+    call Global % Wait
+
+    t_wall  = t_wall / n_points
   end if
 
   !----------------------------------------!
@@ -185,7 +185,6 @@
   '#', 'Utau     = ', u_tau_p
   write(fu,'(a1,(a12,f12.6,a2,a22))') &
   '#', 'Cf_error = ', error, ' %', 'Dean formula is used.'
-
 
   do i = 1, n_prob
     wall_p(i) = dens_const * wall_p(i) * u_tau_p / visc_const
@@ -238,8 +237,8 @@
                                  t_p(i)          !  6
       end if
     end do
-  else 
-    write(fu,'(a)') '#  1:z,  2:u' 
+  else
+    write(fu,'(a)') '#  1:z,  2:u'
     do i = 1, n_prob
       if(n_count(i) .ne. 0) then
         write(fu,'(3es15.5e3)')  wall_p(i),   &  !  1
@@ -248,7 +247,7 @@
       end if
     end do
   end if
-  
+
   close(fu)
 
   if(First_Proc())  write(6, *) '# Finished with User_Mod_Save_Results.f90.'

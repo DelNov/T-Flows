@@ -158,8 +158,9 @@ Printf("Spacing function with delta_min - delta_max: %g - %g defined!",
 //---------------------------------------------------
 Recombine Surface{BOX_SURF};
 
-// This experimental algorithm could give better results
-Mesh.Algorithm = 8;
+// This experimental algorithm could give better results,
+// but also causes crashes in some Gmsh versions
+// Mesh.Algorithm = 8;
 
 // Uncomment the following line to try the full-quad algorithm:
 // Mesh.RecombinationAlgorithm = 2; // or 3

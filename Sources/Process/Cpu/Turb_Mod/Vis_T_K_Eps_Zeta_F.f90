@@ -11,11 +11,7 @@
   type(Grid_Type),  pointer :: Grid
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps, zeta, f22
-  integer                   :: c, c1, c2, s, reg
-  real                      :: u_tan, u_tau
-  real                      :: beta, pr, sc
-  real                      :: u_plus, ebf, kin_vis
-  real                      :: z_o
+  integer                   :: c, reg
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -61,15 +57,15 @@
 
   end if
 
-  !-------------------!                                                          
-  !   Wall function   !                                                          
-  !-------------------+                                                          
-  call Turb % Wall_Function()                                                       
-                                                                                    
-  call Grid % Exchange_Cells_Real(Turb % vis_w)                                     
-  if(Flow % n_scalars > 0) call Grid % Exchange_Cells_Real(Turb % diff_w)           
-  if(Flow % heat_transfer) call Grid % Exchange_Cells_Real(Turb % con_w)            
-                                                                                    
-  call Grid % Exchange_Cells_Real(Turb % vis_t) 
+  !-------------------!
+  !   Wall function   !
+  !-------------------+
+  call Turb % Wall_Function()
+
+  call Grid % Exchange_Cells_Real(Turb % vis_w)
+  if(Flow % n_scalars > 0) call Grid % Exchange_Cells_Real(Turb % diff_w)
+  if(Flow % heat_transfer) call Grid % Exchange_Cells_Real(Turb % con_w)
+
+  call Grid % Exchange_Cells_Real(Turb % vis_t)
 
   end subroutine

@@ -16,7 +16,7 @@
   BACKUP_SAVE_INTERVAL      600
 
 #-------------------
-# Monitoring points 
+# Monitoring points
 #-------------------
   NUMBER_OF_MONITORING_POINTS               5
     MONITORING_POINT_001  0.5  0.5  1.0
@@ -39,10 +39,10 @@
 #----------------------------------------
 # Physical models
 #----------------------------------------
-#  TURBULENCE_MODEL       k_eps_zeta_f
-#  TURBULENCE_MODEL       k_eps
-#  TURBULENCE_MODEL       k_omega_sst 
-  TURBULENCE_MODEL       spalart_allmaras  
+  TURBULENCE_MODEL       k_eps_zeta_f
+# TURBULENCE_MODEL       k_eps
+# TURBULENCE_MODEL       k_omega_sst
+# TURBULENCE_MODEL       spalart_allmaras
 
 #----------------------
 # Numerical parameters
@@ -74,16 +74,16 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u    t     kin    eps    zeta   f22    omg  vis 
-    VALUES              1.0  20.0  1.0e-2 1.0e-3 1.0e-1 6.6e-3 1.0  0.0001
+    VARIABLES           u    t     kin    eps    zeta   f22      omg   vis
+    VALUES              1.0  20.0  1.0e-2 1.0e-3 1.0e-1 6.6e-3   1.0   0.0001
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    lower_face
     TYPE                wall_flux
-    VARIABLES           u     v     w     q   
-    VALUES              0.0   0.0   0.0   1.0 
+    VARIABLES           u     v     w     q
+    VALUES              0.0   0.0   0.0   1.0
 
   BOUNDARY_CONDITION    upper_face
     TYPE                symmetry

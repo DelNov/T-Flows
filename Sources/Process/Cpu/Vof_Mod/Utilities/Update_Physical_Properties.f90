@@ -25,15 +25,19 @@
                            + (1.0 - col % n(c)) * Vof % phase_dens(0)
     Flow % viscosity(c)    = col % n(c)         * Vof % phase_visc(1)  &
                            + (1.0 - col % n(c)) * Vof % phase_visc(0)
-    Flow % capacity(c)     = col % n(c)         * Vof % phase_capa(1)  &
-                           + (1.0 - col % n(c)) * Vof % phase_capa(0)
-    Flow % conductivity(c) = col % n(c)         * Vof % phase_cond(1)  &
-                           + (1.0 - col % n(c)) * Vof % phase_cond(0)
+    if(Flow % heat_transfer) then
+      Flow % capacity(c)     = col % n(c)         * Vof % phase_capa(1)  &
+                             + (1.0 - col % n(c)) * Vof % phase_capa(0)
+      Flow % conductivity(c) = col % n(c)         * Vof % phase_cond(1)  &
+                             + (1.0 - col % n(c)) * Vof % phase_cond(0)
+    end if
   end do
 
   call Grid % Exchange_Cells_Real(Flow % density)
   call Grid % Exchange_Cells_Real(Flow % viscosity)
-  call Grid % Exchange_Cells_Real(Flow % capacity)
-  call Grid % Exchange_Cells_Real(Flow % conductivity)
+  if(Flow % heat_transfer) then
+    call Grid % Exchange_Cells_Real(Flow % capacity)
+    call Grid % Exchange_Cells_Real(Flow % conductivity)
+  end if
 
   end subroutine

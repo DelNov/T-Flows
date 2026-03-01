@@ -64,6 +64,7 @@
 #------------------------
 # Linear solver settings
 #------------------------
+  LINEAR_SOLVERS                     native
   PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
   TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
   TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
@@ -78,7 +79,7 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t      kin      eps      zeta       f22
+    VARIABLES           u     v     w     t      kin      eps      zeta     f22
     VALUES             -0.1   0.0   0.0   20.0   1.0e-3   1.0e-4   6.6e-4   1.0e-4
 
 #---------------------
@@ -86,23 +87,23 @@
 #---------------------
   BOUNDARY_CONDITION    pipe_wall
     TYPE                wall
-    VARIABLES           u     v     w    q    kin   eps      zeta    f22
-    VALUES              0.0   0.0   0.0  0.0  0.0   1.0e-3   0.0   0.0
+    VARIABLES           u     v     w    q    kin   eps      zeta   f22
+    VALUES              0.0   0.0   0.0  0.0  0.0   1.0e-3   0.0    0.0
 
   BOUNDARY_CONDITION    symmetry_plane
     TYPE                symmetry
-    VARIABLES           u     v     w     t      kin      eps      zeta       f22
+    VARIABLES           u     v     w     t      kin      eps      zeta     f22
     VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
 
   BOUNDARY_CONDITION    top_plane
-    TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta       f22
-    VALUES              0.0   0.0  -0.01  20.0   1.0E-4   1.0E-5   6.6E-4     1.0e-4
+    TYPE                inflow
+    VARIABLES           u     v     w      t      kin      eps      zeta     f22
+    VALUES              0.0   0.0  -0.01   20.0   1.0E-4   1.0E-5   6.6E-4   1.0e-4
 
   BOUNDARY_CONDITION    lower_wall
     TYPE                wall
-    VARIABLES           u     v     w    q    kin   eps      zeta    f22
-    VALUES              0.0   0.0   0.0  0.1  0.0   1.0e-3   0.0   0.0
+    VARIABLES           u     v     w     q     kin   eps      zeta   f22
+    VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0    0.0
 
   BOUNDARY_CONDITION    pipe_inlet
     TYPE                inflow
@@ -111,5 +112,5 @@
 
   BOUNDARY_CONDITION    cyl_outlet
     TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta       f22
+    VARIABLES           u     v     w     t      kin      eps      zeta     f22
     VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
