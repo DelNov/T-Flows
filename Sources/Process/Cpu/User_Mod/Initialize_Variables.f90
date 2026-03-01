@@ -24,7 +24,7 @@
   !   User-defined fields must be defined in the   !
   !   range: -Grid % n_bnd_cells:Grid % n_cells)   !
   !------------------------------------------------!
-  allocate(my_useful_field(-Grid % n_bnd_cells : Grid % n_cells))
+  !@ allocate(my_useful_field(-Grid % n_bnd_cells : Grid % n_cells))
 
   !---------------------------------------------------------------------------!
   !   Remove the following 12 lines in real Lagrangian tracking simulations   !

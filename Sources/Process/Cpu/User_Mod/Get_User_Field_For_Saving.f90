@@ -30,13 +30,13 @@
 
     ! Keep in mind that user fields must be defined
     ! in the range -Grid % n_bnd_cells:Grid % n_cells
-    Assert(lbound(my_useful_field,1) .eq. -Grid % n_bnd_cells)
-    Assert(ubound(my_useful_field,1) .eq.  Grid % n_cells)
+    !@ Assert(lbound(my_useful_field,1) .eq. -Grid % n_bnd_cells)
+    !@ Assert(ubound(my_useful_field,1) .eq.  Grid % n_cells)
 
     ! Copy user field to Results_Mod's memory space
-    do c = c_f, c_l
-      field_to_save(c) = my_useful_field(c)
-    end do
+    !@ do c = c_f, c_l
+    !@   field_to_save(c) = my_useful_field(c)
+    !@ end do
 
     ! Set the user field's name - this will appear in .vtu file
     ! If the line setting "field_name" is ommited, the field won't
