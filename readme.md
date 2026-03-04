@@ -1,3 +1,25 @@
+<!--
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   Style: Style: write instructions in "directive mode"
+          (i.e., as an instruction addressed to the reader).
+
+   Examples:
+   - Run it from the command line: …
+   - Use ... to ...
+   - Set NUMBER_OF_TIME_STEPS to ...
+   - Edit the control file
+
+   When writing about the developers, use "first person plural (We)"
+
+   Examples:
+   - We believe that if you are reading these pages ...
+   - We did the same in the section ...
+   - We regularly use GMSH ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-->
+
 # T-Flows
 
 1. [Introduction](#intro)
@@ -54,7 +76,7 @@
     4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
-        3. [Comparing against experiments](#bench_cases_matrix_comparing)
+        4. [Comparing against experiments](#bench_cases_matrix_comparing)
     5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
@@ -913,7 +935,7 @@ At this point, you are ready to run.  Invoke _Process_ by issuing command:
 
 Since _Process_ writes a lot of information on the screen while it is computing,
 it is useful to re-direct the output to a log file, here simply called ```out```.
-We also send the process in the background with an ampersand ```&``` at the end
+You also send the process in the background with an ampersand ```&``` at the end
 of the command line.  Next, let's analyze the output from _Process_.
 It starts with a header: <a name="a_heck_of_a_header"> </a>
 ```
@@ -1472,7 +1494,8 @@ prescribed heat flux rather than temperature, we change letter ```t``` to ```q``
 (as a usual symbol for heat flux).  We also set it to zero, because these walls
 are insulated.
 
-We should also instruct _Process_ to solve for temperature, which is obtained with the line:
+You should also instruct _Process_ to solve for temperature, which is obtained
+with the line:
 ```
 HEAT_TRANSFER    yes
 ```
@@ -1525,7 +1548,7 @@ but we know that _Process_ will set them to their default values of 1.0.
 > **_Note:_** Be reminded that default values for all parameters needed by
 _Process_ are listed in the file: ```[root]/Documentation/all_control_keywords```.
 
-We should also instruct _Process_ that we want to use Boussinesq approximation
+You should also instruct _Process_ that we want to use Boussinesq approximation
 to solve the system, which is obtained with the line:
 ```
  BUOYANCY         thermal
@@ -1577,7 +1600,7 @@ one.  In this case, we follow this rule.
 Another thing worth noting for this case is that the default linear solver
 parameters might not be the best ones (for all variables solved, it is 1.0e-6).
 This may be too tight for velocities and temperature, and a bit too loose for
-pressure.  We therefore set them as following:
+pressure.  Therefore, set them as following:
 ```
  LINEAR_SOLVERS                     native
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
@@ -1711,7 +1734,7 @@ range of Ra numbers.  Feel free to explore them further.
 
 ### With variable physical properties <a name="demo_thermally_driven_variable"> </a>
 
-Using Boussinesq hypotehsis is not the only way we can deal with buoyancy driven flows.
+Using Boussinesq hypotehsis is not the only way you can deal with buoyancy driven flows.
 The alternative would be to be to change air density as the function of temperature, and
 impose a gravitational vector, _Process_ would work out buoyancy forces acting on
 momentum equations.  Dependency of density on temperature has to be imposed in some way
@@ -2041,7 +2064,7 @@ There is nothing else particularly interseting in the ```control``` file for thi
 except the fact that physical properties are not defined.  It is because they are
 set from user functions.
 
-With all this explained, grid can be generated and converted with:
+With all this explained, you can generate and covnert the grid:
 ```
 gmsh -3 air.geo
 ./Convert < convert.scr
@@ -2201,7 +2224,7 @@ _Divide_ from the command line as this:
 ```
 ./Divide  rod_tet_dual  6
 ```
-by which we tell _Divide_ the name of the grid we want to divide, and number of
+by which you tell _Divide_ the name of the grid you want to divide, and number of
 sub-divisions.  If the command is successful, your directory structure, showing
 only new files, looks like this:
 ```
@@ -2251,7 +2274,7 @@ the domain decomposition obtained by _Divide_:
 
 ### Running the simulation in parallel <a name="demo_parallel_proc_running"> </a>
 
-We are ready for parallel run.  Provided that you compiled the _Process_ with
+You are now ready for parallel run.  Provided that you compiled the _Process_ with
 ```MPI=yes``` option, you can start the parallel run with ```mpirun``` command
 as follows:
 ```
@@ -2308,8 +2331,8 @@ it is a good practice to define this point.
 #### Saving and/or exiting prematurely.
 
 For this case, we set the desired number of time steps to 6000, and we set
-ssaving interval to each 1200 time steps.  We know it is a big grid, and we
-don't want to overfill the disk.  Now imagine that you curious to see the
+saving interval to each 1200 time steps.  Tt is a big grid, and you probably
+don't want to overfill the disk.  Now imagine that you are curious to see the
 results before time step reaches the prescribed interval.  (That is, in
 essence, not a bad idea, as you can use to make sure results are not marred
 with numerical instabilities.)
@@ -2342,13 +2365,13 @@ flow start to exhibit three-dimensional patterns:
 
 Fine, maybe the simulation doesn't need to continue.  You have hopefully grasped
 how to launch a parallel simulation.  Before we end, let's just stop the simulation
-which is running.  We could do it with a command:
+which is running.  You could do it with a command:
 ```
 pkill Process
 ```
-which is a rather abrupt way to stop, but we may also direct _Process_ to end
+which is a rather abrupt way to stop, but you may also direct _Process_ to end
 gracefully, saving the last results and backup files before it stops.  To do
-that, we create a file called ```exit_now``` in the running directory.  If
+that, create a file called ```exit_now``` in the running directory.  If
 _Process_ finds this file, it will save results and backup, and exit.  Before
 exiting, it will delete the ```exit_now``` file to prevent interfering with the
 next run in the same directory.
@@ -4581,7 +4604,7 @@ prescribe the desired volume flow rate through the computational domain with:
 
 With this explained, you can launch a simulation with:
 ```
-mpirun -np 8 ./Process > out_01_developing_turbulence.
+mpirun -np 8 ./Process > out_01_developing_turbulence
 ```
 
 This simulation takes a long time.  It depends on the hardware you are using a
@@ -4623,6 +4646,42 @@ to perform Fourier analyzis of the signals, but we already know that we don't
 have enough samples for high quality spectra and we don't even bother at this
 initial stages of turbulence development.
 
+#### Second stage: gathering the statistics
+
+In the previous section, we conducted the simulation until 0.6 s of physical
+time and, based on the values at the monitoring points, concluded that the flow
+is turbulent, and that we can start to gather statistics.  To do that, you have
+to change a few things in the control file.
+
+First, you want to start from the last backup file.  In this case it
+is ```matrix-ts060000.backup```, and the line you shold add to the control
+file is:
+```
+  LOAD_BACKUP_NAME          matrix-ts060000.backup
+```
+
+This line instructs T-Flows to read the results stored at time step 60'000
+and continue the simulation.  However, to actually continue, you should also
+change the line which specifies the total number of time steps:
+```
+  NUMBER_OF_TIME_STEPS 120000
+```
+> **_Note:_** Reading the results at time step 60'000 and
+setting the ```NUMBER_OF_TIME_STEPS``` to 120'000, means that the simulation will
+span from time step 60'001 to 120'000.
+
+Finally, you have to instruct T-Flows to start gathering statistics, and specify
+from which time step, which is achieved with this entry in the ```control```
+file:
+```
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS   60001
+```
+
+With these changes in place, you can launch a simulation with:
+```
+mpirun -np 8 ./Process > out_02_gathering_statistics
+```
+
 ### Comparing against experiments <a name="bench_cases_matrix_comparing"> </a>
 
 To compare results against measurements, we wrote a user function and placed
@@ -4630,8 +4689,8 @@ it in ```User_Mod_Beginning_Of_Simulation```.  Its source resides in
 ```[root]/Tests/Manual/Matrix/User_Mod```.  This function will, after _Process_
 starts and reads the backup file, extract profiles in locations specified by
 the user and exit.  Since the profiles are extracted in the vertical mid-plane
-of the computational domain, we decided to extract them at the nodes.  Since
-_Process_ is cell-centered, we decided to first interpolate results from cells
+of the computational domain, they are extracted at the nodes.  Since
+_Process_ is cell-centered, we first interpolate results from cells
 to nodes, and then extract data from the nodes.
 
 The function works in four stages.  In the first stage it checks command line
@@ -4855,7 +4914,7 @@ or run the simulation straight away with:
 ### Checking the initial condition <a name="bench_cases_buble_checking"> </a>
 
 Since VOF simulations inherently depend on initializing VOF function with user
-function, it is of utmost importance to check if we really specified what we
+function, it is of utmost importance to check if you really specified what you
 wanted.  For that, for checking initial condition, _Process_ creates results
 with ```-ts000000``` appended just before the extension (which is either ```.vtu```
 or ```.pvtu``` depending if you ran your simulation in sequential or parallel
@@ -4863,7 +4922,7 @@ mode.
 
 ![!](Documentation/Manual/Figures/bubble_initial.png "")
 
-While the _Process_ is running, and we are sure that initial condition was
+While the _Process_ is running, and you are sure that initial condition was
 properly set, we would like to turn your attenion to a few things in the
 ```control``` file which are characteristic for VOF simulation.
 
@@ -4906,7 +4965,7 @@ be the same for consistency of surface tension forces, which is set with:
 
 To make sure that in order for volume forces (buoyancy) surface tension forces
 to be properly balanced at cell faces during the Rhie and Chow interpolation,
-we also set Gu's and Choi's correction in the control file:
+you should also set Gu's and Choi's correction in the control file:
 ```
  GU_CORRECTION                          yes
  CHOI_CORRECTION                        yes
