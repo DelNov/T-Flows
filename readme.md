@@ -3815,11 +3815,7 @@ When you run _Generate_ in each of the sub-directories with:
 ./Generate < generate.scr
 ```
 it will create the ```.cfn```, ```.dim```, as well as a few files in ```.vtu```
-format which you can use to visualise the grids you just created.  Please
-observe that files with extension ```.1d``` are also created.  Since the channel
-flow is essentially a one-dimensional problem, _Generate_ creates this file
-with node coordinates in singe non-homogenous direction (_z_ in this case).
-The ```.1d``` file is used in user functions explained below.
+format which you can use to visualise the grids you just created.
 
 > **_Note:_** Although _Generate_ was quite useful in the early stages of
 development of T-Flows, and although it has some nice features like local grid
@@ -3857,15 +3853,20 @@ in [this](#demo_thermally_driven_variable) section.
 ```Uniform_Grid``` have the same user function.  Hence, the entire ```User_Mod```
 in ```Uniform_Grid``` is a mere link to its counterpart in ```Stretched_Grid```.
 
-The compiled user function (```User_Mod_Save_Results```) for these cases works
-in the following way:  it first reads the node coordinates from the ```.1d```
-file created during the grid generation, allocates memory for a number of
-variables to be defined in homogeneous planes, averages results over cells
-which are situated in between consecutive nodes in ```.1d``` file,
-non-dimensionalizes the results and writes them in a file with extension
-```.dat``` for further processing.  All these steps are clearly indicated in
-the source file ```[root]/Tests/Manual/Channel_Re_Tau_590/User_Mod/Save_Results.f90```
-and we believe they don't need further explanations.
+
+The compiled user function (```User_Mod_Save_Results```) works as follows:
+it uses the homogeneous-plane coordinates identified by _Generate_ (or
+_Convert_) and stored in ```Grid % x_coord_plane(:)```, ```Grid % y_coord_plane(:)```,
+and ```Grid % z_coord_plane(:)```.  Based on these planes, it allocates arrays for
+plane-averaged quantities and then, for each interval between two consecutive
+planes (cell rows), averages the solution variables over all cells whose
+centers lie within that interval.  The routine then non-dimensionalizes the
+averaged results (including the computation of friction velocity, and—when
+heat transfer is enabled—thermal scaling) and writes the final profiles to
+an ASCII results file with extension ```-res.dat``` for further post-processing.
+All steps are implemented in
+```[root]/Tests/Manual/Channel_Re_Tau_590/User_Mod/Save_Results.f90``` and are
+sufficiently documented in the source.
 
 #### Running the cases
 
@@ -4264,13 +4265,18 @@ Line 145 ensures that the file is written only from one processor, lines
 how to use T-Flows' standard way to open files and the rest is just plain
 Fortran which doesn't need furhter explanation.
 
-The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
-similar structure to the ```Save_Impinging_Jet_Nu```, but a few differences.
-Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
-reads a file with coordinates in _z_ direction, created during the grid
-conversion process (file ```jet.1d```).  Just like its sister, it declares local
-variables for averaging the results, performs global summs over all processor
-for parallel runs, and eventually saves data for post-processing.
+The remaining user function ```Save_Impinging_Jet_Profiles``` has a structure
+similar to ```Save_Impinging_Jet_Nu```, but it targets wall-normal profile
+extraction for comparison with experimental data.  It first computes the mean
+inlet velocity by integrating the axial velocity over the boundary region
+```PIPE_INLET``` (with global reductions for parallel runs). It then reads the
+wall-normal sampling coordinates from the ASCII file ```wall_normal_coordinate.dat```,
+allocates arrays for the sampled quantities, and performs spatial averaging
+over cells that fall within consecutive wall-normal intervals.
+The averaging is repeated for several radial bands (different ranges of
+_r_, reported as _r/D_, and for each band the routine performs global sums
+across all MPI ranks before writing the resulting non-dimensional profiles to
+time-stamped output files (one per _r/D_ location) for post-processing.
 
 There is one section in the ```Save_Impinging_Jet_Profiles``` which might
 deserve a bit of attention.  It is a section which calculates average inlet
