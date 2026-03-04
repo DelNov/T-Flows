@@ -10,8 +10,8 @@
   NUMBER_OF_TIME_STEPS    1200
   TIME_STEP                  0.0025
 
-  RESULTS_SAVE_INTERVAL     12
-  BACKUP_SAVE_INTERVAL  999999
+  RESULTS_SAVE_INTERVAL    120
+  BACKUP_SAVE_INTERVAL    6000
 
 #-------------------
 # Monitoring points
