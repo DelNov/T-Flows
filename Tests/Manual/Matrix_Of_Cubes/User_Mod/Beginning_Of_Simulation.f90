@@ -37,9 +37,14 @@
     call get_command_argument(1, arg);  read(arg, *) x_p
     call get_command_argument(2, arg);  read(arg, *) y_p
   else
-    print *, '# You failed to invoke the program properly.'
-    print *, '# Correct invocation:'
-    print *, './Process  x_probe  y_probe'
+    call Message % Error(                                                   &
+      72,                                                                   &
+      "This user function is written for post-processing phase only. "  //  &
+      " \n Check the user manual (the readme.md file) for more details."//  &
+      " \n \n The correct invocation is:"                               //  &
+      " \n \n ./Process  x_probe  y_probe"                              //  &
+      " \n \n but only after the turbulent statistics is gathered!!!",      &
+      __FILE__, __LINE__, .true.)
     stop
   end if
 
