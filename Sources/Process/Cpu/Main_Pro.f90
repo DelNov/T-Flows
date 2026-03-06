@@ -150,8 +150,7 @@
 
     ! Initialize variables
     if(.not. read_backup(d)) then
-      call Process % Initialize_Variables(Flow(d), Turb(d),  &
-                                          Vof(d), Swarm(d), Sol(d))
+      call Process % Initialize_Variables(Flow(d), Turb(d), Vof(d))
     end if
     call User_Mod_Initialize_Variables(Flow(d), Turb(d),   &
                                        Vof(d), Swarm(d), Sol(d))

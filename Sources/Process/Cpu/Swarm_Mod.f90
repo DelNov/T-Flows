@@ -69,8 +69,8 @@
     real :: dt  !! time step for the swarm
 
     ! Eddy time interval for stochastic eddy interaction (SEIM) model
-    integer :: time_eim  !! eddy time interval for stochastic
-                         !! eddy interaction (SEIM) model
+    real :: time_eim  !! eddy time interval for stochastic
+                      !! eddy interaction (SEIM) model
     ! Number of sub-steps; time sub-steps
     integer :: n_sub_steps  !! number of sub-steps in time
 

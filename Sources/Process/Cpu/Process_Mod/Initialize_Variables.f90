@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Initialize_Variables(Process, Flow, Turb, Vof, Swarm, Sol)
+  subroutine Initialize_Variables(Process, Flow, Turb, Vof)
 !------------------------------------------------------------------------------!
 !>  This subroutine initializes dependent variables in the simulation. It is   !
 !>  crucial to note that it only executes if a backup file was not read.       !
@@ -12,8 +12,6 @@
   type(Field_Type),   target :: Flow     !! flow object
   type(Turb_Type),    target :: Turb     !! turbulence object
   type(Vof_Type)             :: Vof      !! VOF object
-  type(Swarm_Type)           :: Swarm    !! swarm object
-  type(Solver_Type)          :: Sol      !! solver object
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),  pointer :: Grid
   type(Bulk_Type),  pointer :: bulk
