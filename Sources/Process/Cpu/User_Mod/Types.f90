@@ -3,8 +3,8 @@
 !==============================================================================!
 
   ! An example array, just as an illustration
-  real, dimension(60) :: my_useful_array
+  !@ real, dimension(60) :: my_useful_array
 
   ! An example field
-  real, allocatable :: my_useful_field(:)
+  !@ real, allocatable :: my_useful_field(:)
 
