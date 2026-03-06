@@ -27,8 +27,8 @@
 !                                                                              !
 !   C is derived from:    Lij_res = Lij_mod                                    !
 !                                                                              !
-!   res - resolved, mod - modeled                                              ! 
-!                                                                              ! 
+!   res - resolved, mod - modeled                                              !
+!                                                                              !
 !   Lij_res = <UiUj> - <Ui><Uj>,                                               !
 !                                                                              !
 !   where <> denote test filter                                                !
@@ -36,8 +36,8 @@
 !   Lij_mod = 2 * C * Mij, C = Csmag ** 2.0                                    !
 !                                                                              !
 !   where Mij is:  Mij = <delta**2.0>|<Sij>|<Sij> - <delta |Sij| Sij>          !
-!                                                                              ! 
-!   Finaly C is :                                                              ! 
+!                                                                              !
+!   Finaly C is :                                                              !
 !                                                                              !
 !   C = 0.5 * Lij:Mij / Mij:Mij                                                !
 !                                                                              !
@@ -124,8 +124,8 @@
         m_23_a = m_23_a + Grid % vol(cj) * Flow % shear(cj)              &
                * 0.5 * ( v % z(cj) + w % y(cj) )
 
-        ! Test volume 
-        vol_e = vol_e + Grid % vol(cj) 
+        ! Test volume
+        vol_e = vol_e + Grid % vol(cj)
       end if
     end do
 

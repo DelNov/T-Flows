@@ -226,7 +226,7 @@ else
   else
     FC = $(FCOMP)
   endif
-  OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none
+  OPT_F_COMP = -J $(DIR_MODULE) -cpp -ffree-line-length-none -frecursive
   CC = g++
   OPT_C_COMP = 
   ifeq ($(DEBUG), yes)

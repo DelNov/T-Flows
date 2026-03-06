@@ -37,7 +37,7 @@
   type(Grid_Type),     pointer :: Grid
   type(Turb_Type),     pointer :: Turb
   type(Particle_Type), pointer :: Part
-  integer,             pointer :: time
+  real,                pointer :: time
   integer :: c                          ! nearest cell
   logical :: flag1, flag2, flag3        ! flags for sigma
   real    :: cd                         ! drag coefficient

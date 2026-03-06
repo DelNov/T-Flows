@@ -827,7 +827,6 @@
       v  % n(c) = v % b(c)
       w  % n(c) = w % b(c)
       pp % n(c) = p % b(c)  ! used with ambient boundary conditions
-      p  % n(c) = p % b(c)  ! used with pressure boundary conditions
 
       if(Flow % heat_transfer) then
         t % n(c) = t % b(c)

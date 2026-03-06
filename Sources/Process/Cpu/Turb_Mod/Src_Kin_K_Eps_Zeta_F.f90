@@ -68,7 +68,7 @@
                           + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
-! In general, this clipping should be avoided.  
+! In general, this clipping should be avoided.
 !      if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
 !        Turb % g_buoy(c) = 0.0
 !      end if

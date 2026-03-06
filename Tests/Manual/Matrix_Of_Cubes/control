@@ -39,7 +39,8 @@
 #-----------------
 # Physical models
 #-----------------
-  TURBULENCE_MODEL   les_dynamic
+  TURBULENCE_MODEL                         les_dynamic
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS   60001
 
 #-------------------------------------------------
 # Prescribed mass flow

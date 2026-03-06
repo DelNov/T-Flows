@@ -18,7 +18,7 @@
   type(Var_Type),  pointer :: u, v, w
   type(Face_Type), pointer :: v_flux
   integer                  :: s, c2, reg
-  real                     :: fac, vol_outflow, area_outflow, area_pressure
+  real                     :: fac, vol_outflow, area_outflow
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -186,10 +186,6 @@
          Grid % region % type(reg) .eq. CONVECT   .or.  &
          Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
-          ! For bidirectional PRESSURE boundaries, correct only outflow faces
-          if(Grid % region % type(reg) .eq. PRESSURE) then
-            if(v_flux % n(s) .le. 0.0) cycle
-          end if
           c2 = Grid % faces_c(2,s)
 
           ! Update velocity components ...
@@ -212,50 +208,6 @@
     end do      ! region
 
     ! Don't forget to sum it up over all processors
-
-    !------------------------------------------------------------------!
-    !   If all PRESSURE faces were inflow, no outflow was corrected.    !
-    !   In that case, distribute the required outflow over all          !
-    !   PRESSURE faces to enforce global volume conservation.           !
-    !------------------------------------------------------------------!
-    if(Math % Approx_Real(bulk % vol_out, 0.0, tol=FEMTO)) then
-
-      area_pressure = 0.0
-      do reg = Boundary_Regions()
-        if(Grid % region % type(reg) .eq. PRESSURE) then
-          do s = Faces_In_Region(reg)
-            area_pressure = area_pressure + Grid % s(s)
-          end do
-        end if
-      end do
-      area_pressure = max(area_pressure, FEMTO)
-
-      call Global % Sum_Real(area_pressure)
-
-      bulk % vol_out = 0.0
-      do reg = Boundary_Regions()
-        if(Grid % region % type(reg) .eq. PRESSURE) then
-          do s = Faces_In_Region(reg)
-            c2 = Grid % faces_c(2,s)
-
-            u % n(c2) = (bulk % vol_in + bulk % vol_src) / area_pressure  &
-                      * Grid % sx(s) / Grid % s(s)
-            v % n(c2) = (bulk % vol_in + bulk % vol_src) / area_pressure  &
-                      * Grid % sy(s) / Grid % s(s)
-            w % n(c2) = (bulk % vol_in + bulk % vol_src) / area_pressure  &
-                      * Grid % sz(s) / Grid % s(s)
-
-            v_flux % n(s) = u % n(c2)*Grid % sx(s)    &
-                          + v % n(c2)*Grid % sy(s)    &
-                          + w % n(c2)*Grid % sz(s)
-
-            bulk % vol_out = bulk % vol_out + v_flux % n(s)
-          end do
-        end if
-      end do
-
-    end if
-
     call Global % Sum_Real(bulk % vol_out)
 
   !-------------------------------------------------!
@@ -276,10 +228,6 @@
          Grid % region % type(reg) .eq. CONVECT   .or.  &
          Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
-          ! For bidirectional PRESSURE boundaries, correct only outflow faces
-          if(Grid % region % type(reg) .eq. PRESSURE) then
-            if(v_flux % n(s) .le. 0.0) cycle
-          end if
           c2 = Grid % faces_c(2,s)
 
           ! Update velocity components ...

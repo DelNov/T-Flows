@@ -4,7 +4,7 @@
 !   Calculates SGS stresses and turbulent viscosity for 'LES'.                 !
 !------------------------------------------------------------------------------!
 !   near(c) is the number of corresponding cell on the nearest wall.
-!   In case that, in parallel executions, the subdomain does not have 
+!   In case that, in parallel executions, the subdomain does not have
 !   any nearwall cells, the near(c) is zero.
 !   near(c) is calculated in NearWallCells.f90, only ones in the beginig
 !   of a simulation.
@@ -21,7 +21,7 @@
   type(Var_Type),   pointer :: u, v, w, t
   integer                   :: c, s, c1, c2
   real                      :: fd    ! damping function
-  real                      :: hwn   ! grid step size in wall-normal direction 
+  real                      :: hwn   ! grid step size in wall-normal direction
   real                      :: hmax
   real                      :: cw, u_tan, u_tau, dw, lf_wm, kappa, dely, nu
 !==============================================================================!

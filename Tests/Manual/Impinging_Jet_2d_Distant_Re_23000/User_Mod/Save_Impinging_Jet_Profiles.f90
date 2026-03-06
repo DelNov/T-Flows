@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Save_Impinging_Jet_Profiles(Turb)
 !------------------------------------------------------------------------------!
-!   Subroutine reads the .1d file with wall normal coordinates and extracts    !
+!   Subroutine reads a file with wall normal coordinates and extracts          !
 !   solutions for comparison with corresponding experimental measurements.     !
 !------------------------------------------------------------------------------!
   implicit none
@@ -19,6 +19,7 @@
   real,    allocatable      :: omg_p(:)
   integer, allocatable      :: n_count(:)
   real                      :: r, r1, r2, u_rad, u_tan, lnum, area_in, velo_in
+  logical                   :: there
 !==============================================================================!
 
   ! Take aliases
@@ -51,9 +52,28 @@
   Assert(area_in > 0.0)
   velo_in = velo_in / area_in
 
-  ! Set the name for coordinate file
-  call File % Set_Name(coord_name, extension='.1d')
-  call File % Open_For_Reading_Ascii(coord_name, fu)
+  !--------------------------------------------!
+  !   Read file with wall normal coordinates   !
+  !--------------------------------------------!
+  inquire(file='wall_normal_coordinate.dat', exist=there)
+  if(.not.there) then
+    if(First_Proc()) then
+      print *, "#=========================================================="
+      print *, "# In order to extract Nusselt number profile               "
+      print *, "# an ascii file with cell-faces coordinates has to be read."
+      print *, "# The name of the file is rad_coordinate.dat.              "
+      print *, "# The file format should be as follows:                    "
+      print *, "# 10  ! number of cells + 1                                "
+      print *, "# 0.0                                                      "
+      print *, "# 0.1                                                      "
+      print *, "# 0.2                                                      "
+      print *, "# ...                                                      "
+      print *, "#----------------------------------------------------------"
+    end if
+    return
+  end if
+
+  call File % Open_For_Reading_Ascii('wall_normal_coordinate.dat', fu)
 
   ! Read the number of searching intervals
   read(fu,*) n_prob

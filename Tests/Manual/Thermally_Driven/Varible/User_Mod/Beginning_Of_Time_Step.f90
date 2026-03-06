@@ -22,7 +22,7 @@
   !------------------------------!
   !   Browse through all cells   !
   !------------------------------!
-  do c = Cells_At_Boundaries_In_Domain_And_Buffers()
+  do c = Cells_In_Domain_And_Buffers()
 
     ! Browse through all table entries
     do i = 1, N_ITEMS - 1

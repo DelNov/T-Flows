@@ -2,7 +2,7 @@
   subroutine Const_K_Eps_Zeta_F(Turb)
 !------------------------------------------------------------------------------!
 !   Initializes constants for k-eps-zeta-f and hybrid k-eps-zeta-f             !
-!   turbulence models.                                                         ! 
+!   turbulence models.                                                         !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -20,6 +20,7 @@
   real                     :: nx, ny, nz, bulk_vel, phi_n, dt
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
+  Unused(Vof)
 !==============================================================================!
 
   ! Take aliases

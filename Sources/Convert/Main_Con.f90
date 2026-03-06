@@ -137,6 +137,11 @@
     call Convert % Find_Inside_Faces  (Grid(1))
   end if
 
+  ! Take of the city-related domains
+  if(city) then
+    call Convert % Insert_Buildings(Grid(1))
+  end if
+
   if(porosity) then
     call Grid(1) % Calculate_Cell_Centers()
     call Por % Create_Porosity(Grid(1))

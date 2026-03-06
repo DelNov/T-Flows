@@ -26,23 +26,23 @@ do
     echo "Creating soft links to executables here!"
 
     # Link Convert
-    if [ -f "${cur_dir}"/C* ]; then
-      ln -s -f ${cur_dir}/C* .
+    if [ -f "${cur_dir}"/Conv* ]; then
+      ln -s -f ${cur_dir}/Conv* .
     fi
 
     # Link Divide
-    if [ -f "${cur_dir}"/D* ]; then
-      ln -s -f ${cur_dir}/D* .
+    if [ -f "${cur_dir}"/Divi* ]; then
+      ln -s -f ${cur_dir}/Divi* .
     fi
 
     # Link Generate
-    if [ -f "${cur_dir}"/G* ]; then
-      ln -s -f ${cur_dir}/G* .
+    if [ -f "${cur_dir}"/Gene* ]; then
+      ln -s -f ${cur_dir}/Gene* .
     fi
 
     # Link Process
-    if [ -f "${cur_dir}"/P* ]; then
-      ln -s -f ${cur_dir}/P* .
+    if [ -f "${cur_dir}"/Proc* ]; then
+      ln -s -f ${cur_dir}/Proc* .
     fi
 
   fi

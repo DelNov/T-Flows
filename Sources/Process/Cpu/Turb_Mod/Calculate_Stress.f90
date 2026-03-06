@@ -29,7 +29,7 @@
   call Flow % Grad_Variable(w)
 
   if( Turb % model .eq. K_EPS        .or.  &
-      Turb % model .eq. K_EPS_ZETA_F) then 
+      Turb % model .eq. K_EPS_ZETA_F) then
 
     do c = Cells_In_Domain_And_Buffers()
 
@@ -67,7 +67,7 @@
       Turb % model .eq. HYBRID_LES_RANS) then
     do c = Cells_In_Domain_And_Buffers()
 
-      uu % n(c) = zeta % n(c) * kin % n(c) 
+      uu % n(c) = zeta % n(c) * kin % n(c)
       vv % n(c) = zeta % n(c) * kin % n(c)
       ww % n(c) = zeta % n(c) * kin % n(c)
 

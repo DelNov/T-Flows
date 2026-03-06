@@ -1,3 +1,25 @@
+<!--
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   Style: Style: write instructions in "directive mode"
+          (i.e., as an instruction addressed to the reader).
+
+   Examples:
+   - Run it from the command line: …
+   - Use ... to ...
+   - Set NUMBER_OF_TIME_STEPS to ...
+   - Edit the control file
+
+   When writing about the developers, use "first person plural (We)"
+
+   Examples:
+   - We believe that if you are reading these pages ...
+   - We did the same in the section ...
+   - We regularly use GMSH ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-->
+
 # T-Flows
 
 1. [Introduction](#intro)
@@ -38,34 +60,30 @@
     2. [Linking T-Flows with PETSc](#link_petsc_tflows)
     3. [Using PETSc](#link_petsc_using)
 9. [Benchmark cases](#bench_cases)
-    1. [Laminar flow over a flat plate](#bench_flat_plate)
-        1. [Pre-processing](#bench_flat_plate_pre)
-        2. [Processing - running the case](#bench_flat_plate_run)
-        3. [Post-processing - visualization of results and plotting profiles](#bench_flat_plate_post)
-    2. [Conjugate heat transfer](#bench_conjugate)
+    1. [Conjugate heat transfer](#bench_conjugate)
         1. [Generating the grids](#bench_conjugate_generating)
         2. [Compiling and running](#bench_conjugate_running)
         3. [Comparison with benchmark solution](#bench_conjugate_compare)
         4. [Thing to try next](#bench_conjugate_next)
-    3. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
+    2. [Fully-developed turbulent plane channel flow](#bench_plane_channel)
         1. [RANS computation of a channel flow](#bench_plate_channel_rans)
         2. [LES computation of a channel flow](#bench_plate_channel_les)
-    4. [Round impinging jet and heat transfer](#bench_cases_jet)
+    3. [Round impinging jet and heat transfer](#bench_cases_jet)
         1. [Compiling the sub-programs](#bench_cases_jet_compiling)
         2. [Converting and dividing the mesh](#bench_cases_jet_converting)
         3. [Running the simulation](#bench_case_jet_running)
         4. [Comparing against experiments](#bench_h_case_jet_comparing)
-    5. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
+    4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
-        3. [Comparing against experiments](#bench_cases_matrix_comparing)
-    6. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
+        4. [Comparing against experiments](#bench_cases_matrix_comparing)
+    5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
         3. [Running the case](#bench_cases_buble_running)
         4. [Checking the initial condition](#bench_cases_buble_checking)
         5. [Final solution and benchmarking](#bench_cases_buble_final)
-    7. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
+    6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
 
 # Introduction <a name="intro"></a>
 
@@ -703,21 +721,6 @@ For this case, let's compute them from here so you answer ```1 2``` to the
 above question to instruct _Convert_ which boundaries can be considered as
 solid walls.
 
-Before it ends, _Convert_ will ask you one more thing:
-```
- #===========================================
- # Creating 1d file with the node
- # coordinates in non-homogeneous directions
- #-------------------------------------------
- # Insert non-homogeneous direction
- # (x, y, z, rx, ry, rz or skip)
- # -------------------------------------------
-```
-
-which is important for computation of turbulent flows and described with some
-turbulent benchmark cases [RANS computation of a channel flow](#bench_plane_channel_rans).
-For the time being, feel free to answer with a ```skip```.
-
 #### Analyzing the outcome of _Convert_
 
 During the conversion process, _Convert_ creates the following files:
@@ -932,7 +935,7 @@ At this point, you are ready to run.  Invoke _Process_ by issuing command:
 
 Since _Process_ writes a lot of information on the screen while it is computing,
 it is useful to re-direct the output to a log file, here simply called ```out```.
-We also send the process in the background with an ampersand ```&``` at the end
+You also send the process in the background with an ampersand ```&``` at the end
 of the command line.  Next, let's analyze the output from _Process_.
 It starts with a header: <a name="a_heck_of_a_header"> </a>
 ```
@@ -1491,7 +1494,8 @@ prescribed heat flux rather than temperature, we change letter ```t``` to ```q``
 (as a usual symbol for heat flux).  We also set it to zero, because these walls
 are insulated.
 
-We should also instruct _Process_ to solve for temperature, which is obtained with the line:
+You should also instruct _Process_ to solve for temperature, which is obtained
+with the line:
 ```
 HEAT_TRANSFER    yes
 ```
@@ -1544,7 +1548,7 @@ but we know that _Process_ will set them to their default values of 1.0.
 > **_Note:_** Be reminded that default values for all parameters needed by
 _Process_ are listed in the file: ```[root]/Documentation/all_control_keywords```.
 
-We should also instruct _Process_ that we want to use Boussinesq approximation
+You should also instruct _Process_ that we want to use Boussinesq approximation
 to solve the system, which is obtained with the line:
 ```
  BUOYANCY         thermal
@@ -1596,7 +1600,7 @@ one.  In this case, we follow this rule.
 Another thing worth noting for this case is that the default linear solver
 parameters might not be the best ones (for all variables solved, it is 1.0e-6).
 This may be too tight for velocities and temperature, and a bit too loose for
-pressure.  We therefore set them as following:
+pressure.  Therefore, set them as following:
 ```
  LINEAR_SOLVERS                     native
  TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-3
@@ -1730,7 +1734,7 @@ range of Ra numbers.  Feel free to explore them further.
 
 ### With variable physical properties <a name="demo_thermally_driven_variable"> </a>
 
-Using Boussinesq hypotehsis is not the only way we can deal with buoyancy driven flows.
+Using Boussinesq hypotehsis is not the only way you can deal with buoyancy driven flows.
 The alternative would be to be to change air density as the function of temperature, and
 impose a gravitational vector, _Process_ would work out buoyancy forces acting on
 momentum equations.  Dependency of density on temperature has to be imposed in some way
@@ -1779,7 +1783,7 @@ directory which holds sources for _Process_, there is also a sub-directory calle
 ├── Beginning_Of_Iteration.f90
 ├── Beginning_Of_Simulation.f90
 ├── Beginning_Of_Time_Step.f90
-├── Calculate_Mean.f90
+├── Bulk_Velocity.f90
 ├── End_Of_Compute_Energy.f90
 ├── End_Of_Compute_Momentum.f90
 ├── End_Of_Compute_Pressure.f90
@@ -1790,6 +1794,7 @@ directory which holds sources for _Process_, there is also a sub-directory calle
 ├── End_Of_Simulation.f90
 ├── End_Of_Time_Step.f90
 ├── Force.f90
+├── Get_User_Field_For_Saving.f90
 ├── Initialize_Variables.f90
 ├── Insert_Particles.f90
 ├── Interface_Exchange.f90
@@ -2059,7 +2064,7 @@ There is nothing else particularly interseting in the ```control``` file for thi
 except the fact that physical properties are not defined.  It is because they are
 set from user functions.
 
-With all this explained, grid can be generated and converted with:
+With all this explained, you can generate and covnert the grid:
 ```
 gmsh -3 air.geo
 ./Convert < convert.scr
@@ -2219,7 +2224,7 @@ _Divide_ from the command line as this:
 ```
 ./Divide  rod_tet_dual  6
 ```
-by which we tell _Divide_ the name of the grid we want to divide, and number of
+by which you tell _Divide_ the name of the grid you want to divide, and number of
 sub-divisions.  If the command is successful, your directory structure, showing
 only new files, looks like this:
 ```
@@ -2269,7 +2274,7 @@ the domain decomposition obtained by _Divide_:
 
 ### Running the simulation in parallel <a name="demo_parallel_proc_running"> </a>
 
-We are ready for parallel run.  Provided that you compiled the _Process_ with
+You are now ready for parallel run.  Provided that you compiled the _Process_ with
 ```MPI=yes``` option, you can start the parallel run with ```mpirun``` command
 as follows:
 ```
@@ -2326,8 +2331,8 @@ it is a good practice to define this point.
 #### Saving and/or exiting prematurely.
 
 For this case, we set the desired number of time steps to 6000, and we set
-ssaving interval to each 1200 time steps.  We know it is a big grid, and we
-don't want to overfill the disk.  Now imagine that you curious to see the
+saving interval to each 1200 time steps.  Tt is a big grid, and you probably
+don't want to overfill the disk.  Now imagine that you are curious to see the
 results before time step reaches the prescribed interval.  (That is, in
 essence, not a bad idea, as you can use to make sure results are not marred
 with numerical instabilities.)
@@ -2360,13 +2365,13 @@ flow start to exhibit three-dimensional patterns:
 
 Fine, maybe the simulation doesn't need to continue.  You have hopefully grasped
 how to launch a parallel simulation.  Before we end, let's just stop the simulation
-which is running.  We could do it with a command:
+which is running.  You could do it with a command:
 ```
 pkill Process
 ```
-which is a rather abrupt way to stop, but we may also direct _Process_ to end
+which is a rather abrupt way to stop, but you may also direct _Process_ to end
 gracefully, saving the last results and backup files before it stops.  To do
-that, we create a file called ```exit_now``` in the running directory.  If
+that, create a file called ```exit_now``` in the running directory.  If
 _Process_ finds this file, it will save results and backup, and exit.  Before
 exiting, it will delete the ```exit_now``` file to prevent interfering with the
 next run in the same directory.
@@ -2596,22 +2601,22 @@ is to be read from the file, is given in line ```VARIABLES```.  In this case,
 it will be _y_ coordinate, followed by _u_ velocities.
 
 To facilitate the prescription of this file, we placed a small utility in
-```[root]/Sources/Utilities/Parabolic.f90``` for prescribing parabolic
+```[root]/Sources/Utilities/Parabolic_Channel.f90``` for prescribing parabolic
 velocity profile, which should be compiled with, say:
 ```
-gfortran -o Parabolic Parabolic.f90
+gfortran -o Parabolic_Channel Parabolic_Channel.f90
 ```
 and can be invoked from command line with:
 ```
-./Parabolic  x_start  x_end  bulk_velocity  n_points
+./Parabolic_Channel  x_start  x_end  bulk_velocity  n_points
 ```
 Here, first and second parameter are starting and ending coordinates (not
 necessarily _x_), the desired bulk velocity and number of points over which
 you want to describe the profile.  Since we want to span the parabolic profile
 over _y_, and we know that our _y_ ranges from 0 to 4.1, we know that the
-desired bulk velocity is one, we can invoke _Parabolic_ with:
+desired bulk velocity is one, we can invoke _Parabolic_Channel_ with:
 ```
-./Parabolic  0  4.1  1  31
+./Parabolic_Channel  0  4.1  1  31
 ```
 to get (some lines are ommitted):
 ```
@@ -2645,11 +2650,11 @@ the bulk velocity.
 If you were in the case directory (```[root]/Tests/Manual/Inflows/```) you
 could have also redirect the output from profile with:
 ```
-../../../Sources/Utilities/Parabolic > profile.dat
+../../../Sources/Utilities/Parabolic_Channel > profile.dat
 ```
 
 Clearly, the profile you prescribe in this ASCII file does not have to be
-parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_.
+parabolic, nor does it have to be generated with T-Flows' utility _Parabolic_Channel_.
 You could specify it from experimental or DNS data you have at your disposal.
 You only have to follow the format:
 - first non-comment line specifies the number of points
@@ -3491,14 +3496,6 @@ throw an error but also suggest a workaround.
 
 # Benchmark cases  <a name="bench_cases"></a>
 
-## Laminar flow over a flat plate <a name="bench_flat_plate"> </a>
-
-### Pre-processing <a name="bench_flat_plate_pre"> </a>
-
-### Processing - running the case <a name="bench_flat_plate_run"> </a>
-
-### Post-processing - visualization of results and plotting profiles <a name="bench_flat_plate_post"> </a>
-
 ## Conjugate heat transfer <a name="bench_conjugate"> </a>
 
 To benchmark conjugate heat transfer, we chose the case introduced by [Basak et al.](https://www.sciencedirect.com/science/article/pii/S0009250913000468#s0010)
@@ -3841,11 +3838,7 @@ When you run _Generate_ in each of the sub-directories with:
 ./Generate < generate.scr
 ```
 it will create the ```.cfn```, ```.dim```, as well as a few files in ```.vtu```
-format which you can use to visualise the grids you just created.  Please
-observe that files with extension ```.1d``` are also created.  Since the channel
-flow is essentially a one-dimensional problem, _Generate_ creates this file
-with node coordinates in singe non-homogenous direction (_z_ in this case).
-The ```.1d``` file is used in user functions explained below.
+format which you can use to visualise the grids you just created.
 
 > **_Note:_** Although _Generate_ was quite useful in the early stages of
 development of T-Flows, and although it has some nice features like local grid
@@ -3883,15 +3876,20 @@ in [this](#demo_thermally_driven_variable) section.
 ```Uniform_Grid``` have the same user function.  Hence, the entire ```User_Mod```
 in ```Uniform_Grid``` is a mere link to its counterpart in ```Stretched_Grid```.
 
-The compiled user function (```User_Mod_Save_Results```) for these cases works
-in the following way:  it first reads the node coordinates from the ```.1d```
-file created during the grid generation, allocates memory for a number of
-variables to be defined in homogeneous planes, averages results over cells
-which are situated in between consecutive nodes in ```.1d``` file,
-non-dimensionalizes the results and writes them in a file with extension
-```.dat``` for further processing.  All these steps are clearly indicated in
-the source file ```[root]/Tests/Manual/Channel_Re_Tau_590/User_Mod/Save_Results.f90```
-and we believe they don't need further explanations.
+
+The compiled user function (```User_Mod_Save_Results```) works as follows:
+it uses the homogeneous-plane coordinates identified by _Generate_ (or
+_Convert_) and stored in ```Grid % x_coord_plane(:)```, ```Grid % y_coord_plane(:)```,
+and ```Grid % z_coord_plane(:)```.  Based on these planes, it allocates arrays for
+plane-averaged quantities and then, for each interval between two consecutive
+planes (cell rows), averages the solution variables over all cells whose
+centers lie within that interval.  The routine then non-dimensionalizes the
+averaged results (including the computation of friction velocity, and—when
+heat transfer is enabled—thermal scaling) and writes the final profiles to
+an ASCII results file with extension ```-res.dat``` for further post-processing.
+All steps are implemented in
+```[root]/Tests/Manual/Channel_Re_Tau_590/User_Mod/Save_Results.f90``` and are
+sufficiently documented in the source.
 
 #### Running the cases
 
@@ -4290,13 +4288,18 @@ Line 145 ensures that the file is written only from one processor, lines
 how to use T-Flows' standard way to open files and the rest is just plain
 Fortran which doesn't need furhter explanation.
 
-The remaining user function ```Save_Impinging_Jet_Profiles``` has a very
-similar structure to the ```Save_Impinging_Jet_Nu```, but a few differences.
-Instead of reading a file with radial coordinates, ```Save_Impinging_Jet_Profiles```
-reads a file with coordinates in _z_ direction, created during the grid
-conversion process (file ```jet.1d```).  Just like its sister, it declares local
-variables for averaging the results, performs global summs over all processor
-for parallel runs, and eventually saves data for post-processing.
+The remaining user function ```Save_Impinging_Jet_Profiles``` has a structure
+similar to ```Save_Impinging_Jet_Nu```, but it targets wall-normal profile
+extraction for comparison with experimental data.  It first computes the mean
+inlet velocity by integrating the axial velocity over the boundary region
+```PIPE_INLET``` (with global reductions for parallel runs). It then reads the
+wall-normal sampling coordinates from the ASCII file ```wall_normal_coordinate.dat```,
+allocates arrays for the sampled quantities, and performs spatial averaging
+over cells that fall within consecutive wall-normal intervals.
+The averaging is repeated for several radial bands (different ranges of
+_r_, reported as _r/D_, and for each band the routine performs global sums
+across all MPI ranks before writing the resulting non-dimensional profiles to
+time-stamped output files (one per _r/D_ location) for post-processing.
 
 There is one section in the ```Save_Impinging_Jet_Profiles``` which might
 deserve a bit of attention.  It is a section which calculates average inlet
@@ -4601,7 +4604,7 @@ prescribe the desired volume flow rate through the computational domain with:
 
 With this explained, you can launch a simulation with:
 ```
-mpirun -np 8 ./Process > out_01_developing_turbulence.
+mpirun -np 8 ./Process > out_01_developing_turbulence
 ```
 
 This simulation takes a long time.  It depends on the hardware you are using a
@@ -4643,6 +4646,42 @@ to perform Fourier analyzis of the signals, but we already know that we don't
 have enough samples for high quality spectra and we don't even bother at this
 initial stages of turbulence development.
 
+#### Second stage: gathering the statistics
+
+In the previous section, we conducted the simulation until 0.6 s of physical
+time and, based on the values at the monitoring points, concluded that the flow
+is turbulent, and that we can start to gather statistics.  To do that, you have
+to change a few things in the control file.
+
+First, you want to start from the last backup file.  In this case it
+is ```matrix-ts060000.backup```, and the line you shold add to the control
+file is:
+```
+  LOAD_BACKUP_NAME          matrix-ts060000.backup
+```
+
+This line instructs T-Flows to read the results stored at time step 60'000
+and continue the simulation.  However, to actually continue, you should also
+change the line which specifies the total number of time steps:
+```
+  NUMBER_OF_TIME_STEPS 120000
+```
+> **_Note:_** Reading the results at time step 60'000 and
+setting the ```NUMBER_OF_TIME_STEPS``` to 120'000, means that the simulation will
+span from time step 60'001 to 120'000.
+
+Finally, you have to instruct T-Flows to start gathering statistics, and specify
+from which time step, which is achieved with this entry in the ```control```
+file:
+```
+  STARTING_TIME_STEP_FOR_TURB_STATISTICS   60001
+```
+
+With these changes in place, you can launch a simulation with:
+```
+mpirun -np 8 ./Process > out_02_gathering_statistics
+```
+
 ### Comparing against experiments <a name="bench_cases_matrix_comparing"> </a>
 
 To compare results against measurements, we wrote a user function and placed
@@ -4650,8 +4689,8 @@ it in ```User_Mod_Beginning_Of_Simulation```.  Its source resides in
 ```[root]/Tests/Manual/Matrix/User_Mod```.  This function will, after _Process_
 starts and reads the backup file, extract profiles in locations specified by
 the user and exit.  Since the profiles are extracted in the vertical mid-plane
-of the computational domain, we decided to extract them at the nodes.  Since
-_Process_ is cell-centered, we decided to first interpolate results from cells
+of the computational domain, they are extracted at the nodes.  Since
+_Process_ is cell-centered, we first interpolate results from cells
 to nodes, and then extract data from the nodes.
 
 The function works in four stages.  In the first stage it checks command line
@@ -4875,7 +4914,7 @@ or run the simulation straight away with:
 ### Checking the initial condition <a name="bench_cases_buble_checking"> </a>
 
 Since VOF simulations inherently depend on initializing VOF function with user
-function, it is of utmost importance to check if we really specified what we
+function, it is of utmost importance to check if you really specified what you
 wanted.  For that, for checking initial condition, _Process_ creates results
 with ```-ts000000``` appended just before the extension (which is either ```.vtu```
 or ```.pvtu``` depending if you ran your simulation in sequential or parallel
@@ -4883,7 +4922,7 @@ mode.
 
 ![!](Documentation/Manual/Figures/bubble_initial.png "")
 
-While the _Process_ is running, and we are sure that initial condition was
+While the _Process_ is running, and you are sure that initial condition was
 properly set, we would like to turn your attenion to a few things in the
 ```control``` file which are characteristic for VOF simulation.
 
@@ -4926,7 +4965,7 @@ be the same for consistency of surface tension forces, which is set with:
 
 To make sure that in order for volume forces (buoyancy) surface tension forces
 to be properly balanced at cell faces during the Rhie and Chow interpolation,
-we also set Gu's and Choi's correction in the control file:
+you should also set Gu's and Choi's correction in the control file:
 ```
  GU_CORRECTION                          yes
  CHOI_CORRECTION                        yes
