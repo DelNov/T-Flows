@@ -5,7 +5,7 @@
   HEAT_TRANSFER   yes
 
   TIME_STEP                 0.05
-  NUMBER_OF_TIME_STEPS   3600
+  NUMBER_OF_TIME_STEPS   4800
 
 #------------------
 # Saving intervals
@@ -13,7 +13,7 @@
   RESULTS_SAVE_INTERVAL   300
   BACKUP_SAVE_INTERVAL    600
 
-# LOAD_BACKUP_NAME  jet-ts000120.backup
+#  LOAD_BACKUP_NAME  jet-ts003600.backup
 
 #-------------------
 # Monitoring points 
@@ -41,7 +41,8 @@
   HEAT_CAPACITY          1.0
 
   TURBULENCE_MODEL       k_eps_zeta_f
-# TURBULENCE_MODEL       k_eps
+#  TURBULENCE_MODEL       k_eps
+#  TURBULENCE_MODEL       k_omega_sst
 
 #----------------------
 # Numerical parameters
@@ -64,7 +65,6 @@
 #------------------------
 # Linear solver settings
 #------------------------
-  LINEAR_SOLVERS                     native
   PRECONDITIONER_FOR_SYSTEM_MATRIX   incomplete_cholesky
   TOLERANCE_FOR_MOMENTUM_SOLVER      1.e-5
   TOLERANCE_FOR_PRESSURE_SOLVER      1.e-5
@@ -79,38 +79,38 @@
 # Initial conditions
 #--------------------
   INITIAL_CONDITION
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES             -0.1   0.0   0.0   20.0   1.0e-3   1.0e-4   6.6e-4   1.0e-4
+    VARIABLES           u    v    w    t     kin     eps     zeta    f22    omg
+    VALUES             -0.1  0.0  0.0  20.0  1.0e-3  1.0e-4  6.6e-4  1.0e-4 1.0
 
 #---------------------
 # Boundary conditions
 #---------------------
   BOUNDARY_CONDITION    pipe_wall
     TYPE                wall
-    VARIABLES           u     v     w    q    kin   eps      zeta   f22
-    VALUES              0.0   0.0   0.0  0.0  0.0   1.0e-3   0.0    0.0
+    VARIABLES           u     v     w    q    kin   eps      zeta    f22
+    VALUES              0.0   0.0   0.0  0.0  0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    symmetry_plane
     TYPE                symmetry
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u     v     w    t     kin     eps     zeta    f22
+    VALUES              0.0   0.0   0.0  20.0  1.0E-2  1.0E-3  6.6E-2  1.0e-3
 
   BOUNDARY_CONDITION    top_plane
-    TYPE                inflow
-    VARIABLES           u     v     w      t      kin      eps      zeta     f22
-    VALUES              0.0   0.0  -0.01   20.0   1.0E-4   1.0E-5   6.6E-4   1.0e-4
+    TYPE                pressure
+    VARIABLES           u     v     w     t     kin      eps     zeta   f22
+    VALUES              0.0   0.0  -0.01  20.0  1.0E-4   1.0E-5  6.6E-4 1.0e-4
 
   BOUNDARY_CONDITION    lower_wall
     TYPE                wall
-    VARIABLES           u     v     w     q     kin   eps      zeta   f22
-    VALUES              0.0   0.0   0.0   0.1   0.0   1.0e-3   0.0    0.0
+    VARIABLES           u     v     w    q    kin   eps      zeta    f22
+    VALUES              0.0   0.0   0.0  0.1  0.0   1.0e-3   0.0   0.0
 
   BOUNDARY_CONDITION    pipe_inlet
     TYPE                inflow
-    VARIABLES           rz   u   v   w   t   kin   eps   zeta   f22
-    FILE                inlet_profile_zeta_re_23000.dat
+    VARIABLES           rz  w  t  kin  eps  zeta  f22  omg 
+    FILE                inlet_profile_imp_jet.dat       
 
   BOUNDARY_CONDITION    cyl_outlet
     TYPE                pressure
-    VARIABLES           u     v     w     t      kin      eps      zeta     f22
-    VALUES              0.0   0.0   0.0   20.0   1.0E-2   1.0E-3   6.6E-2   1.0e-3
+    VARIABLES           u    v    w    t     kin     eps     zeta    f22
+    VALUES              0.0  0.0  0.0  20.0  1.0E-2  1.0E-3  6.6E-2  1.0e-3
