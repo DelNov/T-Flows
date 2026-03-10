@@ -16,7 +16,6 @@
   character(SL)             :: coord_name, res_name, ext
   real,    allocatable      :: z_p(:), zm_p(:), u_p(:),  v_p(:), w_p(:), t_p(:)
   real,    allocatable      :: kin_p(:), eps_p(:), vis_p(:), zet_p(:), f22_p(:)
-  real,    allocatable      :: omg_p(:)
   integer, allocatable      :: n_count(:)
   real                      :: r, r1, r2, u_rad, u_tan, lnum, area_in, velo_in
   logical                   :: there
@@ -92,7 +91,6 @@
   allocate(eps_p(n_prob));  eps_p = 0.0
   allocate(vis_p(n_prob));  vis_p = 0.0
   allocate(zet_p(n_prob));  zet_p = 0.0
-  allocate(omg_p(n_prob));  omg_p = 0.0
   allocate(f22_p(n_prob));  f22_p = 0.0
   allocate(zm_p (n_prob));  zm_p  = 0.0
 
@@ -176,7 +174,7 @@
               eps_p(i) = eps_p(i) + eps % n(c)
             else if(Turb % model == K_OMEGA_SST) then
               kin_p(i) = kin_p(i) + kin % n(c)
-              omg_p(i) = omg_p(i) + omega % n(c)
+              eps_p(i) = eps_p(i) + omega % n(c)
             end if
 
             vis_p(i) = vis_p(i) + Turb % vis_t(c) / Flow % viscosity(c)
@@ -206,7 +204,6 @@
       call Global % Sum_Real(vis_p(i))
       call Global % Sum_Real(zet_p(i))
       call Global % Sum_Real(f22_p(i))
-      call Global % Sum_Real(omg_p(i))
       call Global % Sum_Real(t_p(i))
     end do
 
@@ -217,7 +214,6 @@
         v_p(i)   = v_p(i)   / n_count(i)
         kin_p(i) = kin_p(i) / n_count(i)
         eps_p(i) = eps_p(i) / n_count(i)
-        omg_p(i) = omg_p(i) / n_count(i)
         vis_p(i) = vis_p(i) / n_count(i)
         zet_p(i) = zet_p(i) / n_count(i)
         f22_p(i) = f22_p(i) / n_count(i)
@@ -238,7 +234,7 @@
                                 '  3:Urad,   '   //  &
                                 '  4:Uaxi,   '   //  &
                                 '  5:Kin,    '   //  &
-                                '  6:Eps,    '   //  &
+                                '  6:Eps/Omg,'   //  &
                                 '  7:Temp,   '   //  &
                                 '  8:Vis_t/l,'   //  &
                                 '  9:Zeta,   '   //  &
@@ -252,7 +248,6 @@
                                 w_p(i)   / VELO_IN,     &  !  4
                                 kin_p(i) / VELO_IN**2,  &  !  5
                                 eps_p(i),               &  !  6
-                                omg_p(i),               &  !  6
                                 t_p(i),                 &  !  7
                                 vis_p(i),               &  !  8
                                 zet_p(i),               &  !  9
@@ -268,7 +263,6 @@
     v_p(:)     = 0.0
     kin_p(:)   = 0.0
     eps_p(:)   = 0.0
-    omg_p(:)   = 0.0
     vis_p(:)   = 0.0
     zet_p(:)   = 0.0
     f22_p(:)   = 0.0
