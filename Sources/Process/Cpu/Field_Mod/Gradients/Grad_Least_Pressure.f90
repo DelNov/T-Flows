@@ -38,12 +38,7 @@
 
     ! Extrapolation to boundaries
     do reg = Boundary_Regions()
-      if(Grid % region % type(reg) .eq. PRESSURE) then
-        do s = Faces_In_Region(reg)
-          c2 = Grid % faces_c(2,s)
-          p % n(c2) = 0.0
-        end do  ! faces
-      else if(Grid % region % type(reg) .ne. AMBIENT) then
+      if(Grid % region % type(reg) .ne. AMBIENT) then
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
