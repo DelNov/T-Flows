@@ -240,7 +240,6 @@
   if(Turb % model .eq. SPALART_ALLMARAS .or.  &
      Turb % model .eq. DES_SPALART) then
 
-    ! K and epsilon
     call Backup % Load_Variable(d, vc, 'vis', Flow, Turb % vis)
 
     ! Other turbulent quantities
