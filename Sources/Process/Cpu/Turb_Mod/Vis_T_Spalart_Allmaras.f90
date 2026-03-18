@@ -27,14 +27,13 @@
   !-------------------------!
   !   Turbulent viscosity   !
   !-------------------------+
-  if(Turb % model .eq. SPALART_ALLMARAS .or. &
-     Turb % model .eq. DES_SPALART) then
-    do c = Cells_In_Domain_And_Buffers()
-      x_rat    = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
-      f_v1     = x_rat**3/(x_rat**3 + Turb % c_v1**3)
-      Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
-    end do
-  end if
+  do c = Cells_In_Domain_And_Buffers()
+    x_rat    = vis % n(c) / (Flow % viscosity(c)/Flow % density(c))
+    f_v1     = x_rat**3/(x_rat**3 + Turb % c_v1**3)
+    Turb % vis_t(c) = Flow % density(c) * f_v1 * vis % n(c)
+    if(Time % Curr_Dt() < 4800)  &
+    Turb % vis_t(c) = min(Turb % vis_t(c),2.0*Flow % viscosity(c))
+  end do
 
   !-------------------!
   !   Wall function   !
