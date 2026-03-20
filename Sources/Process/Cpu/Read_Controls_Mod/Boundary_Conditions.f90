@@ -328,14 +328,14 @@
             end if
           end if
 
-          if(Turb % model .eq. K_OMEGA_SST) then                                 
-            i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = vals(i)      
-            i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = vals(i)      
-            Turb % y_plus(c) = 1.1                                               
-            if(Flow % heat_transfer) then                                        
-              i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)       
-            end if                                                               
-          end if      
+          if(Turb % model .eq. K_OMEGA_SST) then
+            i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = vals(i)
+            i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = vals(i)
+            Turb % y_plus(c) = 1.1
+            if(Flow % heat_transfer) then
+              i = Key_Ind('T2',  keys, nks); if(i > 0) t2 % b(c) = vals(i)
+            end if
+          end if
 
           if(Turb % model .eq. SPALART_ALLMARAS .or.  &
              Turb % model .eq. DES_SPALART) then
@@ -497,13 +497,13 @@
               end if
             end if
 
-            if(Turb % model .eq. K_OMEGA_SST) then                               
-              i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = prof(k,i)  
-              i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = prof(k,i)  
-              if(Flow % heat_transfer) then                                      
-                i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)    
-              end if                                                             
-            end if    
+            if(Turb % model .eq. K_OMEGA_SST) then
+              i = Key_Ind('KIN', keys, nks); if(i > 0) kin   % b(c) = prof(k,i)
+              i = Key_Ind('OMG', keys, nks); if(i > 0) omega % b(c) = prof(k,i)
+              if(Flow % heat_transfer) then
+                i = Key_Ind('T2',  keys, nks); if(i>0) t2  % b(c) = prof(k,i)
+              end if
+            end if
 
             if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                Turb % model .eq. DES_SPALART) then
@@ -747,20 +747,20 @@
 
                 end if
 
-                ! For turbulence models                                          
-                if(Turb % model .eq. K_OMEGA_SST) then                           
-                                                                                  
-                  i = Key_Ind('KIN',keys,nks)                                    
-                  if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)      
-                                                                                 
-                  i = Key_Ind('OMG',keys,nks)                                    
-                  if(i > 0) omega % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)    
-                                                                                  
-                  if(Flow % heat_transfer) then                                  
-                    i = Key_Ind('T2',keys,nks)                                   
-                    if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)     
-                  end if                                                         
-                end if            
+                ! For turbulence models
+                if(Turb % model .eq. K_OMEGA_SST) then
+
+                  i = Key_Ind('KIN',keys,nks)
+                  if(i > 0) kin % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+
+                  i = Key_Ind('OMG',keys,nks)
+                  if(i > 0) omega % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+
+                  if(Flow % heat_transfer) then
+                    i = Key_Ind('T2',keys,nks)
+                    if(i > 0) t2 % b(c) = wi*prof(m,i) + (1.-wi)*prof(m+1,i)
+                  end if
+                end if
 
                 if(Turb % model .eq. SPALART_ALLMARAS .or.  &
                    Turb % model .eq. DES_SPALART) then
@@ -860,13 +860,13 @@
         end if
       end if
 
-      if(Turb % model .eq. K_OMEGA_SST) then                                     
-        kin % n(c)   = kin % b(c)                                                
-        omega % n(c) = omega % b(c)                                              
-        if(Flow % heat_transfer) then                                            
-          t2 % n(c) = t2 % b(c)                                                  
-        end if                                                                   
-      end if     
+      if(Turb % model .eq. K_OMEGA_SST) then
+        kin % n(c)   = kin % b(c)
+        omega % n(c) = omega % b(c)
+        if(Flow % heat_transfer) then
+          t2 % n(c) = t2 % b(c)
+        end if
+      end if
 
       if(Turb % model .eq. SPALART_ALLMARAS .or.  &
          Turb % model .eq. DES_SPALART) then

@@ -80,7 +80,7 @@
                                    Grid % xc(c),    &
                                    Grid % yc(c),    &
                                    Grid % zc(c))
-      ! Current distance is smaller than the stored one 
+      ! Current distance is smaller than the stored one
       if(curr_dist < min_dist(m)) then
         Monitor % cell(m) = c
         min_dist(m)     = curr_dist

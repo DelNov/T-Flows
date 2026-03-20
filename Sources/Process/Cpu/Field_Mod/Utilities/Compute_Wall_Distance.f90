@@ -30,7 +30,7 @@
   call Sol % Alias_Native   (A, b)
 
   ! If wall distance was calculated, get out of here
-  if(Grid % wall_dist(1) > 0.0) then 
+  if(Grid % wall_dist(1) > 0.0) then
     call Profiler % Stop('Compute_Wall_Distance')
     return
   end if

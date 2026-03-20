@@ -127,12 +127,12 @@
     if(c2 > 0) then
 
       ! Where is matrix(c1,c2) and ...
-      do c = A % row(c1), A % row(c1+1)-1 
+      do c = A % row(c1), A % row(c1+1) - 1
         if(A % col(c) .eq. c2) A % pos(1, s) = c
       end do
 
       ! ... where is matrix(c2,c1)
-      do c=A % row(c2),A % row(c2+1)-1 
+      do c=A % row(c2),A % row(c2+1) - 1
         if(A % col(c) .eq. c1) A % pos(2, s) = c
       end do
     end if

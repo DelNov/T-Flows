@@ -26,7 +26,7 @@
                          MPI_INFO_NULL,  &
                          error)
 
-  ! Read integer value 
+  ! Read integer value
   call Mpi_File_Read(fh,                 &
                      num,                &
                      1,                  &

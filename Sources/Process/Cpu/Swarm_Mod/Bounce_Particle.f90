@@ -182,7 +182,7 @@
       !---------------------------------!
       !   The boundary cell is a wall   !
       !---------------------------------!
-      if(Grid % Bnd_Cond_Type(c2) == WALL .or.  & 
+      if(Grid % Bnd_Cond_Type(c2) == WALL .or.  &
          Grid % Bnd_Cond_Type(c2) == WALLFL) then
 
         ! Velocity normal to the wall and velocity magnitude

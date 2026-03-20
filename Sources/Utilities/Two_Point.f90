@@ -64,7 +64,7 @@
   ! Accumulate over time steps
   do n = 1, N_TIME_STEPS
 
-    ! For all points 
+    ! For all points
     do k = 1, N_POINTS
       r (k) = r (k) + phi(n,1) * phi(n,k)  ! variable
       s1(k) = s1(k) + phi(n,1)**2          ! first sum

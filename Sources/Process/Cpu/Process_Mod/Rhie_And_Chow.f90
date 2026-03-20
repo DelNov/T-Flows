@@ -191,7 +191,7 @@
     ! Face is inside the domain
     if(c2 > 0) then
 
-      ! Interpolate velocity 
+      ! Interpolate velocity
       u_f(s) = fs * u_c(c1) + (1.0 - fs) * u_c(c2)
       v_f(s) = fs * v_c(c1) + (1.0 - fs) * v_c(c2)
       w_f(s) = fs * w_c(c1) + (1.0 - fs) * w_c(c2)
