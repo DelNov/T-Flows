@@ -42,6 +42,7 @@
   integer, allocatable :: send_sort(:), recv_sort(:)
   integer, allocatable :: glo(:)  ! used for checking the communication
   logical, allocatable :: node_in_buffer(:)
+  logical              :: fast_algorithm
 !==============================================================================!
 
   if(Sequential_Run()) return
@@ -56,36 +57,73 @@
   allocate(send_cells(-Grid % n_bnd_cells:Grid % n_cells))
   allocate(recv_cells(-Grid % n_bnd_cells:Grid % n_cells))
 
+  ! First see if the fast algorithm would work across periodic boundaries
+  fast_algorithm = .true.
+  do s = Faces_In_Domain_And_At_Buffers()
+    c1 = Grid % faces_c(1, s)
+    c2 = Grid % faces_c(2, s)
+    if( (  Grid % sx(s) * (Grid % xc(c2) - Grid % xc(c1))  &
+         + Grid % sy(s) * (Grid % yc(c2) - Grid % yc(c1))  &
+         + Grid % sz(s) * (Grid % zc(c2) - Grid % zc(c1)) ) .lt. 0.0) then
+      if(Grid % Comm % cell_proc(c1) .ne. Grid % Comm % cell_proc(c2)) then
+        fast_algorithm = .false.
+      end if
+    end if
+  end do
+
   ! Find which cells are near buffers, it speeds up the procedure quite a bit
-  allocate(node_in_buffer(Grid % n_nodes));  node_in_buffer(:) = .false.
-  do c = Cells_In_Buffers()
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      node_in_buffer(n) = .true.
+  if(fast_algorithm) then
+    O_Print '(a)', " # ... using faster algorithm ..."
+
+    allocate(node_in_buffer(Grid % n_nodes));  node_in_buffer(:) = .false.
+    do c = Cells_In_Buffers()
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        node_in_buffer(n) = .true.
+      end do
     end do
-  end do
-  n_cells_near_buffers = 0
-  do c = Cells_In_Domain()
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      if(node_in_buffer(n)) then
-        n_cells_near_buffers = n_cells_near_buffers + 1
-        exit
-      end if
+
+    n_cells_near_buffers = 0
+
+    do c = Cells_In_Domain()
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        if(node_in_buffer(n)) then
+          n_cells_near_buffers = n_cells_near_buffers + 1
+          exit
+        end if
+      end do
     end do
-  end do
-  allocate(cells_near_buffers(n_cells_near_buffers))
-  n_cells_near_buffers = 0
-  do c = Cells_In_Domain()
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      if(node_in_buffer(n)) then
-        n_cells_near_buffers = n_cells_near_buffers + 1
-        cells_near_buffers(n_cells_near_buffers) = c
-        exit
-      end if
+
+    allocate(cells_near_buffers(n_cells_near_buffers))
+
+    n_cells_near_buffers = 0
+
+    do c = Cells_In_Domain()
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        if(node_in_buffer(n)) then
+          n_cells_near_buffers = n_cells_near_buffers + 1
+          cells_near_buffers(n_cells_near_buffers) = c
+          exit
+        end if
+      end do
     end do
-  end do
+
+  ! Fast algorithm would fail, use all cells
+  else
+    O_Print '(a)', " # ... using slower algorithm ..."
+    n_cells_near_buffers = 0.
+    do c = Cells_In_Domain()
+      n_cells_near_buffers = n_cells_near_buffers + 1
+    end do
+    allocate(cells_near_buffers(n_cells_near_buffers))
+    n_cells_near_buffers = 0
+    do c = Cells_In_Domain()
+      n_cells_near_buffers = n_cells_near_buffers + 1
+      cells_near_buffers(n_cells_near_buffers) = c
+    end do
+  end if
 
   !-------------------------------!
   !   Count buffer cells inside   !

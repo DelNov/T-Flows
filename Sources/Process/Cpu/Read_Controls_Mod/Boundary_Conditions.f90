@@ -562,6 +562,7 @@
                         rz >= xp .and. rz <= x) ) then
                 wi = (xp - rz) / (xp - x)
                 here = .true.
+
               ! Wall distance too
               else if( (keys(1) .eq. 'WD'           .and.  &
                    Grid % wall_dist(c) >= min(x,xp) .and.  &
