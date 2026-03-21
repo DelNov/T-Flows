@@ -31,7 +31,7 @@
   allocate(Surf % Vert(Grid % n_cells))
   allocate(Surf % side(Grid % n_cells * 3))
 
-  ! Allocate logical array if cell holds vertices 
+  ! Allocate logical array if cell holds vertices
   ! (not sure if this will be needed)
   allocate(Surf % cell_has_vertex(Surf % pnt_grid % n_cells))
   Surf % cell_has_vertex(:) = .false.

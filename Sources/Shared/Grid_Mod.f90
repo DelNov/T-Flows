@@ -135,7 +135,7 @@
     integer, allocatable :: faces_c(:,:)  !! faces' cells (the two around it)
     integer, allocatable :: faces_s(:)    !! faces' shadows (periodic pairs)
 
-    ! Face surface areas (si), total surface (s) 
+    ! Face surface areas (si), total surface (s)
     ! and distances between cells (di)
     real, allocatable :: sx(:), sy(:), sz(:), s(:)
     real, allocatable :: dx(:), dy(:), dz(:), d(:)

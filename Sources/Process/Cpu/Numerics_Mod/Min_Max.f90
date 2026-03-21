@@ -1,7 +1,7 @@
 !==============================================================================!
   subroutine Numerics_Mod_Min_Max(phi, phi_min, phi_max)
 !------------------------------------------------------------------------------!
-!>  The Numerics_Mod_Min_Max subroutine in the Numerics_Mod module computes 
+!>  The Numerics_Mod_Min_Max subroutine in the Numerics_Mod module computes
 !>  the minimum and maximum values of a transported variable among neighbours
 !>  of each computational cell.  These bounded values are subsequently used
 !>  in Numerics_Mod_Advection_Scheme.

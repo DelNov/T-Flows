@@ -150,7 +150,7 @@ syn match fortranOperator	"\.\s*\(and\|or\|not\)\s*\."
 syn match fortranOperator	"\(+\|-\|/\|\*\)"
 syn match fortranTypeOb		"\<character\s*\*"
 
-syn match fortranBoolean	"\.\s*\(true\|false\)\s*\."
+syn match fortranBoolean	"\.\s*\(true\|false\|not\)\s*\."
 
 syn keyword fortranReadWrite	backspace close endfile inquire open print read rewind write
 

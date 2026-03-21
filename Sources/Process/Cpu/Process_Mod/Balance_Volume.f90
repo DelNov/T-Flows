@@ -212,6 +212,7 @@
     end do      ! region
 
     ! Don't forget to sum it up over all processors
+    call Global % Sum_Real(bulk % vol_out)
 
     !------------------------------------------------------------------!
     !   If all PRESSURE faces were inflow, no outflow was corrected.    !

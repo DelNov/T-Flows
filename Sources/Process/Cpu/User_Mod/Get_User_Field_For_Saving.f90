@@ -8,7 +8,7 @@
 !                                                                              !
 !   Note: Be aware that this function is called from CPU only, at the moment   !
 !         when results are downloaded to host (CPU).  Thus, make sure that     !
-!         you send the CPU copy of the variable.                    
+!         you send the CPU copy of the variable.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

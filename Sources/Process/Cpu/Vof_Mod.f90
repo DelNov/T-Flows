@@ -94,7 +94,7 @@
     ! phase(0) and phase(1) are supporsed to be vapor and liquid phases, respectively.
     ! c_lee(1): phase(0) -> phase(1)
     ! c_lee(2): phase(1) -> phase(0)
-    real    :: c_lee(2)       ! [1/s] 
+    real    :: c_lee(2)       ! [1/s]
 
     contains
 

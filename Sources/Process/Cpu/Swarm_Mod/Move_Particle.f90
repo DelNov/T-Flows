@@ -41,7 +41,7 @@
   real                         :: up, vp, wp        ! velocity at particle
   real                         :: flow_vel          ! Flow vel. magnitude
   real                         :: k1, k2, k3, k4    ! Runge-Kutta increments
-  real                         :: part_vel          ! relative velocity 
+  real                         :: part_vel          ! relative velocity
   real                         :: gravity           ! gravity magnitude
   real                         :: visc_fluid        ! characteristic viscosity
   real                         :: dens_fluid        ! characteristic density
@@ -129,9 +129,9 @@
 !    !   ad-hoc (No interpolation) "safer side"
 !    if(Turb % y_plus(c) > 35.0) then
 !      w_mod = Swarm % v2_mod(c) * fd_p
-!    else 
+!    else
 !      w_mod = Swarm % v2_mod(c)
-!    end if 
+!    end if
 
     if(Swarm % subgrid_scale_model .eq. DISCRETE_RANDOM_WALK) then
 
@@ -160,7 +160,7 @@
       vp = vp + Part % v_drw
       wp = wp + Part % v_drw
 
-    else ! normal ER-HRL with ad-hoc SGS modeling 
+    else ! normal ER-HRL with ad-hoc SGS modeling
       ! Compute wall-normal vel. at particle position from velocity gradients
       ! should create a switch for this case (SGS model is k-eps-zeta-f model
       ! itself)
@@ -180,7 +180,7 @@
   ! Particle relaxation time
   Part % tau = Part % density * (Part % d **2) / 18.0 / visc_fluid
 
-  ! Particle terminal speed 
+  ! Particle terminal speed
   gravity = sqrt(Flow % grav_x**2 + Flow % grav_y**2 + Flow % grav_z**2)
   Part % vel_t = Part % tau * gravity
 
