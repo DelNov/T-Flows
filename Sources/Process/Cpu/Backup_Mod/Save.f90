@@ -208,10 +208,11 @@
     call Backup % Save_Cell_Real(Grid, d, vc,'t_scale', Turb % t_scale)
   end if
 
-  !-----------------!
-  !   S-A model     !
-  !-----------------!
-  if(Turb % model .eq. SPALART_ALLMARAS) then
+  !--------------------------!
+  !   S-A and DES models     !
+  !--------------------------!
+  if(Turb % model .eq. SPALART_ALLMARAS .or.   &
+     Turb % model .eq. DES_SPALART) then
 
     ! K and epsilon
     call Backup % Save_Variable(d, vc, 'vis', Turb % vis)
