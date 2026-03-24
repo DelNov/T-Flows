@@ -13,9 +13,6 @@
   type(Var_Type),   pointer :: vis
   integer                   :: c
   real                      :: x_rat, f_v1
-!------------------------------[Local parameters]------------------------------!
-  real, parameter           :: A_POW = 8.3
-  real, parameter           :: B_POW = 1.0/7.0
 !==============================================================================!
 
   ! Take aliases

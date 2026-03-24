@@ -7,6 +7,9 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Turb_Type),  target :: Turb
   type(Solver_Type), target :: Sol
+!------------------------------[Local parameters]------------------------------!
+  real, parameter :: DIST_MIN = PICO
+  real, parameter :: SS_MIN   = PICO
 !-----------------------------------[Locals]-----------------------------------!
   type(Field_Type),  pointer :: Flow
   type(Grid_Type),   pointer :: Grid
@@ -16,9 +19,7 @@
   integer                    :: c
   real                       :: x_rat, f_v1, f_v2, f_w, ss, f_t2
   real                       :: dist_v, prod_v, r, gg, dif, dist, chi
-  real, parameter :: dist_min = 1.0e-12
-  real, parameter :: ss_min   = 1.0e-12
-  real :: dist_eff, ss_eff
+  real                       :: dist_eff, ss_eff
 !==============================================================================!
 
   ! Take aliases
@@ -38,7 +39,7 @@
     !------------------------------------------------------!
     ! This limit is important for stability of the model
     !------------------------------------------------------!
-    dist_eff = max(dist, dist_min)
+    dist_eff = max(dist, DIST_MIN)
 
     !---------------------------------!
     !   Compute the production term   !
@@ -52,9 +53,9 @@
     f_t2  = Turb % c_t3 * exp( -Turb % c_t4 * chi*chi )
 
     ss = Flow % vort(c) + vis % n(c) * f_v2 / (Turb % kappa**2 * dist_eff**2)
-    ss_eff = max(ss, ss_min)
+    ss_eff = max(ss, SS_MIN)
 
-    prod_v = Turb % c_b1 * (1.0 - f_t2) * Flow % density(c) * ss_eff * vis % n(c)
+    prod_v = Turb % c_b1 * (1.0-f_t2) * Flow % density(c) * ss_eff * vis % n(c)
 
     b(c)   = b(c) + prod_v * Grid % vol(c)
 
