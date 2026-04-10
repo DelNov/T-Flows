@@ -190,7 +190,7 @@
     real :: afm_eta, afm_psi, c_theta
 
     ! For scale-resolving models
-    real :: c_smag, c_wale
+    real :: c_smag, c_wale, c_hyb
 
     contains
       procedure :: Init_Turb
