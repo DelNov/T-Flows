@@ -87,7 +87,13 @@
 
   end if
 
-  if(Flow % heat_transfer .and. Turb % model .ne. NO_TURBULENCE_MODEL) then
+  if(Flow % heat_transfer .and.                   &
+    (Turb % model .eq. K_EPS            .or.      &
+     Turb % model .eq. K_EPS_ZETA_F     .or.      &
+     Turb % model .eq. HYBRID_LES_RANS  .or.      &
+     Turb % model .eq. SPALART_ALLMARAS .or.      &
+     Turb % model .eq. DES_SPALART      .or.      &
+     Turb % model .eq. K_OMEGA_SST)) then
 
     call Turb % Calculate_Stress   ()
     call Turb % Calculate_Heat_Flux()
