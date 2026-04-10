@@ -23,6 +23,7 @@
   Turb % alpha   =  0.012
   Turb % c_f1    =  1.4
   Turb % c_f2    =  0.3
+  Turb % c_hyb   =  1.2
 
   ! Transport properties
   Turb % kin  % sigma = 1.0
