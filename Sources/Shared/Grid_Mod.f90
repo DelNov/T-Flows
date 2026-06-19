@@ -123,6 +123,9 @@
     ! (Introduced with Insert_Buildings in Convert)
     integer, allocatable :: por(:)  !! porous region to which each cell belongs
 
+    ! For each cell: is it concave?
+    logical, allocatable :: concave(:)  !! is cell concave?
+
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!

@@ -31,6 +31,7 @@
       procedure :: Int_By_Index
       procedure :: Int_Carry_Int
       procedure :: Int_Carry_Real
+      procedure :: Log_By_Index
       procedure :: Real_Array
       procedure :: Real_By_Index
       procedure :: Real_Carry_Int
@@ -64,6 +65,7 @@
   contains
 
 #   include "Sort_Mod/Int_By_Index.f90"
+#   include "Sort_Mod/Log_By_Index.f90"
 #   include "Sort_Mod/Real_By_Index.f90"
 #   include "Sort_Mod/Reverse_Order_Int.f90"
 #   include "Sort_Mod/Reverse_Order_Real.f90"

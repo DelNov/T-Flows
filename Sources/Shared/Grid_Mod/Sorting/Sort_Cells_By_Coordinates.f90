@@ -163,6 +163,7 @@
   call Sort % Real_By_Index(nc, Grid % iyz      (1), Grid % new_c(1))
   call Sort % Real_By_Index(nc, Grid % wall_dist(1), Grid % new_c(1))
   call Sort % Int_By_Index (nc, Grid % por      (1), Grid % new_c(1))
+  call Sort % Log_By_Index (nc, Grid % concave  (1), Grid % new_c(1))
 
   !--------------------------------------------!
   !   Find out distance between cell indices   !
