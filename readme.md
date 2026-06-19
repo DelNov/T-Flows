@@ -76,7 +76,7 @@
     4. [Large eddy simulation over a matrix of cubes](#bench_cases_matrix)
         1. [Preparing the grid](#bench_cases_matrix_prep)
         2. [Running the case](#bench_cases_matrix_running)
-        4. [Comparing against experiments](#bench_cases_matrix_comparing)
+        3. [Comparing against experiments](#bench_cases_matrix_comparing)
     5. [Volume of fluid simulation of a rising bubble](#bench_cases_bubble)
         1. [Initialization of VOF function](#bench_cases_buble_init)
         2. [Compiling](#bench_cases_buble_compiling)
@@ -2331,7 +2331,7 @@ it is a good practice to define this point.
 #### Saving and/or exiting prematurely.
 
 For this case, we set the desired number of time steps to 6000, and we set
-saving interval to each 1200 time steps.  Tt is a big grid, and you probably
+saving interval to each 1200 time steps.  It is a big grid, and you probably
 don't want to overfill the disk.  Now imagine that you are curious to see the
 results before time step reaches the prescribed interval.  (That is, in
 essence, not a bad idea, as you can use to make sure results are not marred

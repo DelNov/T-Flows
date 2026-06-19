@@ -36,9 +36,9 @@
       dist = min(Grid % wall_dist(c), Turb % C_des * Turb % h_max(c))
     end if
 
-    !------------------------------------------------------!
-    ! This limit is important for stability of the model
-    !------------------------------------------------------!
+    !--------------------------------------------------------!
+    !   This limit is important for stability of the model   !
+    !--------------------------------------------------------!
     dist_eff = max(dist, DIST_MIN)
 
     !---------------------------------!

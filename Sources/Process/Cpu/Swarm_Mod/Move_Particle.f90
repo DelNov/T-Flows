@@ -160,7 +160,7 @@
       vp = vp + Part % v_drw
       wp = wp + Part % v_drw
 
-    else ! normal ER-HRL with ad-hoc SGS modeling
+    else  ! normal ER-HRL with ad-hoc SGS modeling
       ! Compute wall-normal vel. at particle position from velocity gradients
       ! should create a switch for this case (SGS model is k-eps-zeta-f model
       ! itself)

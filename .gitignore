@@ -46,6 +46,3 @@ Tests/**/*tex
 Tests/**/*tmp
 Tests/**/control_template_*
 __pycache__
-# Runtime postprocessing output (do NOT commit)
-*-ts*.dat
-out_*.dat
