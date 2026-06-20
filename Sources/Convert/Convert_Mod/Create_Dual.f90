@@ -13,31 +13,6 @@
 !   * To make the dual grid suitable near boundaries and sharp geometric       !
 !     features, additional dual nodes are introduced for boundary closure,     !
 !     sharp edges, and sharp corners.                                          !
-!                                                                              !
-!   Functionality                                                              !
-!                                                                              !
-!   * Initial setup: Sets up the problem name for the dual grid and marks it   !
-!     as polyhedral.                                                           !
-!   * Edge processing: Looks for edges in the primal grid and stores their     !
-!     information.                                                             !
-!   * Edge sorting and compression: sorts all primal edges by their node       !
-!     numbers and compresses them to eliminate duplicates.                     !
-!   * Allocate mappings and arrays: Allocates memory for various arrays and    !
-!     mappings, such as those relating edges to nodes and cells to nodes.      !
-!   * Boundary conditions processing: Processes boundary conditions, including !
-!     updating the number of boundary cells and faces in the dual grid.        !
-!   * Inside mapping: Maps nodes of the primal grid to cells of the dual grid, !
-!     edges of the primal to faces of the dual, and cells of the primal to     !
-!     nodes of the dual.                                                       !
-!   * Memory allocation for dual grid: Allocates memory for the dual grid      !
-!     based on the calculated sizes of various components.                     !
-!   * Handling sharp edges and corners: Processes sharp edges and corners in   !
-!     the primal grid and reflects these in the dual grid structure.           !
-!   * Face and cell assembly in dual grid: Assembles faces and cells in the    !
-!     dual grid based on the primal-to-dual mappings.                          !
-!   * Final Adjustments: Makes final adjustments to the structure of the dual  !
-!     grid, ensuring that it accurately represents the topology of the primal  !
-!     grid.                                                                    !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -51,7 +26,6 @@
   integer              :: i, i_nod, j_nod, i_edg, i_nor, nn
   integer              :: n_bc, d_nn  ! number of BCs and Dual grid node number
   integer              :: s_p, s_d, b_d, c_p, c_d, cnt
-  integer              :: cnt_ins, cnt_bnd
   integer, allocatable :: full_edge_n (:,:)  ! edges, nodes
   integer, allocatable :: full_edge_fb(:)    ! edges' faces at boundary
   integer, allocatable :: full_edge_bc(:)    ! edges' faces boundary regions
@@ -68,11 +42,11 @@
   integer, allocatable :: prim_sharp_edge_flag(:)
   integer, allocatable :: sharp_inject(:)     ! sharp corner injected in Dual
   integer, allocatable :: concave_link(:,:)
+  integer, allocatable :: concave_link_cnt(:)
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
   integer              :: curr_s_d, curr_b_d, unused, dual_f_here
   logical              :: issue_warning, found
-  real                 :: xc_ins, yc_ins, zc_ins, xc_bnd, yc_bnd, zc_bnd
   real                 :: nx, ny, nz, delta
   real,    allocatable :: prim_node_dx(:,:)
   real,    allocatable :: prim_node_dy(:,:)
@@ -306,18 +280,25 @@
 
   ! ... and allocate memory for the Dual grid
   call Convert % Allocate_Memory(Dual)
-  allocate(concave_link(2, Dual % n_nodes));  concave_link(:,:) = 0
-  allocate(sharp_inject(   Dual % n_faces));  sharp_inject(:)   = 0
+  allocate(concave_link(6,  Dual % n_nodes));  concave_link(:,:)   = 0
+  allocate(concave_link_cnt(Dual % n_nodes));  concave_link_cnt(:) = 0
+  allocate(sharp_inject(    Dual % n_faces));  sharp_inject(:)     = 0
 
   ! Find sharp corners (nodes) in the Prim grid
   print *, '# Number of sharp corners = ',  &
             Convert % N_Sharp_Corners(Prim, prim_sharp_node_rank)
 
-  !-----------------------------------------!
-  !                                         !
-  !   Browse through all the edges to map   !
-  !                                         !
-  !-----------------------------------------!
+  !----------------------------------------------!
+  !                                              !
+  !   Form internal Dual faces from Prim edges   !
+  !                                              !
+  !- - - - - - - - - - - - - - - - - - - - - - - +-------!
+  !   * Each Prim edge becomes one internal Dual face.   !
+  !   * The two end nodes of the Prim edge become the    !
+  !     two neighbouring Dual cells of that face.        !
+  !   * The Prim cells surrounding the edge become       !
+  !     the nodes of the Dual face.                      !
+  !------------------------------------------------------!
   d_nn = Prim % n_cells + Prim % n_bnd_cells  ! cells(Prim) =--> nodes(Dual)
 
   do e_p = 1, Prim % n_edges
@@ -394,9 +375,11 @@
       Dual % yn(d_nn) = (Prim % yn(n1_p) + Prim % yn(n2_p)) * 0.5
       Dual % zn(d_nn) = (Prim % zn(n1_p) + Prim % zn(n2_p)) * 0.5
 
-      ! Mark node in the concave corner.  It seems impossible
-      ! sort out the direction of nodes for a concave face
-      ! Retreive boundary face information again
+      ! For a concave sharp edge, the extra Dual node inserted at the
+      ! edge midpoint can make the node ordering of the corresponding
+      ! Dual face ambiguous.  Store the two boundary-side Dual nodes
+      ! linked to this extra node; Sort_Face_Nodes uses this as a
+      ! local sorting hint.
       if(prim_sharp_edge_flag(e_p) .eq. -1) then
         ! print *, ' # Sharp edge:', e_p
         do i_edg = sorted_edge_f(e_p), sorted_edge_l(e_p)
@@ -428,21 +411,20 @@
   deallocate(full_edge_fb)
 
   !---------------------------------------!
-  !                                       !
   !   Sort the points on internal faces   !
-  !                                       !
   !---------------------------------------!
   do s_d = 1, Prim % n_edges  ! edges(Prim) =--> faces(Dual)
-    call Convert % Sort_Face_Nodes(Dual, s_d, concave_link)
+    call Convert % Sort_Face_Nodes(Dual, s_d, concave_link, concave_link_cnt)
   end do
-  concave_link(:,:) = 0  ! reset concave links since they ...
-                         ! ... will now be used for inside faces
+  concave_link(:,:)   = 0  ! reset concave links since they ...
+                           ! ... will now be used for inside faces
+  concave_link_cnt(:) = 0
 
-  !----------------------------------!
-  !                                  !
-  !   Boundary mapping               !
-  !                                  !
-  !----------------------------------!
+  !-------------------------------------------------------------------!
+  !                                                                   !
+  !   Form boundary Dual faces from boundary cells of the Prim grid   !
+  !                                                                   !
+  !-------------------------------------------------------------------!
 
   ! Update current number of Dual faces -> equal to the number of faces inside
   curr_s_d = Prim % n_edges
@@ -455,11 +437,13 @@
   allocate(prim_bnd_cell_flag_in_reg(-Prim % n_bnd_cells:Prim % n_cells))
   prim_bnd_cell_flag_in_reg(:) = 0
 
+  issue_warning = .false.
+
   do bc = 1, Prim % n_bnd_regions
 
-    !-----------------------------------------------------!
-    !   Call this to mark boundary cells in this region   !
-    !-----------------------------------------------------!
+    !---------------------------------------------------------------!
+    !   Call this to mark boundary nodes and cells in this region   !
+    !---------------------------------------------------------------!
     dual_f_here = Convert % N_Nodes_In_Region    (Prim, bc,  &
                                                   prim_node_rank_in_reg)
     unused      = Convert % N_Bnd_Cells_In_Region(Prim, bc,  &
@@ -469,7 +453,7 @@
     !   Find Dual's boundary face, and Dual   !
     !   boundary cell nodes from Prim cells   !
     !-----------------------------------------!
-    do c_p = -Prim % n_bnd_cells, -1
+    do c_p = -Prim % n_bnd_cells, -1  ! boundary cells of the Prim grid
       if(prim_bnd_cell_flag_in_reg(c_p) .ne. 0) then
 
         ! Take the Prim cell's nodes (these are from Prim)
@@ -482,7 +466,8 @@
           Dual % faces_n(Dual % faces_n_nodes(s_d), s_d) = cell_to_node(c_p)
 
           ! Additional boundary cell in the Dual grid
-          b_d  = curr_b_d - prim_node_rank_in_reg(n_p)
+          b_d  = curr_b_d - prim_node_rank_in_reg(n_p)  ! boundary cells have
+                                                        ! negative indices
           Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
           call Enlarge % Matrix_Int(Dual % cells_n,  &
                                     i=(/1,Dual % cells_n_nodes(b_d)/))
@@ -502,13 +487,14 @@
       end if
     end do
 
-    ! Update current number of Dual faces
+    ! Update current number of Dual faces and dual boundary cells
     curr_s_d = curr_s_d + dual_f_here
     curr_b_d = curr_b_d - dual_f_here
 
     !---------------------------------------------------------!
     !   Add additional nodes to Dual's face from Prim edges   !
-    !   Here we work on the faces already introduced above    !
+    !      (Note that here we work on the faces already       !
+    !       introduced above, just adding more nodes)         !
     !---------------------------------------------------------!
     unused = Convert % N_Edges_In_Region(Prim, bc, prim_edge_flag_in_reg)
 
@@ -539,9 +525,9 @@
 
     !------------------------------------------------------------!
     !   Add additional nodes to Dual's face from sharp corners   !
-    !    Here we work on the faces already introduced before     !
+    !        (Note that here we work on the faces already        !
+    !         introduced above, just adding more nodes)          !
     !------------------------------------------------------------!
-    issue_warning = .false.
     do e_p = 1, Prim % n_edges
       if(prim_edge_flag_in_reg(e_p) .ne. 0) then
 
@@ -549,6 +535,8 @@
           n_p = Prim % edges_n(i_nod, e_p)
           s_d = node_to_face(n_p)
           b_d = node_to_cell(n_p)
+
+          Assert(s_d .gt. Prim % n_edges)
 
           ! The grid has sharp corners, add them to boundary faces and cells
           if(prim_sharp_node_rank(n_p) .gt. 0) then
@@ -561,11 +549,13 @@
               Dual % yn(n_d) = Prim % yn(n_p)
               Dual % zn(n_d) = Prim % zn(n_p)
 
+              ! Insert a new node from the edge to the bundary face
               Dual % faces_n_nodes(s_d) = Dual % faces_n_nodes(s_d) + 1
               call Enlarge % Matrix_Int(Dual % faces_n,  &
                                         i=(/1,Dual % faces_n_nodes(s_d)/))
               Dual % faces_n(Dual % faces_n_nodes(s_d), s_d) = n_d
 
+              ! Insert a new node from the edge to the bundary cell
               Dual % cells_n_nodes(b_d) = Dual % cells_n_nodes(b_d) + 1
               call Enlarge % Matrix_Int(Dual % cells_n,  &
                                         i=(/1,Dual % cells_n_nodes(b_d)/))
@@ -578,14 +568,28 @@
               ! Check those little nodes inserted just before
               n1_d = Dual % faces_n(Dual % faces_n_nodes(s_d)-2, s_d)
               n2_d = Dual % faces_n(Dual % faces_n_nodes(s_d)-1, s_d)
-              if(concave_link(1,n_d) .eq. 0 .and.  &
-                 concave_link(2,n_d) .eq. 0) then
-                concave_link(1,n_d) = n1_d
-                concave_link(2,n_d) = n2_d
-              else
+
+              ! Increase the concave link count for this node
+              concave_link_cnt(n_d) = concave_link_cnt(n_d) + 1
+
+              ! Store the first concave link for this node
+              cnt = concave_link_cnt(n_d)
+
+              ! Fill paris 1,2 or 3,4 or 5,6
+              concave_link(cnt*2 - 1, n_d) = n1_d
+              concave_link(cnt*2,     n_d) = n2_d
+
+              ! A sharp-corner Dual node can be reached from more than one
+              ! boundary edge. This is expected at domain vertices where
+              ! several sharp edges meet, for example at the eight corners
+              ! of a cube.  In that case concave_link_cnt(n_d) counts how many
+              ! edge-neighbour pairs were attached to the same sharp-corner
+              ! node.  The pairs are stored in concave_link at first index
+              ! positions (1,2), (3,4), and (5,6).  It seems, from the tests
+              ! that concave_link_cnt can be either 1 or 3, not 2.
+              if(concave_link_cnt(n_d) .gt. 3) then
                 issue_warning = .true.
               end if
-
             end if  ! sharp inject in s_d
           end if    ! sharp corner here
 
@@ -593,17 +597,26 @@
       end if    ! edge is in the region
     end do      ! through edges
 
-    if(issue_warning) then
-      print *, '# Well, you didn''t see this coming!'
-      print *, '# One sharp corner can be in more than one edge'
-    end if
-
   end do  ! bc, boundary region
 
+  if(issue_warning) then
+    print *, '#=============================================='
+    print *, '# Note: sharp-corner Dual nodes with multiple'
+    print *, '#       edge links were detected.'
+    print *, '#       This is expected at domain corners where'
+    print *, '#       several sharp boundary edges meet.'
+    print *, '# Maximum concave link count: ', maxval(concave_link_cnt)
+    print *, '#----------------------------------------------'
+  end if
+
   ! De-allocate what you won't need any more
-  deallocate(cell_to_node)
-  deallocate(node_to_face)
+  deallocate(sharp_inject)
+  deallocate(prim_sharp_node_rank)
+  deallocate(prim_node_rank_in_reg)
+  deallocate(edge_to_node)
   deallocate(node_to_cell)
+  deallocate(node_to_face)
+  deallocate(cell_to_node)
 
   !---------------------------------------!
   !                                       !
@@ -611,8 +624,11 @@
   !                                       !
   !---------------------------------------!
   do s_d = Prim % n_edges + 1, Dual % n_faces
-    call Convert % Sort_Face_Nodes(Dual, s_d, concave_link)
+    call Convert % Sort_Face_Nodes(Dual, s_d, concave_link, concave_link_cnt)
   end do
+
+  deallocate(concave_link_cnt)
+  deallocate(concave_link)
 
   !------------------------------------------------------------!
   !   Save only internal faces to see if sorting of boundary   !
@@ -785,16 +801,16 @@
               prim_node_n_norms(n_p) = prim_node_n_norms(n_p) + 1
               nn = prim_node_n_norms(n_p)
               call Enlarge % Matrix_Real(prim_node_dx,  &
-                                         i=(/1,nn/),     &
+                                         i=(/1,nn/),    &
                                          j=(/1,Prim % n_nodes/))
               call Enlarge % Matrix_Real(prim_node_dy,  &
-                                         i=(/1,nn/),     &
+                                         i=(/1,nn/),    &
                                          j=(/1,Prim % n_nodes/))
               call Enlarge % Matrix_Real(prim_node_dz,  &
-                                         i=(/1,nn/),     &
+                                         i=(/1,nn/),    &
                                          j=(/1,Prim % n_nodes/))
               call Enlarge % Matrix_Real(prim_node_d,   &
-                                         i=(/1,1/),     &
+                                         i=(/1,nn/),    &
                                          j=(/1,Prim % n_nodes/))
               prim_node_dx(nn, n_p) = nx
               prim_node_dy(nn, n_p) = ny

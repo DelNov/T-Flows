@@ -7,7 +7,6 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert  !! parent class
   type(Grid_Type)     :: Grid     !! grid being converted
-  integer             :: bc       !! boundary condition rank (number)
   integer             :: node_flag_at_boundary(Grid % n_nodes)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, i_nod, n, cnt

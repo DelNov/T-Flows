@@ -21,6 +21,8 @@
   character(*)        :: head  !! a header (title) of the file
   integer, intent(in) :: rank  !! a numerical identifier of the file (imagine
                                !! a situation in which you plot a lot of files)
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: CENTER = 1  !! plot center (1) or not (0)
 !-----------------------------------[Locals]-----------------------------------!
   integer           :: i_nod, n, fu
   character(len=80) :: filename  ! don't use SL for separate compilation
@@ -36,7 +38,12 @@
   write(fu,'(a16)')     'DATASET POLYDATA'
 
   ! Write the points out
-  write(fu,'(a6,i7,a6)') 'POINTS', Grid % faces_n_nodes(s), ' float'
+  write(fu,'(a6,i7,a6)') 'POINTS',                          &
+                         Grid % faces_n_nodes(s) + CENTER,  &
+                         ' float'
+  if(CENTER .eq. 1) then
+    write(fu,'(3es15.6)') Grid % xf(s), Grid % yf(s), Grid % zf(s)
+  end if
   do i_nod = 1, Grid % faces_n_nodes(s)
     n = Grid % faces_n(i_nod, s)
     write(fu,'(3es15.6)') Grid % xn(n), Grid % yn(n), Grid % zn(n)
@@ -46,7 +53,7 @@
   write(fu,'(a8,i7,i7)') 'POLYGONS', 1, Grid % faces_n_nodes(s) + 1
   write(fu,'(i7)') Grid % faces_n_nodes(s)
   do i_nod = 1, Grid % faces_n_nodes(s)
-    write(fu,'(i7)') i_nod-1
+    write(fu,'(i7)') i_nod - 1 + CENTER
   end do
 
   ! Beginning of face data
