@@ -53,6 +53,7 @@
   integer, allocatable :: order(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
+  Unused(conc_link_cnt)
 !==============================================================================!
 
   ! Take alias

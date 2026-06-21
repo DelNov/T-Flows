@@ -5,9 +5,13 @@
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
   integer       :: reg, n, c
+
+  ! Variables used only from Process
+# if T_FLOWS_PROGRAM == 4
   logical       :: found
   character(SL) :: porous_region_rank
   character(SL) :: next_strings(MAX_STRING_ITEMS)
+# endif
 !==============================================================================!
 
   !---------------------------!
