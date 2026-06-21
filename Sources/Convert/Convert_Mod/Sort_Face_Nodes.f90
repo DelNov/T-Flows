@@ -44,6 +44,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: i, j, m, n, nn, cnt, cl_a, cl_b
   integer              :: max_loc(2), conc_n
+  logical              :: found
   real                 :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
   real                 :: conc_xn, conc_yn, conc_zn
   real                 :: prod(3), prod_mag
@@ -53,7 +54,6 @@
   integer, allocatable :: order(:)
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
-  Unused(conc_link_cnt)
 !==============================================================================!
 
   ! Take alias
@@ -82,11 +82,21 @@
   do i = 1, nn
     n = Grid % faces_n(i, s)
 
-    ! Do as you did in previous version, just take the first concave link
-    ! (I made an attempt to take into consideration only nodes which do
-    !  belong to the face under consideration, but it made matters worse.)
-    cl_a = concave_link(1, n)
-    cl_b = concave_link(2, n)
+    ! Search for the concave link pair (cl_a and cl_b) which is on the face
+    if(conc_link_cnt(n) .ge. 1) then
+      found = .false.  ! initialize found
+      do j = 1, conc_link_cnt(n)
+        cl_a = concave_link(j*2-1, n)
+        cl_b = concave_link(j*2,   n)
+        if(      (any(Grid % faces_n(1:nn, s) .eq. cl_a))  &
+           .and. (any(Grid % faces_n(1:nn, s) .eq. cl_b))  ) then
+          found = .true.
+          exit
+        end if
+      end do
+
+      Assert(found)  ! make sure it is found
+    end if
 
     if(DEBUG) then
       if(s .eq. 726610) then  ! or some other case-dependent criterion
@@ -96,7 +106,7 @@
 
     ! Move the concave node to the position
     ! in which the face will become convex
-    if(cl_a .gt. 0 .and. cl_b .gt. 0) then
+    if(conc_link_cnt(n) .ge. 1) then
       conc_n = n
       cnt    = cnt + 1
 
@@ -123,9 +133,7 @@
   !-----------------------------------!
   !   Find the plane's center point   !
   !-----------------------------------!
-  call Grid % Faces_Center(s, center_p(1),  &
-                              center_p(2),  &
-                              center_p(3))
+  call Grid % Faces_Center(s, center_p(1), center_p(2), center_p(3))
 
   !------------------------------------------------------------------!
   !   Find nodes' relative positions to the center just calculated   !

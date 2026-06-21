@@ -46,7 +46,7 @@
   integer              :: c_p_list(2048)      ! prim cell and ...
   integer              :: n_d_list(2048)      ! ... dual node list
   integer              :: curr_s_d, curr_b_d, unused, dual_f_here
-  logical              :: issue_warning, found
+  logical              :: error_occured, found
   real                 :: nx, ny, nz, delta
   real,    allocatable :: prim_node_dx(:,:)
   real,    allocatable :: prim_node_dy(:,:)
@@ -380,6 +380,8 @@
       ! Dual face ambiguous.  Store the two boundary-side Dual nodes
       ! linked to this extra node; Sort_Face_Nodes uses this as a
       ! local sorting hint.
+      !
+      ! Note: tests showed that concave_link_cnt after this step is 1
       if(prim_sharp_edge_flag(e_p) .eq. -1) then
         ! print *, ' # Sharp edge:', e_p
         do i_edg = sorted_edge_f(e_p), sorted_edge_l(e_p)
@@ -387,13 +389,18 @@
           c2_p = Prim % faces_c(2, s_p)
           n2_d = c2_p + Prim % n_bnd_cells + 1
           if(c2_p .lt. 0) then
-            if(concave_link(1, d_nn) .eq. 0) then
-              concave_link(1, d_nn) = n2_d
-            else if(concave_link(2, d_nn) .eq. 0) then
-              concave_link(2, d_nn) = n2_d
-            else
-              print *, '# Well, well, this is pretty wrong!'
+            cnt = concave_link_cnt(d_nn)
+
+            ! If cnt==0, it checks pair (1,2), if cnt==1, it checks ...
+            ! ... pair (3,4) and if cnt==2, it checks pair (5,6)
+            if(     concave_link(cnt*2 + 1, d_nn) .eq. 0) then
+                    concave_link(cnt*2 + 1, d_nn) = n2_d
+            else if(concave_link(cnt*2 + 2, d_nn) .eq. 0) then
+                    concave_link(cnt*2 + 2, d_nn) = n2_d
+              cnt = cnt + 1
             end if
+
+            concave_link_cnt(d_nn) = cnt
           end if
         end do
       end if
@@ -437,7 +444,7 @@
   allocate(prim_bnd_cell_flag_in_reg(-Prim % n_bnd_cells:Prim % n_cells))
   prim_bnd_cell_flag_in_reg(:) = 0
 
-  issue_warning = .false.
+  error_occured = .false.
 
   do bc = 1, Prim % n_bnd_regions
 
@@ -585,10 +592,11 @@
               ! of a cube.  In that case concave_link_cnt(n_d) counts how many
               ! edge-neighbour pairs were attached to the same sharp-corner
               ! node.  The pairs are stored in concave_link at first index
-              ! positions (1,2), (3,4), and (5,6).  It seems, from the tests
-              ! that concave_link_cnt can be either 1 or 3, not 2.
+              ! positions (1,2), (3,4), and (5,6).
+              !
+              ! Note: tests showed that concave_link_cnt after this step is 3
               if(concave_link_cnt(n_d) .gt. 3) then
-                issue_warning = .true.
+                error_occured = .true.
               end if
             end if  ! sharp inject in s_d
           end if    ! sharp corner here
@@ -599,14 +607,15 @@
 
   end do  ! bc, boundary region
 
-  if(issue_warning) then
-    print *, '#=============================================='
-    print *, '# Note: sharp-corner Dual nodes with multiple'
-    print *, '#       edge links were detected.'
-    print *, '#       This is expected at domain corners where'
-    print *, '#       several sharp boundary edges meet.'
-    print *, '# Maximum concave link count: ', maxval(concave_link_cnt)
-    print *, '#----------------------------------------------'
+  if(error_occured) then
+    call Message % Error(66, "Dual nodes which are sharp corners "     //     &
+                             "(such a eight cube corners) with more "  //     &
+                             "than three coinciding edges found. "     //     &
+                             "\n \n "                                  //     &
+                             "Such a situation haven't been predicted "//     &
+                             "and the program will have to stop. "     //     &
+                             "Contact the authors and send them this grid.",  &
+                             file = __FILE__, line = __LINE__)
   end if
 
   ! De-allocate what you won't need any more
