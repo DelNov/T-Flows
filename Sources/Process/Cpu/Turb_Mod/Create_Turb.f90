@@ -89,6 +89,8 @@
       allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
       allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
       allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
+      allocate(Turb % u_mean_abs(-nb:nc));  Turb % u_mean_abs = 0.
+      allocate(Turb % w_mean_abs(-nb:nc));  Turb % w_mean_abs = 0.
       if(Flow % heat_transfer) then
         allocate(Turb % t_mean (-nb:nc));  Turb % t_mean  = 0.
         allocate(Turb % q_mean (-nb:nc));  Turb % q_mean  = 0.
@@ -224,6 +226,8 @@
       allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
       allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
       allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
+      allocate(Turb % u_mean_abs(-nb:nc));  Turb % u_mean_abs = 0.
+      allocate(Turb % w_mean_abs(-nb:nc));  Turb % w_mean_abs = 0.
       if(Flow % heat_transfer) then
         allocate(Turb % t_mean(-nb:nc));  Turb % t_mean = 0.
         allocate(Turb % q_mean(-nb:nc));  Turb % q_mean = 0.
@@ -511,6 +515,8 @@
       allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
       allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
       allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
+      allocate(Turb % u_mean_abs(-nb:nc));  Turb % u_mean_abs = 0.
+      allocate(Turb % w_mean_abs(-nb:nc));  Turb % w_mean_abs = 0.
       if(Flow % heat_transfer) then
         allocate(Turb % t_mean(-nb:nc));  Turb % t_mean = 0.
         allocate(Turb % q_mean(-nb:nc));  Turb % q_mean = 0.
@@ -701,6 +707,8 @@
       allocate(Turb % u_mean(-nb:nc));  Turb % u_mean = 0.
       allocate(Turb % v_mean(-nb:nc));  Turb % v_mean = 0.
       allocate(Turb % w_mean(-nb:nc));  Turb % w_mean = 0.
+      allocate(Turb % u_mean_abs(-nb:nc));  Turb % u_mean_abs = 0.
+      allocate(Turb % w_mean_abs(-nb:nc));  Turb % w_mean_abs = 0.
       allocate(Turb % p_mean(-nb:nc));  Turb % p_mean = 0.
       if(Flow % heat_transfer) then
         allocate(Turb % t_mean(-nb:nc));  Turb % t_mean = 0.
