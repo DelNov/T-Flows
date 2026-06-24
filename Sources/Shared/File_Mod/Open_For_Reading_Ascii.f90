@@ -23,10 +23,11 @@
 
   ! File doesn't exist
   if(.not. file_exists) then
-    call Message % Error(60, "File: " // trim(name_i)    //  &
-                             " doesn't exist!"           //  &
-                             " This error is critical."  //  &
-                             " Exiting!",                    &
+    call Message % Error(60, "File: "                          //  &
+                             BRIGHT_CYAN//trim(name_i)//RESET  //  &
+                             " doesn't exist!"                 //  &
+                             " This error is critical."        //  &
+                             " Exiting!",                          &
                              one_proc = .true.)
   end if
 
@@ -37,7 +38,8 @@
 
   ! ... and write a message about it
   if(First_Proc()) then
-    print '(a)', ' # Reading the ASCII file: ' // trim(name_i)
+    print '(a)', " # Reading the ASCII file: " //  &
+                 BRIGHT_CYAN//trim(name_i)//RESET
   end if
 
   end subroutine

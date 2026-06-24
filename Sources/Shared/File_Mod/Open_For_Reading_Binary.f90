@@ -31,10 +31,11 @@
 
   ! File doesn't exist
   if(.not. file_exists) then
-    call Message % Error(60, "File: " // trim(name_i)    //  &
-                             " doesn't exist!"           //  &
-                             " This error is critical."  //  &
-                             " Exiting!",                    &
+    call Message % Error(60, "File: "                          //  &
+                             BRIGHT_CYAN//trim(name_i)//RESET  //  &
+                             " doesn't exist!"                 //  &
+                             " This error is critical."        //  &
+                             " Exiting!",                          &
                              one_proc = .true.)
   end if
 
@@ -49,7 +50,8 @@
   if(verb) then
     if(First_Proc()) then
       if(Sequential_Run()) then
-        print '(a)', ' # Reading the binary file: ' // trim(name_i)
+        print '(a)', " # Reading the binary file: "    //  &
+                     BRIGHT_CYAN//trim(name_i)//RESET
       else
         name_l = name_i
         f = index(name_i, '/')              + 1
@@ -59,8 +61,8 @@
         if(l-f .eq. 2) write(name_l(f:l), '(i3.3)') N_Procs()
         if(l-f .eq. 3) write(name_l(f:l), '(i4.4)') N_Procs()
         if(l-f .eq. 4) write(name_l(f:l), '(i5.5)') N_Procs()
-        print '(a)', ' # Reading the binary files: '  //  &
-                     trim(name_i) // ' ... ' // trim(name_l)
+        print '(a)', " # Reading the binary files: "  //  &
+                     BRIGHT_CYAN//trim(name_i)//RESET
       end if
     end if
   end if

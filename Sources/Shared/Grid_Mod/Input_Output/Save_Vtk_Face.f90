@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtk_Face(Grid, s, head, rank)
+  subroutine Save_Vtk_Face(Grid, s, head, rank, plot_center)
 !------------------------------------------------------------------------------!
 !>  This subroutine, Save_Vtk_Face, (and her sister Save_Vtk_Cell) are designed
 !>  to output detailed visual representations of individual faces (or cells),
@@ -9,11 +9,6 @@
 !>  or examining how a face (or a cell) interacts with different phases in VOF
 !>  simulations with front tracking.
 !------------------------------------------------------------------------------!
-!   * A VTK file is opened for writing, and the necessary headers are set up.  !
-!   * The subroutine writes the node coordinates of the specified face.        !
-!   * It then writes the polygon representing the face and its data.           !
-!   * The file is closed after completing the writing process.                 !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid  !! the grid containing the face
@@ -21,15 +16,22 @@
   character(*)        :: head  !! a header (title) of the file
   integer, intent(in) :: rank  !! a numerical identifier of the file (imagine
                                !! a situation in which you plot a lot of files)
-!------------------------------[Local parameters]------------------------------!
-  integer, parameter :: CENTER = 1  !! plot center (1) or not (0)
+  logical, optional   :: plot_center  !! flag to plot also the center
 !-----------------------------------[Locals]-----------------------------------!
-  integer           :: i_nod, n, fu
+  integer           :: i_nod, n, fu, center
   character(len=80) :: filename  ! don't use SL for separate compilation
 !==============================================================================!
 
+  ! Processs optional parameter
+  center = 0
+  if(present(plot_center)) then
+    if(plot_center) center = 1
+  end if
+
+  ! Update the file name
   write(filename,'(a,"-",i9.9,".vtk")') trim(head), rank
 
+  ! Open the vtk file for writing
   open(newunit=fu, file=filename)
   write(fu,'(a26)')     '# vtk DataFile Version 2.0'
   write(fu,'(a6,i7.7)') 'File: ', s
@@ -39,9 +41,9 @@
 
   ! Write the points out
   write(fu,'(a6,i7,a6)') 'POINTS',                          &
-                         Grid % faces_n_nodes(s) + CENTER,  &
+                         Grid % faces_n_nodes(s) + center,  &
                          ' float'
-  if(CENTER .eq. 1) then
+  if(center .eq. 1) then
     write(fu,'(3es15.6)') Grid % xf(s), Grid % yf(s), Grid % zf(s)
   end if
   do i_nod = 1, Grid % faces_n_nodes(s)
@@ -53,7 +55,7 @@
   write(fu,'(a8,i7,i7)') 'POLYGONS', 1, Grid % faces_n_nodes(s) + 1
   write(fu,'(i7)') Grid % faces_n_nodes(s)
   do i_nod = 1, Grid % faces_n_nodes(s)
-    write(fu,'(i7)') i_nod - 1 + CENTER
+    write(fu,'(i7)') i_nod - 1 + center
   end do
 
   ! Beginning of face data

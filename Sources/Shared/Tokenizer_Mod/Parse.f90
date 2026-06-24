@@ -44,19 +44,20 @@
 
   ! Then parse
   Tok % n_tokens = 0
-  if(Tok % whole(1:1) >= '!') then
+  if(Tok % Is_Char(Tok % whole(1:1))) then
     Tok % n_tokens = 1
-    Tok % s(1)=1
+    Tok % s(1) = 1
   end if
+
   do i = 1, len(Tok % whole) - 1
-    if( Tok % whole(i:  i  ) <  '!' .and.  &
-        Tok % whole(i+1:i+1) >= '!') then
+    if( .not. Tok % Is_Char(Tok % whole(i  :i  )) .and.  &
+              Tok % Is_Char(Tok % whole(i+1:i+1)) ) then
       Tok % n_tokens = Tok % n_tokens + 1
       Assert(Tok % n_tokens <= MAX_TOKENS)
-      Tok % s(Tok % n_tokens) = i+1
+      Tok % s(Tok % n_tokens) = i + 1
     end if
-    if( Tok % whole(i  :i  ) >= '!' .and.  &
-        Tok % whole(i+1:i+1) <  '!') then
+    if(       Tok % Is_Char(Tok % whole(i  :i  )) .and.  &
+        .not. Tok % Is_Char(Tok % whole(i+1:i+1)) ) then
       Tok % e(Tok % n_tokens) = i
     end if
   end do

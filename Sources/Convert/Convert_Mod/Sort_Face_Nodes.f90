@@ -100,7 +100,7 @@
 
     if(DEBUG) then
       if(s .eq. 726610) then  ! or some other case-dependent criterion
-        call Grid % Save_Vtk_Face(s, "face_original", s)
+        call Grid % Save_Vtk_Face(s, "face_original", s, plot_center = .true.)
       end if
     end if
 
@@ -126,7 +126,7 @@
 
   if(DEBUG) then
     if(s .eq. 726610) then  ! or some other case-dependent criterion
-      call Grid % Save_Vtk_Face(s, "face_shifted", s)
+      call Grid % Save_Vtk_Face(s, "face_shifted", s, plot_center = .true.)
     end if
   end if
 
@@ -260,7 +260,7 @@
   ! Plot debugging things
   if(DEBUG) then
     if(s .eq. 726610) then  ! or some other case-dependent criterion
-      call Grid % Save_Vtk_Face(s, "face_sorted", s)
+      call Grid % Save_Vtk_Face(s, "face_sorted", s, plot_center = .true.)
     end if
   end if
 

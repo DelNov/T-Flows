@@ -26,6 +26,7 @@
   integer              :: i, i_nod, j_nod, i_edg, i_nor, nn
   integer              :: n_bc, d_nn  ! number of BCs and Dual grid node number
   integer              :: s_p, s_d, b_d, c_p, c_d, cnt
+  integer              :: n_prim_sharp_c, n_prim_sharp_e
   integer, allocatable :: full_edge_n (:,:)  ! edges, nodes
   integer, allocatable :: full_edge_fb(:)    ! edges' faces at boundary
   integer, allocatable :: full_edge_bc(:)    ! edges' faces boundary regions
@@ -188,7 +189,7 @@
   end do
   sorted_edge_l(Prim % n_edges) = e_p-1  ! mark the end of the last edge
 
-  ! De-allocate two full_edge_... array
+  ! De-allocate two full_edge_... arrays
   ! full_edge_n  -> not needed after compressed Prim % edges_n is built
   ! full_edge_bc -> not needed after Prim % edges_bc / Prim % edges_fb are built
   ! full_edge_fb -> still needed for mapping, for it contains list of faces
@@ -217,12 +218,17 @@
   allocate(edge_to_node( Prim % n_edges));  edge_to_node(:) = 0
 
   allocate(prim_sharp_edge_flag(Prim % n_edges))
-  prim_sharp_edge_flag(:) = 0
+  allocate(prim_sharp_node_rank( Prim % n_nodes))
 
-  !----------------------!
-  !   Plot sharp edges   !
-  !----------------------!
-  unused = Convert % N_Sharp_Edges(Prim, prim_sharp_edge_flag)
+  !--------------------------------!
+  !   Find sharp edges and nodes   !
+  !--------------------------------!
+  n_prim_sharp_e = Convert % N_Sharp_Edges(Prim,  &
+                                           prim_sharp_edge_flag)
+  n_prim_sharp_c = Convert % N_Sharp_Corners(Prim,                  &
+                                             prim_sharp_edge_flag,  &
+                                             prim_sharp_node_rank)
+  ! Plot sharp edges for checking
   call Prim % Save_Vtu_Edges(prim_sharp_edge_flag)  ! -1, 0, +1
 
   !-------------------------!
@@ -260,7 +266,6 @@
   ! Allocate memory to store node ranks in a region
   ! and the node ranks for sharp nodes (corners)
   allocate(prim_node_rank_in_reg(Prim % n_nodes))
-  allocate(prim_sharp_node_rank( Prim % n_nodes))
 
   ! Increase total number of boundary cells in Dual
   do bc = 1, Prim % n_bnd_regions
@@ -273,10 +278,10 @@
   Dual % n_faces = Prim % n_edges  &   ! for faces inside
                  + Dual % n_bnd_cells  ! for faces on the boundary
   Dual % n_cells = Prim % n_nodes
-  Dual % n_nodes = Prim % n_cells                                         &
-                 + Prim % n_bnd_cells                                     &
-                 + Convert % N_Sharp_Edges(Prim, prim_sharp_edge_flag)    &
-                 + Convert % N_Sharp_Corners(Prim, prim_sharp_node_rank)
+  Dual % n_nodes = Prim % n_cells       &
+                 + Prim % n_bnd_cells   &
+                 + n_prim_sharp_e       &
+                 + n_prim_sharp_c
 
   ! ... and allocate memory for the Dual grid
   call Convert % Allocate_Memory(Dual)
@@ -285,8 +290,7 @@
   allocate(sharp_inject(    Dual % n_faces));  sharp_inject(:)     = 0
 
   ! Find sharp corners (nodes) in the Prim grid
-  print *, '# Number of sharp corners = ',  &
-            Convert % N_Sharp_Corners(Prim, prim_sharp_node_rank)
+  print *, '# Number of sharp corners = ', n_prim_sharp_c
 
   !----------------------------------------------!
   !                                              !
@@ -856,7 +860,7 @@
         Dual % zc(c_d) = Dual % zc(c_d) - prim_node_dz(i_nor, n_p) * delta
       end do
       if(DEBUG) then
-        call Dual % Save_Vtk_Cell(c_d, "concave_cell", c_d)
+        call Dual % Save_Vtk_Cell(c_d, "concave_cell", c_d, plot_center=.true.)
       end if
     end if
   end do

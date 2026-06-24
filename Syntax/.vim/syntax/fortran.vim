@@ -420,6 +420,9 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      MAX_N  ITERS  FOR_BUILDINGS  FOR_POROSITIES  FOR_CHIMNEYS
 " Constant from Native_Mod
   syn keyword fortranConstant      MATRIX_ONE  MATRIX_UVW  MATRIX_PP   MATRIX_T
+" Terminal colors
+  syn keyword fortranConstant      ESC  RESET  RED  GREEN  YELLOW  BLUE  MAGENTA  CYAN
+  syn keyword fortranConstant      BRIGHT_RED  BRIGHT_GREEN  BRIGHT_YELLOW  BRIGHT_BLUE  BRIGHT_MAGENTA  BRIGHT_CYAN
 " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points Point   blocks         lines             ranges         Read_Control  Rc
