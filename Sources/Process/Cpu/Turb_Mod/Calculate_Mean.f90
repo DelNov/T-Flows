@@ -16,7 +16,8 @@
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c, n, sc
   real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:),  &
-                               p_mean(:), t_mean(:), q_mean(:)
+                               p_mean(:), t_mean(:), q_mean(:), u_mean_abs(:), &
+                               w_mean_abs(:) 
   real, contiguous, pointer :: kin_mean (:), eps_mean(:),  &
                                zeta_mean(:), f22_mean(:), omega_mean(:)
   real, contiguous, pointer :: uu_res(:), vv_res(:), ww_res(:),  &
@@ -44,6 +45,7 @@
   ! Time averaged momentum and energy equations
   u_mean => Turb % u_mean;  v_mean => Turb % v_mean;  w_mean => Turb % w_mean
   p_mean => Turb % p_mean;  t_mean => Turb % t_mean;  q_mean => Turb % q_mean
+  u_mean_abs => Turb % u_mean_abs;  w_mean_abs => Turb % w_mean_abs
 
   ! Time averaged modeled quantities
   if(Turb % model .eq. K_EPS) then
@@ -90,6 +92,9 @@
       v_mean(c) = (v_mean(c) * real(n) + v % n(c)) / real(n+1)
       w_mean(c) = (w_mean(c) * real(n) + w % n(c)) / real(n+1)
       p_mean(c) = (p_mean(c) * real(n) + p % n(c)) / real(n+1)
+      u_mean_abs(c) = (u_mean_abs(c) * real(n)                          &
+                      + sqrt(u % n(c)**2 + v % n(c)**2)) / real(n+1)
+      w_mean_abs(c) = (w_mean_abs(c) * real(n) + abs(w % n(c))) / real(n+1)
 
       if(Flow % heat_transfer) then
         t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
