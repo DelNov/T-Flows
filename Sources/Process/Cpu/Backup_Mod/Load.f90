@@ -100,6 +100,11 @@
   call Backup % Load_Real(Comm, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
   call Backup % Load_Real(Comm, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
+  !------------------!
+  !   Diural cycle   !
+  !------------------!
+  call Backup % Load_Real(Comm, d, vc, 'energy_in_cum', Turb % energy_in_cum)
+
   !----------------------------!
   !                            !
   !   Navier-Stokes equation   !
@@ -278,6 +283,8 @@
     call Backup % Load_Cell_Real(Grid, d, vc, 'v_mean', Turb % v_mean)
     call Backup % Load_Cell_Real(Grid, d, vc, 'w_mean', Turb % w_mean)
     call Backup % Load_Cell_Real(Grid, d, vc, 'p_mean', Turb % p_mean)
+    call Backup % Load_Cell_Real(Grid, d, vc, 'u_mean_abs', Turb % u_mean_abs)
+    call Backup % Load_Cell_Real(Grid, d, vc, 'w_mean_abs', Turb % w_mean_abs)
     if(Flow % heat_transfer) then
       call Backup % Load_Cell_Real(Grid, d, vc, 't_mean', Turb % t_mean)
       call Backup % Load_Cell_Real(Grid, d, vc, 'q_mean', Turb % q_mean)
