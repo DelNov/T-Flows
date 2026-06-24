@@ -81,7 +81,7 @@
 
         ! Here we limit wall distance to Kolm. length scale to prevent
         ! uphysical solutions
-        l_kolm      = 0.5*((Flow % viscosity(c1)/Flow % density(c1))**3  &
+        l_kolm      = 0.1*((Flow % viscosity(c1)/Flow % density(c1))**3  &
                       / eps % n(c1))**0.25
         f22 % n(c2) = -2.0 * Flow % viscosity(c1)        &
                     / Flow % density(c1) * zeta % n(c1)  &
