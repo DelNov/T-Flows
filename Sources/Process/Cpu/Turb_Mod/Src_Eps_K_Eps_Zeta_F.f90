@@ -21,6 +21,19 @@
   real                       :: eps_wf, eps_int
   real                       :: fa, kin_vis, p_kin_int, p_kin_wf
   real                       :: z_o, dia_coef_tmp
+  real                       :: max_wall_dist, layer_thick
+  real                       :: re_t_loc, re_t_avg, sum_re_t, sum_vol
+  real                       :: alpha_zeta, l_sgs_d, l_rans_d, alpha_d
+  real, parameter            :: re_t_cut = 10.0
+  real, parameter            :: re_t_1 = 600.0
+  real, parameter            :: re_t_4 = 20000.0
+  real, parameter            :: alpha_min = 0.012
+  real, parameter            :: alpha_max = 0.018
+  real, parameter            :: cub_a3 = -1.24081684e-16
+  real, parameter            :: cub_a2 = 4.73275447e-12 
+  real, parameter            :: cub_a1 = 2.62949932e-7
+  real, parameter            :: cub_a0 = 1.18405531e-2 
+
 !------------------------------------------------------------------------------!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -56,9 +69,80 @@
 
   call Turb % Time_And_Length_Scale(Grid)
 
+  !---------------------------------------------------------------!
+  !   Reynolds-number-dependent coefficient in C_e1 correction    !
+  !                                                               !
+  !   C_e1 = c_1e * (1 + alpha_zeta / zeta)                       !
+  !                                                               !
+  !   alpha_zeta is computed once for the whole domain. First,    !
+  !   the maximum wall distance is found. Then Re_t is averaged   !
+  !   in the layer y <= 0.1*y_max, excluding cells with Re_t <= 10.!
+  !   Finally, alpha_zeta is obtained from a cubic interpolation   !
+  !   through the points:                                         !
+  !      (600,   0.012)                                           !
+  !      (4135,  0.013)                                           !
+  !      (9000,  0.014)                                           !
+  !      (20000, 0.018)                                           !
+  !---------------------------------------------------------------!
+
+  sum_re_t = 0.0
+  sum_vol  = 0.0
+
   do c = Cells_In_Domain()
+
+    kin_vis = Flow % viscosity(c) / Flow % density(c)
+
+    ! Local turbulent Reynolds number:
+    !
+    !   Re_t = k^2 / (nu * eps)
+    !
+    re_t_loc = max(kin % n(c), 0.0)**2                         &
+             / (kin_vis * max(eps % n(c), TINY) + TINY)
+
+    
+    if(Turb % model == HYBRID_LES_RANS) then
+      l_sgs_d  = Grid % vol(c)**0.33333333                                                               
+      l_rans_d = Turb % kappa * Grid % wall_dist(c)                              
+      alpha_d  = l_rans_d/l_sgs_d                                                
+
+      if( alpha_d < Turb % c_hyb ) then   
+        if(re_t_loc > re_t_cut) then
+          sum_re_t = sum_re_t + Grid % vol(c) * re_t_loc
+          sum_vol  = sum_vol  + Grid % vol(c)
+        end if
+      end if
+    else
+      if(re_t_loc > re_t_cut) then
+        sum_re_t = sum_re_t + Grid % vol(c) * re_t_loc
+        sum_vol  = sum_vol  + Grid % vol(c)
+      end if
+    end if
+
+  end do
+ 
+  call Global % Sum_Real(sum_re_t) 
+  call Global % Sum_Real(sum_vol) 
+ 
+  if(sum_vol > TINY) then
+    re_t_avg = sum_re_t / sum_vol
+  else
+    re_t_avg = re_t_1
+  end if
+
+  if(re_t_avg <= re_t_1) then
+    alpha_zeta = alpha_min
+  else if(re_t_avg >= re_t_4) then
+    alpha_zeta = alpha_max
+  else
+    alpha_zeta = ((cub_a3 * re_t_avg + cub_a2) * re_t_avg  &
+                + cub_a1) * re_t_avg + cub_a0
+    alpha_zeta = max(alpha_min, min(alpha_max, alpha_zeta))
+  end if
+
+  do c = Cells_In_Domain()
+    kin_vis = Flow % viscosity(c) / Flow % density(c)    
     e_sor = Grid % vol(c) / (Turb % t_scale(c)+TINY)
-    c_11e = Turb % c_1e*(1.0 + Turb % alpha * ( 1.0/(zeta % n(c)+TINY) ))
+    c_11e = Turb % c_1e*(1.0 + alpha_zeta * (1.0/(zeta % n(c)+TINY)))
     b(c) = b(c) + c_11e * e_sor * Turb % p_kin(c)
 
     ! Fill in a diagonal of coefficient matrix
