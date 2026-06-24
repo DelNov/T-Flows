@@ -76,10 +76,37 @@
       ! this linear interpolation should do just fine
       dens_f(s) =        Grid % fw(s)  * Flow % density(c1)  &
                 + (1.0 - Grid % fw(s)) * Flow % density(c2)
-
+       
       ! Transform density into one assumed by Boussinesq
       ! Units: kg/m^3 * K * 1/K = kg/m^3
-      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
+
+!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
+!======================================================================!
+!     Deardorf implementation
+!======================================================================!
+!      Flow % t_ref = 21.5 &
+!      + 45.0 * 0.5 * (Grid % wall_dist(c1) + Grid % wall_dist(c2))
+!
+!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
+!                                                                                
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.3) then           
+!        dens_f(s) = 0.0                                                          
+!      end if                     
+!======================================================================!
+!======================================================================!
+!     Air atmosphere implementation
+!======================================================================!
+      Flow % t_ref = 0.008 * (Grid % fw(s)  * Grid % zc(c1)   &
+                     + (1.0 - Grid % fw(s)) * Grid % zc(c2))
+
+
+      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
+
+      if((Grid % fw(s)  * Grid % zc(c1) + (1.0 - Grid % fw(s)) * Grid % zc(c2)) &
+          > 530.0) then
+        dens_f(s) = 0.0
+      end if 
+
     end do
 
   !---------------------------------------------------------------------!
