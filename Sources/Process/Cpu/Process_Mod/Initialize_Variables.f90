@@ -20,6 +20,7 @@
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Face_Type),  pointer :: v_flux
   real,             pointer :: u_mean(:), v_mean(:), w_mean(:)
+  real,             pointer :: u_mean_abs(:), w_mean_abs(:)
   integer                   :: i, c, c1, c2, m, s, nks, nvs, sc, fu
   integer                   :: n_wall, n_inflow, n_outflow, n_symmetry,  &
                                n_heated_wall, n_pressure, n_ambient, n_convect
@@ -43,14 +44,16 @@
 !==============================================================================!
 
   ! Take aliases
-  Grid     => Flow % pnt_grid
-  bulk     => Flow % bulk
-  v_flux   => Flow % v_flux
-  vis      => Turb % vis
-  u_mean   => Turb % u_mean
-  v_mean   => Turb % v_mean
-  w_mean   => Turb % w_mean
-  omega    => Turb % omega
+  Grid       => Flow % pnt_grid
+  bulk       => Flow % bulk
+  v_flux     => Flow % v_flux
+  vis        => Turb % vis
+  u_mean     => Turb % u_mean    
+  v_mean     => Turb % v_mean
+  w_mean     => Turb % w_mean
+  u_mean_abs => Turb % u_mean_abs
+  w_mean_abs => Turb % w_mean_abs
+  omega      => Turb % omega
   call Flow % Alias_Momentum    (u, v, w)
   call Flow % Alias_Energy      (t)
   call Turb % Alias_K_Eps_Zeta_F(kin, eps, zeta, f22)
@@ -267,6 +270,8 @@
           u_mean(c) = 0.0
           v_mean(c) = 0.0
           w_mean(c) = 0.0
+          u_mean_abs(c) = 0.0
+          w_mean_abs(c) = 0.0
         end if
 
         !--------------!
