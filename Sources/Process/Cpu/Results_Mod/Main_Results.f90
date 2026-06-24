@@ -34,6 +34,12 @@
 !----------------------------------[Locals]------------------------------------!
   integer :: d         ! domain counter
   logical :: save_now
+  logical :: regular_results_save
+  logical :: force_results_save
+  logical :: save_user_results
+  logical :: save_vtu_results
+  integer, parameter :: vtu_save_multiplier = 1
+  integer, save      :: regular_results_save_counter = 0
 !==============================================================================!
 
   ! Get out of here if you don't want to save initial conditions all right
@@ -57,12 +63,27 @@
     end do
   end if
 
-  ! Is it time to save results for post-processing?
-  if(Time % Curr_Dt() .eq. Time % Last_Dt() .or.  &
-     save_now                               .or.  &
-     exit_now                               .or.  &
-     Results % Time_To_Save_Results()       .or.  &
-     Info % Time_To_Exit()) then
+  ! Check the regular results-saving interval from the control file.  This
+  ! interval is now used for User_Mod_Save_Results.  Standard VTU files are
+  ! written only every vtu_save_multiplier-th regular results save.
+  regular_results_save = Results % Time_To_Save_Results()
+  force_results_save = Time % Curr_Dt() .eq. Time % Last_Dt() .or.  &
+                       save_now                               .or.  &
+                       exit_now                               .or.  &
+                       Info % Time_To_Exit()
+
+  if(regular_results_save) then
+    regular_results_save_counter = regular_results_save_counter + 1
+  end if
+
+  save_user_results = force_results_save .or. regular_results_save
+  save_vtu_results  = force_results_save .or.  &
+                      (regular_results_save .and.  &
+                       mod(regular_results_save_counter,  &
+                           vtu_save_multiplier) .eq. 0)
+
+  ! Is it time to save standard VTU results for post-processing?
+  if(save_vtu_results) then
 
     do d = 1, n_dom
       call Control % Switch_To_Domain(d)
@@ -80,7 +101,15 @@
         end if
       end if
 
-      ! Write results in user-customized format
+    end do  ! through domains
+  end if
+
+  ! Is it time to write user-customized results?
+  if(save_user_results) then
+
+    do d = 1, n_dom
+      call Control % Switch_To_Domain(d)
+
       call User_Mod_Save_Results(Flow(d), Turb(d), Vof(d), Swarm(d), domain=d)
       if(Flow(d) % with_particles) then
         call User_Mod_Save_Swarm(Flow(d), Turb(d), Vof(d), Swarm(d), domain=d)
