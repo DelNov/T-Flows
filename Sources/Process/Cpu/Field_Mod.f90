@@ -141,6 +141,9 @@
     ! Temperature
     type(Var_Type) :: t  !! temperature [K]
 
+    ! Variabla for diural cycle
+    real :: source_sink ! [W/m^333]
+
     ! Heat flux to the domain (important for periodic case with heat transfer)
     real :: heat_flux, heated_area, heat  ! [W/m^2], [m^2], [W]
 
