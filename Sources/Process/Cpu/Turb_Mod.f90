@@ -76,6 +76,7 @@
     ! Time averaged momentum and energy equations
     real, allocatable :: u_mean(:), v_mean(:), w_mean(:), p_mean(:)
     real, allocatable :: t_mean(:), q_mean(:)
+    real, allocatable :: u_mean_abs(:), w_mean_abs(:)
 
     ! Time averaged modeled quantities
     ! (Time averages of modeled equations)
@@ -191,6 +192,9 @@
 
     ! For scale-resolving models
     real :: c_smag, c_wale, c_hyb
+
+    ! For diural cycle
+    real :: energy_in_cum
 
     contains
       procedure :: Init_Turb
