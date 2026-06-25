@@ -1,31 +1,32 @@
 !==============================================================================!
-  integer function N_Sharp_Edges(Convert, Grid, edge_data)
+  integer function N_Sharp_Edges(Convert, Grid, sharp_edge_flag)
 !------------------------------------------------------------------------------!
 !>  Aims to identify and count sharp edges in the grid, which are either
 !>  geometrically sharp or located between different boundary conditions.
 !------------------------------------------------------------------------------!
 !   Functionality                                                              !
 !                                                                              !
-!   * Initialization: Initializes a counter cnt and sets the edge_data array   !
+!   * Initialization:                                                          !
+!     - Initializes a counter cnt and sets the sharp_edge_flag array           !
 !   * Identifying Geometrically Sharp Edges:                                   !
 !     - Iterates through each edge, focusing on those between two boundary     !
 !       faces.                                                                 !
 !     - Computes face normals and checks if the edge is geometrically sharp    !
 !       (based on the angle between normals).                                  !
-!     - Marks edges as convex, concave, or not sharp in the edge_data array    !
-!       based on their geometric relation with adjacent faces.                 !
+!     - Marks edges as convex, concave, or not sharp in the sharp_edge_flag    !
+!       array based on their geometric relation with adjacent faces.           !
 !   * Edges Between Different Boundary Conditions:                             !
 !     - Additionally, it checks if an edge lies between faces with different   !
-!       boundary conditions.
-!     - Such edges are also marked as sharp if not already done.
-!   * Return Value:
-!     - Returns the total count of sharp edges.
+!       boundary conditions.                                                   !
+!     - Such edges are also marked as sharp if not already done.               !
+!   * Return Value:                                                            !
+!     - Returns the total count of sharp edges.                                !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type) :: Convert                    !! parent class
-  type(Grid_Type)     :: Grid                       !! grid being converted
-  integer             :: edge_data(Grid % n_edges)  !! edge data
+  class(Convert_Type)  :: Convert                    !! parent class
+  type(Grid_Type)      :: Grid                       !! grid being converted
+  integer, intent(out) :: sharp_edge_flag(Grid % n_edges)  !! edge data
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2, n1, n2
   real    :: norm_1(3), norm_2(3)
@@ -37,7 +38,7 @@
 
   ! Nullify on entry
   cnt = 0
-  edge_data(:) = 0
+  sharp_edge_flag(:) = 0
 
   !---------------------------------------------!
   !                                             !
@@ -68,7 +69,7 @@
       !   Edge is not sharp, mark it as zero   !
       !----------------------------------------!
       if(dot_product(norm_1, norm_2) >= 0.7071) then
-        edge_data(e) = 0
+        sharp_edge_flag(e) = 0
 
       !--------------------------------------------------!
       !   Edge is geometrically sharp, still check if    !
@@ -98,12 +99,12 @@
         ! Edge is convex
         if(dot_product(vec_ef(1:3), norm_1(1:3)) < 0.0 .and.  &
            dot_product(vec_ef(1:3), norm_2(1:3)) < 0.0) then
-          edge_data(e) = 1
+          sharp_edge_flag(e) = 1
 
         ! Edge is concave
         else if(dot_product(vec_ef(1:3), norm_1(1:3)) > 0.0 .and.  &
                 dot_product(vec_ef(1:3), norm_2(1:3)) > 0.0) then
-          edge_data(e) = -1
+          sharp_edge_flag(e) = -1
 
         else
           print '(a,99f12.3)', 'BAD', norm2(vec_ef(1:3)),       &
@@ -126,9 +127,9 @@
   !-------------------------------------------------------------------!
   do e = 1, Grid % n_edges
     if( sum(Grid % edges_bc(1:Grid % n_bnd_regions, e)) .gt. 1 ) then
-      if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
+      if(sharp_edge_flag(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
-        edge_data(e) = 1
+        sharp_edge_flag(e) = 1
       end if
     end if
   end do

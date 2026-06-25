@@ -112,6 +112,9 @@
   ! Allocate cell-based porous regions
   call Enlarge % Array_Int(Grid % por, i=(/-nb_m,nc_m/))
 
+  ! Allocate cell-based concave flag
+  call Enlarge % Array_Log(Grid % concave, i=(/-nb_m,nc_m/))
+
   ! Allocate processor i.d.
   call Enlarge % Array_Int(Grid % Comm % cell_proc, i=(/-nb_m,nc_m/))
   call Enlarge % Array_Int(Grid % Comm % cell_glo,  i=(/-nb_m,nc_m/))

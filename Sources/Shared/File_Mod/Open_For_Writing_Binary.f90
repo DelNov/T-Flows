@@ -27,7 +27,8 @@
 
   if(First_Proc()) then
     if(Sequential_Run()) then
-      print '(a)', ' # Creating the binary file: ' // trim(name_o)
+      print '(a)', " # Creating the binary file: "  //  &
+                   BRIGHT_CYAN//trim(name_o)//RESET
     else
       name_l = name_o
       f = index(name_o, '/')              + 1
@@ -38,10 +39,13 @@
       if(l-f .eq. 3) write(name_l(f:l), '(i4.4)') N_Procs()
       if(l-f .eq. 4) write(name_l(f:l), '(i5.5)') N_Procs()
       if(trim(name_o) .eq. trim(name_l)) then  ! for creation of pvtu file
-        print '(a)', ' # Creating the binary file: ' // trim(name_o)
+        print '(a)', " # Creating the binary file: " //  &
+                     BRIGHT_CYAN//trim(name_o)//RESET
       else
-        print '(a)', ' # Creating the binary files: '  //  &
-                     trim(name_o) // ' ... ' // trim(name_l)
+        print '(a)', " # Creating the binary files: "  //  &
+                     BRIGHT_CYAN//trim(name_o)//RESET  //  &
+                     " ... "                           //  &
+                     BRIGHT_CYAN//trim(name_l)//RESET
       end if
     end if
   end if

@@ -43,12 +43,12 @@
   !   Form the header for error   !
   !-------------------------------!
   if(present(file) .and. present(line)) then
-    write(header_text, '(a,i3)')  "ERROR in file: " // file //  &
-                                  " at line: ", line
+    write(header_text, '(a,i3)')  RED//"ERROR"//RESET//" in file: " //  &
+                                  file // " at line: ", line
   else if(present(file)) then
-    write(header_text, '(a,i3)')  "ERROR in file: " // file
+    write(header_text, '(a,i3)')  RED//"ERROR"//RESET//" in file: " // file
   else
-    write(header_text, '(a,i3)')  "ERROR!"
+    write(header_text, '(a,i3)')  RED//"ERROR"//RESET//"!"
   end if
 
   ! Adjust width, if necessary

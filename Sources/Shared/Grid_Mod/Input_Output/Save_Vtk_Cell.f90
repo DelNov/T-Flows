@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Save_Vtk_Cell(Grid, c, head, rank)
+  subroutine Save_Vtk_Cell(Grid, c, head, rank, plot_center)
 !------------------------------------------------------------------------------!
 !>  This subroutine, Save_Vtk_Cell, (and her sister Save_Vtk_Face) are designed
 !>  to output detailed visual representations of individual cells (or faces),
@@ -9,14 +9,6 @@
 !>  or examining how a cell (or a face) interacts with different phases in VOF
 !>  simulations with front tracking.
 !------------------------------------------------------------------------------!
-!   Functionality                                                              !
-!                                                                              !
-!   * The subroutine opens a VTK file for writing and writes the headers.      !
-!   * It writes the points (node coordinates) of the specified cell.           !
-!   * Polygons representing the cell faces and related data (such as local     !
-!     and global face numbers, surface vectors) are written.                   !
-!   * The file is then closed, completing the cell visualization process.      !
-!------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type)    :: Grid  !! the grid containing the cell
@@ -24,8 +16,9 @@
   character(*)        :: head  !! a header (title) of the file
   integer, intent(in) :: rank  !! a numerical identifier of the file (imagine
                                !! a situation in which you plot a lot of files)
+  logical, optional   :: plot_center  !! flag to plot also the center
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: fu, i_nod, l_nod, n, i_fac, s, ndata, npoly
+  integer              :: fu, i_nod, l_nod, n, i_fac, s, ndata, npoly, center
   character(len=SL)    :: filename
   integer, allocatable :: local_node(:)
 !==============================================================================!
@@ -33,8 +26,16 @@
   allocate(local_node(Grid % n_nodes))
   local_node(:) = 0
 
+  ! Processs optional parameter
+  center = 0
+  if(present(plot_center)) then
+    if(plot_center) center = 1
+  end if
+
+  ! Update the file name
   write(filename,'(a,"-",i9.9,".vtk")') trim(head), rank
 
+  ! Open the vtk file for writing
   open(newunit=fu, file=filename)
   write(fu,'(a26)')     '# vtk DataFile Version 2.0'
   write(fu,'(a6,i7.7)') 'File: ', rank
@@ -43,7 +44,12 @@
   write(fu,'(a16)')     'DATASET POLYDATA'
 
   ! Write the points out
-  write(fu,'(a6,i7,a6)') 'POINTS', abs(Grid % cells_n_nodes(c)), ' float'
+  write(fu,'(a6,i7,a6)') 'POINTS',                               &
+                         abs(Grid % cells_n_nodes(c)) + center,  &
+                         ' float'
+  if(center .eq. 1) then
+    write(fu,'(3es15.6)') Grid % xc(c), Grid % yc(c), Grid % zc(c)
+  end if
   l_nod = 0
   do i_nod = 1, abs(Grid % cells_n_nodes(c))
     n = Grid % cells_n(i_nod, c)
@@ -68,7 +74,7 @@
     write(fu,'(i5)') Grid % faces_n_nodes(s)
     do i_nod = 1, Grid % faces_n_nodes(s)
       n = Grid % faces_n(i_nod, s)
-      write(fu,'(i7)') local_node(n) - 1
+      write(fu,'(i7)') local_node(n) - 1 + center
     end do
   end do
 

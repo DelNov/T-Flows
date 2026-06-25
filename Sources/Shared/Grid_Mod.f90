@@ -123,6 +123,9 @@
     ! (Introduced with Insert_Buildings in Convert)
     integer, allocatable :: por(:)  !! porous region to which each cell belongs
 
+    ! For each cell: is it concave?
+    logical, allocatable :: concave(:)  !! is cell concave?
+
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!
@@ -229,6 +232,7 @@
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Faces_Center
       procedure :: Faces_Surface
 
       ! Determination of grid connectivities
@@ -304,8 +308,9 @@
 #   include "Grid_Mod/Calculate/Face_Centers.f90"
 #   include "Grid_Mod/Calculate/Face_Geometry.f90"
 #   include "Grid_Mod/Calculate/Face_Interpolation.f90"
-#   include "Grid_Mod/Calculate/Faces_Surface.f90"
 #   include "Grid_Mod/Calculate/Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate/Faces_Center.f90"
+#   include "Grid_Mod/Calculate/Faces_Surface.f90"
 #   include "Grid_Mod/Calculate/Global_Volumes.f90"
 #   include "Grid_Mod/Calculate/Wall_Distance.f90"
 #   include "Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90"

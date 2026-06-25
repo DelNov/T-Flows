@@ -254,6 +254,18 @@
       call Convert % Save_Fluent(Grid(g))
     end if
 
+    if(g .eq. 2) then
+      call Message % Framed(80, GREEN//"NOTE"//RESET//":",                     &
+        "Dual grid has been craeted and saved. Keep in mind, however, "    //  &
+        "that although Paraivew support polyhdral cells, its support for " //  &
+        "displaying concave cells and faces is limited. See: \n \n "       //  &
+        "https://vtk.org/doc/nightly/html/classvtkPolyhedron.html"         //  &
+        "#Limitations \n \n "                                              //  &
+        "If you are unsure whether a concave cell or face has been formed "//  &
+        "correctly, temporarily display the grid in Paraview using "       //  &
+        "wireframe representation.")
+    end if
+
     if( (g-n_grids) .eq. 0) then
       ! Create a template control file for this domain
       call Grid(g) % Write_Template_Control_File()

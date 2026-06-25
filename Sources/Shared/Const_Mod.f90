@@ -121,5 +121,24 @@
   ! Steps for expanding the memory in Generate
   integer, parameter :: GROWTH_MARGIN =  131072 !! steps for expanding
                                                 !! memory in Generate
+  !---------------------!
+  !   Color constants   !
+  !---------------------!
+  character(len=1), parameter :: ESC   = achar(27)
+  character(len=4), parameter :: RESET = ESC//'[0m'
+
+  character(len=5), parameter :: RED     = ESC//'[31m'
+  character(len=5), parameter :: GREEN   = ESC//'[32m'
+  character(len=5), parameter :: YELLOW  = ESC//'[33m'
+  character(len=5), parameter :: BLUE    = ESC//'[34m'
+  character(len=5), parameter :: MAGENTA = ESC//'[35m'
+  character(len=5), parameter :: CYAN    = ESC//'[36m'
+
+  character(len=5), parameter :: BRIGHT_RED     = ESC//'[91m'
+  character(len=5), parameter :: BRIGHT_GREEN   = ESC//'[92m'
+  character(len=5), parameter :: BRIGHT_YELLOW  = ESC//'[93m'
+  character(len=5), parameter :: BRIGHT_BLUE    = ESC//'[94m'
+  character(len=5), parameter :: BRIGHT_MAGENTA = ESC//'[95m'
+  character(len=5), parameter :: BRIGHT_CYAN    = ESC//'[96m'
 
   end module
