@@ -25,9 +25,9 @@
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s, reg
   real                       :: u_tan, u_tau
-  real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
+  real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d
   real                       :: kin_vis
-  real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
+  real                       :: z_o, alpha_d, l_sgs_d
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
 !------------------------------------------------------------------------------!
@@ -68,10 +68,10 @@
                           + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
-! In general, this clipping should be avoided.
-!      if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
-!        Turb % g_buoy(c) = 0.0
-!      end if
+       ! In general, this clipping should be avoided.
+       ! if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
+       !   Turb % g_buoy(c) = 0.0
+       ! end if
 
       b(c) = b(c) + max(0.0, Turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))         &
@@ -86,28 +86,21 @@
 
       lf = Grid % vol(c)**ONE_THIRD
 
+      kin_vis =  Flow % viscosity(c) / Flow % density(c)
+
       ! Distance switch
-      l_sgs_d  = 0.8 * lf
-      l_rans_d = 0.41 * Grid % wall_dist(c)
-      alpha_d  = max(1.0,l_rans_d/l_sgs_d)
+      l_sgs_d  = lf
+      l_rans_d = Turb % kappa * Grid % wall_dist(c)
+      alpha_d  = l_rans_d/l_sgs_d
 
-      ! Velocity switch
-      l_sgs_v  = lf * Flow % shear(c)
-      l_rans_v = sqrt(kin % n(c) * zeta % n(c))
-      alpha_v  = l_rans_v / (l_sgs_v + TINY)
-
-      if( (Turb % hybrid_les_rans_switch .eq. SWITCH_DISTANCE)  &
-          .and. (alpha_d < 1.05)                                &
-          .or.                                                  &
-          (Turb % hybrid_les_rans_switch .eq. SWITCH_VELOCITY)  &
-          .and. (alpha_v < 0.5 .or. alpha_d < 1.05) ) then
+      if( alpha_d < Turb % c_hyb ) then
         A % val(A % dia(c)) = A % val(A % dia(c))             &
                             + Flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * Grid % vol(c)
       else
         A % val(A % dia(c)) = A % val(A % dia(c))                        &
           + Flow % density(c)                                            &
-          * min(alpha_d**1.4 * eps % n(c), kin % n(c)**1.5 / (lf*0.01))  &
+          * (kin % n(c)**1.5 / lf)  &
           / (kin % n(c) + TINY) * Grid % vol(c)
       end if
     end do
@@ -116,7 +109,6 @@
       A % val(A % dia(c)) = A % val(A % dia(c))             &
                           + Flow % density(c) * eps % n(c)  &
                           / (kin % n(c) + TINY) * Grid % vol(c)
-
     end do
   end if
 

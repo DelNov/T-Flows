@@ -49,7 +49,7 @@
   character(*)                :: update   !! character switch to control
                                           !! which variables to update
 !------------------------------[Local parameters]------------------------------!
-  integer, parameter :: BEGIN = 12
+  integer, parameter :: BEGIN = 64
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
