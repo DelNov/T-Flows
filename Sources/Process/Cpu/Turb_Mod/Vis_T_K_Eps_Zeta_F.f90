@@ -12,6 +12,7 @@
   type(Var_Type),   pointer :: u, v, w
   type(Var_Type),   pointer :: kin, eps, zeta, f22
   integer                   :: c, reg
+  real                      :: l_sgs_d, l_rans_d, alpha_d, lf
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -41,6 +42,8 @@
     do c = Cells_In_Region(reg)
       Turb % vis_t(c) = Turb % c_mu_d * Flow % density(c) * zeta % n(c)  &
                       * kin % n(c) * Turb % t_scale(c)
+
+
     end do
   end do
 
@@ -51,6 +54,15 @@
       do c = Cells_In_Region(reg)
         Turb % vis_t_eff(c) = max(Turb % vis_t(c),  &
                                   Turb % vis_t_sgs(c))
+
+        lf = Grid % vol(c)**ONE_THIRD 
+        l_sgs_d  = lf                                                        
+        l_rans_d = Turb % kappa * Grid % wall_dist(c)                                      
+        alpha_d  = l_rans_d/l_sgs_d       
+
+        if(alpha_d > Turb % c_hyb) then
+          Turb % vis_t(c) = Turb % vis_t_eff(c)
+        end if  
       end do
     end do
     call Grid % Exchange_Cells_Real(Turb % vis_t_eff)
