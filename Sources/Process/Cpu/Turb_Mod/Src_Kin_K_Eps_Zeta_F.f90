@@ -25,12 +25,11 @@
   real,              pointer :: b(:)
   integer                    :: c, c1, c2, s, reg
   real                       :: u_tan, u_tau
-  real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d, l_rans_v
+  real                       :: lf, ebf, p_kin_int, p_kin_wf, l_rans_d
   real                       :: kin_vis
-  real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
+  real                       :: z_o, alpha_d, l_sgs_d
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
-  real                       :: h_max_new, c_hyb
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
 !                                                                              !
@@ -69,10 +68,10 @@
                           + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
-! In general, this clipping should be avoided.
-!      if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
-!        Turb % g_buoy(c) = 0.0
-!      end if
+       ! In general, this clipping should be avoided.
+       ! if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
+       !   Turb % g_buoy(c) = 0.0
+       ! end if
 
       b(c) = b(c) + max(0.0, Turb % g_buoy(c) * Grid % vol(c))
       A % val(A % dia(c)) = A % val(A % dia(c))         &
@@ -87,14 +86,14 @@
 
       lf = Grid % vol(c)**ONE_THIRD
 
-      kin_vis =  Flow % viscosity(c) / Flow % density(c)                         
-      
+      kin_vis =  Flow % viscosity(c) / Flow % density(c)
+
       ! Distance switch
       l_sgs_d  = lf
       l_rans_d = Turb % kappa * Grid % wall_dist(c)
       alpha_d  = l_rans_d/l_sgs_d
 
-      if( alpha_d < Turb % c_hyb ) then     
+      if( alpha_d < Turb % c_hyb ) then
         A % val(A % dia(c)) = A % val(A % dia(c))             &
                             + Flow % density(c) * eps % n(c)  &
                             / (kin % n(c) + TINY) * Grid % vol(c)
