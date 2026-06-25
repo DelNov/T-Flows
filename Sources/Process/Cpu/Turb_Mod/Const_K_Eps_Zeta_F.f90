@@ -23,6 +23,7 @@
   Turb % alpha   =  0.012
   Turb % c_f1    =  1.4
   Turb % c_f2    =  0.3
+  Turb % c_hyb   =  1.2
 
   ! Transport properties
   Turb % kin  % sigma = 1.0
@@ -39,7 +40,7 @@
   Turb % c_theta = 0.22
 
   ! Constants for AFM turbulent flux
-  Turb % afm_psi = 0.1
-  Turb % afm_eta = 0.1
+  Turb % afm_psi = 0.05
+  Turb % afm_eta = 0.05
 
   end subroutine
