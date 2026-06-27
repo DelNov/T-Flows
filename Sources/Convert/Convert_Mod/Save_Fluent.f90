@@ -233,7 +233,7 @@
     do s = Grid % region % f_face(reg), Grid % region % l_face(reg)
 
       ! Write the number of nodes for this face
-      write(fu, '(z9, 1x)', advance="no")  Grid % faces_n_nodes(c)
+      write(fu, '(z9, 1x)', advance="no")  Grid % faces_n_nodes(s)
 
       ! Write all nodes for the face
       do i_nod = 1, Grid % faces_n_nodes(s)
