@@ -1,4 +1,6 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Tokenizer_Mod

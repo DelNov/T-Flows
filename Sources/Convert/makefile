@@ -200,7 +200,8 @@ else
   OPT_C_COMP = 
   ifeq ($(DEBUG), yes)
     OPT_F_COMP += -O0 -g -fcheck=all -Wunused-parameter -Wall  \
-                  -Wno-integer-division
+                  -Wno-integer-division  \
+                  -fbacktrace -fcheck=all -ffpe-trap=invalid,zero,overflow
   else
     OPT_F_COMP += -O3
   endif

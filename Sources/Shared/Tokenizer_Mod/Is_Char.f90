@@ -1,4 +1,3 @@
-
 !==============================================================================!
   pure logical function Is_Char(Tok, ch)
 !------------------------------------------------------------------------------!
@@ -21,6 +20,8 @@
   class(Tokenizer_Type), intent(in)   :: Tok  !! parent class containing the
                                               !! string to be tokenized
   character(len=1), intent(in)        :: ch   !! input character
+!------------------------[Avoid unused parent warning]-------------------------!
+  Unused(Tok)
 !==============================================================================!
 
   ! Normal printable characters are token characters.

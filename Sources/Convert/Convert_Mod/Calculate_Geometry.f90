@@ -724,7 +724,7 @@
   !   Phase IV  ->  sort the faces   !
   !                                  !
   !----------------------------------!
-  call Grid % Sort_Faces_By_Index(Grid % new_f, Grid % n_faces)
+  call Grid % Sort_Faces_By_Index(Grid % new_f)
   call Sort % Real_By_Index(Grid % n_faces, Grid % xf, Grid % new_f)
   call Sort % Real_By_Index(Grid % n_faces, Grid % yf, Grid % new_f)
   call Sort % Real_By_Index(Grid % n_faces, Grid % zf, Grid % new_f)

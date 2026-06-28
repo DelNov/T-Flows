@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
 
 !==============================================================================!
   program Convert_Prog
@@ -153,6 +154,9 @@
     call Convert % Find_Boundary_Faces(Grid(1))
     call Convert % Find_Inside_Faces  (Grid(1))
   end if
+
+  ! Insert boundary layers
+  call Convert % Insert_Layers(Grid(1))
 
   ! Some mesh generators (Gmsh for sure) can leave duplicate
   ! nodes in the grid. Check it and eliminate them with this

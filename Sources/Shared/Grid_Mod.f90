@@ -221,6 +221,7 @@
 
       ! Various calculations on the grid, geometrical quantities, in essence
       procedure :: Bounding_Box
+      procedure :: Cells_Center
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Inertia
       procedure :: Calculate_Cell_Volumes
@@ -285,6 +286,7 @@
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
+      procedure :: Sort_Nodes_By_Index
 
       ! Procedures to copy grid to device
       procedure :: Copy_Grid_To_Device
@@ -302,6 +304,7 @@
 
     ! Various calculations on the grid, geometrical quantities, in essence
 #   include "Grid_Mod/Calculate/Bounding_Box.f90"
+#   include "Grid_Mod/Calculate/Cells_Center.f90"
 #   include "Grid_Mod/Calculate/Cell_Centers.f90"
 #   include "Grid_Mod/Calculate/Cell_Inertia.f90"
 #   include "Grid_Mod/Calculate/Cell_Volumes.f90"
@@ -366,6 +369,7 @@
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
+#   include "Grid_Mod/Sorting/Sort_Nodes_By_Index.f90"
 
     ! Procedures to copy grid to device
 #   include "Grid_Mod/Gpu/Copy_To_Device.f90"
