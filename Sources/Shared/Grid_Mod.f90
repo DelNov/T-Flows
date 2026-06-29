@@ -286,7 +286,8 @@
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
-      procedure :: Sort_Nodes_By_Index
+      procedure :: Sort_Nodes_By_Key
+      procedure :: Sort_Nodes_Boundary_First
 
       ! Procedures to copy grid to device
       procedure :: Copy_Grid_To_Device
@@ -369,7 +370,8 @@
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
-#   include "Grid_Mod/Sorting/Sort_Nodes_By_Index.f90"
+#   include "Grid_Mod/Sorting/Sort_Nodes_By_Key.f90"
+#   include "Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90"
 
     ! Procedures to copy grid to device
 #   include "Grid_Mod/Gpu/Copy_To_Device.f90"
