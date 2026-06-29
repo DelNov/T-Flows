@@ -43,7 +43,7 @@
   !   Do the sorting of data pertinent to cells   !
   !-----------------------------------------------!
   do c = -Grid % n_bnd_cells, Grid % n_cells
-    do i_nod = 1, Grid % cells_n_nodes(c)
+    do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       Grid % cells_n(i_nod, c) = Grid % new_n(n)
     end do

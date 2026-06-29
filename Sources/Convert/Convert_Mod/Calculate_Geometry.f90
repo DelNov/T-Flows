@@ -333,11 +333,11 @@
 
       call Grid % Print_Regions_List()
       n_per = 0
-      print *, '#=============================================================='
-      print *, '# Enter the ordinal number(s) of periodic-boundary condition(s)'
-      print *, '# from the boundary condition list (see above)                 '
-      print *, '# Type skip if there is none !                                 '
-      print *, '#--------------------------------------------------------------'
+      print *, '#==========================================================='
+      print *, '# Type ordinal number(s) of periodic-boundary condition(s)  '
+      print *, '# from the boundary condition list (see above)              '
+      print *, '# Type skip if there is none !                              '
+      print *, '#-----------------------------------------------------------'
       call File % Read_Line(5)
       answer = Line % tokens(1)
       call String % To_Upper_Case(answer)

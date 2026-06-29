@@ -17,18 +17,33 @@
   yc = 0.0
   zc = 0.0
 
-  ! Browse throug cell's nodes
-  do i_nod = 1, Grid % cells_n_nodes(c)  ! local node counter
-    n = Grid % cells_n(i_nod, c)         ! global node number
-    xc = xc + Grid % xn(n)
-    yc = yc + Grid % yn(n)
-    zc = zc + Grid % zn(n)
-  end do
+  ! For concave cells, cell center was estimated in Convert_Mod/Create_Dual
+  if(.not. Grid % concave(c)) then
 
-  ! Barycenter
-  nn = Grid % cells_n_nodes(c)
-  xc = xc / real(nn)
-  yc = yc / real(nn)
-  zc = zc / real(nn)
+    nn = abs(Grid % cells_n_nodes(c))
+    Assert(nn .gt. 0)
+
+    ! Browse throug cell's nodes
+    do i_nod = 1, nn                ! local node counter
+      n = Grid % cells_n(i_nod, c)  ! global node number
+      xc = xc + Grid % xn(n)
+      yc = yc + Grid % yn(n)
+      zc = zc + Grid % zn(n)
+    end do
+
+    ! Barycenter
+    xc = xc / real(nn)
+    yc = yc / real(nn)
+    zc = zc / real(nn)
+
+  ! Cell is concave, take the already computed cell center
+  else
+
+    xc = Grid % xc(c)
+    yc = Grid % yc(c)
+    zc = Grid % zc(c)
+
+  end if
+
 
   end subroutine

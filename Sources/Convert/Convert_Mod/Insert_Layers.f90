@@ -35,7 +35,8 @@
   character(SL)        :: answer
   integer              :: n_inserting_regions, i_reg, reg, s, c1, c2, ni, nj
   integer              :: cnt_c, cnt_f, cnt_n, cnt_e, cnt_ei, cnt_eb, run
-  integer              :: n, i_nod, j_nod, e, ee, n1, n2, s1, s2, sm, sb
+  integer              :: n, nn, nn1, nn2
+  integer              :: i_nod, j_nod, e, ee, n1, n2, s1, s2, sm, sb
   integer              :: old_n, old_f, old_c, old_bc, cnt_bnd_n
   real                 :: area, dot, eps
   real                 :: fnx, fny, fnz
@@ -205,11 +206,6 @@
 
             if(mark_faces(s) .eq. 0) then
               mark_faces(s) = 1
-
-              ! Layer can be added to primal grids only, meaning the
-              ! number of faces's nodes can be only three or four
-              Assert(Grid % faces_n_nodes(s) .ge. 3)
-              Assert(Grid % faces_n_nodes(s) .le. 4)
 
               ! Calculate face's surface normal
               call Grid % Faces_Surface(s, sx, sy, sz)
@@ -554,6 +550,18 @@
           Grid % cells_n(6, face_to_cell(s)) = node_to(Grid % faces_n(2, s))
           Grid % cells_n(7, face_to_cell(s)) = node_to(Grid % faces_n(3, s))
           Grid % cells_n(8, face_to_cell(s)) = node_to(Grid % faces_n(4, s))
+
+        !-----------------------------------------!
+        !   Polygonal face: create a polyhedron   !
+        !-----------------------------------------!
+        else
+          nn = Grid % faces_n_nodes(s)
+          call Enlarge % Matrix_Int(Grid % cells_n, i=(/1,2*nn/))
+          Grid % cells_n_nodes(face_to_cell(s)) = -2*nn  ! polyhedron
+          do i_nod = 1, nn
+            Grid % cells_n(i_nod,      face_to_cell(s)) = Grid % faces_n(i_nod, s)
+            Grid % cells_n(i_nod + nn, face_to_cell(s)) = node_to(Grid % faces_n(i_nod, s))
+          end do
         end if
 
         !-------------------!
@@ -773,21 +781,31 @@
         dz = zc2 - zc1
         dot = sx*dx + sy*dy + sz * dz
 
-        ! In the first run, the order of nodes is not guaranteed
+        !------------------------------------------------------------!
+        !   In the first run, the order of nodes is not guaranteed   !
+        !------------------------------------------------------------!
         if(run .eq. 1 .and. dot .lt. 0.0) then
+
+          ! Triangle: [1,2,3] -> [1,3,2]
           if(Grid % faces_n_nodes(s) .eq. 3) then
             call Swap_Int(Grid % faces_n(2, s), Grid % faces_n(3, s))
+
+          ! Quad: [1,2,3,4] -> [1,4,3,2]
           else if(Grid % faces_n_nodes(s) .eq. 4) then
             call Swap_Int(Grid % faces_n(2, s), Grid % faces_n(4, s))
+
+          ! Polygons: [1,2,3,4,5]     -> [1,5,4,3,2]
+          !           [1,2,3,4,5,6]   -> [1,6,5,4,3,2]
+          !           [1,2,3,4,5,6,7] -> [1,7,6,5,4,3,2]
           else
-            call Message % Error(60,                                      &
-              "Something is wrong big time: a face which has neither "//  &
-              "three nor four nodes have been detected",                  &
-              file= __FILE__, line = __LINE__)
+            call Sort % Reverse_Order_Int(  &
+              Grid % faces_n(2:Grid % faces_n_nodes(s), s))
           end if
         end if
 
-        ! In the second run, all faces should be fixed
+        !--------------------------------------------------!
+        !   In the second run, all faces should be fixed   !
+        !--------------------------------------------------!
         if(run .eq. 2) then
           Assert(dot .ge. 0)
         end if
@@ -814,8 +832,10 @@
       do i_nod = 1, Grid % faces_n_nodes(s)
         n = Grid % faces_n(i_nod, s)
         Assert(n .gt. 0)
-        Assert(any(Grid % cells_n(1:Grid % cells_n_nodes(c1), c1) .eq. n))
-        Assert(any(Grid % cells_n(1:Grid % cells_n_nodes(c2), c2) .eq. n))
+        nn1 = abs(Grid % cells_n_nodes(c1))
+        nn2 = abs(Grid % cells_n_nodes(c2))
+        Assert(any(Grid % cells_n(1:nn1, c1) .eq. n))
+        Assert(any(Grid % cells_n(1:nn2, c2) .eq. n))
       end do
     end do
 

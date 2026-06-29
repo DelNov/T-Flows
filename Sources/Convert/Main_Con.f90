@@ -155,9 +155,6 @@
     call Convert % Find_Inside_Faces  (Grid(1))
   end if
 
-  ! Insert boundary layers
-  call Convert % Insert_Layers(Grid(1))
-
   ! Some mesh generators (Gmsh for sure) can leave duplicate
   ! nodes in the grid. Check it and eliminate them with this
   if(file_format .eq. 'GMSH') then
@@ -193,6 +190,12 @@
       print '(a)',              ' #                                    '
       print '(a)',              ' #--------------------------------------'
       if(g .eq. 2) call Convert % Create_Dual(Grid(1), Grid(2))
+    end if
+
+    ! Insert boundary layers
+    if( (g-n_grids) .eq. 0) then
+      call Convert % Insert_Layers(Grid(g))
+      call Grid(g) % Save_Vtu_Faces((/0, 0/))
     end if
 
     !--------------------------------------!

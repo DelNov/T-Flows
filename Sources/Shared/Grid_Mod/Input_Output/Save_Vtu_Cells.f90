@@ -39,7 +39,7 @@
 !==============================================================================!
 
   ! A very rudimentary test to check if regions are set
-  Assert(Grid % region % f_cell(Grid % n_regions) .eq.              1)
+  Assert(Grid % region % f_cell(Grid % n_regions) .eq. 1)
   Assert(Grid % region % l_cell(Grid % n_regions) .eq. Grid % n_cells)
 
   call Profiler % Start('Save_Vtu_Cells')
