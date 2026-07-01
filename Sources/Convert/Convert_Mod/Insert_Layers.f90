@@ -75,7 +75,7 @@
       "\n \n                                                         " //  &
       "Type skip to skip insertion of boundary layers")
 
-    call File % Read_Line(5)
+    call File % Read_Line(5, key_log_entry = "# Insert boundary layers")
     answer = Line % tokens(1)
     call String % To_Upper_Case(answer)
 
@@ -95,7 +95,8 @@
     !   Fetch the thickness   !
     !-------------------------!
     read(Line % tokens(Line % n_tokens), *)  thickness
-    print '(a,es10.3)', " # Inserting a boundary layer with thicness ", thickness
+    print '(a,es10.3)', " # Inserting a boundary layer with thickness ",  &
+                        thickness
 
     !-----------------------------------------------------------------------!
     !                                                                       !

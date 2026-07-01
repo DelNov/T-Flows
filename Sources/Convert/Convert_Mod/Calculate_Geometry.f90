@@ -149,7 +149,7 @@
     if(Grid % faces_c(2,s) > 0) then
       if(Grid % faces_c(1,s) > Grid % faces_c(2,s)) then
         call Message % Error(60,                                       &
-                 "This shoulnd't have happened at real face! \n "  //  &
+                 "This shouldn't have happened at real face! \n "  //  &
                  "This error is critical.  Exiting now.!",             &
                  file=__FILE__, line=__LINE__)
       end if
@@ -175,7 +175,7 @@
     print *, '# Enter scaling factor for geometry: '
     print *, '# (or skip to keep as is): '
     print *, '#-----------------------------------------'
-    call File % Read_Line(5)
+    call File % Read_Line(5, key_log_entry = "# Geometric scaling")
     answer = Line % tokens(1)
     call String % To_Upper_Case(answer)
 
@@ -233,7 +233,7 @@
     print *, '# Type 1 for barycentric placement'
     print *, '# Type 2 for orthogonal placement'
     print *, '#------------------------------------'
-    bou_cen = File % Single_Word_From_Keyboard()
+    bou_cen = File % Single_Word_From_Keyboard("# Boundary cell centers")
   else
     bou_cen = '1'
   end if
@@ -338,7 +338,7 @@
       print *, '# from the boundary condition list (see above)              '
       print *, '# Type skip if there is none !                              '
       print *, '#-----------------------------------------------------------'
-      call File % Read_Line(5)
+      call File % Read_Line(5, key_log_entry = "# Periodic boundary conditions")
       answer = Line % tokens(1)
       call String % To_Upper_Case(answer)
 
@@ -381,6 +381,15 @@
           end if
         end if
       end do
+
+      ! Check if there are zero periodic pairs found
+      if(cnt_per .eq. 0) then
+        call Message % Error(60,                                         &
+          "No faces were found in the selected periodic boundary " //    &
+          "region.  Check the ordinal number entered for periodicity.",  &
+          file=__FILE__, line=__LINE__)
+      end if
+
       v(1:3) = v(1:3) / cnt_per;  v(1:3) = v(1:3) / norm2(v(1:3))
       k(1:3) = Math % Cross_Product(v(1:3), (/1.,0.,0./))
       theta  = acos(dot_product    (v(1:3), (/1.,0.,0./)))
@@ -410,6 +419,14 @@
           end if
         end if
       end do
+
+      ! Check if there is an even number of pairs
+      if(mod(cnt_per, 2) .ne. 0) then
+        call Message % Error(60,                                       &
+          "Odd number of faces found in the selected periodic "    //  &
+          "boundary region.  Periodic faces must come in pairs.",      &
+          file=__FILE__, line=__LINE__)
+      end if
 
       !-------------------------------------------!
       !   Sort the faces at periodic boundaries   !
@@ -479,6 +496,22 @@
           Grid % faces_c(2,s2) = 0    ! c21; this zero marks a shadow face, dirty
         end do
       end if
+
+      !-----------------------------------------------------!
+      !   Throw an error if periodic faces can't be found   !
+      !-----------------------------------------------------!
+      do s = 1, cnt_per / 2
+        s1 = b_face(s)
+        s2 = b_face(s + cnt_per / 2)
+
+        if(Grid % faces_s(s1) .le. 0 .or. Grid % faces_s(s2) .le. 0) then
+          call Message % Error(60,                                          &
+            "Failed to find a matching periodic face.  This usually "   //  &
+            "means that the selected boundary region is not periodic, " //  &
+            "or that the scripted input selected the wrong region.",        &
+            file=__FILE__, line=__LINE__)
+        end if
+      end do
 
       n_per = cnt_per / 2
       print *, '# Phase I: periodic cells: ', n_per
@@ -786,7 +819,7 @@
   print *, '# Cell volumes calculated !'
 
   if(Grid % min_vol < 0.0) then
-    print *, '# Negative volume occured!'
+    print *, '# Negative volume occurred!'
     print *, '# Execution will halt now!'
     stop
   end if
