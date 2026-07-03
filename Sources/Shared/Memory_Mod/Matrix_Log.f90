@@ -1,8 +1,10 @@
 !==============================================================================!
-  subroutine Matrix_Log(Mem, a, i, j)
+  subroutine Matrix_Log(Mem, a, i, j, val)
 !------------------------------------------------------------------------------!
 !>  Enlarges a logical matrix to include the ranges of indices specified in
 !>  i and j.
+!>  If the requested ranges are already covered, the matrix is left unchanged.
+!>  The matrix is never shrunk.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -10,6 +12,7 @@
   logical, allocatable, intent(inout) :: a(:,:)  !! operand matrix
   integer, optional,    intent(in)    :: i(:)    !! matrix range in i
   integer, optional,    intent(in)    :: j(:)    !! matrix range in j
+  logical, optional,    intent(in)    :: val     !! new value (optional)
 !-----------------------------------[Locals]-----------------------------------!
   logical, allocatable :: temp(:,:)
   integer              :: new_i_lower
@@ -24,8 +27,15 @@
   character(DL)        :: error_message    ! allocation error message
 !==============================================================================!
 
-  if(present(i)) Assert(size(i) .eq. 2)
-  if(present(j)) Assert(size(j) .eq. 2)
+  ! Check validity of the arguments
+  if(present(i)) then
+    Assert(size(i) .eq. 2)
+    Assert(i(1) .le. i(2))
+  end if
+  if(present(j)) then
+    Assert(size(j) .eq. 2)
+    Assert(j(1) .le. j(2))
+  end if
 
   !----------------------------------------------------------------!
   !   If not allocated, allocate, initialize and get out of here   !
@@ -34,8 +44,6 @@
 
     ! Check validity of the arguments
     Assert(present(i) .and. present(j))
-    Assert(i(1) .le. i(2))
-    Assert(j(1) .le. j(2))
 
     ! Allocate memory
     allocate(a(i(1):i(2), j(1):j(2)),  &
@@ -49,7 +57,11 @@
     end if
 
     ! Initialize
-    a = .false.
+    if(present(val)) then
+      a = val
+    else
+      a = .false.
+    end if
 
     ! Get out
     return
@@ -94,7 +106,11 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
-    temp = .false.
+    if(present(val)) then
+      temp = val
+    else
+      temp = .false.
+    end if
 
     ! Copy old data to new array
     temp(lbound(a,1):ubound(a,1), lbound(a,2):ubound(a,2)) = a

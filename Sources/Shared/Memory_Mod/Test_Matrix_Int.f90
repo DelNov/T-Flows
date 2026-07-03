@@ -1,7 +1,8 @@
 !==============================================================================!
   logical function Test_Matrix_Int(Mem, a, i, j)
 !------------------------------------------------------------------------------!
-!>  Checks if indices i and j are within bounds of integer matrix a
+!>  Private function to check if indices i and j are within bounds of
+!>  integer matrix a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

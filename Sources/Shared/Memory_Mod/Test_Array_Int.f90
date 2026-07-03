@@ -1,7 +1,7 @@
 !==============================================================================!
   logical function Test_Array_Int(Mem, a, i)
 !------------------------------------------------------------------------------!
-!>  Checks if index i is within bounds of integer array a
+!>  Private function to check if index i is within bounds of integer array a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -1,7 +1,7 @@
 !==============================================================================!
   logical function Test_Array_Log(Mem, a, i)
 !------------------------------------------------------------------------------!
-!>  Checks if index i is within bounds of logical array a
+!>  Private function to check if index i is within bounds of logical array a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

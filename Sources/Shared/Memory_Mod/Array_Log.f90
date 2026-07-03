@@ -1,33 +1,34 @@
 !==============================================================================!
-  subroutine Array_Log(Mem, a, i)
+  subroutine Array_Log(Mem, a, i, val)
 !------------------------------------------------------------------------------!
 !>  Enlarges a logical array a to include the range of indices specified by i.
+!>  If the requested range is already covered, the array is left unchanged.
+!>  The array is never shrunk.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Memory_Type),   intent(in)    :: Mem    !! parent class
   logical, allocatable, intent(inout) :: a(:)   !! operand array
   integer,              intent(in)    :: i(:)   !! array range
+  logical, optional,    intent(in)    :: val    !! new value (optional)
 !-----------------------------------[Locals]-----------------------------------!
   logical, allocatable :: temp(:)
   integer              :: new_i_lower
   integer              :: new_i_upper
-  integer              :: i_lower     = 1
-  integer              :: i_upper     = 1
+  integer              :: i_lower = 1
+  integer              :: i_upper = 1
   integer              :: error_code       ! allocation error code
   character(DL)        :: error_message    ! allocation error message
 !==============================================================================!
 
   ! Array range must be specified in an array with the length of two
   Assert(size(i) .eq. 2)
+  Assert(i(1) .le. i(2))
 
   !----------------------------------------------------------------!
   !   If not allocated, allocate, initialize and get out of here   !
   !----------------------------------------------------------------!
   if(.not. allocated(a)) then
-
-    ! Check validity of the arguments
-    Assert(i(1) .le. i(2))
 
     ! Allocate memory
     allocate(a(i(1):i(2)),  &
@@ -41,7 +42,11 @@
     end if
 
     ! Initialize
-    a = .false.
+    if(present(val)) then
+      a = val
+    else
+      a = .false.
+    end if
 
     ! Get out
     return
@@ -70,7 +75,11 @@
          'This error is critical.  Exiting!',                         &
          file=__FILE__, line=__LINE__)
     end if
-    temp = .false.
+    if(present(val)) then
+      temp = val
+    else
+      temp = .false.
+    end if
 
     ! Copy old data to new array
     temp(lbound(a,1):ubound(a,1)) = a
