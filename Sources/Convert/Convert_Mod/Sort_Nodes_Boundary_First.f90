@@ -1,12 +1,13 @@
 !==============================================================================!
-  subroutine Sort_Nodes_Boundary_First(Grid, n_bnd_nodes)
+  subroutine Sort_Nodes_Boundary_First(Convert, Grid, n_bnd_nodes)
 !------------------------------------------------------------------------------!
 !>  Sort nodes by placing boundary nodes first.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Grid_Type),  intent(inout) :: Grid  !! parent grid
-  integer, optional, intent(out)   :: n_bnd_nodes
+  class(Convert_Type), intent(inout) :: Convert      !! parent class
+  type(Grid_Type),     intent(inout) :: Grid         !! grid being sorted
+  integer, optional,   intent(out)   :: n_bnd_nodes
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: s, c2, i_nod, n, cnt_bnd_n
   integer, allocatable :: key(:)
