@@ -1,5 +1,8 @@
 !==============================================================================!
-  subroutine Insert_Layers(Convert, Grid)
+  subroutine Insert_Layers(Convert, Grid,                              &
+                                    n_layer_regions, layer_regions,    &
+                                    n_layers,        layer_thickness,  &
+                                    compress_domain)
 !------------------------------------------------------------------------------!
 !   At this point, boundary and inside faces have been found, but
 !   geometrical quantities and final sorted ranges have not been formed yet.
@@ -27,28 +30,36 @@
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(Convert_Type)        :: Convert  !! parent class
-  type(Grid_Type),    target :: Grid     !! primal grid
+  class(Convert_Type)     :: Convert  !! parent class
+  type(Grid_Type), target :: Grid     !! primal grid
+  integer,    intent(in)  :: n_layer_regions
+  integer                 :: layer_regions(n_layer_regions)
+  integer,    intent(in)  :: n_layers
+  real                    :: layer_thickness(n_layers)
+  logical,    intent(in)  :: compress_domain
 !------------------------------[Local parameters]------------------------------!
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  character(SL)        :: answer
-  integer              :: n_inserting_regions, i_reg, reg, s, c1, c2, ni, nj
+  integer              :: i_reg, reg, s, c1, c2, ni, nj
   integer              :: cnt_c, cnt_f, cnt_n, cnt_e, cnt_ei, cnt_eb, run
   integer              :: n, nn, nn1, nn2
   integer              :: i_nod, j_nod, e, ee, n1, n2, s1, s2, sm, sb
   integer              :: old_n, old_f, old_c, old_bc, cnt_bnd_n
-  real                 :: area, dot, eps
-  real                 :: fnx, fny, fnz
+  real                 :: area, dot, eps, magn
+  real                 :: nx, ny, nz
   real                 :: xf, yf, zf, xc, yc, zc, sx, sy, sz
   real                 :: xc1, yc1, zc1, xc2, yc2, zc2, dx, dy, dz
   real                 :: thickness, a(3,3), b(3), x(3)
   logical              :: invertible, inner, outer, warning
+  integer              :: i_lay
   integer, allocatable :: node_to(:), face_to_face(:), face_to_cell(:)
   integer, allocatable :: edge_cnt(:), key(:)
   integer, allocatable :: edge_n1(:), edge_n2(:), edge_s1(:), edge_s2(:)
-  integer, allocatable :: mark_nodes(:), mark_faces(:)
-  real,    allocatable :: nx(:),  ny(:),  nz(:)
+  integer, allocatable :: mark_nodes(:), mark_face(:), node_cnt(:)
+  logical, allocatable :: fixed_nodes(:)
+  real,    allocatable :: phi(:)
+  real,    allocatable :: disp_x(:), disp_y(:), disp_z(:)  ! node displacements
+  real,    allocatable :: node_nx(:), node_ny(:), node_nz(:)  ! node normals
   real,    allocatable :: a11(:), a12(:), a13(:)
   real,    allocatable :: a22(:), a23(:), a33(:)
   real,    allocatable :: bx(:),  by(:),  bz(:)
@@ -56,47 +67,15 @@
   Unused(Convert)
 !==============================================================================!
 
-  !----------------------------------------!
-  !                                        !
-  !   Outer do loop over boundary layers   !
-  !                                        !
-  !----------------------------------------!
-  do
+  do i_lay = 1, n_layers
 
-    call Print_Regions_List(Grid)
-
-    call Message % Framed(60,                                              &
-      "Inserting boundary layers.                                    ",    &
-      "Type ordinal number(s) of boundary-condition regions to       " //  &
-      "expand, followed by the boundary-layer thickness.             " //  &
-      "\n \n                                                         " //  &
-      "Example:  2  5  7  0.01                                       " //  &
-      "expands regions 2, 5 and 7 by a layer of thickness 0.01.      " //  &
-      "\n \n                                                         " //  &
-      "Type skip to skip insertion of boundary layers")
-
-    call File % Read_Line(5, key_log_entry = "# Insert boundary layers")
-    answer = Line % tokens(1)
-    call String % To_Upper_Case(answer)
-
-    if(answer .eq. 'SKIP') then
-      print *, "# Finished inserting boundary layers."
-      exit
+    if(compress_domain) then
+      thickness = sum(layer_thickness(1:n_layers))
+    else
+      thickness = layer_thickness(i_lay)
+      print '(a,es10.3)', " # Inserting a boundary layer with thickness ",  &
+                            thickness
     end if
-
-    print *, '# Inserting boundary layer!'
-
-    !------------------------------------------------!
-    !   Fetch the number of regions to be extruded   !
-    !------------------------------------------------!
-    n_inserting_regions = Line % n_tokens - 1  ! the last one is thickness
-
-    !-------------------------!
-    !   Fetch the thickness   !
-    !-------------------------!
-    read(Line % tokens(Line % n_tokens), *)  thickness
-    print '(a,es10.3)', " # Inserting a boundary layer with thickness ",  &
-                        thickness
 
     !-----------------------------------------------------------------------!
     !                                                                       !
@@ -119,18 +98,17 @@
     !   Sort nodes boundaries first because only   !
     !   these will be coppied to new layer later   !
     !----------------------------------------------!
-    call Grid % Sort_Nodes_Boundary_First(cnt_bnd_n)
+    call Convert % Sort_Nodes_Boundary_First(Grid, cnt_bnd_n)
 
     !--------------------------------------------------------!
     !   Count nodes which will be copied into the new layer  !
     !    in order to know how much more memory to allocate.  !
     !--------------------------------------------------------!
-    call Enlarge % Array_Int (mark_nodes, (/1, Grid % n_nodes/))
-    mark_nodes(:) = 0
+    call Enlarge % Array_Int (mark_nodes, (/1, Grid % n_nodes/), val=0)
 
     cnt_n = 0  ! number of extruded nodes
-    do i_reg = 1, n_inserting_regions
-      read(Line % tokens(i_reg), *) reg
+    do i_reg = 1, n_layer_regions
+      reg = layer_regions(i_reg)
 
       ! Browse through all faces
       do s = 1, Grid % n_faces
@@ -159,29 +137,23 @@
     !----------------------------------------------!
     !   Allocate memory for local working arrays   !
     !----------------------------------------------!
-    call Enlarge % Array_Int (mark_faces, (/1, Grid % n_faces/))
+    call Enlarge % Array_Int (mark_face, (/1, Grid % n_faces/), val=NO)
 
-    call Enlarge % Array_Real(nx, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(ny, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(nz, (/1, cnt_bnd_n/))
+    call Enlarge % Array_Real(disp_x, (/1, Grid % n_nodes/), val=0.0)
+    call Enlarge % Array_Real(disp_y, (/1, Grid % n_nodes/), val=0.0)
+    call Enlarge % Array_Real(disp_z, (/1, Grid % n_nodes/), val=0.0)
 
-    call Enlarge % Array_Real(a11, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(a12, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(a13, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(a22, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(a23, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(a33, (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(bx,  (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(by,  (/1, cnt_bnd_n/))
-    call Enlarge % Array_Real(bz,  (/1, cnt_bnd_n/))
+    call Enlarge % Array_Real(a11, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(a12, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(a13, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(a22, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(a23, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(a33, (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(bx,  (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(by,  (/1, cnt_bnd_n/), val=0.0)
+    call Enlarge % Array_Real(bz,  (/1, cnt_bnd_n/), val=0.0)
 
     mark_nodes(:) = 0
-    mark_faces(:) = 0
-
-    nx (:) = 0.0;  ny (:) = 0.0;  nz (:) = 0.0
-    a11(:) = 0.0;  a12(:) = 0.0;  a13(:) = 0.0
-    a22(:) = 0.0;  a23(:) = 0.0;  a33(:) = 0.0
-    bx (:) = 0.0;  by (:) = 0.0;  bz (:) = 0.0
 
     !-----------------------------------------------------------------------!
     !                                                                       !
@@ -195,8 +167,8 @@
     !   stored at every node of the face.                                   !
     !-----------------------------------------------------------------------!
     warning = .false.
-    do i_reg = 1, n_inserting_regions
-      read(Line % tokens(i_reg), *) reg
+    do i_reg = 1, n_layer_regions
+      reg = layer_regions(i_reg)
 
       do s = 1, Grid % n_faces
         c1 = Grid % faces_c(1,s)
@@ -205,8 +177,8 @@
         if(c2 < 0) then
           if(Grid % region % at_cell(c2) .eq. reg) then
 
-            if(mark_faces(s) .eq. 0) then
-              mark_faces(s) = 1
+            if(mark_face(s) .eq. NO) then
+              mark_face(s) = YES
 
               ! Calculate face's surface normal
               call Grid % Faces_Surface(s, sx, sy, sz)
@@ -214,20 +186,20 @@
               area = sqrt(sx**2 + sy**2 + sz**2)
               Assert(area > TINY)
 
-              fnx = sx / area
-              fny = sy / area
-              fnz = sz / area
+              nx = sx / area
+              ny = sy / area
+              nz = sz / area
 
               call Grid % Faces_Center(s, xf, yf, zf)
 
               call Grid % Cells_Center(c1, xc, yc, zc)
 
-              dot = fnx*(xf-xc) + fny*(yf-yc) + fnz*(zf-zc)
+              dot = nx*(xf-xc) + ny*(yf-yc) + nz*(zf-zc)
               if(dot < 0.0) then
                 warning = .true.
-                fnx = -fnx
-                fny = -fny
-                fnz = -fnz
+                nx = -nx
+                ny = -ny
+                nz = -nz
               end if
 
               do i_nod = 1, Grid % faces_n_nodes(s)
@@ -237,16 +209,16 @@
 
                 mark_nodes(n) = mark_nodes(n) + 1
 
-                a11(n) = a11(n) + fnx * fnx
-                a12(n) = a12(n) + fnx * fny
-                a13(n) = a13(n) + fnx * fnz
-                a22(n) = a22(n) + fny * fny
-                a23(n) = a23(n) + fny * fnz
-                a33(n) = a33(n) + fnz * fnz
+                a11(n) = a11(n) + nx * nx
+                a12(n) = a12(n) + nx * ny
+                a13(n) = a13(n) + nx * nz
+                a22(n) = a22(n) + ny * ny
+                a23(n) = a23(n) + ny * nz
+                a33(n) = a33(n) + nz * nz
 
-                bx(n) = bx(n) + fnx
-                by(n) = by(n) + fny
-                bz(n) = bz(n) + fnz
+                bx(n) = bx(n) + nx
+                by(n) = by(n) + ny
+                bz(n) = bz(n) + nz
               end do
             end if
           end if
@@ -262,7 +234,7 @@
         "this stage of grid conversion", file = __FILE__, line = __LINE__)
     end if
 
-    eps = MICRO
+    eps = MILI
 
     do n = 1, Grid % n_nodes
       if(mark_nodes(n) .gt. 0) then
@@ -285,13 +257,13 @@
         call Math % Gaussian_Elimination(3, a, b, x, invertible)
 
         if(invertible) then
-          nx(n) = x(1)
-          ny(n) = x(2)
-          nz(n) = x(3)
+          disp_x(n) = x(1)
+          disp_y(n) = x(2)
+          disp_z(n) = x(3)
         else
-          nx(n) = bx(n) / mark_nodes(n)
-          ny(n) = by(n) / mark_nodes(n)
-          nz(n) = bz(n) / mark_nodes(n)
+          disp_x(n) = bx(n) / mark_nodes(n)
+          disp_y(n) = by(n) / mark_nodes(n)
+          disp_z(n) = bz(n) / mark_nodes(n)
         end if
 
       end if  ! mark_nodes(n) .gt. 0
@@ -306,6 +278,142 @@
     deallocate(bx)
     deallocate(by)
     deallocate(bz)
+
+    !---------------------!
+    !                     !
+    !   Compress domain   !
+    !                     !
+    !---------------------!
+    if(compress_domain) then
+
+      ! Reserve memory for fixed_nodes, array which holds boundary conditions
+      ! This is needed for Solve_Node_Potential and Smooth_Node_Displacements
+      call Enlarge % Array_Log(fixed_nodes, (/1, Grid % n_nodes/), val=.false.)
+
+      ! Find edges.
+      ! This is needed for Solve_Node_Potential and Smooth_Node_Displacements
+      call Grid % Find_Edges()
+
+      !---------------------------------------!
+      !   Solve for distance-like potential   !
+      !---------------------------------------!
+      call Enlarge % Array_Real(phi, (/1, Grid % n_nodes/), val=0.0)
+
+      ! Set boundary conditions for potential
+      do n = 1, Grid % n_nodes
+        if(mark_nodes(n) .gt. 0) then
+          fixed_nodes(n) = .true.
+        end if
+      end do    ! through nodes
+
+      call Convert % Solve_Node_Potential(Grid, fixed_nodes, phi, 1.0e-6, 1000)
+
+      call Grid % Save_Debug_Vtu(append="node-potential",  &
+                                 scalar_node = phi,        &
+                                 scalar_name = "node-potential")
+
+      ! Reset fixed nodes (this probably not needed)
+      fixed_nodes(:) = .false.
+
+      !----------------------------------------------------------------!
+      !   Form fixed_nodes arrays for distance like potential solver   !
+      !----------------------------------------------------------------!
+
+      ! Set boundary conditions for displacements
+      do n = 1, Grid % n_nodes
+
+        disp_x(n) = -disp_x(n) * thickness
+        disp_y(n) = -disp_y(n) * thickness
+        disp_z(n) = -disp_z(n) * thickness
+
+        ! Far anchor nodes: prescribed zero displacement
+        if(phi(n) .gt. 0.95) then  ! this 0.95 is a bit of ad-hoc
+          fixed_nodes(n) = .true.
+        end if
+
+        ! Boundary-layer nodes: prescribed inward displacement
+        if(mark_nodes(n) .gt. 0) then
+          fixed_nodes(n) = .true.
+        end if
+
+      end do    ! through nodes
+
+      !--------------------------!
+      !   Estimate node normal   !
+      !--------------------------!
+      call Enlarge % Array_Real(node_nx, (/1, Grid % n_nodes/), 0.0)
+      call Enlarge % Array_Real(node_ny, (/1, Grid % n_nodes/), 0.0)
+      call Enlarge % Array_Real(node_nz, (/1, Grid % n_nodes/), 0.0)
+      call Enlarge % Array_Int(node_cnt, (/1, Grid % n_nodes/), 0)
+
+      do s = 1, Grid % n_faces
+        if(Grid % faces_c(2,s) .lt. 0) then
+
+          call Grid % Faces_Surface(s, sx, sy, sz)
+
+          area = sqrt(sx*sx + sy*sy + sz*sz)
+          Assert(area .gt. TINY)
+          nx = sx / area
+          ny = sy / area
+          nz = sz / area
+
+          do i_nod = 1, Grid % faces_n_nodes(s)
+            n = Grid % faces_n(i_nod, s)
+            node_nx(n)  = node_nx(n)  + nx
+            node_ny(n)  = node_ny(n)  + ny
+            node_nz(n)  = node_nz(n)  + nz
+            node_cnt(n) = node_cnt(n) + 1
+          end do
+        end if
+      end do
+
+      do n = 1, Grid % n_nodes
+        if(node_cnt(n) .gt. 0) then
+
+          node_nx(n) = node_nx(n) / real(node_cnt(n))
+          node_ny(n) = node_ny(n) / real(node_cnt(n))
+          node_nz(n) = node_nz(n) / real(node_cnt(n))
+
+          magn = sqrt(node_nx(n)**2 + node_ny(n)**2 + node_nz(n)**2)
+          Assert(magn .gt. TINY)
+          node_nx(n) = node_nx(n) / magn
+          node_ny(n) = node_ny(n) / magn
+          node_nz(n) = node_nz(n) / magn
+        end if
+      end do
+
+      call Grid % Save_Debug_Vtu(append="node-normals",                        &
+                                 vector_node = (/node_nx, node_ny, node_nz/),  &
+                                 vector_name = "node-normals")
+
+      !----------------------------------------!
+      !   Call solver for node displacements   !
+      !----------------------------------------!
+      call Convert % Smooth_Node_Displacements(Grid,                       &
+                                               fixed_nodes,                &
+                                               disp_x,  disp_y,  disp_z,   &
+                                               node_nx, node_ny, node_nz,  &
+                                               1.0e-6, 1000)
+      call Grid % Save_Vtu_Edges()
+
+      deallocate(node_nx)
+      deallocate(node_ny)
+      deallocate(node_nz)
+      deallocate(fixed_nodes)
+
+      !--------------------------------------------------------!
+      !   Leave the do i_lay loop after one compression pass   !
+      !--------------------------------------------------------!
+      exit
+
+    end if  ! compress_domain
+
+    !---------------------------------------------------------!
+    !                                                         !
+    !   If you are here, you are not compressing the domain   !
+    !   but adding new layers (and nodes, faces and cells).   !
+    !                                                         !
+    !---------------------------------------------------------!
 
     ! Estimate to which new nodes will current nodes be projected
     cnt_n = 0
@@ -328,17 +436,17 @@
     ! Set coordinates in these new nodes
     do n = 1, old_n
       if(mark_nodes(n) .gt. 0) then
-        Grid % xn(node_to(n)) = Grid % xn(n) + nx(n) * thickness
-        Grid % yn(node_to(n)) = Grid % yn(n) + ny(n) * thickness
-        Grid % zn(node_to(n)) = Grid % zn(n) + nz(n) * thickness
+        Grid % xn(node_to(n)) = Grid % xn(n) + disp_x(n) * thickness
+        Grid % yn(node_to(n)) = Grid % yn(n) + disp_y(n) * thickness
+        Grid % zn(node_to(n)) = Grid % zn(n) + disp_z(n) * thickness
       end if
     end do
 
     Assert(Grid % n_nodes .eq. old_n + cnt_n)
 
-    deallocate(nx)
-    deallocate(ny)
-    deallocate(nz)
+    deallocate(disp_x)
+    deallocate(disp_y)
+    deallocate(disp_z)
 
     !-------------------!
     !                   !
@@ -352,7 +460,7 @@
     call Enlarge % Array_Int(face_to_face, (/1, Grid % n_faces/))
     call Enlarge % Array_Int(face_to_cell, (/1, Grid % n_faces/))
     do s = 1, Grid % n_faces
-      if(mark_faces(s) .gt. 0) then
+      if(mark_face(s) .eq. YES) then
 
         ! Handle cell mapping
         cnt_f = cnt_f + 1
@@ -372,11 +480,11 @@
     !----------------!
 
     ! This are approximate sizes
-    call Enlarge % Array_Int(edge_n1,  (/1, 3*cnt_f/))
-    call Enlarge % Array_Int(edge_n2,  (/1, 3*cnt_f/))
-    call Enlarge % Array_Int(edge_s1,  (/1, 3*cnt_f/))
-    call Enlarge % Array_Int(edge_s2,  (/1, 3*cnt_f/))
-    call Enlarge % Array_Int(edge_cnt, (/1, 3*cnt_f/))
+    call Enlarge % Array_Int(edge_n1,  (/1, 4*cnt_f/))
+    call Enlarge % Array_Int(edge_n2,  (/1, 4*cnt_f/))
+    call Enlarge % Array_Int(edge_s1,  (/1, 4*cnt_f/))
+    call Enlarge % Array_Int(edge_s2,  (/1, 4*cnt_f/))
+    call Enlarge % Array_Int(edge_cnt, (/1, 4*cnt_f/))
 
     ! Counter for all edges, inner and outer
     cnt_e = 0
@@ -386,7 +494,7 @@
     !   Find all edges touched by marked nodes on boundary faces.   !
     !   The two faces sharing each edge are stored in edge_s1 and   !
     !   edge_s2, so inner and outer side faces can be identified    !
-    !   later from mark_faces(s1) and mark_faces(s2).               !
+    !   later from mark_face(s1) and mark_face(s2).                 !
     !                                                               !
     !---------------------------------------------------------------!
     do s = 1, Grid % n_faces
@@ -425,7 +533,7 @@
             if(e == 0) then
 
               cnt_e = cnt_e + 1
-              Assert(cnt_e .le. 3*cnt_f)
+              Assert(cnt_e .le. 4*cnt_f)
 
               ! Edge count will be needed to distinguish inner from outer edges
               edge_cnt(cnt_e) = edge_cnt(cnt_e) + 1
@@ -506,7 +614,7 @@
     !   original boundary condition at the projected surface.       !
     !---------------------------------------------------------------!
     do s = 1, Grid % n_faces
-      if(mark_faces(s) .gt. 0) then
+      if(mark_face(s) .eq. YES) then
 
         ! Copy nodes
         Grid % faces_n_nodes(face_to_face(s)) = Grid % faces_n_nodes(s)
@@ -580,7 +688,7 @@
           Grid % cells_n(i_nod, c2) = n
         end do
 
-      end if  ! mark_faces(s) .gt. 0
+      end if  ! mark_face(s) .eq. YES
     end do    ! faces
 
     !-------------------------------------------------------------!
@@ -607,7 +715,8 @@
         Assert(s2 .gt. 0)
 
         ! Is it inner our outer edge?
-        inner = mark_faces(s1) .gt. 0 .and. mark_faces(s2) .gt. 0
+        inner =       mark_face(s1) .eq. YES  &
+                .and. mark_face(s2) .eq. YES
         outer = .not. inner
 
         ! Run 1 creates side boundary faces, run 2 creates side inner faces.
@@ -646,12 +755,12 @@
           Assert(cnt_ei .eq. 0)
 
           ! Distinguish marked from boundary cell
-          if(     mark_faces(s1) .gt. 0  &
-            .and. mark_faces(s2) .eq. 0) then
+          if(     mark_face(s1) .eq. YES  &
+            .and. mark_face(s2) .eq. NO) then
             sm = s1  ! marked face
             sb = s2  ! non marked face
-          else if(mark_faces(s1) .eq. 0  &
-            .and. mark_faces(s2) .gt. 0) then
+          else if(mark_face(s1) .eq. NO  &
+            .and. mark_face(s2) .eq. YES) then
             sm = s2  ! marked face
             sb = s1  ! non-marked face
           else
@@ -713,7 +822,7 @@
     deallocate(edge_s2)
 
     deallocate(mark_nodes)
-    deallocate(mark_faces)
+    deallocate(mark_face)
     deallocate(node_to)
     deallocate(face_to_face)
     deallocate(face_to_cell)
@@ -847,19 +956,20 @@
     !------------------------!
     if(DEBUG) then
     !@  Grid % s(:) = 1.0
-    !@  call Grid % Save_Vtu_Faces(sub=(/0,0/), volume_flux=mark_faces)
+    !@  call Grid % Save_Vtu_Faces(sub=(/0,0/), volume_flux=mark_face)
     !@  call Enlarge % Array_Real(mark_nodes, (/1, Grid % n_nodes/))
     !@
     !@  call Grid % Save_Debug_Vtu(append="node-count",         &
     !@                             scalar_node = mark_nodes,    &
     !@                             scalar_name = "node-count")
-    !@  call Enlarge % Array_Real(nx, (/1, Grid % n_nodes/))
-    !@  call Enlarge % Array_Real(ny, (/1, Grid % n_nodes/))
-    !@  call Enlarge % Array_Real(nz, (/1, Grid % n_nodes/))
+    !@  call Enlarge % Array_Real(disp_x, (/1, Grid % n_nodes/))
+    !@  call Enlarge % Array_Real(disp_y, (/1, Grid % n_nodes/))
+    !@  call Enlarge % Array_Real(disp_z, (/1, Grid % n_nodes/))
     !@  call Grid % Save_Debug_Vtu(append="node-thicknesss",    &
-    !@                             vector_node = (/nx,ny,nz/),  &
+    !@                             vector_node = (/disp_x,disp_y,disp_z/),  &
     !@                             vector_name = "node-thickness")
     end if
-  end do
+
+  end do  ! through layers
 
   end subroutine

@@ -193,10 +193,8 @@
     end if
 
     ! Insert boundary layers
-    if( (g-n_grids) .eq. 0) then
-      call Convert % Insert_Layers(Grid(g))
-      call Grid(g) % Save_Vtu_Faces((/0, 0/))
-    end if
+    call Convert % Insert_Layers_Driver(Grid(g), g, n_grids)
+    call Grid(g) % Save_Vtu_Faces((/0, 0/))
 
     !--------------------------------------!
     !   Calculate geometrical quantities   !

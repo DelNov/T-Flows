@@ -121,6 +121,14 @@
   ! Steps for expanding the memory in Generate
   integer, parameter :: GROWTH_MARGIN =  131072 !! steps for expanding
                                                 !! memory in Generate
+
+  !----------------------------------------------------------------!
+  !   Two little helper words used in different algorithms, most   !
+  !    often used with mesh manipulation and interface tracking    !
+  !----------------------------------------------------------------!
+  integer, parameter :: YES = 1
+  integer, parameter :: NO  = 1 - YES
+
   !---------------------!
   !   Color constants   !
   !---------------------!
