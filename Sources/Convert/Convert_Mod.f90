@@ -40,7 +40,8 @@
       procedure          :: Find_Parents
       procedure          :: Guess_Format
       procedure          :: Insert_Buildings
-      procedure          :: Insert_Layers
+      procedure          :: Insert_Layers_Driver
+      procedure, private :: Insert_Layers
       procedure          :: Load_Fluent
       procedure          :: Load_Forrest
       procedure          :: Load_Gambit
@@ -55,7 +56,10 @@
       procedure, private :: N_Sharp_Edges
       procedure          :: Remove_Porosities
       procedure          :: Save_Fluent
+      procedure, private :: Smooth_Node_Displacements
+      procedure, private :: Solve_Node_Potential
       procedure, private :: Sort_Face_Nodes
+      procedure, private :: Sort_Nodes_Boundary_First
   end type
 
   ! Singleton Convert object
@@ -176,6 +180,7 @@
 #   include "Convert_Mod/Find_Parents.f90"
 #   include "Convert_Mod/Guess_Format.f90"
 #   include "Convert_Mod/Insert_Buildings.f90"
+#   include "Convert_Mod/Insert_Layers_Driver.f90"
 #   include "Convert_Mod/Insert_Layers.f90"
 #   include "Convert_Mod/Load_Fluent.f90"
 #   include "Convert_Mod/Load_Forrest.f90"
@@ -191,6 +196,9 @@
 #   include "Convert_Mod/N_Sharp_Edges.f90"
 #   include "Convert_Mod/Remove_Porosities.f90"
 #   include "Convert_Mod/Save_Fluent.f90"
+#   include "Convert_Mod/Smooth_Node_Displacements.f90"
+#   include "Convert_Mod/Solve_Node_Potential.f90"
 #   include "Convert_Mod/Sort_Face_Nodes.f90"
+#   include "Convert_Mod/Sort_Nodes_Boundary_First.f90"
 
   end module

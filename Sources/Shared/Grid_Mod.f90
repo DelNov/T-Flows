@@ -244,6 +244,7 @@
       procedure :: Face_Normal
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
+      procedure :: Find_Edges
       procedure :: Initialize_New_Numbers
       procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
@@ -287,7 +288,6 @@
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
       procedure :: Sort_Nodes_By_Key
-      procedure :: Sort_Nodes_Boundary_First
 
       ! Procedures to copy grid to device
       procedure :: Copy_Grid_To_Device
@@ -328,6 +328,7 @@
 #   include "Grid_Mod/Connectivity/Face_Normal.f90"
 #   include "Grid_Mod/Connectivity/Find_Cells_Faces.f90"
 #   include "Grid_Mod/Connectivity/Find_Nodes_Cells.f90"
+#   include "Grid_Mod/Connectivity/Find_Edges.f90"
 #   include "Grid_Mod/Connectivity/Initialize_New_Numbers.f90"
 #   include "Grid_Mod/Connectivity/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Connectivity/Is_Point_In_Cell.f90"
@@ -371,7 +372,6 @@
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Key.f90"
-#   include "Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90"
 
     ! Procedures to copy grid to device
 #   include "Grid_Mod/Gpu/Copy_To_Device.f90"

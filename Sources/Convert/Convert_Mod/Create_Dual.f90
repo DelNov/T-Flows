@@ -7,12 +7,24 @@
 !   Philosophy                                                                 !
 !                                                                              !
 !   * This routine converts a tetrahedral primal grid into a polyhedral dual   !
-!     grid. The basic idea is that each primal node becomes a dual cell, each  !
-!     primal edge becomes a dual face, and each primal cell becomes a dual     !
-!     node.                                                                    !
-!   * To make the dual grid suitable near boundaries and sharp geometric       !
-!     features, additional dual nodes are introduced for boundary closure,     !
-!     sharp edges, and sharp corners.                                          !
+!     grid. The BASIC idea is that each primal node becomes a dual cell, each  !
+!     primal edge becomes a dual face, and each primal cell (including         !
+!     boundary cells) becomes a dual node.                                     !
+!                                                                              !
+!     The way I like to express it in the comments is:                         !
+!                                                                              !
+!       nodes(Prim) =--> cells(Dual)                                           !
+!       edges(Prim) =--> faces(Dual)                                           !
+!       cells(Prim) =--> nodes(Dual)                                           !
+!                                                                              !
+!   * This basic mapping can fail close to boundaries due to sharp edges and   !
+!     nodes in sharp corners, for which the additional nodes are added:        !
+!                                                                              !
+!       sharp edges(Prim)         =--> sharp nodes(Dual)                       !
+!       sharp corners/nodes(Prim) =--> sharp corners/nodes(Dual)               !
+!                                                                              !
+!     Thus, the nodes in the dual grid originate from primal cells (including  !
+!     boundary cells), primal edges and even primal nodes.                     !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
@@ -147,9 +159,9 @@
   allocate(sorted_edge_f(Prim % n_edges));  sorted_edge_f(:) = 0
   allocate(sorted_edge_l(Prim % n_edges));  sorted_edge_l(:) = 0
 
-  allocate(Prim % edges_n (2,      Prim % n_edges))
-  allocate(Prim % edges_bc(0:n_bc, Prim % n_edges))
-  allocate(Prim % edges_fb(2,      Prim % n_edges))
+  call Enlarge % Matrix_Int(Prim % edges_n, i=(/1,2/),   j=(/1,Prim % n_edges/))
+  call Enlarge % Matrix_Int(Prim % edges_bc,i=(/0,n_bc/),j=(/1,Prim % n_edges/))
+  call Enlarge % Matrix_Int(Prim % edges_fb,i=(/1,2/),   j=(/1,Prim % n_edges/))
   Prim % edges_n (:,:) = 0
   Prim % edges_bc(:,:) = 0  ! as if .false.
   Prim % edges_fb(:,:) = 0

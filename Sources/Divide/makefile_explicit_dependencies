@@ -4,7 +4,6 @@
 $(DIR_OBJECT)/Divide_Mod.o:\
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
-$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
@@ -42,6 +41,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -443,7 +443,6 @@ $(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
 $(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
-$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
@@ -481,6 +480,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -893,7 +893,6 @@ $(DIR_SHARED)/Memory_Mod/Array_Int.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
-$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
@@ -931,6 +930,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -1568,7 +1568,6 @@ $(DIR_SHARED)/Stl_Mod/Create_From_File.f90 \
 $(DIR_SHARED)/Stl_Mod/Allocate_Stl.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
-$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_Boundary_First.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Cells_By_Coordinates.f90 \
@@ -1606,6 +1605,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
