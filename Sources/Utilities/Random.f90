@@ -21,7 +21,7 @@
   call Mpi_Init(error)
 
   ! Get number of processors
-  call Mpi_Comm_Size(MPI_COMM_WORLD, n_proc, error) 
+  call Mpi_Comm_Size(MPI_COMM_WORLD, n_proc, error)
 
   ! Get current processor number
   call Mpi_Comm_Rank(MPI_COMM_WORLD, this_proc, error)

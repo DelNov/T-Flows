@@ -42,6 +42,6 @@
                       keyword, '!'
       end if
     end if
-  end if 
+  end if
 
   end subroutine

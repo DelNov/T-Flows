@@ -2,6 +2,7 @@
 # Dependencies for: ./Divide_Mod.f90
 #---------------------------------------------------
 $(DIR_OBJECT)/Divide_Mod.o:\
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
@@ -40,6 +41,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -51,10 +53,12 @@ $(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cells_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
@@ -437,6 +441,7 @@ $(DIR_SHARED)/Work_Mod/Allocate_Real_Cell.f90 \
 $(DIR_SHARED)/Work_Mod/Allocate_Int_Node.f90 \
 $(DIR_SHARED)/Work_Mod/Allocate_Int_Face.f90 \
 $(DIR_SHARED)/Work_Mod/Allocate_Int_Cell.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
@@ -475,6 +480,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -486,10 +492,12 @@ $(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cells_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
@@ -771,6 +779,7 @@ $(DIR_OBJECT)/Comm_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Tokenizer_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/Parse.f90 \
+$(DIR_SHARED)/Tokenizer_Mod/Is_Char.f90 \
 $(DIR_SHARED)/Assert_Mod/Handle_Assert.f90 \
 $(DIR_OBJECT)/Assert_Mod.o 
 
@@ -837,6 +846,7 @@ $(DIR_SHARED)/Sort_Mod/Quick/Real_Array.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Real.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Int.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Log_By_Index.f90 \
 $(DIR_SHARED)/Sort_Mod/Int_By_Index.f90 \
 $(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Two_Int.f90 \
 $(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Int.f90 \
@@ -881,6 +891,7 @@ $(DIR_SHARED)/Memory_Mod/Array_Real.f90 \
 $(DIR_SHARED)/Memory_Mod/Array_Log.f90 \
 $(DIR_SHARED)/Memory_Mod/Array_Int.f90 \
 $(DIR_OBJECT)/Memory_Mod.o \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
@@ -919,6 +930,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -930,10 +942,12 @@ $(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cells_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
@@ -1269,6 +1283,7 @@ $(DIR_SHARED)/Sort_Mod/Quick/Real_Array.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Real.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Carry_Int.f90 \
 $(DIR_SHARED)/Sort_Mod/Quick/Int_Array.f90 \
+$(DIR_SHARED)/Sort_Mod/Log_By_Index.f90 \
 $(DIR_SHARED)/Sort_Mod/Int_By_Index.f90 \
 $(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Two_Int.f90 \
 $(DIR_SHARED)/Sort_Mod/Heap/Two_Real_Carry_Int.f90 \
@@ -1551,6 +1566,7 @@ $(DIR_SHARED)/Stl_Mod/Facet_Coords.f90 \
 $(DIR_SHARED)/Stl_Mod/Facet_Body.f90 \
 $(DIR_SHARED)/Stl_Mod/Create_From_File.f90 \
 $(DIR_SHARED)/Stl_Mod/Allocate_Stl.f90 \
+$(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Key.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Region.f90 \
 $(DIR_SHARED)/Grid_Mod/Sorting/Sort_Faces_By_Index.f90 \
@@ -1589,6 +1605,7 @@ $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Point_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Is_Face_In_Cell.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Initialize_New_Numbers.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Nodes_Cells.f90 \
+$(DIR_SHARED)/Grid_Mod/Connectivity/Find_Edges.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Find_Cells_Faces.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Face_Normal.f90 \
 $(DIR_SHARED)/Grid_Mod/Connectivity/Determine_Regions_Ranges.f90 \
@@ -1600,10 +1617,12 @@ $(DIR_SHARED)/Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Wall_Distance.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Global_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Faces_Surface.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Faces_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Surfaces.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Interpolation.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Geometry.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Face_Centers.f90 \
+$(DIR_SHARED)/Grid_Mod/Calculate/Cells_Center.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Volumes.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Inertia.f90 \
 $(DIR_SHARED)/Grid_Mod/Calculate/Cell_Centers.f90 \
@@ -1618,6 +1637,7 @@ $(DIR_OBJECT)/Grid_Mod.o
 #---------------------------------------------------
 $(DIR_OBJECT)/Message_Mod.o:\
 $(DIR_SHARED)/Tokenizer_Mod/Parse.f90 \
+$(DIR_SHARED)/Tokenizer_Mod/Is_Char.f90 \
 $(DIR_OBJECT)/Tokenizer_Mod.o \
 $(DIR_SHARED)/Message_Mod/Warning.f90 \
 $(DIR_SHARED)/Message_Mod/Thin_Line.f90 \

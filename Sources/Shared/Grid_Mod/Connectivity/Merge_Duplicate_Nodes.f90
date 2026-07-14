@@ -115,7 +115,7 @@
 
     ! Faces' nodes
     do s = 1, Grid % n_faces
-      do i_nod = 1, Grid % faces_n_nodes(c)
+      do i_nod = 1, Grid % faces_n_nodes(s)
         n = Grid % faces_n(i_nod, s)
         if(n > 0) Grid % faces_n(i_nod, s) = Grid % new_n(n)
       end do
@@ -139,7 +139,7 @@
       end do
     end do
     do s = 1, Grid % n_faces                       ! faces' nodes
-      do i_nod = 1, Grid % faces_n_nodes(c)
+      do i_nod = 1, Grid % faces_n_nodes(s)
         n = Grid % faces_n(i_nod, s)
         Grid % n_nodes = max(Grid % n_nodes, n)
       end do

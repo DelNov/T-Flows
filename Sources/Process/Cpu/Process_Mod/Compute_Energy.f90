@@ -46,7 +46,7 @@
   type(Turb_Type),     target :: Turb     !! turbulence object
   type(Vof_Type),      target :: Vof      !! VOF object
   type(Solver_Type),   target :: Sol      !! solver object
-!-----------------------------------[Locals]-----------------------------------! 
+!-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: u, v, w, t
   type(Face_Type),   pointer :: v_flux

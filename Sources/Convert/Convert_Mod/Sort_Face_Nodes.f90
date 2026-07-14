@@ -1,5 +1,5 @@
 !==============================================================================!
-  subroutine Sort_Face_Nodes(Convert, Grid, s, concave_link)
+  subroutine Sort_Face_Nodes(Convert, Grid, s, concave_link, conc_link_cnt)
 !------------------------------------------------------------------------------!
 !>  Designed to reorganize the nodes of a given face in a mesh structure
 !>  so that they follow a rotational (circular) order.
@@ -37,19 +37,21 @@
   class(Convert_Type) :: Convert                        !! parent class
   type(Grid_Type)     :: Grid                           !! grid being converted
   integer             :: s                              !! face number
-  integer             :: concave_link(2,Grid % n_nodes) !! concave link storage
+  integer             :: concave_link(6,Grid % n_nodes) !! concave link storage
+  integer             :: conc_link_cnt(Grid % n_nodes)  !! concave link count
+!------------------------------[Local parameters]------------------------------!
+  logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
-  integer              :: i, j, m, n, nn, cnt
-  real                 :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
+  integer              :: i, j, m, n, nn, cnt, cl_a, cl_b
   integer              :: max_loc(2), conc_n
+  logical              :: found
+  real                 :: normal_p(3), center_p(3), x_p(3), y_p(3), sense(3)
   real                 :: conc_xn, conc_yn, conc_zn
   real                 :: prod(3), prod_mag
   real                 :: sumang, criter
   real,    allocatable :: rp_2d(:,:), rp_3d(:,:), np_3d(:,:), sorting(:)
   real,    allocatable :: angles(:,:)
   integer, allocatable :: order(:)
-! integer              :: k, ni, nj, nk, min_loc
-! real                 :: vec_ji(3), vec_jk(3), mag_ji, mag_jk, dot_prod
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
 !==============================================================================!
@@ -79,7 +81,32 @@
   conc_n = 0
   do i = 1, nn
     n = Grid % faces_n(i, s)
-    if(concave_link(1, n) .gt. 0 .and. concave_link(2, n) .gt. 0) then
+
+    ! Search for the concave link pair (cl_a and cl_b) which is on the face
+    if(conc_link_cnt(n) .ge. 1) then
+      found = .false.  ! initialize found
+      do j = 1, conc_link_cnt(n)
+        cl_a = concave_link(j*2-1, n)
+        cl_b = concave_link(j*2,   n)
+        if(      (any(Grid % faces_n(1:nn, s) .eq. cl_a))  &
+           .and. (any(Grid % faces_n(1:nn, s) .eq. cl_b))  ) then
+          found = .true.
+          exit
+        end if
+      end do
+
+      Assert(found)  ! make sure it is found
+    end if
+
+    if(DEBUG) then
+      if(s .eq. 726610) then  ! or some other case-dependent criterion
+        call Grid % Save_Vtk_Face(s, "face_original", s, plot_center = .true.)
+      end if
+    end if
+
+    ! Move the concave node to the position
+    ! in which the face will become convex
+    if(conc_link_cnt(n) .ge. 1) then
       conc_n = n
       cnt    = cnt + 1
 
@@ -89,28 +116,24 @@
       conc_zn = Grid % zn(n)
 
       ! Move the concave node in a convex position
-      Grid % xn(n) = 0.5 * (  Grid % xn(concave_link(1, n))     &
-                            + Grid % xn(concave_link(2, n))  )
-      Grid % yn(n) = 0.5 * (  Grid % yn(concave_link(1, n))     &
-                            + Grid % yn(concave_link(2, n))  )
-      Grid % zn(n) = 0.5 * (  Grid % zn(concave_link(1, n))     &
-                            + Grid % zn(concave_link(2, n))  )
+      Grid % xn(n) = 0.5 * (Grid % xn(cl_a) + Grid % xn(cl_b))
+      Grid % yn(n) = 0.5 * (Grid % yn(cl_a) + Grid % yn(cl_b))
+      Grid % zn(n) = 0.5 * (Grid % zn(cl_a) + Grid % zn(cl_b))
     end if
   end do
   ! if(cnt .eq. 1) print *, '# Found a concave link in face', s
   ! if(cnt .eq. 2) print *, '# Found two concave links in face', s
 
+  if(DEBUG) then
+    if(s .eq. 726610) then  ! or some other case-dependent criterion
+      call Grid % Save_Vtk_Face(s, "face_shifted", s, plot_center = .true.)
+    end if
+  end if
+
   !-----------------------------------!
   !   Find the plane's center point   !
   !-----------------------------------!
-  center_p(:) = 0
-  do i = 1, nn
-    n = Grid % faces_n(i, s)
-    center_p(1) = center_p(1) + Grid % xn(n)
-    center_p(2) = center_p(2) + Grid % yn(n)
-    center_p(3) = center_p(3) + Grid % zn(n)
-  end do
-  center_p(1:3) = center_p(1:3) / real(nn)
+  call Grid % Faces_Center(s, center_p(1), center_p(2), center_p(3))
 
   !------------------------------------------------------------------!
   !   Find nodes' relative positions to the center just calculated   !
@@ -140,7 +163,7 @@
     do j = i + 1, nn
       prod(1:3) = Math % Cross_Product(np_3d(1:3,i), np_3d(1:3,j))
       prod_mag = min(norm2(prod(1:3)), 1.0-MILI)
-      angles(i,j) = asin(prod_mag) * 57.2957795131
+      angles(i,j) = asin(prod_mag) * 57.2957795131  ! in degrees
       if(angles(i,j) > MILI) then
         cnt = cnt + 1
         sumang = sumang + angles(i,j)
@@ -232,6 +255,13 @@
       order(1:nn)             = cshift(order(1:nn), 1)
       Grid % faces_n(1:nn, s) = cshift(Grid % faces_n(1:nn, s), 1)
     end do
+  end if
+
+  ! Plot debugging things
+  if(DEBUG) then
+    if(s .eq. 726610) then  ! or some other case-dependent criterion
+      call Grid % Save_Vtk_Face(s, "face_sorted", s, plot_center = .true.)
+    end if
   end if
 
   end subroutine

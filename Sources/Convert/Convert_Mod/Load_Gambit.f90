@@ -87,7 +87,7 @@
         if(j>1) call File % Read_Line(fu) ! BOUNDARY CONDITIONS
         call File % Read_Line(fu)
         read(Line % tokens(3),*) dum1
-        Grid % n_bnd_cells = Grid % n_bnd_cells + dum1 
+        Grid % n_bnd_cells = Grid % n_bnd_cells + dum1
         do i = 1, dum1
           read(fu,*) c, dum2, dir
         end do

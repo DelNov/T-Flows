@@ -91,7 +91,7 @@
       ! ... along an inertial particle's path
       t_sgs = (1.0/(0.5 + 0.75*c_o))*(k_sgs/eps_sgs)
 
-      ! Standard deviation of particle velocity due to SGS vel. fluctuations 
+      ! Standard deviation of particle velocity due to SGS vel. fluctuations
       theta  = Swarm % tau / t_sgs
       alpha  = Flow % dt / Swarm % tau
       lambda = (1.0/1.0 + theta)                    &

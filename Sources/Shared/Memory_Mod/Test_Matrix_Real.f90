@@ -1,7 +1,8 @@
 !==============================================================================!
   logical function Test_Matrix_Real(Mem, a, i, j)
 !------------------------------------------------------------------------------!
-!>  Checks if indices i and j are within bounds of real matrix a
+!>  Private function to check if indices i and j are within bounds of
+!>  real matrix a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

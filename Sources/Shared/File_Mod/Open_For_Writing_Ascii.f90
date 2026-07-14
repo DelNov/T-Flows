@@ -17,7 +17,8 @@
   open(newunit = file_unit, file = trim(name_o), status = 'replace')
 
   if(First_Proc()) then
-    print '(a)', ' # Creating the ASCII file: ' // trim(name_o)
+    print '(a)', " # Creating the ASCII file: "   //  &
+                 BRIGHT_CYAN//trim(name_o)//RESET
   end if
 
   end subroutine

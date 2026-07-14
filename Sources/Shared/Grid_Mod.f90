@@ -123,6 +123,9 @@
     ! (Introduced with Insert_Buildings in Convert)
     integer, allocatable :: por(:)  !! porous region to which each cell belongs
 
+    ! For each cell: is it concave?
+    logical, allocatable :: concave(:)  !! is cell concave?
+
     !-------------------------!
     !  Face-based variables   !
     !-------------------------!
@@ -135,7 +138,7 @@
     integer, allocatable :: faces_c(:,:)  !! faces' cells (the two around it)
     integer, allocatable :: faces_s(:)    !! faces' shadows (periodic pairs)
 
-    ! Face surface areas (si), total surface (s) 
+    ! Face surface areas (si), total surface (s)
     ! and distances between cells (di)
     real, allocatable :: sx(:), sy(:), sz(:), s(:)
     real, allocatable :: dx(:), dy(:), dz(:), d(:)
@@ -218,6 +221,7 @@
 
       ! Various calculations on the grid, geometrical quantities, in essence
       procedure :: Bounding_Box
+      procedure :: Cells_Center
       procedure :: Calculate_Cell_Centers
       procedure :: Calculate_Cell_Inertia
       procedure :: Calculate_Cell_Volumes
@@ -229,6 +233,7 @@
       procedure :: Calculate_Wall_Distance
       procedure :: Calculate_Weights_Cells_To_Nodes
       procedure :: Calculate_Weights_Nodes_To_Cells
+      procedure :: Faces_Center
       procedure :: Faces_Surface
 
       ! Determination of grid connectivities
@@ -239,6 +244,7 @@
       procedure :: Face_Normal
       procedure :: Find_Cells_Faces
       procedure :: Find_Nodes_Cells
+      procedure :: Find_Edges
       procedure :: Initialize_New_Numbers
       procedure :: Is_Face_In_Cell
       procedure :: Is_Point_In_Cell
@@ -281,6 +287,7 @@
       procedure :: Sort_Faces_By_Index
       procedure :: Sort_Faces_By_Region
       procedure :: Sort_Nodes_By_Coordinates
+      procedure :: Sort_Nodes_By_Key
 
       ! Procedures to copy grid to device
       procedure :: Copy_Grid_To_Device
@@ -298,14 +305,16 @@
 
     ! Various calculations on the grid, geometrical quantities, in essence
 #   include "Grid_Mod/Calculate/Bounding_Box.f90"
+#   include "Grid_Mod/Calculate/Cells_Center.f90"
 #   include "Grid_Mod/Calculate/Cell_Centers.f90"
 #   include "Grid_Mod/Calculate/Cell_Inertia.f90"
 #   include "Grid_Mod/Calculate/Cell_Volumes.f90"
 #   include "Grid_Mod/Calculate/Face_Centers.f90"
 #   include "Grid_Mod/Calculate/Face_Geometry.f90"
 #   include "Grid_Mod/Calculate/Face_Interpolation.f90"
-#   include "Grid_Mod/Calculate/Faces_Surface.f90"
 #   include "Grid_Mod/Calculate/Face_Surfaces.f90"
+#   include "Grid_Mod/Calculate/Faces_Center.f90"
+#   include "Grid_Mod/Calculate/Faces_Surface.f90"
 #   include "Grid_Mod/Calculate/Global_Volumes.f90"
 #   include "Grid_Mod/Calculate/Wall_Distance.f90"
 #   include "Grid_Mod/Calculate/Weights_Cells_To_Nodes.f90"
@@ -319,6 +328,7 @@
 #   include "Grid_Mod/Connectivity/Face_Normal.f90"
 #   include "Grid_Mod/Connectivity/Find_Cells_Faces.f90"
 #   include "Grid_Mod/Connectivity/Find_Nodes_Cells.f90"
+#   include "Grid_Mod/Connectivity/Find_Edges.f90"
 #   include "Grid_Mod/Connectivity/Initialize_New_Numbers.f90"
 #   include "Grid_Mod/Connectivity/Is_Face_In_Cell.f90"
 #   include "Grid_Mod/Connectivity/Is_Point_In_Cell.f90"
@@ -361,6 +371,7 @@
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Index.f90"
 #   include "Grid_Mod/Sorting/Sort_Faces_By_Region.f90"
 #   include "Grid_Mod/Sorting/Sort_Nodes_By_Coordinates.f90"
+#   include "Grid_Mod/Sorting/Sort_Nodes_By_Key.f90"
 
     ! Procedures to copy grid to device
 #   include "Grid_Mod/Gpu/Copy_To_Device.f90"

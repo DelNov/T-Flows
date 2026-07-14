@@ -67,7 +67,7 @@
        NEDGE(NS),NINT,NIPNEW,NISCUT,NIV,NIVNEW
 !* Avoid unused warning
   ASSOCIATE(ISOAP => ISOAP); END ASSOCIATE
-!* Determination of the faces intersected by the isosurface      
+!* Determination of the faces intersected by the isosurface
   NISCUT=0
 !* NEDGE(IS) = Number of intersected edges of the face IS
   DO IS=1,NTS
@@ -91,7 +91,7 @@
   IF(NISCUT.EQ.0) THEN
      NISO=0
      RETURN
-  END IF      
+  END IF
 !* Iso-vertices insertion
   NIPNEW=0
   DO IS=1,NTS
@@ -102,7 +102,7 @@
            IP=IPV(IS,IV)
            IV1=IV+1
            IF(IV1.GT.NIPV(IS))IV1=1
-           IP1=IPV(IS,IV1)               
+           IP1=IPV(IS,IV1)
            IF(IA(IP).NE.IA(IP1)) THEN
               NINT=NINT+1
               NIV=NIV+1
@@ -122,13 +122,13 @@
                     IP1N=IPIA1(IPNEW)
                     IF(IP0N.EQ.IP0I.AND.IP1N.EQ.IP1I) THEN
                        ISE(IS,NINT)=IPNEW
-                       IPVINT(IS,NIV)=IPNEW                           
+                       IPVINT(IS,NIV)=IPNEW
                        IVISE(IS,IPNEW)=NIV
                        IPISE(IPNEW,ITYPE)=IS
                        GOTO 10
                     END IF
-                 END DO     
-              END DO        
+                 END DO
+              END DO
               NIPNEW=NIPNEW+1
               IPIA0(NIPNEW)=IP0I
               IPIA1(NIPNEW)=IP1I
@@ -136,12 +136,12 @@
               ISE(IS,NINT)=NIPNEW
               IVISE(IS,NIPNEW)=NIV
               IPISE(NIPNEW,ITYPE)=IS
-           END IF           
+           END IF
 10            CONTINUE
         END DO
         NIPVINT(IS)=NIV
-     END IF                 
-  END DO                    
+     END IF
+  END DO
 !* Iso-vertices arrangement
   NIVNEW=NIPNEW
   ISNEW=0

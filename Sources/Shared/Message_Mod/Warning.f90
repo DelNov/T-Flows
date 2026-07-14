@@ -35,14 +35,16 @@
   character(DL) :: header_text
 !==============================================================================!
 
-  !-------------------------------!
-  !   Form the header for error   !
-  !-------------------------------!
+  !---------------------------------!
+  !   Form the header for warning   !
+  !---------------------------------!
   if(present(file) .and. present(line)) then
-    write(header_text, '(a,i3)')  "WARNING in file: " // file //  &
-                                  " on line: ", line
+    write(header_text, '(a,i3)')  YELLOW//"WARNING"//RESET//" in file: " //  &
+                                  file // " at line: ", line
+  else if(present(file)) then
+    write(header_text, '(a,i3)')  YELLOW//"WARNING"//RESET//" in file: " // file
   else
-    write(header_text, '(a,i3)')  "WARNING!"
+    write(header_text, '(a,i3)')  YELLOW//"WARNING"//RESET//"!"
   end if
 
   ! Adjust width, if necessary

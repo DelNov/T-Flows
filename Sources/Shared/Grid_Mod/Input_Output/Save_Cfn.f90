@@ -1,8 +1,8 @@
 !==============================================================================!
   subroutine Save_Cfn(Grid,        &
                       sub,         &  ! subdomain
-                      nn_sub,      &  ! number of nodes in the sub. 
-                      nc_sub,      &  ! number of cells in the sub. 
+                      nn_sub,      &  ! number of nodes in the sub.
+                      nc_sub,      &  ! number of cells in the sub.
                       nf_sub,      &  ! number of faces in the sub.
                       ns_sub,      &  ! number of shadow faces
                       nbc_sub)

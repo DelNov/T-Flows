@@ -59,7 +59,7 @@
     do c = 1, Grid % n_cells
       if(Grid % Comm % cell_proc(c) .eq. sub) then
         nc_sub = nc_sub + 1       ! increase the number of cells in sub.
-        Grid % new_c(c) = nc_sub  ! assign new (local) cell number 
+        Grid % new_c(c) = nc_sub  ! assign new (local) cell number
         Grid % old_c(nc_sub) = c
 
         do i_nod = 1, abs(Grid % cells_n_nodes(c))
@@ -111,7 +111,7 @@
           if(Grid % Comm % cell_proc(c) .eq. subo .and.  &
              Grid % new_c(c) .eq. MARK) then
             nc_sub = nc_sub + 1       ! increase the number of cells in sub.
-            Grid % new_c(c) = nc_sub  ! assign new (local) cell number 
+            Grid % new_c(c) = nc_sub  ! assign new (local) cell number
             Grid % old_c(nc_sub) = c
           end if
         end do

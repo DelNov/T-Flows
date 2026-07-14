@@ -194,14 +194,14 @@
   Pol % faces_n(9,2) = 15
   Pol % faces_n(9,3) = 7
 
-  ! Pol % faces_n(10,1:Pol % faces_n_nodes(10)) = (/27,32,31,16,19,14,8/) 
-  Pol % faces_n(10,1) = 27 
-  Pol % faces_n(10,2) = 32 
-  Pol % faces_n(10,3) = 31 
-  Pol % faces_n(10,4) = 16 
-  Pol % faces_n(10,5) = 19 
-  Pol % faces_n(10,6) = 14 
-  Pol % faces_n(10,7) = 8 
+  ! Pol % faces_n(10,1:Pol % faces_n_nodes(10)) = (/27,32,31,16,19,14,8/)
+  Pol % faces_n(10,1) = 27
+  Pol % faces_n(10,2) = 32
+  Pol % faces_n(10,3) = 31
+  Pol % faces_n(10,4) = 16
+  Pol % faces_n(10,5) = 19
+  Pol % faces_n(10,6) = 14
+  Pol % faces_n(10,7) = 8
 
   ! Pol % faces_n(11,1:Pol % faces_n_nodes(11)) = (/14,12,9,13,8/)
   Pol % faces_n(11,1) = 14

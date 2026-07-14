@@ -101,7 +101,7 @@
       print *, '# Unsupported cell type with ',  &
                   Grid % cells_n_nodes(c), ' nodes.'
       print *, '# Exiting'
-      stop 
+      stop
     end if
 
   end do

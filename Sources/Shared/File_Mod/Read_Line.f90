@@ -1,47 +1,34 @@
 !==============================================================================!
-  subroutine Read_Line(File, un, reached_end, remove)
+  subroutine Read_Line(File, un, reached_end, remove, key_log_entry)
 !------------------------------------------------------------------------------!
-!>  Reads a Line from a file unit un and discards if it is comment and, if
-!>  specified so, unwanted characters.  In addition, it breaks the line in
-!>  tokens (individual strings).
+!>  Reads one meaningful line from file unit un into Line % whole.
+!>  Empty lines and comment lines are skipped, and optional characters
+!>  specified through remove are replaced with blanks.  After a valid
+!>  line is found, it is split into tokens and stored in the global Line
+!>  object.
 !>
-!>  A comment is each line which begins with "!", "#" or "%".
-!>  Input line must not exceed len(Line % whole) characters in length.
-!------------------------------------------------------------------------------!
-!   Functionality:                                                             !
-!                                                                              !
-!   * Initial setup:                                                           !
-!     - Sets reached_end to .false. if it is provided.                         !
-!     - Determines the number of characters to be removed based on remove.     !
-!   * Reading the line:                                                        !
-!     - Checks if the file is formatted or unformatted using inquire.          !
-!     - Reads the line either as a formatted string or character by character, !
-!       depending on the file format.                                          !
-!     - Ignores carriage return characters (byte .eq. 13) and stops reading    !
-!       at newline characters (byte .eq. 10).                                  !
-!   * Removing unwanted characters:                                            !
-!     - If remove is provided, removes specified characters from the line by   !
-!       replacing them with spaces.                                            !
-!   * Adjusting the line:                                                      !
-!     - Trims leading spaces from the line using adjustl.                      !
-!   * Skipping empty or comment lines:                                         !
-!     - Skips over empty lines and lines starting with comment characters      !
-!   * Tokenization:                                                            !
-!     - Calls Line % Parse() to tokenize the line                              !
-!   * End of file handling:                                                    !
-!     - If the end of the file is reached (indicated by the end=2 label),      !
-!       sets reached_end to .true. if it is present.                           !
+!>  Comment lines are lines whose first non-blank character is "!", "#"
+!>  or "%".  The input line must not exceed len(Line % whole) characters.
+!>
+!>  When reading from standard input (unit 5), the consumed line is also
+!>  appended to keyboard_input.log.  If key_log_entry is present, it is
+!>  written before the consumed line, making the log usable as a commented
+!>  replay script.
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
-  class(File_Type)       :: File         !! parent class
-  integer                :: un           !! file unit
-  logical,      optional :: reached_end  !! flag to set if the end of the file
-                                         !! was reached during the reading
-  character(*), optional :: remove       !! list of characters to remove
+  class(File_Type)       :: File           !! parent class
+  integer                :: un             !! file unit
+  logical,      optional :: reached_end    !! flag to set if the end of the file
+                                           !! was reached during the reading
+  character(*), optional :: remove         !! list of characters to remove
+  character(*), optional :: key_log_entry  !! optional headline for key. log
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: i, j, n
+  integer       :: i, j, n, key_log_unit
   integer(1)    :: byte
+  logical       :: first_call = .true.
+  character(10) :: time
+  character(8)  :: date
   character(7)  :: format = '(a0000)'
   character(SL) :: fmtd
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -96,6 +83,33 @@
   if( trim(Line % whole(1:1)) .eq. '!' .or.               &
       trim(Line % whole(1:1)) .eq. '#' .or.               &
       trim(Line % whole(1:1)) .eq. '%' ) goto 1
+
+  !--------------------------!
+  !   Save to keyboard log   !
+  !--------------------------!
+  if(un .eq. 5) then
+    call File % Append_For_Writing_Ascii("keyboard_input.log",  &
+                                          key_log_unit,         &
+                                          processor = 1)
+    if(first_call) then
+      call date_and_time(date=date, time=time)
+
+      write(key_log_unit, '(a)')  "#=========================================="
+      write(key_log_unit, '(a,a4,"-",a2,"-",a2," ",a2,":",a2,":",a2)')  &
+                          "# New log, started on: ",                    &
+                          date(1:4), date(5:6), date(7:8),              &
+                          time(1:2), time(3:4), time(5:6)
+      write(key_log_unit, '(a)')  "#------------------------------------------"
+      write(key_log_unit, *)
+      first_call = .false.
+    end if
+    if(present(key_log_entry)) then
+      write(key_log_unit, '(a)') key_log_entry
+    end if
+    write(key_log_unit, *)  trim(Line % whole)
+    write(key_log_unit, *)
+    close(key_log_unit)
+  end if
 
   !----------------------------------------!
   !   Parse tokens. This is somehow cool   !

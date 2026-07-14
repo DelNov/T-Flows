@@ -25,7 +25,7 @@
           ((p1 .eq. n3).and.(p3 .eq. n1)) .or.  &
           ((p1 .eq. n2).and.(p3 .eq. n4)) ) goto 1
     end do
-  end do 
+  end do
 
   print *, '# ERROR!'
   print *, '# You tried to define the surface', n1, n2, n3, n4

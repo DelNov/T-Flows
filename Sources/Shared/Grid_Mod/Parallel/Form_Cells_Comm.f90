@@ -33,8 +33,8 @@
   logical, parameter :: DEBUG = .false.
 !-----------------------------------[Locals]-----------------------------------!
   integer              :: sub, ms, mr, cnt, n_fail, i, j, i_cel, j_cel, i_nod
-  integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, n
-  integer              :: n_cells_near_buffers
+  integer              :: c, c1, c2, s, n_buff_faces, n_max_buff_cells, n, ss
+  integer              :: n_cells_near_buffers, run
   integer, allocatable :: cells_near_buffers(:)
   integer, allocatable :: send_cells(:), recv_cells(:)
   integer, allocatable :: send_buff_cnt(:,:), recv_buff_cnt(:,:)
@@ -56,35 +56,53 @@
   allocate(send_cells(-Grid % n_bnd_cells:Grid % n_cells))
   allocate(recv_cells(-Grid % n_bnd_cells:Grid % n_cells))
 
-  ! Find which cells are near buffers, it speeds up the procedure quite a bit
+  !-------------------------------------!
+  !   Find nodes in the buffers first   !
+  !-------------------------------------!
   allocate(node_in_buffer(Grid % n_nodes));  node_in_buffer(:) = .false.
+
+  ! Just straight cells which are already in the buffers
   do c = Cells_In_Buffers()
     do i_nod = 1, abs(Grid % cells_n_nodes(c))
       n = Grid % cells_n(i_nod, c)
       node_in_buffer(n) = .true.
     end do
   end do
-  n_cells_near_buffers = 0
-  do c = Cells_In_Domain()
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      if(node_in_buffer(n)) then
-        n_cells_near_buffers = n_cells_near_buffers + 1
-        exit
-      end if
-    end do
+
+  ! This takes care of the cases where
+  ! cells' paritioning on each side of
+  ! the periodic are not the same
+  do s = Faces_In_Domain_And_At_Buffers()
+    if(Grid % faces_s(s) .gt. 0) then
+      do i_nod = 1, Grid % faces_n_nodes(s)
+        n = Grid % faces_n(i_nod, s)
+        node_in_buffer(n) = .true.
+      end do
+      ss = Grid % faces_s(s)
+      do i_nod = 1, Grid % faces_n_nodes(ss)
+        n = Grid % faces_n(i_nod, ss)
+        node_in_buffer(n) = .true.
+      end do
+    end if
   end do
-  allocate(cells_near_buffers(n_cells_near_buffers))
-  n_cells_near_buffers = 0
-  do c = Cells_In_Domain()
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      if(node_in_buffer(n)) then
-        n_cells_near_buffers = n_cells_near_buffers + 1
-        cells_near_buffers(n_cells_near_buffers) = c
-        exit
-      end if
+
+  !----------------------------------------------!
+  !   Based on nodes which are in the buffers,   !
+  !   find the cells which are near buffers.     !
+  !----------------------------------------------!
+  do run = 1, 2
+    n_cells_near_buffers = 0
+    do c = Cells_In_Domain()
+      do i_nod = 1, abs(Grid % cells_n_nodes(c))
+        n = Grid % cells_n(i_nod, c)
+        if(node_in_buffer(n)) then
+          n_cells_near_buffers = n_cells_near_buffers + 1
+          if(run .eq. 2) cells_near_buffers(n_cells_near_buffers) = c
+          exit
+        end if
+      end do
     end do
+    if(run .eq. 1) allocate(cells_near_buffers(n_cells_near_buffers))
   end do
 
   !-------------------------------!

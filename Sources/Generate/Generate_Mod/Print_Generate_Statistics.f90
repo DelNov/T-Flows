@@ -69,7 +69,7 @@
     end do
     if(numb .ne. 0) then
       print 6, '# Number of nodes with ', j, ' twins     : ', numb
-    end if 
+    end if
   end do
 6 format (a24, i3, a13, i8)
 

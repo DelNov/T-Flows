@@ -1,4 +1,6 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
+#include "../Shared/Unused.h90"
 
 !==============================================================================!
   module Tokenizer_Mod
@@ -30,7 +32,8 @@
     character(1)            :: first, last         !! the first and the last
                                                    !! character in the whole
     contains
-      procedure :: Parse  !! procedure to tokenize the string stored in whole
+      procedure :: Parse    !! procedure to tokenize the string
+      procedure :: Is_Char  !! determines if token is printable
 
   end type
 
@@ -42,5 +45,6 @@
   contains
 
 #   include "Tokenizer_Mod/Parse.f90"
+#   include "Tokenizer_Mod/Is_Char.f90"
 
   end module

@@ -48,6 +48,8 @@
   type(Vof_Type),      target :: Vof      !! VOF object
   character(*)                :: update   !! character switch to control
                                           !! which variables to update
+!------------------------------[Local parameters]------------------------------!
+  integer, parameter :: BEGIN = 64
 !-----------------------------------[Locals]-----------------------------------!
   type(Grid_Type), pointer :: Grid
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
@@ -269,6 +271,7 @@
 
         ! Wall temperature or heat fluxes for k-eps-zeta-f
         ! and high-re k-eps models.
+<<<<<<< HEAD
         if(Turb % model .eq. K_EPS_ZETA_F    .or.  &
            Turb % model .eq. HYBRID_LES_RANS .or.  &
            Turb % model .eq. LES_DYNAMIC     .or.  &
@@ -277,13 +280,29 @@
            Turb % model .eq. SPALART_ALLMARAS.or.  &
            Turb % model .eq. DES_SPALART     .or.  &
            Turb % model .eq. K_OMEGA_SST     .or.  &
+=======
+        if(Turb % model .eq. K_EPS_ZETA_F     .or.  &
+           Turb % model .eq. HYBRID_LES_RANS  .or.  &
+           Turb % model .eq. LES_DYNAMIC      .or.  &
+           Turb % model .eq. LES_WALE         .or.  &
+           Turb % model .eq. LES_SMAGORINSKY  .or.  &
+           Turb % model .eq. SPALART_ALLMARAS .or.  &
+           Turb % model .eq. DES_SPALART      .or.  &
+           Turb % model .eq. K_OMEGA_SST      .or.  &
+>>>>>>> origin/bojan_inserts_boundary_layers
            Turb % model .eq. K_EPS) then
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
                       / (Turb % con_w(c1) + TINY)
+<<<<<<< HEAD
             if(Time % Curr_Dt() .lt. 100) then
               t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
                         / Flow % conductivity(c1)
+=======
+            if(Time % Curr_Dt() < BEGIN) then
+              t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
+                        / (Flow % conductivity(c1))
+>>>>>>> origin/bojan_inserts_boundary_layers
             end if
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * Turb % con_w(c1)  &

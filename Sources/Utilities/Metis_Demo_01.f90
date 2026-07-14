@@ -13,11 +13,11 @@
   integer, allocatable :: eptr(:),   &
                           nodes(:),  &
                           epart(:),  &
-                          npart(:)              
+                          npart(:)
   integer, pointer     :: vwgt   => null(),  &
                           vsize  => null()
   real, pointer        :: tpwgts => null()
-  integer              :: mopts(41)       ! options passed to METIS 
+  integer              :: mopts(41)       ! options passed to METIS
 
   integer, parameter :: METIS_OPTION_PTYPE     =  1
   integer, parameter :: METIS_OPTION_OBJTYPE   =  2
@@ -73,9 +73,9 @@
                            mopts,   &
                            objval,  &
                            epart,   &
-                           npart) 
+                           npart)
 
-  print *, '# Node partitioning: ', npart  
+  print *, '# Node partitioning: ', npart
   print *, '# Elem partitioning: ', epart
 
   end program

@@ -60,7 +60,7 @@
   print '(a)', ' #========================================'
   print '(a)', ' # Input problem name: (without extension)'
   print '(a)', ' #----------------------------------------'
-  call File % Read_Line(5)
+  call File % Read_Line(5, key_log_entry="# Problem name (without ext.)")
   read(Line % tokens(1), *) problem_name(1)
 
   Grid % name = problem_name(1)
@@ -97,7 +97,7 @@
                                   tent_n_nodes,      &
                                   tent_n_bnd_cells)
 
-  print *, '# Allocation successfull !'
+  print *, '# Allocation successful !'
 
   !-------------!
   !   Corners   !

@@ -40,10 +40,10 @@
   else
 
     print *, '# Input problem name: (without extension)'
-    problem_name(1) = File % Single_Word_From_Keyboard()
+    problem_name(1) = File % Single_Word_From_Keyboard("# Problem name:")
 
     print *, '# Number of subdomains:'
-    n_sub = File % Single_Int_From_Keyboard()
+    n_sub = File % Single_Int_From_Keyboard("# Number of subdomains:")
 
   end if
 

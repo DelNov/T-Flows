@@ -1,7 +1,8 @@
 !==============================================================================!
   logical function Test_Matrix_Log(Mem, a, i, j)
 !------------------------------------------------------------------------------!
-!>  Checks if indices i and j are within bounds of logical matrix a
+!>  Private function to check if indices i and j are within bounds of
+!>  logical matrix a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

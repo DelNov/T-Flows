@@ -31,7 +31,7 @@
                          MPI_INFO_NULL,  &
                          error)
 
-  ! Write real value 
+  ! Write real value
   call Mpi_File_Write(fh,                 &
                       arr(1),             &
                       length,             &

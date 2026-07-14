@@ -58,7 +58,7 @@
       ! Cell in which the current particle resides
       c = Swarm % Particle(k) % cell
 
-      ! Current number of states (for swarm quantity averaging) 
+      ! Current number of states (for swarm quantity averaging)
       m = real(Swarm % n_states(c))
 
       ! Mean velocities for swarm

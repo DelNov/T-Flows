@@ -22,7 +22,7 @@
 !     - It calculates the minimum and maximum values for the x, y, and z       !
 !       coordinates of the vertices.                                           !
 !     - The object is scaled based on its height (z dimension), and its origin !
-!       is shifted to the center of its bounding box in the x and y directions ! 
+!       is shifted to the center of its bounding box in the x and y directions !
 !       This normalization ensures that the object fits within a standard      !
 !       coordinate system and size range.                                      !
 !   * Storing Geometry in Grid:                                                !

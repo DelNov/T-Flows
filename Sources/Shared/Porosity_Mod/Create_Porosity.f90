@@ -4,10 +4,15 @@
   class(Porosity_Type)    :: Por
   type(Grid_Type), target :: Grid
 !-----------------------------------[Locals]-----------------------------------!
-  integer       :: reg, n, c
+  integer       :: reg, c
+
+  ! Variables used only from Process
+# if T_FLOWS_PROGRAM == 4
+  integer       :: n
   logical       :: found
   character(SL) :: porous_region_rank
   character(SL) :: next_strings(MAX_STRING_ITEMS)
+# endif
 !==============================================================================!
 
   !---------------------------!

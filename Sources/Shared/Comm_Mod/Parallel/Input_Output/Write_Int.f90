@@ -26,13 +26,13 @@
                          MPI_INFO_NULL,  &
                          error)
 
-  ! Write integer value 
+  ! Write integer value
   call Mpi_File_Write(fh,                 &
                       num,                &
                       1,                  &
                       comm_type_int,      &
                       MPI_STATUS_IGNORE,  &
-                      error) 
+                      error)
 
   disp = disp + IP
 

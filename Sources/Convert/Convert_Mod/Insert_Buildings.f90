@@ -92,11 +92,11 @@
     if(bc_name(1:3) .eq. 'TOP') has_top = .true.
   end do
   if(.not. has_top) then
-    call Message % Error(72,                                                &
-                'The grid does not have a boundary condition called   ' //  &
-                '"top".  Withouot it, you cannot define a computation ' //  &
-                'domain for simulation of city flows \n \n            ' //  &
-                'This error is critical.  Exiting!',                        &
+    call Message % Error(72,                                               &
+                'The grid does not have a boundary condition called  ' //  &
+                '"top".  Without it, you cannot define a computation ' //  &
+                'domain for simulation of city flows \n \n           ' //  &
+                'This error is critical.  Exiting!',                       &
                 file=__FILE__, line=__LINE__)
   end if
 
@@ -106,12 +106,12 @@
   !                                                          !
   !----------------------------------------------------------!
 
-  print *, '#=============================================================' // &
+  print *, '#============================================================' // &
            '============'
-  print *, '# Enter the name of the ASCII STL ground file (with extenstion):'
-  print *, '#-------------------------------------------------------------' // &
+  print *, '# Enter the name of the ASCII STL ground file (with extension):'
+  print *, '#------------------------------------------------------------' // &
            '------------'
-  name_in = File % Single_Word_From_Keyboard()
+  name_in = File % Single_Word_From_Keyboard("# STL ground file (with ext.)")
   call File % Open_For_Reading_Ascii(name_in, fu)
 
   !--------------------------!
@@ -465,7 +465,7 @@
   do iter = 1, ITERS
     do b = 1, n_buildings
 
-      ! Search for the top (layer) of this bulding)
+      ! Search for the top (layer) of this building)
       do lay = 1, n_node_layers - 1  ! 0 would be ground, don't touch it
         i_nod = 1
         n = buildings_ground_nodes(b, i_nod)     ! ground node
@@ -473,7 +473,7 @@
         if(node_on_building(n+lay+lay) .eq. 0) then
           top = lay
           if(iter .eq. 1) then
-            print '(a,i4,a,i4)', ' # Top layer on bulding', b, ' is: ', top
+            print '(a,i4,a,i4)', ' # Top layer on building', b, ' is: ', top
             Assert(node_on_building(n+top) .eq. b)
           end if
           exit

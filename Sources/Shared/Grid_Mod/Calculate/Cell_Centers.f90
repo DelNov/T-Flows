@@ -7,25 +7,39 @@
 !---------------------------------[Arguments]----------------------------------!
   class(Grid_Type) :: Grid  !! grid under consideration
 !-----------------------------------[Locals]-----------------------------------!
-  integer :: c, i_nod, n
+  integer :: c, i_nod, n, nn
 !==============================================================================!
 
-  ! (Re)initialize cell coordinates
-  Grid % xc(:) = 0.0
-  Grid % yc(:) = 0.0
-  Grid % zc(:) = 0.0
-
-  ! Compute them by adding node coordinates and dividing by their number
+  !--------------------------------------------------------------------------!
+  !   Compute them by adding node coordinates and dividing by their number   !
+  !--------------------------------------------------------------------------!
   do c = 1, Grid % n_cells
-    do i_nod = 1, abs(Grid % cells_n_nodes(c))
-      n = Grid % cells_n(i_nod, c)
-      Grid % xc(c) = Grid % xc(c) + Grid % xn(n)  &
-                   / real(abs(Grid % cells_n_nodes(c)))
-      Grid % yc(c) = Grid % yc(c) + Grid % yn(n)  &
-                   / real(abs(Grid % cells_n_nodes(c)))
-      Grid % zc(c) = Grid % zc(c) + Grid % zn(n)  &
-                   / real(abs(Grid % cells_n_nodes(c)))
-    end do
+
+    ! For concave cells, cell center was estimated in Convert_Mod/Create_Dual
+    if(.not. Grid % concave(c)) then
+
+      ! (Re)initialize cell coordinates
+      Grid % xc(c) = 0.0
+      Grid % yc(c) = 0.0
+      Grid % zc(c) = 0.0
+
+      nn = abs(Grid % cells_n_nodes(c))
+      Assert(nn .gt. 0)
+
+      do i_nod = 1, nn
+        n = Grid % cells_n(i_nod, c)
+        Grid % xc(c) = Grid % xc(c) + Grid % xn(n)
+        Grid % yc(c) = Grid % yc(c) + Grid % yn(n)
+        Grid % zc(c) = Grid % zc(c) + Grid % zn(n)
+      end do
+
+      ! Barycenter
+      Grid % xc(c) = Grid % xc(c) / real(nn)
+      Grid % yc(c) = Grid % yc(c) / real(nn)
+      Grid % zc(c) = Grid % zc(c) / real(nn)
+
+    end if
+
   end do
 
   print *, '# Cell centers calculated !'

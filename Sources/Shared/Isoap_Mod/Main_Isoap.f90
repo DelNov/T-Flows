@@ -18,7 +18,7 @@
 ! NIPV     = number of vertices of each face of the polyhedron        !
 ! NTP      = number of vertices of the polyhedron                     !
 ! NTS      = number of faces of the polyhedron                        !
-! PHI      = scalar value assigned to each vertex of the polyhedron   !      
+! PHI      = scalar value assigned to each vertex of the polyhedron   !
 ! PHIISO   = iso value                                                !
 ! VERTP    = coordinates of the vertices of the polyhedron            !
 ! On return:                                                          !
@@ -29,7 +29,7 @@
 !            each iso-edge                                            !
 ! NIPVISO  = number of iso-vertices of each iso-polygon               !
 ! NISO     = number of iso-polygons                                   !
-! VERTISO  = coordinates of the iso vertices                          !      
+! VERTISO  = coordinates of the iso vertices                          !
 !---------------------------------------------------------------------!
   SUBROUTINE MAIN_ISOAP(ISOAP, POLYHEDRON, ISO_POLYGONS)
 !---------------------------------------------------------------------!
@@ -116,6 +116,6 @@
                 VERTP(IP1,3)-VERTP(IP0,3))/(PHI(IP1)-PHI(IP0))
         END DO
      END DO
-  END IF      
+  END IF
   RETURN
   END

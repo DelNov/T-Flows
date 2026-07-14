@@ -150,7 +150,7 @@ syn match fortranOperator	"\.\s*\(and\|or\|not\)\s*\."
 syn match fortranOperator	"\(+\|-\|/\|\*\)"
 syn match fortranTypeOb		"\<character\s*\*"
 
-syn match fortranBoolean	"\.\s*\(true\|false\)\s*\."
+syn match fortranBoolean	"\.\s*\(true\|false\|not\)\s*\."
 
 syn keyword fortranReadWrite	backspace close endfile inquire open print read rewind write
 
@@ -420,7 +420,12 @@ if b:fortran_dialect == "f08"
   syn keyword fortranConstant      MAX_N  ITERS  FOR_BUILDINGS  FOR_POROSITIES  FOR_CHIMNEYS
 " Constant from Native_Mod
   syn keyword fortranConstant      MATRIX_ONE  MATRIX_UVW  MATRIX_PP   MATRIX_T
-" After the constants, I have alternating definitions of types and objects derived from them
+" Terminal colors
+  syn keyword fortranConstant      ESC  RESET  RED  GREEN  YELLOW  BLUE  MAGENTA  CYAN
+  syn keyword fortranConstant      BRIGHT_RED  BRIGHT_GREEN  BRIGHT_YELLOW  BRIGHT_BLUE  BRIGHT_MAGENTA  BRIGHT_CYAN
+" Some turbulence parameters
+  syn keyword fortranConstant      RE_T_CUT    RE_T_1    RE_T_4    ALPHA_MIN    ALPHA_MAX    CUB_A3    CUB_A2    CUB_A1    CUB_A0
+  " After the constants, I have alternating definitions of types and objects derived from them
   syn keyword fortranTypeTflows    Domain_Type    Point_Type     Block_Type     Line_Type         Range_Type     Read_Controls_Type
   syn keyword fortranObjectTflows  Dom            points Point   blocks         lines             ranges         Read_Control  Rc
   syn keyword fortranTypeTflows    Generate_Type  Convert_Type   Divide_Type    Grid_Type         Control_Type   Time_Type

@@ -1,14 +1,14 @@
 !==============================================================================!
-  integer function N_Edges_In_Region(Convert, Grid, bc, edge_data)
+  integer function N_Edges_In_Region(Convert, Grid, bc, edge_flag)
 !------------------------------------------------------------------------------!
-!   Counts and marks (with edge_data) edges in the given boundary color        !
+!   Counts and marks (with edge_flag) edges in the given boundary color        !
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
   class(Convert_Type) :: Convert
   type(Grid_Type)     :: Grid
   integer             :: bc
-  integer             :: edge_data(Grid % n_edges)
+  integer             :: edge_flag(Grid % n_edges)
 !-----------------------------------[Locals]-----------------------------------!
   integer :: e, cnt, s1, s2, n1, n2
   real    :: norm_1(3), norm_2(3)
@@ -20,7 +20,7 @@
 
   ! Nullify on entry
   cnt = 0
-  edge_data(:) = 0
+  edge_flag(:) = 0
 
   !---------------------------------------------!
   !                                             !
@@ -51,7 +51,7 @@
       !   Edge is not sharp, mark it as zero   !
       !----------------------------------------!
       if(dot_product(norm_1, norm_2) >= 0.7071) then
-        edge_data(e) = 0
+        edge_flag(e) = 0
 
       !--------------------------------------------------!
       !   Edge is geometrically sharp, still check if    !
@@ -81,12 +81,12 @@
         ! Edge is convex
         if(dot_product(vec_ef(1:3), norm_1(1:3)) < 0.0 .and.  &
            dot_product(vec_ef(1:3), norm_2(1:3)) < 0.0) then
-          edge_data(e) = 1
+          edge_flag(e) = 1
 
         ! Edge is concave
         else if(dot_product(vec_ef(1:3), norm_1(1:3)) > 0.0 .and.  &
                 dot_product(vec_ef(1:3), norm_2(1:3)) > 0.0) then
-          edge_data(e) = -1
+          edge_flag(e) = -1
 
         else
           print '(A,99F12.3)', 'BAD', norm2(vec_ef(1:3)), norm_1, norm_2,  &
@@ -109,9 +109,9 @@
   do e = 1, Grid % n_edges
     if(Grid % edges_bc(bc, e) .gt. 0) then
     if( sum(Grid % edges_bc(1:Grid % n_bnd_regions, e)) .gt. 1 ) then
-      if(edge_data(e) .eq. 0) then  ! hasn't been marked yet
+      if(edge_flag(e) .eq. 0) then  ! hasn't been marked yet
         cnt = cnt + 1
-        edge_data(e) = 1
+        edge_flag(e) = 1
       end if
     end if
     end if  ! it is in this bc

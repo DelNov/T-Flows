@@ -35,7 +35,7 @@
   integer, parameter :: METIS_OPTION_UBVEC     = 25
 !-----------------------------------[Locals]-----------------------------------!
   integer     :: nvtxs,              &  ! number of vertices
-                 ncons,              &  ! number of constrains 
+                 ncons,              &  ! number of constrains
                  nparts = 2             ! requested number of partitions
   integer        mopts(41)
   type(c_ptr) :: vwgt  =c_null_ptr,  &  ! weights of the vertices
@@ -85,7 +85,7 @@
                                 mopts,     &  ! (in), int(:)
                                 objval,    &  ! (out) int(:)
                                 part)         ! (out) int(:)
- 
+
   print *, part
 
   end program

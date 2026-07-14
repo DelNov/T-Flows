@@ -35,7 +35,7 @@
                      leng,               &
                      MPI_CHARACTER,      &
                      MPI_STATUS_IGNORE,  &
-                     error) 
+                     error)
 
   disp = disp + leng
 

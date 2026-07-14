@@ -18,7 +18,7 @@
   integer :: error = 0
 !==============================================================================!
 
-  ! Set view for distributed cell data 
+  ! Set view for distributed cell data
   ! (this part is the same as in Write counterpart)
   call Mpi_File_Set_View(fh,                    &
                          disp,                  &
@@ -28,7 +28,7 @@
                          MPI_INFO_NULL,         &
                          error)
 
-  ! Read distributed cell data 
+  ! Read distributed cell data
   call Mpi_File_Read(fh,                 &
                      arr,                &
                      Comm % nc_sub,      &

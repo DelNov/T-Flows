@@ -64,7 +64,7 @@
   !-------------------------------!
   !   Call the Message function   !
   !-------------------------------!
-  call Message % Framed(20,                                   &
+  call Message % Framed(60,                                   &
     "Grid currently has the following boundary conditions:",  &
     reg_list(1:ll))
 

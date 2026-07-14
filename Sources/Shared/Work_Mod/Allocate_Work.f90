@@ -36,11 +36,9 @@
   ! Get the maximum number of nodes
   Work % max_nn = maxval(Grid(1:size(Grid)) % n_nodes)
 
-  !------
-  !   
-  !------
-
-  ! Allocate the basic container's work space
+  !-----------------------------------------------!
+  !   Allocate the basic container's work space   !
+  !-----------------------------------------------!
   allocate(Work % i_cell(MAX_WORK_ARRAYS));  Work % last_i_cell = 0
   allocate(Work % i_face(MAX_WORK_ARRAYS));  Work % last_i_face = 0
   allocate(Work % i_node(MAX_WORK_ARRAYS));  Work % last_i_node = 0

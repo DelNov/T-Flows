@@ -1,5 +1,5 @@
 !==============================================================================!
-  integer function N_Bnd_Cells_In_Region(Convert, Grid, bc, cell_data)
+  integer function N_Bnd_Cells_In_Region(Convert, Grid, bc, bnd_cell_flag)
 !------------------------------------------------------------------------------!
 !>  Counts and marks boundary cells in a specified boundary condition (bc)
 !>  category within a grid.
@@ -9,9 +9,9 @@
   class(Convert_Type) :: Convert  !! parent class
   type(Grid_Type)     :: Grid     !! grid being converted
   integer             :: bc       !! boundary condition rank (number)
-  integer             :: cell_data(-Grid % n_bnd_cells  &
-                                   :Grid % n_cells)  !! stored data on
-                                                     !! boundary cells
+  integer             :: bnd_cell_flag(-Grid % n_bnd_cells  &
+                                       :Grid % n_cells)  !! stored flag on
+                                                         !! boundary cells
 !-----------------------------------[Locals]-----------------------------------!
   integer :: c, cnt
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -19,13 +19,13 @@
 !==============================================================================!
 
   ! Nullify on entry
-  cnt = 0
-  cell_data(:) = 0
+  bnd_cell_flag(:) = 0
 
+  cnt = 0
   do c = -Grid % n_bnd_cells, -1
     if( Grid % region % at_cell(c) .eq. bc ) then
       cnt = cnt + 1
-      cell_data(c) = cell_data(c) + 1
+      bnd_cell_flag(c) = bnd_cell_flag(c) + 1
     end if
   end do
 

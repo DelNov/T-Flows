@@ -31,13 +31,13 @@
                          MPI_INFO_NULL,  &
                          error)
 
-  ! Read integer value 
+  ! Read integer value
   call Mpi_File_Read(fh,                 &
                      arr(1),             &
                      length,             &
                      comm_type_real,     &
                      MPI_STATUS_IGNORE,  &
-                     error) 
+                     error)
 
   disp = disp + RP * length
 

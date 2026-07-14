@@ -39,7 +39,7 @@
 !==============================================================================!
 
   ! A very rudimentary test to check if regions are set
-  Assert(Grid % region % f_cell(Grid % n_regions) .eq.              1)
+  Assert(Grid % region % f_cell(Grid % n_regions) .eq. 1)
   Assert(Grid % region % l_cell(Grid % n_regions) .eq. Grid % n_cells)
 
   call Profiler % Start('Save_Vtu_Cells')
@@ -259,6 +259,15 @@
                     ' Name="Grid Cell Porosity Region [1]"'  //  &
                     ' format="appended"'                     //  &
                     ' offset="' // trim(str1) //'">'         // LF
+  write(fu) IN_4 // '</DataArray>' // LF
+  data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
+
+  ! Cell is probably concace
+  write(str1, '(i0.0)') data_offset
+  write(fu) IN_4 // '<DataArray type='//intp               //  &
+                    ' Name="Grid Cell Maybe Concave [1]"'  //  &
+                    ' format="appended"'                   //  &
+                    ' offset="' // trim(str1) //'">'       // LF
   write(fu) IN_4 // '</DataArray>' // LF
   data_offset = data_offset + SP + n_cells_sub * IP  ! prepare for next
 
@@ -501,6 +510,21 @@
   do c = Cells_In_Domain()
     if(Grid % new_c(c) .ne. 0) then
       i=i+1;  i_buffer(i) = Grid % por(c)
+    end if
+  end do
+  write(fu) i_buffer(1:i)
+
+  ! Cell concavity
+  data_size = int(n_cells_sub * IP, SP)
+  write(fu) data_size
+  i = 0
+  do c = Cells_In_Domain()
+    if(Grid % new_c(c) .ne. 0) then
+      if(Grid % concave(c)) then
+        i=i+1;  i_buffer(i) = 1
+      else
+        i=i+1;  i_buffer(i) = 0
+      end if
     end if
   end do
   write(fu) i_buffer(1:i)

@@ -15,7 +15,7 @@
   integer :: c
 !==============================================================================!
 
-  ! Write "distributed" cell data 
+  ! Write "distributed" cell data
   do c = 1, Comm % nc_tot
     write(fh) array(c)
   end do

@@ -1,24 +1,56 @@
-MIT License
+T-FLOWS PROPRIETARY LICENSE AGREEMENT
+Version 1.0 (2024)
 
-Copyright (c) 2017 Kemal Hanjalic, Bojan Niceno, Muhamed Hadziabdic,
-                   Rustam Mullyadzhanov and Egor Palkin
+Copyright (c)
+T-Flows Development Team
+All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and all accompanying files (“Software”) are the exclusive 
+property of the T-Flows Development Team. The Software is provided under 
+a paid, time-limited commercial license.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. LICENSE
+   The Licensee is granted a non-exclusive, non-transferable, 
+   time-limited right to install and use the Software strictly in 
+   accordance with the terms of the commercial license agreement issued 
+   to the Licensee.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE use OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. RESTRICTIONS
+   Without prior written permission from the T-Flows Development Team, 
+   the Licensee may NOT:
+     - copy, distribute, or publish the Software;
+     - modify, alter, translate, or create derivative works;
+     - disclose or provide access to any third party;
+     - reverse-engineer, decompile, or disassemble the Software;
+     - use the Software outside the number of CPUs/GPUs/hosts permitted 
+       in the commercial license.
+
+3. OWNERSHIP
+   All intellectual property rights in the Software remain exclusively 
+   with the T-Flows Development Team. No ownership rights are transferred 
+   to the Licensee.
+
+4. NO WARRANTY
+   The Software is provided “AS IS”, without warranty of any kind, 
+   express or implied, including but not limited to performance, 
+   correctness, non-infringement, or fitness for a particular purpose.
+
+5. LIABILITY
+   In no event shall the T-Flows Development Team be liable for any 
+   damages, whether direct, indirect, incidental, or consequential, 
+   arising from the use of the Software.
+
+6. TERMINATION
+   The License automatically terminates if the Licensee violates any 
+   term of this agreement. Upon termination, the Licensee must cease 
+   using the Software and delete all copies.
+
+7. GOVERNING LAW
+   This agreement is governed by Swiss/EU law unless otherwise specified 
+   in a separate commercial agreement.
+
+Unauthorized use of this Software constitutes a violation of 
+international copyright law.
+
 
 

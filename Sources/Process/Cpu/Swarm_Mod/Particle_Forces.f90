@@ -27,7 +27,7 @@
   real                         :: cd          ! drag coefficient
   real                         :: part_vol    ! particle volume
   real                         :: part_area   ! particle area
-  real                         :: dens_fluid  ! characteristic density 
+  real                         :: dens_fluid  ! characteristic density
 !==============================================================================!
 
   ! Take aliases

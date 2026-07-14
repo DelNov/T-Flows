@@ -61,7 +61,7 @@
   integer                    :: n_sect, n_elem, n_blocks, n_bnd_sect, n_grps
   integer                    :: n_memb, n_tags, n_crvs, n_nods, error, ios
   integer                    :: i, j, k, c, dim, p_tag, s_tag, type, fu, tot
-  integer                    :: run, s_tag_max, n_e_0d, n_e_1d, n_e_2d, n_e_3d
+  integer                    :: n_e_0d, n_e_1d, n_e_2d, n_e_3d
   integer                    :: f, e  ! buffer indices: first (f) and end (e)
   integer,       allocatable :: n(:), new(:)
   integer,       allocatable :: phys_tags(:), p_tag_corr(:), n_bnd_cells(:)
@@ -296,119 +296,109 @@
   !   Read info on boundary conditions   !
   !                                      !
   !--------------------------------------!
-  do run = 1, 2  ! in the first run find max index
-    if(run .eq. 1) s_tag_max = 0
+  rewind(fu)
+# ifdef __INTEL_COMPILER
+  error = fseek(fu, pos_entities, 0)
+# else
+  call fseek(fu, pos_entities, 0)
+# endif
+  if(ascii) then
+    read(fu, *) (Line % tokens(k), k = 1, 4)
+    read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
+    read(Line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
+    read(Line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
+    read(Line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
+  else
+    call File % Read_Binary_Int8_Array(fu, 4)
+    n_e_0d = int(int8_array(1))  ! number of 0D entities (points)
+    n_e_1d = int(int8_array(2))  ! number of 1D entities (lines)
+    n_e_2d = int(int8_array(3))  ! number of 2D entities (faces)
+    n_e_3d = int(int8_array(4))  ! number of 3D entities (volumes)
+  end if
 
-    rewind(fu)
-#   ifdef __INTEL_COMPILER
-    error = fseek(fu, pos_entities, 0)
-#   else
-    call fseek(fu, pos_entities, 0)
-#   endif
-    if(ascii) then
-      read(fu, *) (Line % tokens(k), k = 1, 4)
-      read(Line % tokens(1), *) n_e_0d  ! number of 0D entities (points)
-      read(Line % tokens(2), *) n_e_1d  ! number of 1D entities (lines)
-      read(Line % tokens(3), *) n_e_2d  ! number of 2D entities (faces)
-      read(Line % tokens(4), *) n_e_3d  ! number of 3D entities (volumes)
-    else
-      call File % Read_Binary_Int8_Array(fu, 4)
-      n_e_0d = int(int8_array(1))  ! number of 0D entities (points)
-      n_e_1d = int(int8_array(2))  ! number of 1D entities (lines)
-      n_e_2d = int(int8_array(3))  ! number of 2D entities (faces)
-      n_e_3d = int(int8_array(4))  ! number of 3D entities (volumes)
-    end if
-
-    !--------------------------!
-    !   Skip 0D (point) info   !
-    !--------------------------!
-    if(ascii) then
-      do i = 1, n_e_0d
-        read(fu, *) Line % whole
-      end do
-    else
-      do i = 1, n_e_0d
-        ! Node's tag
-        call File % Read_Binary_Int4_Array (fu, 1)
-        ! Node's coordinates
-        call File % Read_Binary_Real8_Array(fu, 3)
-        ! Number of physical tags (it is assumed to be zero, to check maybe?)
-        call File % Read_Binary_Int8_Array (fu, 1)
-      end do
-    end if
-
-    !--------------------------!
-    !   Skip 1D (curve) info   !
-    !--------------------------!
-    if(ascii) then
-      do i = 1, n_e_1d
-        read(fu, *) Line % whole
-      end do
-    else
-      do i = 1, n_e_1d
-        ! Curve's tag
-        call File % Read_Binary_Int4_Array (fu, 1)
-        ! Bounding box coordinates
-        call File % Read_Binary_Real8_Array(fu, 6)
-        ! Number of physical tags (it is assumed to be zero, to check maybe?)
-        call File % Read_Binary_Int8_Array (fu, 1)
-        ! Number of bounding points (assumed to be two, a check one day?)
-        call File % Read_Binary_Int8_Array (fu, 1)
-        ! Points one and two
-        call File % Read_Binary_Int4_Array (fu, 2)
-      end do
-    end if
-
-    !-------------------------------!
-    !   Analyze 2D (surface) data   !
-    !-------------------------------!
-    do i = 1, n_e_2d
-
-      if(ascii) then
-        call File % Read_Line(fu)
-        read(Line % tokens(1), *) s_tag          ! surface tag
-        read(Line % tokens(8), *) n_tags         ! for me this was 1 or 0
-        do j = 1, n_tags                         ! browse physical tags ...
-          read(Line % tokens(8+j), *) p_tag      ! ... and read them
-        end do
-        read(Line % tokens(9+n_tags), *) n_crvs  ! number of bounding curves
-      else
-        ! Surface's tag
-        call File % Read_Binary_Int4_Array (fu, 1)
-        s_tag = int4_array(1)
-        ! Bounding box coordinates
-        call File % Read_Binary_Real8_Array(fu, 6)
-        ! Number of physical tags
-        call File % Read_Binary_Int8_Array (fu, 1)
-        n_tags = int(int8_array(1))
-        do j = 1, n_tags  ! read the physical tags you have
-          call File % Read_Binary_Int4_Array (fu, 1)
-          p_tag = int4_array(1)
-        end do
-        ! Number of bounding curves
-        call File % Read_Binary_Int8_Array (fu, 1)
-        n_crvs = int(int8_array(1))
-        ! Read the bounding curves
-        call File % Read_Binary_Int4_Array (fu, n_crvs)
-      end if
-      if(n_tags .eq. 1) then
-        if(run .eq. 1) s_tag_max = max(s_tag_max, s_tag)
-        if(run .eq. 2) then
-          phys_tags(s_tag) = p_tag_corr(p_tag)
-        end if
-      end if
-      if(n_tags > 1) then
-        call Message % Error(50,                                        &
-               " More than one boundary condition per entity. \n "  //  &
-               " It is not supported in this verion of T-Flows!",       &
-               file=__FILE__, line=__LINE__)
-      end if
+  !--------------------------!
+  !   Skip 0D (point) info   !
+  !--------------------------!
+  if(ascii) then
+    do i = 1, n_e_0d
+      read(fu, *) Line % whole
     end do
-    if(run .eq. 1) then
-      allocate(phys_tags(s_tag_max))
-      phys_tags(:) = -1
+  else
+    do i = 1, n_e_0d
+      ! Node's tag
+      call File % Read_Binary_Int4_Array (fu, 1)
+      ! Node's coordinates
+      call File % Read_Binary_Real8_Array(fu, 3)
+      ! Number of physical tags (it is assumed to be zero, to check maybe?)
+      call File % Read_Binary_Int8_Array (fu, 1)
+    end do
+  end if
+
+  !--------------------------!
+  !   Skip 1D (curve) info   !
+  !--------------------------!
+  if(ascii) then
+    do i = 1, n_e_1d
+      read(fu, *) Line % whole
+    end do
+  else
+    do i = 1, n_e_1d
+      ! Curve's tag
+      call File % Read_Binary_Int4_Array (fu, 1)
+      ! Bounding box coordinates
+      call File % Read_Binary_Real8_Array(fu, 6)
+      ! Number of physical tags (it is assumed to be zero, to check maybe?)
+      call File % Read_Binary_Int8_Array (fu, 1)
+      ! Number of bounding points (assumed to be two, a check one day?)
+      call File % Read_Binary_Int8_Array (fu, 1)
+      ! Points one and two
+      call File % Read_Binary_Int4_Array (fu, 2)
+    end do
+  end if
+
+  !-------------------------------!
+  !   Analyze 2D (surface) data   !
+  !-------------------------------!
+  do i = 1, n_e_2d
+
+    if(ascii) then
+      call File % Read_Line(fu)
+      read(Line % tokens(1), *) s_tag          ! surface tag
+      read(Line % tokens(8), *) n_tags         ! for me this was 1 or 0
+      do j = 1, n_tags                         ! browse physical tags ...
+        read(Line % tokens(8+j), *) p_tag      ! ... and read them
+      end do
+      read(Line % tokens(9+n_tags), *) n_crvs  ! number of bounding curves
+    else
+      ! Surface's tag
+      call File % Read_Binary_Int4_Array (fu, 1)
+      s_tag = int4_array(1)
+      ! Bounding box coordinates
+      call File % Read_Binary_Real8_Array(fu, 6)
+      ! Number of physical tags
+      call File % Read_Binary_Int8_Array (fu, 1)
+      n_tags = int(int8_array(1))
+      do j = 1, n_tags  ! read the physical tags you have
+        call File % Read_Binary_Int4_Array (fu, 1)
+        p_tag = int4_array(1)
+      end do
+      ! Number of bounding curves
+      call File % Read_Binary_Int8_Array (fu, 1)
+      n_crvs = int(int8_array(1))
+      ! Read the bounding curves
+      call File % Read_Binary_Int4_Array (fu, n_crvs)
     end if
-  end do  ! next run
+    if(n_tags .eq. 1) then
+      call Enlarge % Array_Int(phys_tags, i=(/1,s_tag/))
+      phys_tags(s_tag) = p_tag_corr(p_tag)
+    end if
+    if(n_tags > 1) then
+      call Message % Error(50,                                        &
+             " More than one boundary condition per entity. \n "  //  &
+             " It is not supported in this verion of T-Flows!",       &
+             file=__FILE__, line=__LINE__)
+    end if
+  end do
 
   !----------------------------------------!
   !                                        !

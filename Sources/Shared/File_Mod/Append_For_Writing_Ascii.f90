@@ -27,7 +27,8 @@
   ! All this construct to create the opening message
   if(.not. present(processor)) then
     if(.not. file_exists) then
-      print *, '# Creating the file in append mode: ', trim(name_o)
+      print *, '# Creating the file in append mode: ',  &
+               BRIGHT_CYAN//trim(name_o)//RESET
     end if
     if(file_exists .and. first_call) then
       print *, '# Appending to file: ', trim(name_o)
@@ -35,10 +36,12 @@
   else
     if(processor < 2) then
       if(.not. file_exists) then
-        print *, '# Creating the file in append mode: ', trim(name_o)
+        print *, '# Creating the file in append mode: ',  &
+                 BRIGHT_CYAN//trim(name_o)//RESET
       end if
       if(file_exists .and. first_call) then
-        print *, '# Appending to file: ', trim(name_o)
+        print *, '# Appending to file: ',  &
+                 BRIGHT_CYAN//trim(name_o)//RESET
       end if
     end if
   end if

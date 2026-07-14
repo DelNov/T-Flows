@@ -1,7 +1,7 @@
 !==============================================================================!
   logical function Test_Array_Real(Mem, a, i)
 !------------------------------------------------------------------------------!
-!>  Checks if index i is within bounds of real array a
+!>  Private function to check if index i is within bounds of real array a
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!

@@ -50,7 +50,7 @@
       ay_t = abs(Grid % sy(s))
       az_t = abs(Grid % sz(s))
 
-      ! If the flux is across a buffer face, it is summed up twice.  
+      ! If the flux is across a buffer face, it is summed up twice.
       ! The variable "wgt" is here to take care of that.
       wgt = 1.0
       if(c2 > Grid % n_cells - Grid % Comm % n_buff_cells) wgt = 0.5
@@ -58,7 +58,7 @@
       !-------!
       !   X   !
       !-------!
-      if( (xc1 <= bulk % xp).and.(xc2 > bulk % xp) .or.    &
+      if( (xc1 <= bulk % xp).and.(xc2 > bulk % xp) .or.  &
           (xc2 <= bulk % xp).and.(xc1 > bulk % xp) ) then
 
         bulk % area_x = bulk % area_x + wgt * ax_t
@@ -67,7 +67,7 @@
       !-------!
       !   Y   !
       !-------!
-      if( (yc1 <= bulk % yp).and.(yc2 > bulk % yp) .or. & 
+      if( (yc1 <= bulk % yp).and.(yc2 > bulk % yp) .or.  &
           (yc2 <= bulk % yp).and.(yc1 > bulk % yp) ) then
 
         bulk % area_y = bulk % area_y + wgt * ay_t
@@ -76,7 +76,7 @@
       !-------!
       !   Z   !
       !-------!
-      if( (zc1 <= bulk % zp).and.(zc2 > bulk % zp) .or. & 
+      if( (zc1 <= bulk % zp).and.(zc2 > bulk % zp) .or.  &
           (zc2 <= bulk % zp).and.(zc1 > bulk % zp) ) then
 
         bulk % area_z = bulk % area_z + wgt * az_t

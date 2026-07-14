@@ -1,4 +1,5 @@
 #include "../Shared/Assert.h90"
+#include "../Shared/Macros.h90"
 
 !==============================================================================!
   program Convert_Prog
@@ -59,7 +60,7 @@
   print '(a)', ' #========================================================'
   print '(a)', ' # Enter the grid file name you are importing (with ext.):'
   print '(a)', ' #--------------------------------------------------------'
-  file_name = File % Single_Word_From_Keyboard()
+  file_name = File % Single_Word_From_Keyboard("# Grid name (with ext.)")
 
   !-----------------------------------------------!
   !                                               !
@@ -117,12 +118,12 @@
     call Convert % Load_Obj(Grid(1), file_name)
     call Grid(1) % Save_Vtu_Faces((/0, 0/))
 
-    print '(a)', ' #========================================================'
-    print '(a)', ' # Enter STL forrest file name to plant trees (with ext.):'
-    print '(a)', ' #--------------------------------------------------------'
+    print '(a)', ' #======================================================='
+    print '(a)', ' # Enter STL forest file name to plant trees (with ext.):'
+    print '(a)', ' #-------------------------------------------------------'
     read(*,*) file_name
 
-    ! Read the forrest STL file and plant the trees
+    ! Read the forest STL file and plant the trees
     call Convert % Load_Forrest(Grid, file_name)
     call Grid(2) % Save_Vtu_Faces((/0, 0/))
 
@@ -168,7 +169,7 @@
   print '(a)', ' #================================================='
   print '(a)', ' # Would you like to create a dual grid? (yes/no)'
   print '(a)', ' #-------------------------------------------------'
-  answer = File % Single_Word_From_Keyboard()
+  answer = File % Single_Word_From_Keyboard(key_log_entry="# Create dual grid")
   call String % To_Upper_Case(answer)
 
   n_grids = 1
@@ -190,6 +191,10 @@
       print '(a)',              ' #--------------------------------------'
       if(g .eq. 2) call Convert % Create_Dual(Grid(1), Grid(2))
     end if
+
+    ! Insert boundary layers
+    call Convert % Insert_Layers_Driver(Grid(g), g, n_grids)
+    call Grid(g) % Save_Vtu_Faces((/0, 0/))
 
     !--------------------------------------!
     !   Calculate geometrical quantities   !
@@ -252,6 +257,18 @@
     ! Save Fluent's .cas file
     if(SAVE_CAS) then
       call Convert % Save_Fluent(Grid(g))
+    end if
+
+    if(g .eq. 2) then
+      call Message % Framed(80, GREEN//"NOTE"//RESET//":",                     &
+        "Dual grid has been created and saved. Keep in mind, however, "    //  &
+        "that although Paraview supports polyhedral cells its support "    //  &
+        "for displaying concave cells and faces is limited. See: \n \n "   //  &
+        "https://vtk.org/doc/nightly/html/classvtkPolyhedron.html"         //  &
+        "#Limitations \n \n "                                              //  &
+        "If you are unsure whether a concave cell or face has been formed "//  &
+        "correctly, temporarily display the grid in Paraview using "       //  &
+        "wireframe representation.")
     end if
 
     if( (g-n_grids) .eq. 0) then

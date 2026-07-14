@@ -40,7 +40,7 @@
     'problems in multiple domains, such as conjugate heat transfer.    '  //  &
     '\n \n                                                             '  //  &
     'Type "skip" to skip this and set wall distance to -1.0 everywhere.')
-  call File % Read_Line(5)
+  call File % Read_Line(5, key_log_entry="# Distance from the walls")
   answer = Line % tokens(1)
   call String % To_Upper_Case(answer)
 
