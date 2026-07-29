@@ -5142,6 +5142,15 @@ own density and diameter, they do not follow the flow slavishly - they lag
 behind it or overshoot it, which is precisely the mechanism which makes them
 deposit on walls of curved ducts.
 
+Note that, at present, the coupling between the phases is _one-way_: the
+particles feel the fluid through the forces described below, but the fluid
+does not feel the particles, as no momentum sources from the particles enter
+the flow equations.  That is a sound assumption for dilute suspensions - such
+as the aerosol flow in this section, in which the volume fraction of the
+dispersed phase is vanishingly small - but keep it in mind if your
+application is heavily laden with particles.  Two-way coupling and
+particle-particle collisions are currently not implemented.
+
 ![!](Documentation/Manual/Figures/swarm_particle_physics.png "")
 
 The figure above summarizes the model.  Each particle experiences a drag force
@@ -5188,13 +5197,35 @@ at the VOF interfaces, and continue moving with them.
 
 For turbulent flows, the velocity seen by the particles depends on the
 turbulence modeling approach.  In LES, the resolved velocity field is
-interpolated to particle positions directly.  When the hybrid LES/RANS model
-is used, only the modeled part of turbulence exists near the walls, and its
-effect on particles is re-introduced through one of the two stochastic models
-selected with keyword ```SWARM_SUBGRID_SCALE_MODEL```: ```brownian_fukagata```,
-a Brownian-motion-like diffusion force following the ideas of Fukagata et al.,
-or ```discrete_random_walk```, in which particles interact with randomly
-sampled turbulent eddies reconstructed from the modeled quantities.
+interpolated to particle positions directly, and no further modeling is
+needed.  With RANS and hybrid models, however, a part (or all) of the
+turbulence is not resolved but modeled, and a particle traveling through such
+a field would see an unphysically smooth flow - it would never get kicked
+around by the eddies which the model averaged out.  To re-introduce the
+effect of the unresolved turbulence on the particles, two stochastic models
+are implemented and selected with keyword ```SWARM_SUBGRID_SCALE_MODEL```:
+
+- ```brownian_fukagata``` implements the Brownian-diffusion-like force
+  model of Fukagata et al. (2004).  In each cell, a random force is drawn
+  from a Gaussian distribution whose standard deviation follows from the
+  subgrid-scale kinetic energy and its dissipation rate, hence from the
+  intensity of the unresolved turbulence.  The force enters the particle
+  equation of motion alongside drag and buoyancy.  In the sources, this
+  model is engaged together with the hybrid LES/Prandtl-layer approach.
+
+- ```discrete_random_walk``` implements a stochastic eddy interaction
+  model in the spirit of discrete random walk methods (following Z. Cheng
+  et al., 2018).  Each particle interacts with a sequence of randomly
+  sampled eddies whose lifetimes and length scales are reconstructed from
+  the modeled turbulent quantities (in particular the wall-normal velocity
+  scale of the zeta-f model), and the resulting velocity fluctuations are
+  added to the fluid velocity seen by the particle.  This model is engaged
+  together with the hybrid LES/RANS (ER-HRL) model, which provides the
+  modeled quantities it feeds on.
+
+If no stochastic model is selected, particles simply see the resolved (or
+mean) velocity field, which is also how the benchmark in this section is
+set up.
 
 Lagrangian particle tracking works in parallel too: particles which cross into
 buffer cells of a sub-domain are handed over to the neighboring processor.
