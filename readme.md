@@ -84,6 +84,12 @@
         4. [Checking the initial condition](#bench_cases_buble_checking)
         5. [Final solution and benchmarking](#bench_cases_buble_final)
     6. [Lagrangian tracking of particles in an L-bend](#bench_cases_swarm)
+        1. [Lagrangian particle tracking in T-Flows](#bench_cases_swarm_model)
+        2. [The benchmark case](#bench_cases_swarm_case)
+        3. [Preparing the grids](#bench_cases_swarm_grids)
+        4. [Developing the flow](#bench_cases_swarm_flow)
+        5. [Tracking the particles](#bench_cases_swarm_tracking)
+        6. [Deposition efficiency](#bench_cases_swarm_results)
 
 # Introduction <a name="intro"></a>
 
@@ -5106,4 +5112,403 @@ velocity at the end of each time step.  We use tool Grace to plot the results
 and compare them with benchmark solutions.
 
 ## Lagrangian tracking of particles in an L-bend <a name="bench_cases_swarm"> </a>
+
+All the multiphase simulations we showed so far dealt with flows whose phases
+are separated by resolved interfaces, described with the VOF method in the
+section on the [rising bubble](#bench_cases_bubble).  In this section we
+demonstrate the second multiphase modeling track in T-Flows: Lagrangian
+particle tracking, used for flows laden with dispersed particles.  We use it
+to compute deposition of aerosol particles in a 90-degree pipe bend (an
+L-bend), and we benchmark the computed deposition rates against measurements
+and against a commercial CFD solver for a range of particle diameters.
+
+Through this case, you will encounter the following new concepts:
+
+- the physical model behind Lagrangian particle tracking in T-Flows and the
+  control file keywords governing it
+- simulations in two computational domains, coupled through an interface
+- insertion of particles through a user function
+- extraction of particle deposition statistics
+
+### Lagrangian particle tracking in T-Flows <a name="bench_cases_swarm_model"></a>
+
+In T-Flows, a collection of particles sharing the same physical properties
+(density and diameter) is called a _swarm_.  The functionality for tracking a
+swarm through a computational domain is implemented in the class ```Swarm_Type```
+(residing in ```[root]/Sources/Process/Cpu/Swarm_Mod.f90```), whereas each
+individual particle is described by the class ```Particle_Type```.  Particles
+are treated as material points; they are carried by the flow but, having their
+own density and diameter, they do not follow the flow slavishly - they lag
+behind it or overshoot it, which is precisely the mechanism which makes them
+deposit on walls of curved ducts.
+
+![!](Documentation/Manual/Figures/swarm_particle_physics.png "")
+
+The figure above summarizes the model.  Each particle experiences a drag force
+and a buoyancy force (sketch (a)).  The drag force follows from the drag
+coefficient which, for particle Reynolds numbers (```re``` in sources) below
+1000, reads:
+```
+cd = 24 / re * f,    where    f = 1 + 0.15 * re^0.687
+```
+that is, the Stokes drag with the correction of Schiller and Naumann for
+finite Reynolds numbers, whereas for particle Reynolds numbers beyond 1000 a
+constant value of 0.43 is taken.  The particle Reynolds number is based on the
+particle diameter and the velocity of the particle _relative_ to the fluid.
+The buoyancy force is computed from the reduced gravity ```(1 - rho_f/rho_p) g```,
+meaning that it vanishes if you do not prescribe the ```GRAVITATIONAL_VECTOR```
+in the control file.  An important derived quantity is the particle relaxation
+time:
+```
+tau_p = rho_p * d_p^2 / (18 * mu_f)
+```
+which tells how quickly a particle adjusts to changes in the surrounding flow
+and which, together with a characteristic flow time scale, forms the Stokes
+number - the governing parameter for particle-laden flows.
+
+The fluid velocity is evaluated at the particle position by interpolating from
+the nearest cell center with the help of the velocity gradients.  Particle
+velocities are integrated in time with a fourth-order Runge-Kutta scheme, and
+positions with a first-order explicit scheme.  Since particles are much
+smaller than the grid cells, and their response times much shorter than the
+time steps used for the flow, each flow time step is divided into a number of
+particle sub-steps, set by keyword ```NUMBER_OF_SWARM_SUB_STEPS```.
+
+When a particle hits a wall, its fate is decided by the coefficient of
+restitution (sketch (b) above and keyword ```SWARM_COEFFICIENT_OF_RESTITUTION```):
+a value of 1.0 gives an elastic bounce, values between 0 and 1 a bounce with
+damped wall-normal velocity, and 0.0 makes the particle stick to the wall, in
+which case it is counted as _deposited_.  Particles which leave the domain
+through outflow boundaries are counted as _escaped_.  During the simulation,
+_Process_ prints a small table with these counters (total, active, deposited
+and escaped particles), which is the basis for the deposition statistics used
+in this benchmark.  In three-phase flow situations (two fluid phases resolved
+with VOF and particles as the third phase), particles can also get _trapped_
+at the VOF interfaces, and continue moving with them.
+
+For turbulent flows, the velocity seen by the particles depends on the
+turbulence modeling approach.  In LES, the resolved velocity field is
+interpolated to particle positions directly.  When the hybrid LES/RANS model
+is used, only the modeled part of turbulence exists near the walls, and its
+effect on particles is re-introduced through one of the two stochastic models
+selected with keyword ```SWARM_SUBGRID_SCALE_MODEL```: ```brownian_fukagata```,
+a Brownian-motion-like diffusion force following the ideas of Fukagata et al.,
+or ```discrete_random_walk```, in which particles interact with randomly
+sampled turbulent eddies reconstructed from the modeled quantities.
+
+Lagrangian particle tracking works in parallel too: particles which cross into
+buffer cells of a sub-domain are handed over to the neighboring processor.
+For that to work over periodic boundaries, _Process_ needs the periodic
+face-pairs (the _shadow_ faces) mentioned in the note in section
+[Converting the mesh](#demo_lid_driven_hexa_convert).
+
+The complete list of keywords governing a swarm, with their default values,
+is:
+```
+PARTICLE_TRACKING                          no       (yes to activate the swarm)
+MAX_PARTICLES                              0        (size of the swarm to allocate)
+SWARM_DENSITY                              1000.0
+SWARM_DIAMETER                             2.5e-5
+SWARM_COEFFICIENT_OF_RESTITUTION           1.0      (1 elastic, 0 sticky)
+NUMBER_OF_SWARM_SUB_STEPS                  60
+STARTING_TIME_STEP_FOR_SWARM_COMPUTATION   1200
+STARTING_TIME_STEP_FOR_SWARM_STATISTICS    huge     (essentially off)
+SWARM_SUBGRID_SCALE_MODEL                  none     (brownian_fukagata or
+                                                     discrete_random_walk)
+SWARM_SAVE_INTERVAL                        60       (in time steps)
+```
+
+Two things are still needed to close the picture: a way to bring particles
+into the domain, and a way to get them out to files for visualization.  The
+former is done in the user function ```User_Mod_Insert_Particles```, called at
+the end of each time step, in which you place particles wherever you want with
+the member procedure ```Insert_At```; we show how it is done below.  The
+latter is done automatically by _Process_: every ```SWARM_SAVE_INTERVAL```
+time steps it saves the particles in a ```.vtu``` file with the extension
+```-swarm``` (for example ```bend-swarm-ts001500.vtu```), readable by ParaView
+just like the flow field files.
+
+### The benchmark case <a name="bench_cases_swarm_case"></a>
+
+The case we use to demonstrate all of the above is deposition of aerosol
+particles in a 90-degree pipe bend, following the setup used in laboratory
+experiments with such bends:
+
+<img src="Documentation/Manual/Figures/swarm_lbend_domain.png" width="700"/>
+
+Air (density 1.2 kg/m^3, viscosity 1.8e-5 Pa s) flows through a pipe of
+diameter _D_ = 20 mm with the bulk velocity of 3 m/s, giving the Reynolds
+number of 4000.  The bend has the curvature radius of _R_c_ = 40 mm (hence
+_R_c_/_D_ = 2) and is extended with straight arms on both sides.  Water-like
+particles (density 1000 kg/m^3) with diameters ranging from 3 to 50 microns
+are released close to the bend inlet, and we measure the _deposition
+efficiency_: the percentage of the released particles which stick to the
+walls, as opposed to escaping through the outflow.  Since the coefficient of
+restitution is set to zero, every particle which touches a wall is counted as
+deposited.  Gravity is not prescribed, so the deposition is governed purely by
+particle inertia: heavier particles fail to follow the sharp turn of the
+streamlines in the bend and impact the outer wall, while the smallest ones
+follow the flow almost perfectly and sneak through.  The deposition efficiency
+therefore grows with particle diameter in a characteristic S-shaped curve, and
+reproducing that curve is a rather stringent test of the entire particle
+tracking machinery.
+
+The simulation runs in two computational domains, like the conjugate heat
+transfer case in section [Conjugate heat transfer](#bench_conjugate), but with
+a twist: the first domain (```pipe```) is a short pipe segment, periodic in
+the streamwise direction, whose only purpose is to serve as a _precursor_ - to
+develop a fully turbulent pipe flow which is copied to the inlet of the second
+domain (```bend```) at every time step through the interface condition.  That
+way, the bend receives a realistic developed turbulent inflow rather than a
+flat velocity profile.  The flow in the precursor is driven by the prescribed
+volume flow rate, as introduced in the section on
+[setting the volume flow rates and pressure drops](#demo_parallel_proc_setting_volume_flow_ratees).
+
+The case resides in ```[root]/Tests/Manual/L_Bend/``` with the following
+contents:
+```
+[root]/Tests/Manual/L_Bend/
+├── Control_Flow_Development/
+│   ├── control
+│   ├── control.1
+│   └── control.2
+├── Control_Particle_Tracking/
+│   ├── control
+│   ├── control.1
+│   └── control.2
+├── Results/
+├── User_Mod/
+│   ├── Insert_Particles.f90
+│   └── Interface_Exchange.f90
+├── bend.geo
+├── convert.1.scr
+├── convert.2.scr
+├── pipe.geo
+└── readme
+```
+The computation goes in two stages - flow development and particle tracking -
+and each stage has its own set of control files.  Directory ```Results```
+holds the reference data for the deposition efficiency, and ```User_Mod```
+holds the user functions compiled into _Process_ for this case.
+
+### Preparing the grids <a name="bench_cases_swarm_grids"></a>
+
+Both grids are created with GMSH.  The scripts are parametrized in the same
+spirit as the ones you met before, so feel free to open them and explore.
+Create the meshes with:
+```
+gmsh -3 pipe.geo -o pipe.msh
+gmsh -3 bend.geo -o bend.msh
+```
+The bend grid counts 333 thousand hexahedral cells, with an O-grid
+cross-section clustered towards the pipe walls.  Conversion to T-Flows format
+must be done twice, and the scripts with answers for _Convert_ are already
+provided:
+```
+./Convert < convert.1.scr
+./Convert < convert.2.scr
+```
+Note two things in ```convert.1.scr```: the pipe is periodic in the _y_
+direction (the first boundary condition in its list), and the wall distance
+calculation is requested for the walls, since the k-eps model used for the
+flow needs it.  If you visualize the two grids (files ```pipe.faces.vtu``` and
+```bend.faces.vtu```), you should see this:
+
+![!](Documentation/Manual/Figures/swarm_lbend_grid.png "")
+
+### Developing the flow <a name="bench_cases_swarm_flow"></a>
+
+Since this is a simulation in two domains, the control files come in three
+pieces, exactly like in the section on
+[conjugate heat transfer](#bench_conjugate): the file ```control``` holds what
+is common to both domains, whereas ```control.1``` and ```control.2```
+hold the specifics for domains ```pipe``` and ```bend```.  For the first
+stage, copy them from ```Control_Flow_Development```:
+```
+cp Control_Flow_Development/control* .
+```
+The common control file is worth a look:
+```
+NUMBER_OF_DOMAINS         2
+
+TIME_STEP                          0.005
+NUMBER_OF_TIME_STEPS            1000
+
+RESULTS_SAVE_INTERVAL                           100
+BACKUP_SAVE_INTERVAL                            500
+SWARM_SAVE_INTERVAL                             100
+STARTING_TIME_STEP_FOR_SWARM_COMPUTATION       1001
+
+SAVE_RESULTS_AT_BOUNDARIES        no
+
+TOLERANCE_FOR_SIMPLE_ALGORITHM     1.e-3
+
+INTERFACE_CONDITION      pipe         bend
+  BOUNDARY_CONDITIONS    periodic_y   bend_inlet
+```
+The entry ```INTERFACE_CONDITION``` connects the periodic boundary of the
+precursor with the inlet of the bend; the actual copying of velocities is done
+in the user function ```Interface_Exchange.f90``` provided with the case.
+Note also that ```STARTING_TIME_STEP_FOR_SWARM_COMPUTATION``` is set to 1001,
+beyond the last time step of this stage: particles will enter the story only
+in the second stage, when the flow is fully developed.  In ```control.1``` you
+can see that the flow in the precursor is driven by ```PRESSURE_DROPS``` and
+```VOLUME_FLOW_RATES``` (giving the bulk velocity of 3 m/s), and both domains
+use the ```k_eps``` turbulence model with the ```minmod``` advection scheme.
+
+Before running, compile _Process_ with the user functions for this case.  From
+```[root]/Sources/Process/Cpu``` run:
+```
+make clean
+make DIR_CASE=../../../Tests/Manual/L_Bend
+```
+and then, back in the case directory, launch the simulation:
+```
+./Process > out_stage_1  &
+```
+This stage integrates the flow for five seconds of physical time, enough for
+the precursor to reach a statistically steady state and for the bend to be
+washed through.  At the end, backup files ```pipe-ts001000.backup``` and
+```bend-ts001000.backup``` are left behind for the second stage.  The
+velocity field at the end of the first stage, in the mid-plane of the bend
+domain, looks like this:
+
+![!](Documentation/Manual/Figures/swarm_lbend_velocity.png "")
+
+The flow accelerates along the inner wall of the bend, and just downstream of
+it a slower region forms along the inner wall of the outlet arm, while the
+faster fluid is pushed towards the outer wall - the asymmetry which the
+particles are about to feel.
+
+### Tracking the particles <a name="bench_cases_swarm_tracking"></a>
+
+For the second stage, copy the control files from
+```Control_Particle_Tracking```:
+```
+cp Control_Particle_Tracking/control* .
+```
+and tell both domains to continue from the backups by adding to
+```control.1```:
+```
+LOAD_BACKUP_NAME   pipe-ts001000.backup
+```
+and to ```control.2```:
+```
+LOAD_BACKUP_NAME   bend-ts001000.backup
+```
+The common control file for this stage brings a couple of changes: the time
+step is reduced to 1.0e-4 (a swarm of tiny particles has response times far
+shorter than the flow), the number of time steps is increased to 20000, and
+particles are saved every 10 time steps.  The interesting news is in
+```control.2```, in the section related to the swarm:
+```
+PARTICLE_TRACKING                               yes
+SWARM_DIAMETER                                    3.0e-6
+# SWARM_DIAMETER                                    5.0e-6
+# SWARM_DIAMETER                                   10.0e-6
+# ...
+# SWARM_DIAMETER                                   50.0e-6
+SWARM_DENSITY                                  1000.0
+NUMBER_OF_SWARM_SUB_STEPS                        16
+MAX_PARTICLES                                 10000
+SWARM_COEFFICIENT_OF_RESTITUTION                  0.0
+```
+Particle tracking is switched on for the bend domain only, with the swarm of
+3-micron particles active and the remaining diameters listed as comments.  To
+conduct the full benchmark, you run this stage once for each diameter,
+uncommenting one line at a time.
+
+Particles are brought into the domain by the user function
+```Insert_Particles.f90```, which is worth opening.  At time steps 1001, 1501,
+2001 and 2501 (that is: four batches, half a second of physical time apart),
+it releases 631 particles arranged in concentric rings over the pipe
+cross-section, just downstream of the bend inlet.  The insertion itself boils
+down to calls like:
+```
+call Swarm % Particle(k) % Insert_At(x, 0.0999, z,        &
+                                     n_parts_in_buffers,  &
+                                     Flow=Flow)
+```
+which places a particle at the given coordinates and picks up the local flow
+velocity as its initial velocity.  The function also keeps the count of
+inserted particles in ```Swarm % n_particles```, and refuses to insert more
+than ```MAX_PARTICLES```.
+
+Launch the second stage the same way as the first one:
+```
+./Process > out_stage_2  &
+```
+While it is running, _Process_ prints the swarm statistics at every time
+step.  Here is how it looks at time step 2600, with all four batches (2524
+particles) released and the first ones already leaving through the outflow:
+```
+ #================================================#
+ #                Swarm statistics                #
+ #------------------------------------------------#
+ #  Total number of particles     :   2524        #
+ #  Number of active particles    :   1429        #
+ #  Number of deposited particles :      0        #
+ #  Number of escaped particles   :   1095        #
+ #  Total number of reflections   :      0.0E+00  #
+ #================================================#
+```
+Do not let the zero deposited particles at this stage confuse you: the
+particles which deposit are mostly the slow ones creeping along the walls,
+and they need a good part of the full twenty thousand time steps to reach
+the outer wall of the bend.
+and every ```SWARM_SAVE_INTERVAL``` time steps it saves the particle
+positions in files like ```bend-swarm-ts001500.vtu```.  Read them in ParaView
+together with the flow field or the boundaries of the domain to see the swarm
+being carried around the bend:
+
+![!](Documentation/Manual/Figures/swarm_lbend_particles.png "")
+
+> **_Note:_** With the time step of 1.0e-4 seconds and 16 sub-steps, each
+particle is advanced with sub-steps of 6.25e-6 seconds.  That is not a luxury:
+the relaxation time of a 3-micron water droplet in air is about 2.8e-5
+seconds, so the sub-steps must be of that order for a stable and accurate
+integration of the particle equation of motion.  If _Process_ reports
+particles being lost, the first remedy to try is increasing
+```NUMBER_OF_SWARM_SUB_STEPS```.
+
+### Deposition efficiency <a name="bench_cases_swarm_results"></a>
+
+After twenty thousand time steps (two seconds of physical time), all the
+released particles have either deposited on the walls or escaped through the
+outflow, and the counters in the swarm statistics are final.  The deposition
+efficiency for the given particle diameter is simply the number of deposited
+particles over the total number of released ones.  Repeat the run for all
+diameters listed in ```control.2```, and the S-shaped curve emerges.
+Reference data are provided in the directory ```Results```: the measured
+deposition efficiencies (```data.dat```), results obtained with a commercial
+solver on the same grid and with the same physical setup (```fluent.dat```),
+T-Flows results at the time this case was set up (```t-flows.dat```), and the
+logs of those runs (```out_particles_*_um```).  For example, the archived log
+of the 10-micron run (```out_particles_10_um```, which released more batches
+than the four described above) ends with 405 deposited out of 4681 released
+particles, giving the deposition efficiency of 8.65% - exactly the value you
+will find for that diameter in ```t-flows.dat```.  The comparison looks like
+this:
+
+![!](Documentation/Manual/Figures/swarm_lbend_deposition.png "")
+
+Both codes reproduce the S-shaped growth of the deposition efficiency with
+particle diameter.  Neither of them is spot-on in the steepest part of the
+curve - T-Flows underpredicts the deposition of the smaller particles, while
+the commercial solver overshoots it between 20 and 30 microns - but T-Flows
+stays closer to the measurements over practically the whole range of
+diameters.  Given that everything in this chain matters - the quality of the
+developed inflow, the turbulence model, the interpolation of velocities to
+particle positions, and the sub-stepped integration of particle motion - we
+consider this agreement a solid verification of the Lagrangian particle
+tracking in T-Flows.
+
+Things you might want to try next:
+
+- set ```SWARM_COEFFICIENT_OF_RESTITUTION``` to 1.0 and watch the particles
+  ricochet through the bend instead of depositing
+- prescribe the ```GRAVITATIONAL_VECTOR``` and see how much gravitational
+  settling adds to the inertial deposition for the largest particles
+- engage one of the stochastic models with ```SWARM_SUBGRID_SCALE_MODEL```
+  and assess the effect of modeled turbulence on the mid-range of the curve
 
