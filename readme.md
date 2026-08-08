@@ -5205,23 +5205,28 @@ around by the eddies which the model averaged out.  To re-introduce the
 effect of the unresolved turbulence on the particles, two stochastic models
 are implemented and selected with keyword ```SWARM_SUBGRID_SCALE_MODEL```:
 
-- ```brownian_fukagata``` implements the Brownian-diffusion-like force
-  model of Fukagata et al. (2004).  In each cell, a random force is drawn
-  from a Gaussian distribution whose standard deviation follows from the
-  subgrid-scale kinetic energy and its dissipation rate, hence from the
+- ```brownian_fukagata``` implements the Brownian-diffusion-like force model of
+  [Fukagata et al.](https://link.springer.com/article/10.1007/s00231-003-0462-8).
+  In each cell, a random force is drawn from a Gaussian distribution whose
+  standard deviation follows from the subgrid-scale kinetic energy and its
+  dissipation rate, both taken from the dynamic LES model, hence from the
   intensity of the unresolved turbulence.  The force enters the particle
-  equation of motion alongside drag and buoyancy.  In the sources, this
-  model is engaged together with the hybrid LES/Prandtl-layer approach.
+  equation of motion alongside drag and buoyancy.
 
-- ```discrete_random_walk``` implements a stochastic eddy interaction
-  model in the spirit of discrete random walk methods (following Z. Cheng
-  et al., 2018).  Each particle interacts with a sequence of randomly
-  sampled eddies whose lifetimes and length scales are reconstructed from
-  the modeled turbulent quantities (in particular the wall-normal velocity
-  scale of the zeta-f model), and the resulting velocity fluctuations are
-  added to the fluid velocity seen by the particle.  This model is engaged
-  together with the hybrid LES/RANS (ER-HRL) model, which provides the
-  modeled quantities it feeds on.
+- ```discrete_random_walk``` implements a stochastic eddy interaction model in
+  the spirit of discrete random walk methods, following
+  [Cheng et al.](https://www.sciencedirect.com/science/article/pii/S0309170817303858).
+  Each particle interacts with a sequence of randomly sampled eddies whose
+  lifetimes and length scales are reconstructed from the modeled turbulent
+  quantities (in particular the wall-normal velocity scale of the k-ε-ζ-f
+  model), and the resulting velocity fluctuations are added to the fluid
+  velocity seen by the particle.
+
+Both models draw the modeled turbulent quantities they feed on from a specific
+turbulence model, and are therefore silently inactive with any other choice of
+```TURBULENCE_MODEL```: ```brownian_fukagata``` is evaluated only with
+```hybrid_les_prandtl```, and ```discrete_random_walk``` only with
+```hybrid_les_rans```.
 
 If no stochastic model is selected, particles simply see the resolved (or
 mean) velocity field, which is also how the benchmark in this section is
@@ -5252,27 +5257,31 @@ SWARM_SAVE_INTERVAL                        60       (in time steps)
 Two things are still needed to close the picture: a way to bring particles
 into the domain, and a way to get them out to files for visualization.  The
 former is done in the user function ```User_Mod_Insert_Particles```, called at
-the end of each time step, in which you place particles wherever you want with
-the member procedure ```Insert_At```; we show how it is done below.  The
-latter is done automatically by _Process_: every ```SWARM_SAVE_INTERVAL```
-time steps it saves the particles in a ```.vtu``` file with the extension
-```-swarm``` (for example ```bend-swarm-ts001500.vtu```), readable by ParaView
-just like the flow field files.
+the beginning of each time step, before the flow equations are solved and
+before the particles already in the domain are advanced.  In it you place
+particles wherever you want with the member procedure ```Insert_At```; we show
+how it is done below.  The latter is done automatically by _Process_: every
+```SWARM_SAVE_INTERVAL``` time steps it saves the particles in a ```.vtu```
+file with the extension ```-swarm``` (for example
+```bend-swarm-ts001500.vtu```), readable by ParaView just like the flow field
+files.
 
 ### The benchmark case <a name="bench_cases_swarm_case"></a>
 
 The case we use to demonstrate all of the above is deposition of aerosol
-particles in a 90-degree pipe bend, following the setup used in laboratory
-experiments with such bends:
+particles in a 90-degree pipe bend.  Measured deposition efficiencies for this
+configuration are delivered with the case, so the computed curve can be
+compared against an experiment and not only against another code:
 
 <img src="Documentation/Manual/Figures/swarm_lbend_domain.png" width="700"/>
 
 Air (density 1.2 kg/m^3, viscosity 1.8e-5 Pa s) flows through a pipe of
 diameter _D_ = 20 mm with the bulk velocity of 3 m/s, giving the Reynolds
 number of 4000.  The bend has the curvature radius of _R_c_ = 40 mm (hence
-_R_c_/_D_ = 2) and is extended with straight arms on both sides.  Water-like
-particles (density 1000 kg/m^3) with diameters ranging from 3 to 50 microns
-are released close to the bend inlet, and we measure the _deposition
+_R_c_/_D_ = 2) and is extended with straight arms of 5 _D_ on both sides.
+Water-like particles (density 1000 kg/m^3) with diameters ranging from 3 to 50
+microns are released in a cross-section 2 _D_ downstream of the inlet, that is
+3 _D_ ahead of the point where the bend starts, and we measure the _deposition
 efficiency_: the percentage of the released particles which stick to the
 walls, as opposed to escaping through the outflow.  Since the coefficient of
 restitution is set to zero, every particle which touches a wall is counted as
@@ -5331,18 +5340,27 @@ Create the meshes with:
 gmsh -3 pipe.geo -o pipe.msh
 gmsh -3 bend.geo -o bend.msh
 ```
-The bend grid counts 333 thousand hexahedral cells, with an O-grid
-cross-section clustered towards the pipe walls.  Conversion to T-Flows format
-must be done twice, and the scripts with answers for _Convert_ are already
-provided:
+Both grids share the same O-grid cross-section of 1332 cells, clustered
+towards the pipe walls.  The precursor is ten cells long, giving 13 320 cells,
+whereas the bend is extruded over 250 cells along its axis, giving exactly
+333 000 hexahedral cells.  Conversion to T-Flows format must be done twice,
+and the scripts with answers for _Convert_ are already provided:
 ```
 ./Convert < convert.1.scr
 ./Convert < convert.2.scr
 ```
-Note two things in ```convert.1.scr```: the pipe is periodic in the _y_
-direction (the first boundary condition in its list), and the wall distance
-calculation is requested for the walls, since the k-eps model used for the
-flow needs it.  If you visualize the two grids (files ```pipe.faces.vtu``` and
+Two answers in ```convert.1.scr``` deserve a comment.  The pipe is made
+periodic in the _y_ direction by answering ```1```, the ordinal number of
+```PERIODIC``` in the boundary condition list _Convert_ prints just above the
+question.  Once periodicity is established, that boundary is no longer a
+boundary, so the list shrinks to a single entry and the wall distance is then
+requested with ```1``` as well - this time meaning ```PIPE_WALLS```.  The wall
+distance is needed because both domains are computed with the k-eps model.
+The same question in ```convert.2.scr``` is answered with ```2```, since the
+bend keeps all three of its boundaries (```BEND_INLET```, ```BEND_WALLS``` and
+```BEND_OUTLET```) and the walls are the second in that list.
+
+If you visualize the two grids (files ```pipe.faces.vtu``` and
 ```bend.faces.vtu```), you should see this:
 
 ![!](Documentation/Manual/Figures/swarm_lbend_grid.png "")
@@ -5379,7 +5397,11 @@ INTERFACE_CONDITION      pipe         bend
 ```
 The entry ```INTERFACE_CONDITION``` connects the periodic boundary of the
 precursor with the inlet of the bend; the actual copying of velocities is done
-in the user function ```Interface_Exchange.f90``` provided with the case.
+in the user function ```Interface_Exchange.f90``` provided with the case.  The
+name ```periodic_y``` in that entry is not the one from ```pipe.geo``` - the
+GMSH file calls that surface ```periodic```.  Once _Convert_ turns it into a
+periodic direction it ceases to be an ordinary boundary and becomes the
+internal region ```PERIODIC_Y```, and that is the name _Process_ expects here.
 Note also that ```STARTING_TIME_STEP_FOR_SWARM_COMPUTATION``` is set to 1001,
 beyond the last time step of this stage: particles will enter the story only
 in the second stage, when the flow is fully developed.  In ```control.1``` you
@@ -5451,10 +5473,11 @@ uncommenting one line at a time.
 
 Particles are brought into the domain by the user function
 ```Insert_Particles.f90```, which is worth opening.  At time steps 1001, 1501,
-2001 and 2501 (that is: four batches, half a second of physical time apart),
-it releases 631 particles arranged in concentric rings over the pipe
-cross-section, just downstream of the bend inlet.  The insertion itself boils
-down to calls like:
+2001 and 2501 - that is, four batches spaced 500 time steps, or 0.05 seconds
+of physical time, apart - it releases 631 particles over the pipe
+cross-section, in the plane _y_ = 0.0999 introduced above: one on the axis and
+14 concentric rings around it, the _i_-th ring carrying 6 _i_ particles.  The
+insertion itself boils down to calls like:
 ```
 call Swarm % Particle(k) % Insert_At(x, 0.0999, z,        &
                                      n_parts_in_buffers,  &
@@ -5462,32 +5485,45 @@ call Swarm % Particle(k) % Insert_At(x, 0.0999, z,        &
 ```
 which places a particle at the given coordinates and picks up the local flow
 velocity as its initial velocity.  The function also keeps the count of
-inserted particles in ```Swarm % n_particles```, and refuses to insert more
-than ```MAX_PARTICLES```.
+inserted particles in ```Swarm % n_particles``` and, if a batch pushes that
+count beyond ```MAX_PARTICLES```, it prints a message and stops the
+simulation.  So make sure ```MAX_PARTICLES``` covers all the batches you
+intend to release: four batches of 631 make 2524 particles in total, which is
+why 10000 is reserved in ```control.2```.
 
 Launch the second stage the same way as the first one:
 ```
 ./Process > out_stage_2  &
 ```
-While it is running, _Process_ prints the swarm statistics at every time
-step.  Here is how it looks at time step 2600, with all four batches (2524
-particles) released and the first ones already leaving through the outflow:
+From time step 1001 on, when the first batch enters, _Process_ prints the
+swarm statistics at every time step:
 ```
  #================================================#
  #                Swarm statistics                #
  #------------------------------------------------#
- #  Total number of particles     :   2524        #
- #  Number of active particles    :   1429        #
- #  Number of deposited particles :      0        #
- #  Number of escaped particles   :   1095        #
+ #  Total number of particles     :   4681        #
+ #  Number of active particles    :      0        #
+ #  Number of deposited particles :    405        #
+ #  Number of escaped particles   :   4276        #
  #  Total number of reflections   :      0.0E+00  #
  #================================================#
 ```
-Do not let the zero deposited particles at this stage confuse you: the
-particles which deposit are mostly the slow ones creeping along the walls,
-and they need a good part of the full twenty thousand time steps to reach
-the outer wall of the bend.
-and every ```SWARM_SAVE_INTERVAL``` time steps it saves the particle
+The counts above are the final ones of the archived 10-micron run stored in
+```Results```; a table of the same shape scrolls past at every time step while
+your own run is in progress.  The three lower counters partition the swarm:
+active particles are still travelling, deposited ones are stuck to a wall, and
+escaped ones have left through the outflow.  Reflections stay at zero here
+because the coefficient of restitution is zero, so a particle touching a wall
+deposits instead of bouncing.
+
+Do not read too much into these numbers early in the run.  Travelling at the
+bulk velocity of 3 m/s, a particle needs roughly 0.07 seconds (some 700 time
+steps) merely to cover the distance from the injection plane, around the bend
+and out through the outlet, and the ones drifting along the walls take far
+longer than that.  The counters therefore fill up slowly and only settle once
+the last particle has been accounted for.
+
+Every ```SWARM_SAVE_INTERVAL``` time steps _Process_ also saves the particle
 positions in files like ```bend-swarm-ts001500.vtu```.  Read them in ParaView
 together with the flow field or the boundaries of the domain to see the swarm
 being carried around the bend:
@@ -5504,35 +5540,46 @@ particles being lost, the first remedy to try is increasing
 
 ### Deposition efficiency <a name="bench_cases_swarm_results"></a>
 
-After twenty thousand time steps (two seconds of physical time), all the
-released particles have either deposited on the walls or escaped through the
-outflow, and the counters in the swarm statistics are final.  The deposition
-efficiency for the given particle diameter is simply the number of deposited
-particles over the total number of released ones.  Repeat the run for all
-diameters listed in ```control.2```, and the S-shaped curve emerges.
+The last time step of this stage, 20000, is a generous upper bound.  In the
+archived runs the last particle either deposited on a wall or escaped through
+the outflow with the time-step counter somewhere between 8600 and 14000,
+depending on the diameter; from there on the number of active particles is
+zero and the counters are final.  The deposition efficiency for the
+given particle diameter is then simply the number of deposited particles over
+the total number of released ones.  Repeat the run for all diameters listed in
+```control.2```, and the S-shaped curve emerges.
+
 Reference data are provided in the directory ```Results```: the measured
-deposition efficiencies (```data.dat```), results obtained with a commercial
-solver on the same grid and with the same physical setup (```fluent.dat```),
-T-Flows results at the time this case was set up (```t-flows.dat```), and the
-logs of those runs (```out_particles_*_um```).  For example, the archived log
-of the 10-micron run (```out_particles_10_um```, which released more batches
-than the four described above) ends with 405 deposited out of 4681 released
+deposition efficiencies (```data.dat```), results obtained for the same
+configuration with a commercial solver (```fluent.dat```), T-Flows results at
+the time this case was set up (```t-flows.dat```), and the tails of the logs
+of those T-Flows runs (```out_particles_*_um```).  Each log ends with the
+swarm statistics, so you can recompute every point of the curve from it.  The
+10-micron run, for instance, ends with 405 deposited out of 4681 released
 particles, giving the deposition efficiency of 8.65% - exactly the value you
-will find for that diameter in ```t-flows.dat```.  The comparison looks like
-this:
+will find for that diameter in ```t-flows.dat```.
+
+> **_Note:_** Those archived runs released 4681 particles, not the 2524 which
+four batches of 631 give, because they used a denser injection pattern than
+the ```Insert_Particles.f90``` shipped with the case produces today.  The
+deposition efficiency is a ratio, so the comparison holds either way, but do
+not be surprised when your own totals differ.
+
+The comparison looks like this:
 
 ![!](Documentation/Manual/Figures/swarm_lbend_deposition.png "")
 
 Both codes reproduce the S-shaped growth of the deposition efficiency with
-particle diameter.  Neither of them is spot-on in the steepest part of the
-curve - T-Flows underpredicts the deposition of the smaller particles, while
-the commercial solver overshoots it between 20 and 30 microns - but T-Flows
-stays closer to the measurements over practically the whole range of
-diameters.  Given that everything in this chain matters - the quality of the
-developed inflow, the turbulence model, the interpolation of velocities to
-particle positions, and the sub-stepped integration of particle motion - we
-consider this agreement a solid verification of the Lagrangian particle
-tracking in T-Flows.
+particle diameter, and neither is spot-on.  T-Flows falls below the
+measurements through the rising part of the curve, from 5 to 20 microns, while
+the commercial solver misses on both sides: it predicts almost no deposition
+below 15 microns and then overshoots between 20 and 30.  Taken point by point,
+though, T-Flows is the closer of the two everywhere except at the smallest
+diameter of 3 microns.  Given that everything in this chain matters - the
+quality of the developed inflow, the turbulence model, the interpolation of
+velocities to particle positions, and the sub-stepped integration of particle
+motion - we consider this agreement a solid validation of the Lagrangian
+particle tracking in T-Flows.
 
 Things you might want to try next:
 
