@@ -5021,7 +5021,7 @@ option will establish new links to user's case.
 
 At this point feel free to proceed with generating the grid:
 ```
-gmsh -3 rising.geo
+gmsh -3 bubble.geo
 ```
 and converting it to T-Flows format:
 ```
