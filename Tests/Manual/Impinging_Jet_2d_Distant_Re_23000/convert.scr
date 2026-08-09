@@ -4,6 +4,9 @@ jet.neu
 # Create dual grid?
 no
 
+# Boundary layers
+skip
+
 # Geometric scaling
 skip
 

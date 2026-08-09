@@ -4,6 +4,9 @@ cylinder.msh
 # Create dual mesh
 no
 
+# Boundary layers
+skip
+
 # Geometrical scaling
 skip
 

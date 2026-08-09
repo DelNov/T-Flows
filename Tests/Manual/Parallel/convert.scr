@@ -4,6 +4,9 @@ rod_tet.msh
 # Dual grid?
 yes
 
+# Boundary layers
+skip
+
 # Geometric scaling
 1.000000
 

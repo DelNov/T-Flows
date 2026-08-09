@@ -4,6 +4,9 @@ air.msh
 # Create dual mesh
 no
 
+# Boundary layers
+skip
+
 # Geometrical scaling
 0.07803
 

@@ -4,6 +4,9 @@ matrix.msh
 # Dual grid?
 no
 
+# Boundary layers
+skip
+
 # Geometrical scaling?
 skip
 

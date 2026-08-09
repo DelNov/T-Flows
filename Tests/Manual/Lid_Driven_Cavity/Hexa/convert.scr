@@ -4,6 +4,9 @@ lid_driven.msh
 # Dual grid
 no
 
+# Boundary layers
+skip
+
 # Scale geometry
 1.00
 
