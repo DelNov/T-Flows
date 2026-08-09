@@ -40,6 +40,7 @@
             1. [Creating the grid](#demo_lid_driven_hexa_create)
             1. [Converting the grid](#demo_lid_driven_hexa_convert)
         2. [Lid-driven cavity on polyhedral grid](#demo_lid_driven_dual)
+        3. [Inserting boundary layers](#demo_lid_driven_bnd_layers)
     2. [Thermally-driven cavity flow](#demo_thermally_driven)
         1. [With Boussinesq approximation](#demo_thermally_driven_boussinesq)
         2. [With variable physical properties](#demo_thermally_driven_variable)
@@ -620,6 +621,48 @@ won't cover now, but _Convert_ will stop with the following question:
 
 at which point you type ```no```.  Dual grids will be covered in the
 [Lid-driven cavity on polyhedral grids](#demo_lid_driven_dual).
+Straight after it, _Convert_ lists the boundary conditions it found in the grid
+file and offers to grow boundary layers on any of them:
+```
+ #===========================================================
+ # Grid currently has the following boundary conditions:
+ #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ # 1. UPPER_WALL
+ # 2. SIDE_WALLS
+ # 3. LOWER_WALL
+ # 4. PERIODIC_Y
+ #-----------------------------------------------------------
+ #===========================================================
+ # Inserting boundary layers.
+ #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ # Type ordinal number(s) of boundary-condition regions.
+ #
+ # Example: 2 5 7
+ #
+ # Then type boundary-layer thicknesses on the next line.
+ # Positive values extrude layers out of the domain.
+ # Negative values insert layers into the domain.
+ #
+ # Extruding example: 0.004 0.003 0.002 0.001
+ # Intruding example: -0.004 -0.003 -0.002 -0.001
+ #
+ # Type skip to skip insertion of boundary layers.
+ #-----------------------------------------------------------
+```
+
+The grid you made in GMSH is already graded towards the walls, so there is
+nothing to add here and you answer ```skip```.  We describe what this feature
+does, and when to reach for it, in the section
+[Inserting boundary layers](#demo_lid_driven_bnd_layers).
+
+> **_Warning:_** This question is new and it comes _before_ everything else
+_Convert_ asks you.  If you drive _Convert_ from a script such as
+```convert.scr```, the script answers by position, not by name, so a script
+written before this feature existed will feed its scaling factor to the
+boundary-layer question and shift every answer after it by one.  All the
+scripts shipped in ```[root]/Tests``` already carry the ```skip```; if you
+keep scripts of your own, add one line to them too.
+
 Next question _Convert_ asks you concerns geometric extents:
 ```
  #=========================================
@@ -1358,6 +1401,80 @@ in CFD and should not be used to meassure the accuracy of the code.
 Section [Benchmark cases](#bench_cases) serves that purpose.
 
 ![!](Documentation/Manual/Figures/lid_driven_dual_solution.png "")
+
+### Inserting boundary layers <a name="demo_lid_driven_bnd_layers"></a>
+
+The grids you made so far were graded towards the walls in GMSH, which is the
+most comfortable way to resolve a boundary layer.  It is not always available
+to you.  A grid may reach you from a generator which only produces tetrahedra,
+or you may want to refine the near-wall region of a geometry you have already
+meshed without going back to the generator and re-doing the work.  For those
+occasions _Convert_ can grow prismatic layers on the boundaries of a grid it
+is reading.  It is the question posed right after the one about dual grids,
+[shown above](#demo_lid_driven_hexa_convert), which you answered with
+```skip``` back then.
+
+Answer it in two lines.  On the first, list the ordinal numbers of the boundary
+regions you want layers on, taken from the list of boundary conditions
+_Convert_ prints just above the question.  On the second, list the thickness of
+each layer, one number per layer, so the number of layers is simply how many
+values you type.  The list runs from the inside of the domain towards the
+boundary, meaning the _last_ value is the thickness of the layer which ends up
+touching the wall.  That is why the examples in the prompt decrease: they leave
+the finest cell against the wall, which is what you want.
+
+The sign of the thicknesses decides where the layers go:
+
+- **Positive values extrude layers out of the domain.**  The old boundary
+  surface becomes an internal one and the grid grows outwards.  Use this when
+  the geometry you meshed is the fluid volume you want to keep, and the layers
+  may stick out of it.
+- **Negative values insert layers into the domain.**  _Convert_ first pulls the
+  interior back from the selected boundaries by the total thickness of all
+  layers, solving a distance-like potential to decide how the interior nodes
+  should move, and then fills the freed space with the layers.  The outer
+  extents of the geometry stay exactly where they were.  This is the option you
+  want when the geometry has to keep its dimensions.
+
+> **_Warning:_** Do not mix the signs.  _Convert_ stops with a critical error
+if it finds both positive and negative thicknesses in the same list, because it
+cannot extrude and intrude at the same time.
+
+To see the difference, take the hexahedral lid-driven cavity grid, whose
+```LOWER_WALL``` is third in the list of boundary conditions, and answer ```3```
+followed by ```0.004 0.003 0.002 0.001```.  Without layers, that grid converts
+to 1200 cells inside and extents:
+```
+ # X from:  0.000E+00  to:  1.000E+00
+ # Y from:  0.000E+00  to:  1.000E-01
+ # Z from:  0.000E+00  to:  1.000E+00
+```
+With the four positive thicknesses, _Convert_ reports each layer as it goes:
+```
+ # Inserting a boundary layer with thickness  4.000E-03
+ # New nodes in the boundary layer:            84
+ # Inserting a boundary layer with thickness  3.000E-03
+ # New nodes in the boundary layer:            84
+ # Inserting a boundary layer with thickness  2.000E-03
+ # New nodes in the boundary layer:            84
+ # Inserting a boundary layer with thickness  1.000E-03
+ # New nodes in the boundary layer:            84
+```
+and ends up with 1440 cells inside, the extra 240 being four layers over the
+sixty faces of the lower wall.  The cavity is now taller than it was, by the
+0.01 you asked for:
+```
+ # Z from: -9.998E-03  to:  1.000E+00
+```
+Repeat it with ```-0.004 -0.003 -0.002 -0.001``` and you get the same 1440
+cells, but the cavity is still the box it was meant to be:
+```
+ # Z from: -6.613E-13  to:  1.000E+00
+```
+
+> **_Note:_** If you asked for a dual grid, _Convert_ poses this question only
+once, and the layers are added to the dual grid, since that is the one which
+gets saved for _Process_.
 
 ## Thermally-driven cavity flow <a name="demo_thermally_driven"></a>
 
