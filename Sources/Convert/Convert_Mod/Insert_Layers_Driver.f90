@@ -35,6 +35,7 @@
       "Example:  2  5  7                                     " //  &
       "\n \n                                                 " //  &
       "Then type boundary-layer thicknesses on the next line." //  &
+      " \n                                                   " //  &
       "Positive values extrude layers out of the domain. \n  " //  &
       "Negative values insert layers into the domain.        " //  &
       " \n \n                                                " //  &
