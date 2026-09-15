@@ -126,7 +126,7 @@
            + (1.0 - Grid % fw(s)) * Flow % viscosity(c2) / pr_2
 
       vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t(c1)  / pr_t1  &
-                       + (1.0-Grid % fw(s)) * Turb % vis_t(c2)) / pr_t2  &
+                       + (1.0-Grid % fw(s)) * Turb % vis_t(c2)  / pr_t2) &
                        / sigma_eff
     end if
 
@@ -294,7 +294,7 @@
     if( phi % n(c) < 0.0 ) phi % n(c) = phi % o(c)
   end do
 
-  ! Set the lower limit of zeta to 1.8
+  ! Set the upper limit of zeta to 1.8
   if(phi % name .eq. 'ZETA') then
     do c = Cells_In_Domain_And_Buffers()
       phi % n(c) = min(phi % n(c), 1.8)
