@@ -24,6 +24,8 @@
   character(len=9)      :: dom_control(MD) = 'control.d'
   integer               :: sc, tp, ldt
   logical               :: read_backup(MD), exit_now, pot_init
+  logical               :: save_profile_now
+  real                  :: profile_save_interval, next_profile_save_time
   type(Grid_Type)       :: Grid(MD)        ! grid used in computations
   type(Field_Type)      :: Flow(MD)        ! flow field we will be solving for
   type(Swarm_Type)      :: Swarm(MD)       ! swarm of particles
@@ -226,6 +228,14 @@
   ! Save initial condition
   call Results % Main_Results(n_dom, Flow, Turb, Vof, Swarm, exit_now)
 
+  !---------------------------------------------------------------------!
+  ! Lightweight profile output for Deardorff averaging.
+  ! This calls ONLY User_Mod_Profiles; it does not write VTU or backup.
+  ! Change this value if another physical-time interval is desired.
+  !---------------------------------------------------------------------!
+  profile_save_interval  = 1.0
+  next_profile_save_time = Time % Get_Time() + profile_save_interval
+
   !-------------------------------------!
   !                                     !
   !   The time loop really begins now   !
@@ -343,6 +353,11 @@
     !----------------------------------!
     !   End of the current time step   !
     !----------------------------------!
+
+    ! Save a plane-averaged profile approximately every
+    ! profile_save_interval seconds of physical time.
+    save_profile_now = Time % Get_Time() >= next_profile_save_time
+
     do d = 1, n_dom
       call Process % Convective_Outflow(Flow(d), Turb(d), Vof(d))
     end do
@@ -360,6 +375,12 @@
       ! Calculate mean values
       call Turb(d) % Calculate_Mean(n_stat_t)
 
+      ! Save ONLY the small plane-averaged profile file.
+      ! No VTU and no backup are written by this call.
+      if(save_profile_now) then
+        call User_Mod_Profiles(Flow(d), Turb(d))
+      end if
+
       ! Adjust pressure drops to keep the mass fluxes constant
       call Flow(d) % Adjust_P_Drops()
 
@@ -375,9 +396,20 @@
                                      n_stat_t, n_stat_p)
     end do
 
+    ! Advance the next requested physical output time.  The DO WHILE
+    ! also behaves correctly if a time step happens to cross more than
+    ! one requested profile interval.
+    if(save_profile_now) then
+      do while(next_profile_save_time <= Time % Get_Time())
+        next_profile_save_time = next_profile_save_time + profile_save_interval
+      end do
+    end if
+
     !----------------------!
     !   Save the results   !
     !----------------------!
+    ! Keep the normal T-Flows result/backup mechanism unchanged.
+    ! Its interval can remain much larger than profile_save_interval.
     call Results % Main_Results(n_dom, Flow, Turb, Vof, Swarm, exit_now)
 
     ! Ran more than a set wall clock time limit
