@@ -84,28 +84,32 @@
 !======================================================================!
 !     Deardorf implementation
 !======================================================================!
-!      Flow % t_ref = 21.5 &
+      Flow % t_ref = 21.5 &
+      + 45.0 * 0.5 * (Grid % zc(c1) + Grid % zc(c2))
 !      + 45.0 * 0.5 * (Grid % wall_dist(c1) + Grid % wall_dist(c2))
-!
-!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
-!                                                                                
+
+      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
+                                                                                
+      if((Grid % zc(c1) + Grid % zc(c2))*0.5 > 0.56) then           
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.6) then           
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.36) then           
 !      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.3) then           
-!        dens_f(s) = 0.0                                                          
-!      end if                     
+        dens_f(s) = 0.0                                                          
+      end if                     
 !======================================================================!
 !======================================================================!
 !     Air atmosphere implementation
 !======================================================================!
-      Flow % t_ref = 0.008 * (Grid % fw(s)  * Grid % zc(c1)   &
-                     + (1.0 - Grid % fw(s)) * Grid % zc(c2))
-
-
-      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
-
-      if((Grid % fw(s)  * Grid % zc(c1) + (1.0 - Grid % fw(s)) * Grid % zc(c2)) &
-          > 530.0) then
-        dens_f(s) = 0.0
-      end if 
+!      Flow % t_ref = 0.008 * (Grid % fw(s)  * Grid % zc(c1)   &
+!                     + (1.0 - Grid % fw(s)) * Grid % zc(c2))
+!
+!
+!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
+!
+!      if((Grid % fw(s)  * Grid % zc(c1) + (1.0 - Grid % fw(s)) * Grid % zc(c2)) &
+!          > 530.0) then
+!        dens_f(s) = 0.0
+!      end if 
 
     end do
 
