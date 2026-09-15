@@ -29,7 +29,7 @@
   real                       :: kin_vis
   real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
   real                       :: ut_log_law, vt_log_law, wt_log_law
-  real                       :: nx, ny, nz, qx, qy, qz, g_buoy_wall
+  real                       :: nx, ny, nz, g_dot_n, q_theta_wall, g_buoy_wall
   real                       :: h_max_new, c_hyb
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
@@ -170,10 +170,6 @@
           nx = Grid % sx(s) / Grid % s(s)
           ny = Grid % sy(s) / Grid % s(s)
           nz = Grid % sz(s) / Grid % s(s)
-          qx = t % q(c2) * nx
-          qy = t % q(c2) * ny
-          qz = t % q(c2) * nz
-
           ut_log_law = - Turb % con_w(c1)                                 &
                      / (Flow % density(c1) * Flow % capacity(c1))         &
                      * (t % n(c2) - t % n(c1))/Grid % wall_dist(c1) * nx
@@ -195,23 +191,42 @@
             t % q(c2) = Turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
                       / Grid % wall_dist(c1)
 
-          g_buoy_wall = Flow % density(c1)                                    &
-                      * Flow % beta * abs(  Flow % grav_x                     &
-                                          + Flow % grav_y                     &
-                                          + Flow % grav_z)                    &
-                      * sqrt(abs(  t % q(c2)                                  &
-                                 / (Flow % density(c1)*Flow % capacity(c1)))  &
-                      * Turb % c_mu_theta5                                    &
-                      * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+          ! General wall-buoyancy formulation valid for arbitrary wall
+          ! orientation.  The Hanjalic-Hrebtov wall heat-flux magnitude is
+          ! projected on gravity through g.n, while sign(q_w) distinguishes
+          ! stable from unstable thermal stratification.
+          g_dot_n =   Flow % grav_x * nx  &
+                    + Flow % grav_y * ny  &
+                    + Flow % grav_z * nz
 
-          ! Clean up b(c) from old values of g_buoy
-          b(c1)      = b(c1) - Turb % g_buoy(c1) * Grid % vol(c1)
+          q_theta_wall = sqrt(abs(  t % q(c2)                         &
+                         / (Flow % density(c1)*Flow % capacity(c1)))  &
+                         * Turb % c_mu_theta5                         &
+                         * sqrt(abs(t2 % n(c1) * kin % n(c1))))
+
+          g_buoy_wall = - Flow % density(c1) * Flow % beta  &
+                      * sign(1.0, t % q(c2))                &
+                      * g_dot_n                             &
+                      * q_theta_wall
+
+          ! Remove the old interior buoyancy contribution using the same
+          ! explicit/implicit split with which it was originally assembled.
+          b(c1) = b(c1) - max(0.0, Turb % g_buoy(c1)) * Grid % vol(c1)
+          A % val(A % dia(c1)) = A % val(A % dia(c1))            &
+                               - max(0.0, -Turb % g_buoy(c1)     &
+                               * Grid % vol(c1)                  &
+                               / (kin % n(c1) + TINY))
 
           Turb % g_buoy(c1) = Turb % g_buoy(c1) * exp(-1.0 * ebf) &
                             + g_buoy_wall * exp(-1.0 / ebf)
 
-          ! Add new values of g_buoy based on wall function approach
-          b(c1)      = b(c1) + Turb % g_buoy(c1) * Grid % vol(c1)
+          ! Add the blended buoyancy contribution with the same
+          ! explicit/implicit linearization as in the interior cells.
+          b(c1) = b(c1) + max(0.0, Turb % g_buoy(c1)) * Grid % vol(c1)
+          A % val(A % dia(c1)) = A % val(A % dia(c1))            &
+                               + max(0.0, -Turb % g_buoy(c1)     &
+                               * Grid % vol(c1)                  &
+                               / (kin % n(c1) + TINY))
 
         end if  ! Flow % buoyancy .eq. THERMALLY_DRIVEN
       end do    ! faces in regions
