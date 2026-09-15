@@ -64,7 +64,7 @@
 
         ! Calculate u_tau for smooth wall
         if(Turb % model == K_EPS .or. Turb % model == K_EPS_ZETA_F .or. &
-           Turb % model == K_OMEGA_SST) then
+           Turb % model == HYBRID_LES_RANS .or. Turb % model == K_OMEGA_SST) then
           u_tau = Turb % c_mu25 * sqrt(kin % n(c1))
         else
           u_tau = Turb % U_Tau_Log_Law(u_tan,                &

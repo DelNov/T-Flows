@@ -17,6 +17,7 @@
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c1, c2
   real                      :: pr_t1, pr_t2, pr_tf, con_mol, con_turb
+  real                      :: lf, l_sgs_d, l_rans_d, alpha_d
   real                      :: cap_dens_c1, cap_dens_c2, tx_f, ty_f, tz_f
   real                      :: ut_cap_dens, vt_cap_dens, wt_cap_dens
 !==============================================================================!
@@ -42,11 +43,41 @@
      Turb % model .ne. LES_DYNAMIC         .and.  &
      Turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
      Turb % model .ne. LES_WALE            .and.  &
+     Turb % model .ne. HYBRID_LES_RANS     .and.  &
      Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      Turb % model .ne. DNS) then
     pr_t1 = Turb % Prandtl_Turb(c1)
     pr_t2 = Turb % Prandtl_Turb(c2)
     pr_tf = Grid % fw(s) * pr_t1 + (1.0-Grid % fw(s)) * pr_t2
+  end if
+
+  ! Hybrid LES/RANS: use RANS Pr_t in RANS cells and Pr_t = 0.4 in LES cells.
+  ! Re-evaluate the same local switching criterion used in Vis_T_K_Eps_Zeta_F.
+  if(Turb % model .eq. HYBRID_LES_RANS) then
+    lf       = Grid % vol(c1)**ONE_THIRD
+    l_sgs_d  = lf
+    l_rans_d = Turb % kappa * Grid % wall_dist(c1)
+    alpha_d  = l_rans_d / l_sgs_d
+    if(alpha_d > Turb % c_hyb) then
+      pr_t1 = 0.4
+    else
+      pr_t1 = Turb % Prandtl_Turb(c1)
+    end if
+
+    if(c2 > 0) then
+      lf       = Grid % vol(c2)**ONE_THIRD
+      l_sgs_d  = lf
+      l_rans_d = Turb % kappa * Grid % wall_dist(c2)
+      alpha_d  = l_rans_d / l_sgs_d
+      if(alpha_d > Turb % c_hyb) then
+        pr_t2 = 0.4
+      else
+        pr_t2 = Turb % Prandtl_Turb(c2)
+      end if
+    else
+      ! Boundary face: use the regime of the adjacent interior cell.
+      pr_t2 = pr_t1
+    end if
   end if
 
   !------------------------------------------------------!
@@ -66,8 +97,8 @@
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
-    con_turb  = Grid % fw(s)* Flow % capacity(c1)*Turb % vis_t_eff(c1)/pr_tf  &
-         + (1.0-Grid % fw(s))*Flow % capacity(c2)*Turb % vis_t_eff(c2)/pr_tf
+    con_turb = Grid % fw(s) * Flow % capacity(c1) * Turb % vis_t(c1) / pr_t1  &
+             + (1.0-Grid % fw(s)) * Flow % capacity(c2) * Turb % vis_t(c2) / pr_t2
   end if
 
   !-----------------------------------!
