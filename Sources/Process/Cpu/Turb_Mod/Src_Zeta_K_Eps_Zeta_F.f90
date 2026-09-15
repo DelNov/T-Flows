@@ -20,10 +20,14 @@
 !   In transport equation for zeta two source terms exist which have form:     !
 !                                                                              !
 !    /                                                                         !
-!    |                     eps                                                 !
-!    | ( f22 * kin * dV - ---- * dV )                                          !
-!    |                    zeta                                                 !
+!    |                        p_kin                                           !
+!    | ( f22 * dV      -  zeta * ---- * dV )                                  !
+!    |                            kin                                         !
 !    /                                                                         !
+!                                                                              !
+!   (obtained by substituting zeta = v2/kin into the v2 equation               !
+!    Dv2/Dt = kin*f22 - v2*eps/kin, using Dkin/Dt = p_kin - eps; the           !
+!    eps/kin terms cancel, leaving zeta*p_kin/kin as the destruction term)     !
 !                                                                              !
 !   First term can appear as positive and as negative as well so depend of     !
 !   sign of term , it is placed on left or right hand side.  Second, negative  !
