@@ -191,11 +191,12 @@
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
-      ! Ambient when it is inflow (see the v_flux check)
-      else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. AMBIENT  &
+      ! Ambient or pressure, when it is inflow (see the v_flux check)
+      else if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. AMBIENT .or.  &
+                Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE)     &
               .and. v_flux % n(s) .lt. 0.0) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-        b(c1)  = b(c1) + a12 * phi % n(c2)  ! phi % n(c2) is ambient value here
+        b(c1)  = b(c1) + a12 * phi % n(c2)  ! phi % n(c2) is prescribed here
 
       else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
         b(c1) = b(c1) + Grid % s(s) * phi % q(c2)
