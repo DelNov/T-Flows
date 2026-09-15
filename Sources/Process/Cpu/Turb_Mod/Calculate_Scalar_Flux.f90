@@ -48,15 +48,6 @@
       Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
       Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
       Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
-
-      if(Turb % model .eq. HYBRID_LES_RANS) then
-        Turb % uc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % x(c)
-        Turb % vc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % y(c)
-        Turb % wc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % z(c)
-      end if
     end do
 
   else if(Turb % scalar_flux_model .eq. GGDH) then

@@ -27,15 +27,9 @@
                      + 1.0 / Flow % viscosity(c2) )
 
   if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
-     Turb % model .ne. DNS                 .and.  &
-     Turb % model .ne. HYBRID_LES_RANS) then
+     Turb % model .ne. DNS) then
     vis_eff = vis_eff + Grid % fw(s)  * Turb % vis_t(c1)  &
                   +(1.0-Grid % fw(s)) * Turb % vis_t(c2)
-  end if
-
-  if(Turb % model .eq. HYBRID_LES_RANS) then
-    vis_eff =      Grid % fw(s)  * Turb % vis_t_eff(c1)   &
-            + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) + vis_eff
   end if
 
   if(c2 < 0) then

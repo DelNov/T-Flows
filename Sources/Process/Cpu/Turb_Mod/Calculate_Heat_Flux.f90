@@ -49,12 +49,6 @@
       ut % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
       vt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
       wt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
-
-      if(Turb % model .eq. HYBRID_LES_RANS) then
-        ut % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % x(c)
-        vt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % y(c)
-        wt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % z(c)
-      end if
     end do
 
   else if(Turb % heat_flux_model .eq. GGDH) then
