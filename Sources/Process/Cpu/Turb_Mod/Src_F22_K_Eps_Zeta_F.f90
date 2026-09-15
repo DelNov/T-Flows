@@ -28,8 +28,9 @@
 !                                                                              !
 !  where f22hg - f22hg homogenious is placed in a source coefficients b(c)     !
 !                                                                              !
-!      f22hg = (1.0 - Cv_1)*(vi2(c)/kin(c) - 2.0/3.0)/t_scale(c)     &         !
-!              + 2.0*Cv2*p_kin(c)/(3.0*kin(c))                                 !
+!      f22hg = (1.0 - Cv_1 - 0.65*p_kin(c)/eps(c))                            !
+!              * (zeta(c) - 2.0/3.0) / t_scale(c)                             !
+!              + 0.0085 * p_kin(c) / kin(c)                                   !
 !                                                                              !
 !    int( f22*dV ); this term is placed in a diagonal of coefficient matrix    !
 !                                                                              !

@@ -181,7 +181,7 @@
     real :: sig_k2, sig_w1, sig_w2, beta, gamma
 
     ! For the k-eps-v2f model:
-    real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1, c_f2
+    real :: c_mu_d, c_l, c_t, alpha, c_nu, c_f1
 
     ! For the Spalart-Allmaras and DES models:
     real :: c_des, c_b1, c_b2, c_w1, c_w2, c_w3, c_v1, c_t3, c_t4
