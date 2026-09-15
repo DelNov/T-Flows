@@ -136,7 +136,7 @@
     phij = max( 0.0, min( (beta1-1.0)*rj, g_d + g_u*rj, beta2 ) )
 
   else if(phi % adv_scheme .eq. SUPERBEE) then
-    phij = 0.5 * max( 0.0, min( 2.0*rj,1.0 ), min( rj,2.0 ) )
+    phij = fj * max( 0.0, min( 2.0*rj,1.0 ), min( rj,2.0 ) )
 
   else if(phi % adv_scheme .eq. UPWIND) then
     phi_f = phi % n(c)  ! upwind value
