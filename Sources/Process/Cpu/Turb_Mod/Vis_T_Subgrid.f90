@@ -84,7 +84,7 @@
   !-------------------------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = Cells_In_Domain_And_Buffers()
-      nc2 = max(  Flow % beta * (  Flow % grav_x * t % x(c)   &
+      nc2 = max(- Flow % beta * (  Flow % grav_x * t % x(c)   &
                                  + Flow % grav_y * t % y(c)   &
                                  + Flow % grav_z * t % z(c)), 0.0)
       Turb % vis_t(c) = Turb % vis_t(c)            &
