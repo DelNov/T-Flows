@@ -326,8 +326,15 @@
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY .or.    &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE ) then
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+          t % n(c2) = t % n(c1)
+
+        ! For a bidirectional PRESSURE boundary, only overwrite the
+        ! prescribed value when actually flowing out; on backflow
+        ! (suction) keep the control-file value so Compute_Energy can
+        ! use it as a Dirichlet condition for the incoming fluid.
+        else if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .and.  &
+                 Flow % v_flux % n(s) .gt. 0.0 ) then
           t % n(c2) = t % n(c1)
         end if
 
@@ -438,8 +445,15 @@
         end if
 
         if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. OUTFLOW .or.     &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY .or.    &
-            Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE ) then
+            Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
+          t % n(c2) = t % n(c1)
+
+        ! For a bidirectional PRESSURE boundary, only overwrite the
+        ! prescribed value when actually flowing out; on backflow
+        ! (suction) keep the control-file value so Compute_Energy can
+        ! use it as a Dirichlet condition for the incoming fluid.
+        else if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .and.  &
+                 Flow % v_flux % n(s) .gt. 0.0 ) then
           t % n(c2) = t % n(c1)
         end if
 
@@ -501,8 +515,15 @@
           end if ! Turb. models
 
           if( Var_Mod_Bnd_Cond_Type(phi,c2) .eq. OUTFLOW .or.     &
-              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY .or.    &
-              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE ) then
+              Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY ) then
+            phi % n(c2) = phi % n(c1)
+
+          ! For a bidirectional PRESSURE boundary, only overwrite the
+          ! prescribed value when actually flowing out; on backflow
+          ! (suction) keep the control-file value so Compute_Scalar can
+          ! use it as a Dirichlet condition for the incoming fluid.
+          else if( Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .and.  &
+                   Flow % v_flux % n(s) .gt. 0.0 ) then
             phi % n(c2) = phi % n(c1)
           end if
 
