@@ -151,7 +151,11 @@
     return
   end if
 
-  phi_f = phi % n(c) + phij * sgn * (phi % n(c2)-phi % n(c1))
+  ! For GAMMA, phij was never set above (its own branch computes
+  ! phi_f directly below), so skip this generic assembly for it.
+  if(phi % adv_scheme .ne. GAMMA) then
+    phi_f = phi % n(c) + phij * sgn * (phi % n(c2)-phi % n(c1))
+  end if
 
   if(phi % adv_scheme .eq. GAMMA) then
     beta = 0.1
