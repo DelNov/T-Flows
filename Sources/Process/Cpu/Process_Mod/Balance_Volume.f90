@@ -84,6 +84,18 @@
         area_outflow = area_outflow + Grid % s(s)
 
       end do
+
+    ! An INFLOW boundary can locally reverse into suction; when it
+    ! does, it constitutes real outflow too, and must be accounted
+    ! for here.  Its area is deliberately NOT added to area_outflow,
+    ! since INFLOW cells are never among the corrected faces below.
+    else if(Grid % region % type(reg) .eq. INFLOW) then
+      do s = Faces_In_Region(reg)
+        if(v_flux % n(s) .gt. 0.0) then
+          vol_outflow = vol_outflow + v_flux % n(s)
+        end if
+      end do
+
     end if  ! some kind of outflow
   end do    ! boundary regions
   call Global % Sum_Reals(vol_outflow,  &
@@ -128,8 +140,15 @@
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. INFLOW) then
         do s = Faces_In_Region(reg)
-          bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
-          bulk % area_in = bulk % area_in + Grid % s(s)
+          ! An INFLOW boundary can locally reverse into suction; in
+          ! that case its flux is a real outflow, not an inflow.
+          if(v_flux % n(s) .gt. 0.0) then
+            bulk % area_out = bulk % area_out + Grid % s(s)
+            bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
+          else
+            bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
+            bulk % area_in = bulk % area_in + Grid % s(s)
+          end if
         end do
       end if  ! inflow boundary
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
