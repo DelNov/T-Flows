@@ -33,6 +33,7 @@
   real                       :: z_o, dia_coef_tmp
   real                       :: re_t_loc, re_t_avg, sum_re_t, sum_vol
   real                       :: alpha_zeta, l_sgs_d, l_rans_d, alpha_d
+  real                       :: max_wall_dist, layer_thick
 !------------------------------------------------------------------------------!
 !   In dissipation of turbulent kinetic energy equation exist two              !
 !   source terms which have form:                                              !
@@ -83,10 +84,22 @@
   !      (9000,  0.014)                                              !
   !      (20000, 0.018)                                              !
   !------------------------------------------------------------------!
+  ! Find the maximum wall distance in the domain, to later
+  ! restrict the Re_t averaging to the near-wall layer only
+  max_wall_dist = 0.0
+  do c = Cells_In_Domain()
+    max_wall_dist = max(max_wall_dist, Grid % wall_dist(c))
+  end do
+  call Global % Max_Real(max_wall_dist)
+
+  layer_thick = 0.1 * max_wall_dist
+
   sum_re_t = 0.0
   sum_vol  = 0.0
 
   do c = Cells_In_Domain()
+
+    if(Grid % wall_dist(c) > layer_thick) cycle
 
     kin_vis = Flow % viscosity(c) / Flow % density(c)
 
