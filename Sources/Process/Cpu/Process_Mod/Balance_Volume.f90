@@ -205,7 +205,12 @@
          Grid % region % type(reg) .eq. CONVECT   .or.  &
          Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
-          ! For bidirectional PRESSURE boundaries, correct only outflow faces
+          ! For bidirectional PRESSURE boundaries, correct only outflow
+          ! faces.  (OUTFLOW is intentionally NOT guarded here: at this
+          ! point nothing has come out yet, e.g. at startup, when a
+          ! freshly-initialized OUTFLOW face's v_flux is exactly 0 and
+          ! would otherwise be skipped forever, since OUTFLOW has no
+          ! PRESSURE-like fallback redistribution below.)
           if(Grid % region % type(reg) .eq. PRESSURE) then
             if(v_flux % n(s) .le. 0.0) cycle
           end if
@@ -296,8 +301,12 @@
          Grid % region % type(reg) .eq. CONVECT   .or.  &
          Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
-          ! For bidirectional PRESSURE boundaries, correct only outflow faces
-          if(Grid % region % type(reg) .eq. PRESSURE) then
+          ! Correct only outflow faces: PRESSURE is bidirectional by
+          ! design, and OUTFLOW is guarded too in case it locally
+          ! reverses (e.g. transient separation) even though it isn't
+          ! meant to.
+          if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+             Grid % region % type(reg) .eq. OUTFLOW) then
             if(v_flux % n(s) .le. 0.0) cycle
           end if
           c2 = Grid % faces_c(2,s)
