@@ -98,7 +98,6 @@
     ! On the boundary perform the extrapolation
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-         Grid % region % type(reg) .eq. PRESSURE .or.  &
          Grid % region % type(reg) .eq. AMBIENT) then
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
@@ -107,6 +106,30 @@
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
+        end do  ! faces
+
+      ! Pressure: on outflow, extrapolate as usual.  On backflow, force
+      ! the velocity to be purely normal (inward), instead of whatever
+      ! direction the interior cell happens to extrapolate, since that
+      ! can carry a spurious tangential component - particularly bad on
+      ! skewed cells near domain corners/edges.
+      else if(Grid % region % type(reg) .eq. PRESSURE) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+
+          if(Flow % v_flux % n(s) .lt. 0.0) then
+            call Grid % Face_Normal(s, nx, ny, nz)
+            un = Flow % v_flux % n(s) / Grid % s(s)
+
+            u % n(c2) = un * nx
+            v % n(c2) = un * ny
+            w % n(c2) = un * nz
+          else
+            u % n(c2) = u % n(c1)
+            v % n(c2) = v % n(c1)
+            w % n(c2) = w % n(c1)
+          end if
         end do  ! faces
 
       ! Symmetry: extrapolate the tangential part, zero out the normal
