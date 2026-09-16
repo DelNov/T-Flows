@@ -198,7 +198,11 @@
                 Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW)        &
               .and. v_flux % n(s) .lt. 0.0) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-        b(c1)  = b(c1) + a12 * phi % n(c2)  ! phi % n(c2) is prescribed here
+        ! Use phi % b(c2), not phi % n(c2): the latter may have been
+        ! overwritten by a zero-gradient extrapolation during a
+        ! previous outflow phase of this same (bidirectional) boundary,
+        ! while phi % b(c2) always retains the original control-file value
+        b(c1)  = b(c1) + a12 * phi % b(c2)
 
       else if(Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALLFL) then
         b(c1) = b(c1) + Grid % s(s) * phi % q(c2)

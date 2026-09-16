@@ -117,11 +117,15 @@
     else if(c2  < 0) then
 
       ! Inflow: it can locally reverse into suction, so only impose
-      ! the Dirichlet value while actually flowing in
+      ! the Dirichlet value while actually flowing in.  Use phi % b(c2),
+      ! not phi % n(c2): the latter may have been overwritten by a
+      ! zero-gradient extrapolation during a previous outflow phase of
+      ! this same (bidirectional) boundary, while phi % b(c2) always
+      ! retains the original control-file value.
       if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW  &
            .and. Flow % v_flux % n(s) .lt. 0.0)) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-        b(c1) = b(c1) + a12 * phi % n(c2)
+        b(c1) = b(c1) + a12 * phi % b(c2)
       end if
 
       ! Ambient or pressure, when it is inflow (see v_flux check)
@@ -129,7 +133,7 @@
             Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)      &
            .and. Flow % v_flux % n(s) .lt. 0.0)) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
-        b(c1) = b(c1) + a12 * phi % n(c2)
+        b(c1) = b(c1) + a12 * phi % b(c2)
       end if
 
       ! Wall and wall flux; solid walls in any case
