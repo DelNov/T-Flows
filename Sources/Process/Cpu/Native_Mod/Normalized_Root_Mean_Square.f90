@@ -46,12 +46,12 @@
       x_min = min(x_min, x(i))
       x_max = max(x_max, x(i))
     end do
+    call Global % Min_Real(x_min)
+    call Global % Max_Real(x_max)
   else
     x_min = 0.0
     x_max = norm
   endif
-  call Global % Min_Real(x_min)
-  call Global % Max_Real(x_max)
 
   ! Avoid roundoff error and divided-by-zero
   ! don't do rms = rms / (x_max - x_min + TINY)
