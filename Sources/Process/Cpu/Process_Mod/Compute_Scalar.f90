@@ -185,15 +185,17 @@
     else if(c2 < 0) then
 
       ! Conditions which are always of Dirichlet type
-      if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW) .or.  &
-          (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL)   .or.  &
+      if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. WALL)   .or.  &
           (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. CONVECT) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1)  + a12 * phi % n(c2)
 
-      ! Ambient or pressure, when it is inflow (see the v_flux check)
-      else if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. AMBIENT .or.  &
-                Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE)     &
+      ! Ambient, pressure, or inflow (which can locally reverse into
+      ! suction): impose the Dirichlet value only when actually
+      ! flowing in (see the v_flux check)
+      else if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. AMBIENT  .or.  &
+                Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .or.  &
+                Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW)        &
               .and. v_flux % n(s) .lt. 0.0) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1)  = b(c1) + a12 * phi % n(c2)  ! phi % n(c2) is prescribed here
