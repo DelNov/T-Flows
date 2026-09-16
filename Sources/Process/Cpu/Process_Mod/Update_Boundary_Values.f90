@@ -57,6 +57,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
   real                     :: dt_dn
+  real                     :: nx, ny, nz, un
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -97,7 +98,6 @@
     ! On the boundary perform the extrapolation
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-         Grid % region % type(reg) .eq. SYMMETRY .or.  &
          Grid % region % type(reg) .eq. PRESSURE .or.  &
          Grid % region % type(reg) .eq. AMBIENT) then
         do s = Faces_In_Region(reg)
@@ -107,6 +107,21 @@
           u % n(c2) = u % n(c1)
           v % n(c2) = v % n(c1)
           w % n(c2) = w % n(c1)
+        end do  ! faces
+
+      ! Symmetry: extrapolate the tangential part, zero out the normal
+      ! part, so no velocity crosses the symmetry plane
+      else if(Grid % region % type(reg) .eq. SYMMETRY) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+          call Grid % Face_Normal(s, nx, ny, nz)
+
+          un = u % n(c1) * nx + v % n(c1) * ny + w % n(c1) * nz
+
+          u % n(c2) = u % n(c1) - un * nx
+          v % n(c2) = v % n(c1) - un * ny
+          w % n(c2) = w % n(c1) - un * nz
         end do  ! faces
       end if    ! boundary condition
     end do      ! region
