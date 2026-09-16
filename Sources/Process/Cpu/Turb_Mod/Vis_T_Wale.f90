@@ -78,7 +78,7 @@
 
     Turb % wale_v(c) =  sqrt( abs (sijd_sijd(c)**3) )   &
               / (sqrt( abs (shear2(c)   **5) ) +        &
-                 sqrt( sqrt(sijd_sijd(c)**6) ) + TINY)
+                 sqrt( sqrt(sijd_sijd(c)**5) ) + TINY)
   end do
 
   call Work % Disconnect_Real_Cell(sijd_sijd, shear2, vort2)
