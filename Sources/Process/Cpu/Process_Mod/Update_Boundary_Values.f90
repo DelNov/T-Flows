@@ -169,10 +169,9 @@
 
       do reg = Boundary_Regions()
 
-        ! Regions outflow, pressure or symmetry
+        ! Regions outflow or symmetry: always extrapolate
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY .or.  &
-           Grid % region % type(reg) .eq. PRESSURE) then
+           Grid % region % type(reg) .eq. SYMMETRY) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
@@ -183,6 +182,27 @@
             f22  % n(c2) = f22  % n(c1)
             if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+
+        ! Bidirectional boundaries: only overwrite the prescribed value
+        ! when actually flowing out; on backflow keep the control-file
+        ! value so Compute_Variable/Compute_F22 can use it as a
+        ! Dirichlet condition for the incoming fluid
+        else if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+                Grid % region % type(reg) .eq. INFLOW) then
+          do s = Faces_In_Region(reg)
+            if(Flow % v_flux % n(s) .gt. 0.0) then
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
+              kin  % n(c2) = kin  % n(c1)
+              eps  % n(c2) = eps  % n(c1)
+              zeta % n(c2) = zeta % n(c1)
+              f22  % n(c2) = f22  % n(c1)
+              if(Flow % heat_transfer) then
+                t2  % n(c2) = t2  % n(c1)
+              end if
             end if
           end do  ! faces
         end if    ! boundary condition
@@ -196,10 +216,9 @@
 
       do reg = Boundary_Regions()
 
-        ! Regions outflow, pressure or symmetry
+        ! Regions outflow or symmetry: always extrapolate
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY .or.  &
-           Grid % region % type(reg) .eq. PRESSURE) then
+           Grid % region % type(reg) .eq. SYMMETRY) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
@@ -208,6 +227,25 @@
             eps % n(c2) = eps % n(c1)
             if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+
+        ! Bidirectional boundaries: only overwrite the prescribed value
+        ! when actually flowing out; on backflow keep the control-file
+        ! value so Compute_Variable can use it as a Dirichlet condition
+        ! for the incoming fluid
+        else if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+                Grid % region % type(reg) .eq. INFLOW) then
+          do s = Faces_In_Region(reg)
+            if(Flow % v_flux % n(s) .gt. 0.0) then
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
+              kin % n(c2) = kin % n(c1)
+              eps % n(c2) = eps % n(c1)
+              if(Flow % heat_transfer) then
+                t2  % n(c2) = t2  % n(c1)
+              end if
             end if
           end do  ! faces
         end if    ! boundary condition
@@ -221,10 +259,9 @@
 
       do reg = Boundary_Regions()
 
-        ! Regions outflow, pressure or symmetry
+        ! Regions outflow or symmetry: always extrapolate
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY .or.  &
-           Grid % region % type(reg) .eq. PRESSURE) then
+           Grid % region % type(reg) .eq. SYMMETRY) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
@@ -233,6 +270,25 @@
             omega % n(c2) = omega % n(c1)
             if(Flow % heat_transfer) then
               t2  % n(c2) = t2  % n(c1)
+            end if
+          end do  ! faces
+
+        ! Bidirectional boundaries: only overwrite the prescribed value
+        ! when actually flowing out; on backflow keep the control-file
+        ! value so Compute_Variable can use it as a Dirichlet condition
+        ! for the incoming fluid
+        else if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+                Grid % region % type(reg) .eq. INFLOW) then
+          do s = Faces_In_Region(reg)
+            if(Flow % v_flux % n(s) .gt. 0.0) then
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
+              kin % n(c2)   = kin % n(c1)
+              omega % n(c2) = omega % n(c1)
+              if(Flow % heat_transfer) then
+                t2  % n(c2) = t2  % n(c1)
+              end if
             end if
           end do  ! faces
         end if    ! boundary condition
@@ -247,15 +303,29 @@
 
       do reg = Boundary_Regions()
 
-        ! Regions outflow, pressure or symmetry
+        ! Regions outflow or symmetry: always extrapolate
         if(Grid % region % type(reg) .eq. OUTFLOW  .or.  &
-           Grid % region % type(reg) .eq. SYMMETRY .or.  &
-           Grid % region % type(reg) .eq. PRESSURE) then
+           Grid % region % type(reg) .eq. SYMMETRY) then
           do s = Faces_In_Region(reg)
             c1 = Grid % faces_c(1,s)
             c2 = Grid % faces_c(2,s)
 
             vis % n(c2) = vis % n(c1)
+          end do  ! faces
+
+        ! Bidirectional boundaries: only overwrite the prescribed value
+        ! when actually flowing out; on backflow keep the control-file
+        ! value so Compute_Variable can use it as a Dirichlet condition
+        ! for the incoming fluid
+        else if(Grid % region % type(reg) .eq. PRESSURE .or.  &
+                Grid % region % type(reg) .eq. INFLOW) then
+          do s = Faces_In_Region(reg)
+            if(Flow % v_flux % n(s) .gt. 0.0) then
+              c1 = Grid % faces_c(1,s)
+              c2 = Grid % faces_c(2,s)
+
+              vis % n(c2) = vis % n(c1)
+            end if
           end do  ! faces
         end if    ! boundary condition
       end do      ! regions
@@ -329,11 +399,12 @@
             Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
           t % n(c2) = t % n(c1)
 
-        ! For a bidirectional PRESSURE boundary, only overwrite the
-        ! prescribed value when actually flowing out; on backflow
-        ! (suction) keep the control-file value so Compute_Energy can
-        ! use it as a Dirichlet condition for the incoming fluid.
-        else if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .and.  &
+        ! For bidirectional boundaries, only overwrite the prescribed
+        ! value when actually flowing out; on backflow keep the
+        ! control-file value so Compute_Energy can use it as a
+        ! Dirichlet condition for the incoming fluid.
+        else if( (Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.  &
+                  Var_Mod_Bnd_Cond_Type(t,c2) .eq. INFLOW) .and.  &
                  Flow % v_flux % n(s) .gt. 0.0 ) then
           t % n(c2) = t % n(c1)
         end if
@@ -448,11 +519,12 @@
             Var_Mod_Bnd_Cond_Type(t,c2) .eq. SYMMETRY ) then
           t % n(c2) = t % n(c1)
 
-        ! For a bidirectional PRESSURE boundary, only overwrite the
-        ! prescribed value when actually flowing out; on backflow
-        ! (suction) keep the control-file value so Compute_Energy can
-        ! use it as a Dirichlet condition for the incoming fluid.
-        else if( Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .and.  &
+        ! For bidirectional boundaries, only overwrite the prescribed
+        ! value when actually flowing out; on backflow keep the
+        ! control-file value so Compute_Energy can use it as a
+        ! Dirichlet condition for the incoming fluid.
+        else if( (Var_Mod_Bnd_Cond_Type(t,c2) .eq. PRESSURE .or.  &
+                  Var_Mod_Bnd_Cond_Type(t,c2) .eq. INFLOW) .and.  &
                  Flow % v_flux % n(s) .gt. 0.0 ) then
           t % n(c2) = t % n(c1)
         end if
@@ -518,11 +590,12 @@
               Var_Mod_Bnd_Cond_Type(phi,c2) .eq. SYMMETRY ) then
             phi % n(c2) = phi % n(c1)
 
-          ! For a bidirectional PRESSURE boundary, only overwrite the
-          ! prescribed value when actually flowing out; on backflow
-          ! (suction) keep the control-file value so Compute_Scalar can
-          ! use it as a Dirichlet condition for the incoming fluid.
-          else if( Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .and.  &
+          ! For bidirectional boundaries, only overwrite the prescribed
+          ! value when actually flowing out; on backflow keep the
+          ! control-file value so Compute_Scalar can use it as a
+          ! Dirichlet condition for the incoming fluid.
+          else if( (Var_Mod_Bnd_Cond_Type(phi,c2) .eq. PRESSURE .or.  &
+                    Var_Mod_Bnd_Cond_Type(phi,c2) .eq. INFLOW) .and.  &
                    Flow % v_flux % n(s) .gt. 0.0 ) then
             phi % n(c2) = phi % n(c1)
           end if

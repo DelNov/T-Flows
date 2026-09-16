@@ -116,15 +116,18 @@
       A % val(A % dia(c2))  = A % val(A % dia(c2))  + a21
     else if(c2  < 0) then
 
-      ! Inflow
-      if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW)) then
+      ! Inflow: it can locally reverse into suction, so only impose
+      ! the Dirichlet value while actually flowing in
+      if( (Grid % Bnd_Cond_Type(c2) .eq. INFLOW  &
+           .and. Flow % v_flux % n(s) .lt. 0.0)) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
 
-      ! Ambient when it is inflow (see v_flux check)
-      if( (Grid % Bnd_Cond_Type(c2) .eq. AMBIENT  &
-           .and. Flow % v_flux % n(s) .gt. 0.0)) then
+      ! Ambient or pressure, when it is inflow (see v_flux check)
+      if( ((Grid % Bnd_Cond_Type(c2) .eq. AMBIENT .or.   &
+            Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)      &
+           .and. Flow % v_flux % n(s) .lt. 0.0)) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * phi % n(c2)
       end if
