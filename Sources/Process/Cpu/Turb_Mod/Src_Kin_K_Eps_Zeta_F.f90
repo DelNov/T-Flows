@@ -30,6 +30,7 @@
   real                       :: z_o, alpha_d, alpha_v, l_sgs_d, l_sgs_v
   real                       :: ut_log_law, vt_log_law, wt_log_law
   real                       :: nx, ny, nz, g_dot_n, q_theta_wall, g_buoy_wall
+  real                       :: q_wall
   real                       :: h_max_new, c_hyb
 !------------------------------------------------------------------------------!
 !   Dimensions:                                                                !
@@ -187,8 +188,17 @@
           wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
 
+          ! Local, log-law based wall heat-flux estimate used only for the
+          ! buoyancy production terms below.  This must NOT be written into
+          ! t % q(c2): that array is the actual wall heat flux used later
+          ! by Compute_Energy (and, with the exponential near-wall fit,
+          ! already holds a more accurate value computed in
+          ! Update_Boundary_Values) - overwriting it here would silently
+          ! clobber it with this cruder estimate.  Sign follows the same
+          ! convention as elsewhere (positive: heat flowing into the fluid).
+          q_wall = 0.0
           if(Grid % Bnd_Cond_Type(c2) .eq. WALL)                    &
-            t % q(c2) = Turb % con_w(c1) * (t % n(c1) - t % n(c2))  &
+            q_wall = Turb % con_w(c1) * (t % n(c2) - t % n(c1))  &
                       / Grid % wall_dist(c1)
 
           ! General wall-buoyancy formulation valid for arbitrary wall
@@ -199,13 +209,13 @@
                     + Flow % grav_y * ny  &
                     + Flow % grav_z * nz
 
-          q_theta_wall = sqrt(abs(  t % q(c2)                         &
+          q_theta_wall = sqrt(abs(  q_wall                             &
                          / (Flow % density(c1)*Flow % capacity(c1)))  &
                          * Turb % c_mu_theta5                         &
                          * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
           g_buoy_wall = - Flow % density(c1) * Flow % beta  &
-                      * sign(1.0, t % q(c2))                &
+                      * sign(1.0, q_wall)                   &
                       * g_dot_n                             &
                       * q_theta_wall
 

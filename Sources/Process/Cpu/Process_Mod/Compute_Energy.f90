@@ -249,8 +249,17 @@
       A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
     else if(c2 .lt. 0) then
 
+      ! Constant-temperature wall with the improved (exponential-fit)
+      ! near-wall treatment: impose the flux already estimated in
+      ! Update_Boundary_Values from the wall/c1/c0 temperature triplet,
+      ! instead of closing the diffusion coefficient with a log-law
+      ! based con_eff, which this method is meant to bypass
+      if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .and.  &
+         Flow % exp_temp_wall) then
+        b(c1) = b(c1) + Grid % s(s) * t % q(c2)
+
       ! Conditions which are always of Dirichlet type
-      if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
+      else if( (Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL)   .or.  &
           (Var_Mod_Bnd_Cond_Type(t, c2) .eq. CONVECT) ) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         b(c1) = b(c1) + a12 * t % n(c2)

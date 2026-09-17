@@ -67,6 +67,7 @@
 !-----------------------------------[Locals]-----------------------------------!
   integer :: i, j, k
   real    :: a, b, c, d, b_array(N_SAMPLES), e_array(N_SAMPLES)
+  logical :: crossing_found
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(x0)  ! x0 is kept for symmetry with sister procedure
 !==============================================================================!
@@ -84,6 +85,7 @@
   !---------------------------------------------------------------!
   !   Browse through Newton-Raphson like iterations to find "b"   !
   !---------------------------------------------------------------!
+  crossing_found = .false.
   do i = 1, MAX_ITER
 
     if(DEBUG) print *, '---------------------------------'
@@ -105,12 +107,21 @@
     ! changed the sign for the next iteration.
     do j = 2, N_SAMPLES
       if(e_array(j-1) * e_array(j) < 0.0) then
+        crossing_found = .true.
         call Math % Set_Array_Range(N_SAMPLES, b_array(j-1),  &
                                                b_array(j),    &
                                                b_array)
         goto 1
       end if
     end do
+
+    ! No sign change anywhere in the sampled range: the target ratio "d"
+    ! is unreachable by this exponential form for any real "b" (e.g. when
+    ! y1 is nearly as far from y0 as y2 is, d approaches or exceeds the
+    ! curve's achievable range of (0,1) for x1<x2).  Bail out now instead
+    ! of silently iterating on an unchanged bracket, which would converge
+    ! to its midpoint b=0 and return a bogus zero derivative.
+    if(.not. crossing_found) goto 3
 1   continue
 
     ! Check if desired relative tolerance has been reached
@@ -139,5 +150,15 @@
   !   Calculate remaining unkown values   !
   !---------------------------------------!
   dy_dx_0 = a * b
+
+  return
+
+  !-----------------------------------------------------------------------!
+  !   Fallback for when no "b" could bracket the prescribed ratio "d":    !
+  !   use the plain two-point slope between the wall and the first        !
+  !   off-wall point, same as the linear (log-law-free) estimate.         !
+  !-----------------------------------------------------------------------!
+3 continue
+  dy_dx_0 = (y1 - y0) / x1
 
   end subroutine

@@ -479,22 +479,32 @@
               ! Find the cell on the side opposite of wall cell c2
               c_cand = Grid % faces_c(1,s1) + Grid % faces_c(2,s1) - c1
 
-              ! Keep the farthest candidate found so far, as a fallback
-              ! in case none satisfies the criterion below.  (Fortran's
-              ! .or. is not guaranteed to short-circuit, so c0 .eq. 0
-              ! is checked in its own "if" to avoid an out-of-bounds
-              ! Grid % wall_dist(c0) when no candidate is set yet.)
-              if(c0 .eq. 0) then
-                c0 = c_cand
-              else if(Grid % wall_dist(c_cand) > Grid % wall_dist(c0)) then
-                c0 = c_cand
-              end if
+              ! Only accept genuine interior/buffer cells as the third
+              ! fit point.  On a corner cell (one that touches the wall
+              ! and another boundary, e.g. inflow or a second wall),
+              ! c_cand can otherwise land on that other boundary's ghost
+              ! cell, whose wall_dist can be ~0 too, collapsing the fit
+              ! to near-degenerate points and producing a garbage (even
+              ! wrong-signed) dt_dn.
+              if(c_cand > 0) then
 
-              ! Use wall distace criterion to tell if this is proper cell
-              if(Grid % wall_dist(c_cand) > 1.25 * Grid % wall_dist(c1)) then
-                c0 = c_cand
-                goto 1
-              end if
+                ! Keep the farthest candidate found so far, as a fallback
+                ! in case none satisfies the criterion below.  (Fortran's
+                ! .or. is not guaranteed to short-circuit, so c0 .eq. 0
+                ! is checked in its own "if" to avoid an out-of-bounds
+                ! Grid % wall_dist(c0) when no candidate is set yet.)
+                if(c0 .eq. 0) then
+                  c0 = c_cand
+                else if(Grid % wall_dist(c_cand) > Grid % wall_dist(c0)) then
+                  c0 = c_cand
+                end if
+
+                ! Use wall distace criterion to tell if this is proper cell
+                if(Grid % wall_dist(c_cand) > 1.25 * Grid % wall_dist(c1)) then
+                  c0 = c_cand
+                  goto 1
+                end if
+              end if  ! c_cand > 0
             end if
           end do
         end if
