@@ -3,7 +3,8 @@
                                   dy_dx_0,  &  ! unknown
                                   x0, y0,   &  ! x0=0, y0 is prescribed
                                   x1, y1,   &  ! prescribed
-                                  x2, y2)      ! prescribed
+                                  x2, y2,   &  ! prescribed
+                                  fit_ok)      ! optional, see below
 !------------------------------------------------------------------------------!
 !>  This subroutine fits exponential curve of the form:
 !>  y = a * exp(b*x) + c
@@ -59,6 +60,15 @@
   real, intent(in)  :: x0, y0   !! x0 is zero, y0 prescribed
   real, intent(in)  :: x1, y1   !! prescribed point 1
   real, intent(in)  :: x2, y2   !! prescribed point 2
+  logical, intent(out), optional :: fit_ok  !! .false. if the prescribed
+                                             !! points could not be
+                                             !! bracketed by this
+                                             !! exponential form (see the
+                                             !! fallback branch below);
+                                             !! dy_dx_0 is then just the
+                                             !! plain two-point slope and
+                                             !! the caller may prefer its
+                                             !! own physics-based fallback
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: MAX_ITER  = 64
   integer, parameter :: N_SAMPLES =  8
@@ -151,6 +161,8 @@
   !---------------------------------------!
   dy_dx_0 = a * b
 
+  if(present(fit_ok)) fit_ok = .true.
+
   return
 
   !-----------------------------------------------------------------------!
@@ -159,6 +171,8 @@
   !   off-wall point, same as the linear (log-law-free) estimate.         !
   !-----------------------------------------------------------------------!
 3 continue
+
+  if(present(fit_ok)) fit_ok = .false.
   dy_dx_0 = (y1 - y0) / x1
 
   end subroutine
