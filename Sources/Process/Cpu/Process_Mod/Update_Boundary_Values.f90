@@ -55,7 +55,7 @@
   type(Var_Type),  pointer :: u, v, w, t, phi, fun
   type(Var_Type),  pointer :: kin, eps, zeta, f22, vis, t2, omega
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
-  integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg
+  integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg, c_cand
   real                     :: dt_dn
   real                     :: nx, ny, nz, un
 !------------------------[Avoid unused parent warning]-------------------------!
@@ -466,15 +466,45 @@
       if(Cell_In_This_Proc(c1) .and. c2 < 0) then
         if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL .or.  &
            Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
+
+          ! No candidate found yet for this face; the loop below always
+          ! keeps the farthest candidate seen, so c0 is never left over
+          ! (stale) from a previous, unrelated wall face.
+          c0 = 0
+
           do i_fac = 1, Grid % cells_n_faces(c1)
             s1 = Grid % cells_f(i_fac, c1)  ! side around c1
             if(s1 .ne. s) then
 
               ! Find the cell on the side opposite of wall cell c2
-              c0 = Grid % faces_c(1,s1) + Grid % faces_c(2,s1) - c1
+              c_cand = Grid % faces_c(1,s1) + Grid % faces_c(2,s1) - c1
 
-              ! Use wall distace criterion to tell if this is proper cell
-              if(Grid % wall_dist(c0) > 1.25 * Grid % wall_dist(c1)) goto 1
+              ! Only accept genuine interior/buffer cells as the third
+              ! fit point.  On a corner cell (one that touches the wall
+              ! and another boundary, e.g. inflow or a second wall),
+              ! c_cand can otherwise land on that other boundary's ghost
+              ! cell, whose wall_dist can be ~0 too, collapsing the fit
+              ! to near-degenerate points and producing a garbage (even
+              ! wrong-signed) dt_dn.
+              if(c_cand > 0) then
+
+                ! Keep the farthest candidate found so far, as a fallback
+                ! in case none satisfies the criterion below.  (Fortran's
+                ! .or. is not guaranteed to short-circuit, so c0 .eq. 0
+                ! is checked in its own "if" to avoid an out-of-bounds
+                ! Grid % wall_dist(c0) when no candidate is set yet.)
+                if(c0 .eq. 0) then
+                  c0 = c_cand
+                else if(Grid % wall_dist(c_cand) > Grid % wall_dist(c0)) then
+                  c0 = c_cand
+                end if
+
+                ! Use wall distace criterion to tell if this is proper cell
+                if(Grid % wall_dist(c_cand) > 1.25 * Grid % wall_dist(c1)) then
+                  c0 = c_cand
+                  goto 1
+                end if
+              end if  ! c_cand > 0
             end if
           end do
         end if
