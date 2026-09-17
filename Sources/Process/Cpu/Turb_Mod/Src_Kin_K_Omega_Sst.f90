@@ -151,14 +151,17 @@
           wt % n(c1) = wt % n(c1) * exp(-1.0 * ebf)  &
                      + wt_log_law * exp(-1.0 / ebf)
 
-          ! Local, log-law based wall heat-flux estimate used only for the
-          ! buoyancy production term below.  Must NOT be written into
-          ! t % q(c2): that array is the actual wall heat flux used later
-          ! by Compute_Energy (and, with the exponential near-wall fit,
+          ! Local wall heat-flux estimate used only for the buoyancy
+          ! production term below.  Must NOT be written into t % q(c2):
+          ! that array is the actual wall heat flux used later by
+          ! Compute_Energy (and, with the exponential near-wall fit,
           ! already holds a more accurate value computed in
           ! Update_Boundary_Values) - overwriting it here would silently
-          ! clobber it with this cruder estimate.
-          q_wall = 0.0
+          ! clobber it with this cruder estimate.  Default to the
+          ! existing t % q(c2): for WALLFL that IS the (correct,
+          ! user-prescribed) flux, unchanged here.  For WALL it is
+          ! overridden below with a log-law based estimate.
+          q_wall = t % q(c2)
           if(Grid % Bnd_Cond_Type(c2) .eq. WALL)                    &
             q_wall = Turb % con_w(c1) * (t % n(c2) - t % n(c1))  &
                       / Grid % wall_dist(c1)
