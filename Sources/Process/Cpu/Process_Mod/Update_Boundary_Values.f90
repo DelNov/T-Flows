@@ -58,6 +58,7 @@
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg, c_cand
   real                     :: dt_dn
   real                     :: nx, ny, nz, un
+  logical                  :: fit_ok
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
 !==============================================================================!
@@ -536,9 +537,34 @@
                       dt_dn,                              &
                       Grid % wall_dist(c2), t % n(c2),    &
                       Grid % wall_dist(c1), t % n(c1),    &
-                      Grid % wall_dist(c0), t % n(c0))
+                      Grid % wall_dist(c0), t % n(c0),    &
+                      fit_ok)
 
-          t % q(c2) = -dt_dn * Flow % conductivity(c1)
+          if(fit_ok) then
+            t % q(c2) = -dt_dn * Flow % conductivity(c1)
+
+          ! The fit could not resolve a meaningful near-wall gradient
+          ! (typically when t % n(c1) and t % n(c0) are too close to
+          ! each other for the exponential form to bracket).  Molecular
+          ! conductivity times a crude two-point slope would badly
+          ! under-predict the flux in that case, since it ignores
+          ! turbulent transport entirely - fall back to the log-law
+          ! (con_w based) estimate instead, same as the old way.
+          else if(Turb % model .eq. K_EPS_ZETA_F     .or.  &
+                  Turb % model .eq. HYBRID_LES_RANS  .or.  &
+                  Turb % model .eq. LES_DYNAMIC      .or.  &
+                  Turb % model .eq. LES_WALE         .or.  &
+                  Turb % model .eq. LES_SMAGORINSKY  .or.  &
+                  Turb % model .eq. SPALART_ALLMARAS .or.  &
+                  Turb % model .eq. DES_SPALART      .or.  &
+                  Turb % model .eq. K_OMEGA_SST      .or.  &
+                  Turb % model .eq. K_EPS) then
+            t % q(c2) = ( t % n(c2) - t % n(c1) ) * Turb % con_w(c1)  &
+                      / Grid % wall_dist(c1)
+
+          else
+            t % q(c2) = -dt_dn * Flow % conductivity(c1)
+          end if
 
         end if
 
