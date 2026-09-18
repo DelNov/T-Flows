@@ -158,7 +158,15 @@
     ! Side is on the boundary
     else
 
-      b(c1) = b(c1) - v_flux % n(s)
+      ! On a PRESSURE boundary, p is Dirichlet, so pp shouldn't be pushed
+      ! away from zero there.  That's enforced through the extra diagonal
+      ! term "a12" below, not by ignoring this face's own contribution to
+      ! the cell's mass balance - c1 can have other faces (internal or
+      ! other boundaries) whose imbalance still needs to be corrected,
+      ! particularly at corners where multiple regions meet.
+      if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
+        b(c1) = b(c1) - v_flux % n(s)
+      end if
 
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. AMBIENT) then
@@ -169,13 +177,6 @@
   end do
 
   do reg = Boundary_Regions()
-
-    if(Grid % region % type(reg) .eq. PRESSURE) then
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        b(c1) = 0.0
-      end do  ! faces
-    end if    ! pressure
 
     if(Grid % region % type(reg) .eq. AMBIENT) then
       do s = Faces_In_Region(reg)
