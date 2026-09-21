@@ -82,20 +82,30 @@
 
 !      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
 !======================================================================!
-!     Deardorf implementation
+!     Deardorff implementation
+!
+!     CASE-SPECIFIC HACK (penet_conv, penetrative convection / Deardorff
+!     water-tank cases only): overrides Flow % t_ref unconditionally,
+!     ignoring whatever REFERENCE_TEMPERATURE is set in the control
+!     file, and zeroes buoyancy above z=0.56 m as a "sponge" for that
+!     case's 0.6 m tall computational domain (the real tank is 0.355 m).
+!     This is NOT guarded by case name or control-file flag, so it will
+!     silently apply to ANY OTHER thermally-buoyant case run on this
+!     branch too.  See memory note on this session for context/discussion
+!     of a more general (non-hardcoded) replacement.
 !======================================================================!
       Flow % t_ref = 21.5 &
       + 45.0 * 0.5 * (Grid % zc(c1) + Grid % zc(c2))
 !      + 45.0 * 0.5 * (Grid % wall_dist(c1) + Grid % wall_dist(c2))
 
-      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
-                                                                                
-      if((Grid % zc(c1) + Grid % zc(c2))*0.5 > 0.56) then           
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.6) then           
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.36) then           
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.3) then           
-        dens_f(s) = 0.0                                                          
-      end if                     
+      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
+
+      if((Grid % zc(c1) + Grid % zc(c2))*0.5 > 0.56) then
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.6) then
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.36) then
+!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.3) then
+        dens_f(s) = 0.0
+      end if
 !======================================================================!
 !======================================================================!
 !     Air atmosphere implementation
