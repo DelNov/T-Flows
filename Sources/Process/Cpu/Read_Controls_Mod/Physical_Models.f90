@@ -106,6 +106,8 @@
 
   call Control % Reference_Density           (Flow % dens_ref, .true.)
   call Control % Reference_Temperature       (Flow % t_ref,    .true.)
+  call Control % Reference_Temperature_Profile(Flow % t_ref_profile_on, .true.)
+  call Control % Buoyancy_Cutoff_Height      (Flow % buoy_cutoff_z, .true.)
   call Control % Volume_Expansion_Coefficient(Flow % beta,     .true.)
   call Control % Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
   call Control % Turbulent_Schmidt_Number    (sc_t)  ! default is (0.9)

@@ -13,7 +13,7 @@
   type(Grid_Type),   pointer :: Grid
   type(Var_Type),    pointer :: t
   integer                    :: c, c1, c2, s
-  real                       :: xic1, xic2, temp_f
+  real                       :: xic1, xic2, temp_f, temp_ref_f
   real,              pointer :: grav_i
   real, contiguous,  pointer :: xic(:), xif(:), si(:), dxi(:)
   real, contiguous,  pointer :: cell_fi(:), face_fi(:)
@@ -61,6 +61,22 @@
   !   For Boussinesq hypothesis   !
   !-------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
+
+    ! If a per-cell reference temperature profile was requested
+    ! (control file: REFERENCE_TEMPERATURE_PROFILE yes), capture it
+    ! from the field once, on the first call - this is meant for cases
+    ! with a non-trivial background stratification (e.g. penetrative
+    ! convection), where buoyancy should be computed relative to the
+    ! local ambient state rather than a single global constant.  This
+    ! generalizes what used to be a hardcoded, Deardorff-specific
+    ! formula here (t_ref = 21.5 + 45*z, matching that one case's
+    ! initial linear profile) into something any stratified case can
+    ! opt into just by setting the control-file flag.
+    if(Flow % t_ref_profile_on .and. .not. allocated(Flow % t_ref_prof)) then
+      allocate(Flow % t_ref_prof(-Grid % n_bnd_cells:Grid % n_cells))
+      Flow % t_ref_prof(:) = t % n(:)
+    end if
+
     do s = 1, Grid % n_faces
       c1  = Grid % faces_c(1, s)
       c2  = Grid % faces_c(2, s)
@@ -76,50 +92,25 @@
       ! this linear interpolation should do just fine
       dens_f(s) =        Grid % fw(s)  * Flow % density(c1)  &
                 + (1.0 - Grid % fw(s)) * Flow % density(c2)
-       
+
       ! Transform density into one assumed by Boussinesq
       ! Units: kg/m^3 * K * 1/K = kg/m^3
+      if(Flow % t_ref_profile_on) then
+        temp_ref_f =        Grid % fw(s)  * Flow % t_ref_prof(c1)  &
+                   + (1.0 - Grid % fw(s)) * Flow % t_ref_prof(c2)
+      else
+        temp_ref_f = Flow % t_ref
+      end if
 
-!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
-!======================================================================!
-!     Deardorff implementation
-!
-!     CASE-SPECIFIC HACK (penet_conv, penetrative convection / Deardorff
-!     water-tank cases only): overrides Flow % t_ref unconditionally,
-!     ignoring whatever REFERENCE_TEMPERATURE is set in the control
-!     file, and zeroes buoyancy above z=0.56 m as a "sponge" for that
-!     case's 0.6 m tall computational domain (the real tank is 0.355 m).
-!     This is NOT guarded by case name or control-file flag, so it will
-!     silently apply to ANY OTHER thermally-buoyant case run on this
-!     branch too.  See memory note on this session for context/discussion
-!     of a more general (non-hardcoded) replacement.
-!======================================================================!
-      Flow % t_ref = 21.5 &
-      + 45.0 * 0.5 * (Grid % zc(c1) + Grid % zc(c2))
-!      + 45.0 * 0.5 * (Grid % wall_dist(c1) + Grid % wall_dist(c2))
+      dens_f(s) = dens_f(s) * (temp_ref_f - temp_f) * Flow % beta
 
-      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta
-
-      if((Grid % zc(c1) + Grid % zc(c2))*0.5 > 0.56) then
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.6) then
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.36) then
-!      if((Grid % wall_dist(c1) + Grid % wall_dist(c2))*0.5 > 0.3) then
+      ! Optional "sponge": zero buoyancy above a cutoff height, e.g.
+      ! for a computational domain extended above the physically
+      ! modelled region (control file: BUOYANCY_CUTOFF_HEIGHT).
+      ! Defaults to HUGE, so this never triggers unless requested.
+      if((Grid % zc(c1) + Grid % zc(c2)) * 0.5 > Flow % buoy_cutoff_z) then
         dens_f(s) = 0.0
       end if
-!======================================================================!
-!======================================================================!
-!     Air atmosphere implementation
-!======================================================================!
-!      Flow % t_ref = 0.008 * (Grid % fw(s)  * Grid % zc(c1)   &
-!                     + (1.0 - Grid % fw(s)) * Grid % zc(c2))
-!
-!
-!      dens_f(s) = dens_f(s) * (Flow % t_ref - temp_f) * Flow % beta              
-!
-!      if((Grid % fw(s)  * Grid % zc(c1) + (1.0 - Grid % fw(s)) * Grid % zc(c2)) &
-!          > 530.0) then
-!        dens_f(s) = 0.0
-!      end if 
 
     end do
 

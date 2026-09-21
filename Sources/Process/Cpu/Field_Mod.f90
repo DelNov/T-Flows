@@ -151,6 +151,19 @@
     real :: t_ref  !! reference temperature used for buoyancy terms [K]
     real :: beta   !! volume expansion coefficient [1/K]
 
+    ! Alternative to the constant t_ref above: a per-cell reference
+    ! temperature profile, captured from the field at the first time
+    ! step, for cases with a non-trivial background stratification
+    ! (control file: REFERENCE_TEMPERATURE_PROFILE yes).  Allocated
+    ! lazily (stays unallocated when not used) in Buoyancy_Forces.
+    logical            :: t_ref_profile_on = .false.
+    real, allocatable  :: t_ref_prof(:)
+
+    ! Optional height above which buoyancy is zeroed - a "sponge" for a
+    ! computational domain extended above the physically modelled
+    ! region (control file: BUOYANCY_CUTOFF_HEIGHT).  Defaults to HUGE.
+    real :: buoy_cutoff_z
+
     ! Exponential extrapolation of temperature to the walls
     logical :: exp_temp_wall
 

@@ -163,6 +163,8 @@
       procedure :: Heat_Transfer
       procedure :: Buoyancy
       procedure :: Reference_Temperature
+      procedure :: Reference_Temperature_Profile
+      procedure :: Buoyancy_Cutoff_Height
       procedure :: Saturation_Temperature
       procedure :: Volume_Expansion_Coefficient
       procedure :: Hybrid_Les_Rans_Switch
@@ -377,6 +379,8 @@
 #   include "Control_Mod/Physics/Heat_Transfer.f90"
 #   include "Control_Mod/Physics/Buoyancy.f90"
 #   include "Control_Mod/Physics/Reference_Temperature.f90"
+#   include "Control_Mod/Physics/Reference_Temperature_Profile.f90"
+#   include "Control_Mod/Physics/Buoyancy_Cutoff_Height.f90"
 #   include "Control_Mod/Physics/Saturation_Temperature.f90"
 #   include "Control_Mod/Physics/Volume_Expansion_Coefficient.f90"
 
