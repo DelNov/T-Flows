@@ -187,6 +187,20 @@
       end do  ! faces
     end if    ! ambient
 
+    ! PENET_CONV-specific: the TOP boundary in the penetrative convection
+    ! cases (Deardorff) is a PRESSURE region but geometrically simple (no
+    ! multi-region corners like the ones that broke on the real garage
+    ! mesh), and is very sensitive to any pp leakage at that boundary.
+    ! Keep the original, more aggressive treatment there on purpose:
+    ! fully reset b(c1), not just this face's own contribution.
+    if(Grid % region % type(reg) .eq. PRESSURE .and.  &
+       trim(Grid % region % name(reg)) .eq. 'TOP') then
+      do s = Faces_In_Region(reg)
+        c1 = Grid % faces_c(1,s)
+        b(c1) = 0.0
+      end do  ! faces
+    end if    ! pressure and top
+
   end do      ! regions
 
   ! Volume balance reporting
