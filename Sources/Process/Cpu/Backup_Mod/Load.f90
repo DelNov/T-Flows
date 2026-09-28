@@ -100,11 +100,6 @@
   call Backup % Load_Real(Comm, d, vc, 'bulk_p_drop_y', bulk % p_drop_y)
   call Backup % Load_Real(Comm, d, vc, 'bulk_p_drop_z', bulk % p_drop_z)
 
-  !------------------!
-  !   Diural cycle   !
-  !------------------!
-  call Backup % Load_Real(Comm, d, vc, 'energy_in_cum', Turb % energy_in_cum)
-
   !----------------------------!
   !                            !
   !   Navier-Stokes equation   !
