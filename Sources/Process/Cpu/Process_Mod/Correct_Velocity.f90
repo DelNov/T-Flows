@@ -169,16 +169,23 @@
 
   if(Flow % has_ambient .and. .not. Flow % reached_ambient_pressure) then
 
-    ! At boundaries, p asymptotically reaches pp
+    ! At boundaries, p (interior cell value) asymptotically reaches the
+    ! ambient value prescribed in pp at the boundary.  Compare the
+    ! interior cell (c1), which is the one actually evolving towards
+    ! that value, not the boundary cell (c2), whose p and pp are both
+    ! set once from the control file and never change afterwards - that
+    ! comparison would be identically zero from the first iteration on.
     max_diff = -HUGE
     do reg = Boundary_Regions()
       if(Grid % region % type(reg) .eq. AMBIENT) then
         do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
-          max_diff = max(max_diff, abs(p % n(c2) - pp % n(c2)))
+          max_diff = max(max_diff, abs(p % n(c1) - pp % n(c2)))
         end do
       end if
     end do
+    call Global % Max_Real(max_diff)
 
     ! Once pressure at boundaries reaches the value prescribed in control
     ! file, which was up to no in pp, the pp can go back to its usual mode

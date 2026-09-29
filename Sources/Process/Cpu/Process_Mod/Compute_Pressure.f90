@@ -180,18 +180,30 @@
     end if
   end do
 
-  do reg = Boundary_Regions()
+  ! While the pressure field is still building up towards the ambient
+  ! values prescribed in the control file, pull pp at cells next to an
+  ! AMBIENT boundary towards that prescribed value.  Accumulate into
+  ! b(c1) instead of overwriting it - c1 can have other faces (internal
+  ! or other boundaries) whose mass imbalance still needs to be
+  ! corrected, particularly at corners where multiple regions meet (see
+  ! the analogous fix for PRESSURE boundaries).  Once the ambient value
+  ! has been reached, stop forcing pp here so it can go back to being a
+  ! pure mass-conservation correction, consistent with how it is used
+  ! in the pressure update below.
+  if(Flow % has_ambient .and. .not. Flow % reached_ambient_pressure) then
+    do reg = Boundary_Regions()
 
-    if(Grid % region % type(reg) .eq. AMBIENT) then
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-        a12   = A % fc(s) * M % v_m(c1)
-        b(c1) = a12 * pp % n(c2)
-      end do  ! faces
-    end if    ! ambient
+      if(Grid % region % type(reg) .eq. AMBIENT) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+          a12   = A % fc(s) * M % v_m(c1)
+          b(c1) = b(c1) + a12 * pp % n(c2)
+        end do  ! faces
+      end if    ! ambient
 
-  end do      ! regions
+    end do      ! regions
+  end if
 
   ! Volume balance reporting
   call Flow % Report_Vol_Balance(Sol, Iter % Current())
