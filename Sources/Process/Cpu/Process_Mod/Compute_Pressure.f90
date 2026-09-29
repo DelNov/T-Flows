@@ -158,15 +158,19 @@
     ! Side is on the boundary
     else
 
-      ! On a PRESSURE boundary, p is Dirichlet, so pp shouldn't be pushed
-      ! away from zero there.  That's enforced through the extra diagonal
-      ! term "a12" below, not by ignoring this face's own contribution to
-      ! the cell's mass balance - c1 can have other faces (internal or
-      ! other boundaries) whose imbalance still needs to be corrected,
-      ! particularly at corners where multiple regions meet.
-      if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
-        b(c1) = b(c1) - v_flux % n(s)
-      end if
+      ! A PRESSURE face's own flux used to be excluded here, on the
+      ! reasoning that p is Dirichlet there so pp shouldn't be pushed
+      ! away from zero by it.  But excluding it leaves c1's mass
+      ! imbalance to be resolved entirely through its other (internal)
+      ! faces, since this face is never touched by the local pp
+      ! correction either (Correct_Velocity only corrects c2 > 0
+      ! faces) - visible as an over-corrected ring of cells right next
+      ! to a PRESSURE opening (e.g. an eddy's radial velocity getting
+      ! clipped approaching a PRESSURE outlet, but not an OUTFLOW one).
+      ! OUTFLOW never excluded its own face here, so treat PRESSURE the
+      ! same way; pp is still kept near zero at the boundary through the
+      ! extra diagonal term "a12" below, not by discarding this term.
+      b(c1) = b(c1) - v_flux % n(s)
 
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. AMBIENT) then
