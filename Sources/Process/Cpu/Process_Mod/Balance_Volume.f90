@@ -302,11 +302,12 @@
          Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
           ! Correct only outflow faces: PRESSURE is bidirectional by
-          ! design, and OUTFLOW is guarded too in case it locally
-          ! reverses (e.g. transient separation) even though it isn't
-          ! meant to.
+          ! design, and OUTFLOW and CONVECT are guarded too in case
+          ! they locally reverse (e.g. transient separation) even
+          ! though they aren't meant to.
           if(Grid % region % type(reg) .eq. PRESSURE .or.  &
-             Grid % region % type(reg) .eq. OUTFLOW) then
+             Grid % region % type(reg) .eq. OUTFLOW  .or.  &
+             Grid % region % type(reg) .eq. CONVECT) then
             if(v_flux % n(s) .le. 0.0) cycle
           end if
           c2 = Grid % faces_c(2,s)

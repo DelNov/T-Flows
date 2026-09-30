@@ -254,7 +254,10 @@
                         ' (solver for pressure)')
 
   ! Set singularity to the matrix
-  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
+  ! TEST: restored the "has_pressure" exclusion - a PRESSURE boundary
+  ! already pins pp via the a12 diagonal boost above, so the matrix
+  ! isn't singular and shouldn't need this regularization.
+  if(.not. Flow % has_ambient .and. .not. Flow % has_pressure) then
     call Sol % Set_Singular(pp)
   end if
 
@@ -262,7 +265,7 @@
   call Sol % Run(A, pp, b, norm = p_nor)
 
   ! Remove singularity from the matrix
-  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
+  if(.not. Flow % has_ambient .and. .not. Flow % has_pressure) then
     call Sol % Remove_Singular(pp)
   end if
 
