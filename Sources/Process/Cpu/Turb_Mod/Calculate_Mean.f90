@@ -14,7 +14,7 @@
   type(Var_Type),   pointer :: kin, eps, f22, zeta, vis, t2, omega
   type(Var_Type),   pointer :: uu, vv, ww, uv, uw, vw
   type(Var_Type),   pointer :: ut, vt, wt
-  integer                   :: c, n, sc
+  integer                   :: c, n, sc, reg
   real, contiguous, pointer :: u_mean(:), v_mean(:), w_mean(:),  &
                                p_mean(:), t_mean(:), q_mean(:), u_mean_abs(:), &
                                w_mean_abs(:) 
@@ -171,6 +171,19 @@
         phi_mean(sc, c) = (phi_mean(sc, c) * real(n) + phi % n(c)) / real(n+1)
       end do
     end do
+
+    ! Mean temperature and heat flux at boundaries.  Wall heat flux is
+    ! defined in boundary cells only, and gradients of the mean temperature
+    ! next to a wall, as well as the mean wall temperature, need its value
+    ! in boundary cells too.
+    if(Flow % heat_transfer) then
+      do reg = Boundary_Regions()
+        do c = Cells_In_Region(reg)
+          t_mean(c) = (t_mean(c) * real(n) + t % n(c)) / real(n+1)
+          q_mean(c) = (q_mean(c) * real(n) + t % q(c)) / real(n+1)
+        end do
+      end do
+    end if
 
   end if
 

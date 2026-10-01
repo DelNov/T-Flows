@@ -114,12 +114,21 @@
             beta = 0.0
           end if
 
-          ebf = Turb % Ebf_Scalar(c1, pr)
-          Turb % con_w(c1) =    Turb % y_plus(c1)                         &
-                              * Flow % viscosity(c1)                      &
-                              * Flow % capacity(c1)                       &
-                      / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
-                         + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+          ! For y+ tending to zero, the expression below tends to molecular
+          ! conductivity, but gives zero for y+ exactly zero.  With fluid at
+          ! rest (y+ is zero at all walls) no heat could then enter through
+          ! a wall with prescribed temperature, and a flow driven by buoyancy
+          ! alone would never start.  Hence, the limit is set explicitly.
+          if(Turb % y_plus(c1) < NANO) then
+            Turb % con_w(c1) = Flow % conductivity(c1)
+          else
+            ebf = Turb % Ebf_Scalar(c1, pr)
+            Turb % con_w(c1) =    Turb % y_plus(c1)                         &
+                                * Flow % viscosity(c1)                      &
+                                * Flow % capacity(c1)                       &
+                        / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
+                           + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+          end if
 
           if(Turb % monin_obukov) then
             Turb % con_w(c1) = pr_t * Turb % con_w(c1)                  &
@@ -140,11 +149,16 @@
             beta = 0.0
           end if
 
-          ebf = Turb % Ebf_Scalar(c1, sc)
-          Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
-              * (Flow % viscosity(c1)/Flow % density(c1))         &
-              / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
-               + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+          ! The same limit as for con_w above: molecular diffusivity
+          if(Turb % y_plus(c1) < NANO) then
+            Turb % diff_w(c1) = (Flow % viscosity(c1)/Flow % density(c1)) / sc
+          else
+            ebf = Turb % Ebf_Scalar(c1, sc)
+            Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
+                * (Flow % viscosity(c1)/Flow % density(c1))         &
+                / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
+                 + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+          end if
 
           if(Turb % monin_obukov) then
             Turb % diff_w(c1) = sc_t * Turb % diff_w(c1)                      &
