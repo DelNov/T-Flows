@@ -284,6 +284,11 @@
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t
 
+  ! Turbulent Prandtl and Schmidt numbers for LES models.  For sub-grid scale
+  ! fluxes, these are used instead of pr_t and sc_t from the control file.
+  real, parameter :: PR_T_LES = 0.4
+  real, parameter :: SC_T_LES = 0.7
+
   contains
 
     ! Logic of turbulence models

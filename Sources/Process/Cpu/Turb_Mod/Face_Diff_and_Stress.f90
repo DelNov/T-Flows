@@ -18,7 +18,7 @@
   integer                   :: c1, c2
   real                      :: dif_mol, dif_turb
   real                      :: lf1, lf2, alpha_d1, alpha_d2
-  real                      :: sc_t1, sc_t2
+  real                      :: sc_t1, sc_t2, sc_tf
   real                      :: phix_f, phiy_f, phiz_f
   real                      :: uc_f, vc_f, wc_f
 !==============================================================================!
@@ -47,8 +47,13 @@
 
   if(Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      Turb % model .ne. DNS) then
-    dif_turb = Grid % fw(s)  * Turb % vis_t(c1) / sc_t  &
-        + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_t
+    ! LES models: turbulent Schmidt number for sub-grid scale
+    ! fluxes, rather than sc_t from the control file
+    sc_tf = sc_t
+    if(Turb % Les()) sc_tf = SC_T_LES
+
+    dif_turb = Grid % fw(s)  * Turb % vis_t(c1) / sc_tf  &
+        + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_tf
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then

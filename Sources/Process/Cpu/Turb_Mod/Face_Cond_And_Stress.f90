@@ -51,6 +51,11 @@
     pr_tf = Grid % fw(s) * pr_t1 + (1.0-Grid % fw(s)) * pr_t2
   end if
 
+  ! LES models: turbulent Prandtl number for sub-grid scale heat flux, the
+  ! same one Prandtl_Turb returns for them (and wall functions use), rather
+  ! than pr_t from the control file
+  if(Turb % Les()) pr_tf = PR_T_LES
+
   ! Hybrid LES/RANS: use RANS Pr_t in RANS cells and Pr_t = 0.4 in LES cells.
   ! Re-evaluate the same local switching criterion used in Vis_T_K_Eps_Zeta_F.
   if(Turb % model .eq. HYBRID_LES_RANS) then
