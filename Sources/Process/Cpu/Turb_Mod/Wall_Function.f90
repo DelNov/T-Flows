@@ -14,6 +14,7 @@
   integer                   :: s, c1, c2, reg
   real                      :: u_tau, u_tan, nu
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
+  real                      :: sc_tf
 !------------------------------[Local parameters]------------------------------!
   real, parameter           :: A_POW = 8.3
   real, parameter           :: B_POW = 1.0/7.0
@@ -141,7 +142,13 @@
 
         if(Flow % n_scalars > 0) then
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
-          beta = Turb % Beta_Scalar(sc, sc_t)
+
+          ! Turbulent Schmidt number; for LES models the one for
+          ! sub-grid scale fluxes, as Prandtl_Turb does for pr_t above
+          sc_tf = sc_t
+          if(Turb % Les()) sc_tf = SC_T_LES
+
+          beta = Turb % Beta_Scalar(sc, sc_tf)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer:
           ! New temperature inlet profile consistent with wall functions"
@@ -157,11 +164,11 @@
             Turb % diff_w(c1) =  Turb % y_plus(c1)                  &
                 * (Flow % viscosity(c1)/Flow % density(c1))         &
                 / (Turb % y_plus(c1) * sc * exp(-1.0 * ebf)         &
-                 + (u_plus + beta) * sc_t * exp(-1.0 / ebf) + TINY)
+                 + (u_plus + beta) * sc_tf * exp(-1.0 / ebf) + TINY)
           end if
 
           if(Turb % monin_obukov) then
-            Turb % diff_w(c1) = sc_t * Turb % diff_w(c1)                      &
+            Turb % diff_w(c1) = sc_tf * Turb % diff_w(c1)                     &
                            * Turb % Monin_Obukov_Thermal(abs(u_tan),          &
                              Grid % wall_dist(c1), z_o, t % n(c1), t % n(c2), &
                              abs(Flow % grav_z))

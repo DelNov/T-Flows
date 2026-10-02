@@ -19,7 +19,7 @@
 
   ! In case an LES model is used, set it simply to 0.4
   if(Turb % Les()) then
-    Prandtl_Turb = 0.4
+    Prandtl_Turb = PR_T_LES
 
   ! Otherwise, use the correlation proposed by Kays and Crawford
   else

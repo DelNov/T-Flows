@@ -15,7 +15,7 @@
   type(Var_Type),   pointer :: phi
   integer                   :: c, k, c1, c2, s, reg
   real                      :: uc_log_law, vc_log_law, wc_log_law
-  real                      :: nx, ny, nz, ebf
+  real                      :: nx, ny, nz, ebf, sc_tf
 !==============================================================================!
 
   ! Take aliases
@@ -43,11 +43,16 @@
   ! First guess is the flux defined by SGDH !
   !-----------------------------------------!
   if(Turb % scalar_flux_model .eq. SGDH) then
+    ! LES models: turbulent Schmidt number for sub-grid scale
+    ! fluxes, rather than sc_t from the control file
+    sc_tf = sc_t
+    if(Turb % Les()) sc_tf = SC_T_LES
+
     do c = Cells_In_Domain_And_Buffers()
 
-      Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % x(c)
-      Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % y(c)
-      Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_t * phi % z(c)
+      Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % x(c)
+      Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % y(c)
+      Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % z(c)
     end do
 
   else if(Turb % scalar_flux_model .eq. GGDH) then
