@@ -102,8 +102,14 @@
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
-    con_turb = Grid % fw(s) * Flow % capacity(c1) * Turb % vis_t(c1) / pr_t1  &
-             + (1.0-Grid % fw(s)) * Flow % capacity(c2) * Turb % vis_t(c2) / pr_t2
+    ! Sub-grid scale viscosity bounds turbulent conductivity from below, as
+    ! it bounds vis_t_eff in momentum, with Pr_t = 0.4 as in LES models
+    con_turb = Grid % fw(s) * Flow % capacity(c1)             &
+             * max(Turb % vis_t(c1) / pr_t1,                  &
+                   Turb % vis_t_sgs(c1) / PR_T_LES)           &
+             + (1.0-Grid % fw(s)) * Flow % capacity(c2)       &
+             * max(Turb % vis_t(c2) / pr_t2,                  &
+                   Turb % vis_t_sgs(c2) / PR_T_LES)
   end if
 
   !-----------------------------------!
