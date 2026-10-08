@@ -2,20 +2,20 @@
   subroutine User_Mod_Save_Results(Flow, Turb, Vof, Swarm, domain)
 !------------------------------------------------------------------------------!
 !   Averages results in homogeneous (z) planes and writes them to a .dat file. !
-!   Works for all turbulence models: RANS, LES, and hybrid.                   !
+!   Works for all turbulence models: RANS, LES, and hybrid.                    !
 !                                                                              !
 !   Statistics handling:                                                       !
-!     Turb % statistics == .true.  -> LES/HYB: use time-averaged means and    !
+!     Turb % statistics == .true.  -> LES/HYB: use time-averaged means and     !
 !                                     resolved Reynolds stresses               !
-!     Turb % statistics == .false. -> RANS (or LES/HYB before stat window):   !
+!     Turb % statistics == .false. -> RANS (or LES/HYB before stat window):    !
 !                                     use instantaneous field                  !
 !                                                                              !
-!   Mean arrays (u_mean, uu_res, …) are ONLY allocated when                   !
+!   Mean arrays (u_mean, uu_res, …) are ONLY allocated when                    !
 !   Turb % statistics == .true. (see Create_Turb.f90), therefore use_stats is  !
-!   additionally guarded by allocated(...) checks before accessing them.        !
+!   additionally guarded by allocated(...) checks before accessing them.       !
 !                                                                              !
 !   Friction-coefficient reference: Zanoun et al. implicit correlation         !
-!     1/sqrt(Cf) = 1.911 * ln(Re * sqrt(Cf)) – 1.282                         !
+!     1/sqrt(Cf) = 1.911 * ln(Re * sqrt(Cf)) – 1.282                           !
 !   Solved by Newton iteration (Dean used as initial guess only).              !
 !------------------------------------------------------------------------------!
   implicit none
@@ -35,11 +35,11 @@
   !   Local averaging arrays (always allocated, selectively filled)           !
   !---------------------------------------------------------------------------!
   real, allocatable :: wall_p(:)                 ! mean wall distance
-  real, allocatable :: u_p(:), v_p(:), w_p(:)   ! mean velocity components
+  real, allocatable :: u_p(:), v_p(:), w_p(:)    ! mean velocity components
   real, allocatable :: y_plus_p(:)               ! mean y+
   real, allocatable :: uu_p(:), vv_p(:), ww_p(:) ! normal resolved stresses
   real, allocatable :: uw_p(:)                   ! shear: resolved (stats) or
-                                                  ! modelled (RANS)
+                                                 ! modelled (RANS)
   real, allocatable :: uw_mod_p(:)               ! modelled shear (LES/HYB)
   real, allocatable :: kin_p(:), eps_p(:)        ! k, eps
   real, allocatable :: omg_p(:)                  ! omega (K_OMEGA_SST)
@@ -116,7 +116,7 @@
   n_prob = Grid % n_z_planes - 1
 
   !-------------------------------------------------------------------------!
-  !   Allocate local arrays (all of them; unused ones simply stay at zero)   !
+  !   Allocate local arrays (all of them; unused ones simply stay at zero)  !
   !-------------------------------------------------------------------------!
   allocate(n_count  (n_prob));  n_count   = 0
   allocate(wall_p   (n_prob));  wall_p    = 0.0
@@ -182,7 +182,7 @@
           ww_p(i) = ww_p(i) + Turb % ww_res(c) - w_vel * w_vel
           uw_p(i) = uw_p(i) + Turb % uw_res(c) - u_vel * w_vel
 
-          !--- Model-specific modelled stress and eddy viscosity -------------!
+          !--- Model-specific modelled stress and eddy viscosity ---------------!
           if(Turb % model == HYBRID_LES_RANS) then
             ! RANS part carries k and eps; LES part provides vis_t_sgs
             kin_p   (i) = kin_p   (i) + Turb % kin_mean(c)
@@ -231,7 +231,7 @@
         else
 
           !--- Modelled shear stress (dynamic units) ---------------------------!
-          !    Divided by density during non-dimensionalisation below          !
+          !    Divided by density during non-dimensionalisation below           !
           if(Turb % model == HYBRID_LES_RANS) then
             uw_p(i) = uw_p(i) + Turb % vis_t_eff(c) * (u % z(c) + w % x(c))
           else
@@ -341,7 +341,7 @@
 
   !------------------------------------------------------------------!
   !   Friction velocity                                              !
-  !   y+(1) > 5  → pressure-drop formula (reliable in log region)   !
+  !   y+(1) > 5  → pressure-drop formula (reliable in log region)    !
   !   y+(1) ≤ 5  → viscous-sublayer formula using full |U| near wall !
   !------------------------------------------------------------------!
   if(y_plus_p(1) > 5.0) then
@@ -361,9 +361,9 @@
   end if
 
   !------------------------------------------------------------------!
-  !   Zanoun et al. skin-friction correlation for plane channel flow  !
+  !   Zanoun et al. skin-friction correlation for plane channel flow !
   !     1/sqrt(Cf) = 1.911*ln(Re*sqrt(Cf)) - 1.282                   !
-  !   Implicit in Cf → solve by Newton iteration.                     !
+  !   Implicit in Cf → solve by Newton iteration.                    !
   !   Dean's formula ( Cf = 0.073 Re^{-0.25} ) is used as seed only. !
   !------------------------------------------------------------------!
   re        = abs(dens_const * ubulk * 2.0 / visc_const)
@@ -436,11 +436,11 @@
   !------------------------------------------------------------------!
   !   Non-dimensionalise                                             !
   !                                                                  !
-  !   Shear stress convention:                                        !
-  !     use_stats  (LES/HYB)  → uw is kinematic (m²/s²),            !
+  !   Shear stress convention:                                       !
+  !     use_stats  (LES/HYB)  → uw is kinematic (m²/s²),             !
   !                              divide by u_tau²                    !
-  !     .not. use_stats (RANS) → uw = vis_t*(du/dz+dw/dx) is        !
-  !                              dynamic (Pa), divide by ρ u_tau²   !
+  !     .not. use_stats (RANS) → uw = vis_t*(du/dz+dw/dx) is         !
+  !                              dynamic (Pa), divide by ρ u_tau²    !
   !------------------------------------------------------------------!
   do i = 1, n_prob
     wall_p  (i) = dens_const * wall_p(i) * u_tau_p / visc_const  ! → y+
@@ -492,21 +492,21 @@
                      // '  11:t2+  12:ut+  13:vt+  14:wt+'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(14es15.5e3)')                                  &
-              wall_p(i),                                              &  !  1
-              u_p(i),                                                 &  !  2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                          &  !  3
-              kin_p(i),                                               &  !  4
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),               &  !  5
-              uw_p(i),                                                &  !  6
-              uw_mod_p(i),                                            &  !  7
-              uw_p(i) + uw_mod_p(i),                                  &  !  8
-              vis_t_p(i),                                             &  !  9
-              t_p(i),                                                 &  ! 10
-              t2_p(i),                                                &  ! 11
-              ut_p(i),                                                &  ! 12
-              vt_p(i),                                                &  ! 13
-              wt_p(i)                                                    ! 14
+            write(fu,'(14es15.5e3)')                               &
+              wall_p(i),                                           &  !  1
+              u_p(i),                                              &  !  2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                       &  !  3
+              kin_p(i),                                            &  !  4
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),            &  !  5
+              uw_p(i),                                             &  !  6
+              uw_mod_p(i),                                         &  !  7
+              uw_p(i) + uw_mod_p(i),                               &  !  8
+              vis_t_p(i),                                          &  !  9
+              t_p(i),                                              &  ! 10
+              t2_p(i),                                             &  ! 11
+              ut_p(i),                                             &  ! 12
+              vt_p(i),                                             &  ! 13
+              wt_p(i)                                                 ! 14
           end if
         end do
       else
@@ -514,16 +514,16 @@
                      // '  6:uw_res+  7:uw_mod+  8:uw_tot+  9:vis_t'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(9es15.5e3)')                                   &
-              wall_p(i),                                              &  !  1
-              u_p(i),                                                 &  !  2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                          &  !  3
-              kin_p(i),                                               &  !  4
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),               &  !  5
-              uw_p(i),                                                &  !  6
-              uw_mod_p(i),                                            &  !  7
-              uw_p(i) + uw_mod_p(i),                                  &  !  8
-              vis_t_p(i)                                                 !  9
+            write(fu,'(9es15.5e3)')                                    &
+              wall_p(i),                                               &  !  1
+              u_p(i),                                                  &  !  2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                           &  !  3
+              kin_p(i),                                                &  !  4
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)) + kin_p(i),                &  !  5
+              uw_p(i),                                                 &  !  6
+              uw_mod_p(i),                                             &  !  7
+              uw_p(i) + uw_mod_p(i),                                   &  !  8
+              vis_t_p(i)                                                  !  9
           end if
         end do
       end if  ! heat_transfer
@@ -537,31 +537,31 @@
                      // '  12:wt+'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(12es15.5e3)')                                  &
-              wall_p(i),                                              &  !  1
-              u_p(i),                                                 &  !  2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                          &  !  3
-              uw_p(i),                                                &  !  4
-              uw_mod_p(i),                                            &  !  5
-              uw_p(i) + uw_mod_p(i),                                  &  !  6
-              vis_t_p(i),                                             &  !  7
-              t_p(i),                                                 &  !  8
-              t2_p(i),                                                &  !  9
-              ut_p(i),                                                &  ! 10
-              vt_p(i),                                                &  ! 11
-              wt_p(i)                                                    ! 12
+            write(fu,'(12es15.5e3)')                                   &
+              wall_p(i),                                               &  !  1
+              u_p(i),                                                  &  !  2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                           &  !  3
+              uw_p(i),                                                 &  !  4
+              uw_mod_p(i),                                             &  !  5
+              uw_p(i) + uw_mod_p(i),                                   &  !  6
+              vis_t_p(i),                                              &  !  7
+              t_p(i),                                                  &  !  8
+              t2_p(i),                                                 &  !  9
+              ut_p(i),                                                 &  ! 10
+              vt_p(i),                                                 &  ! 11
+              wt_p(i)                                                     ! 12
           end if
         end do
       else
-        write(fu,'(a)') '#  1:y+  2:u+  3:kin_res+  4:uw_res+'       &
+        write(fu,'(a)') '#  1:y+  2:u+  3:kin_res+  4:uw_res+'              &
                      // '  5:uw_mod+  6:uw_tot+  7:vis_t'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(7es15.5e3)')                                  &
-              wall_p(i), u_p(i),                                     &  !  1-2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                         &  !  3
-              uw_p(i), uw_mod_p(i), uw_p(i)+uw_mod_p(i),             &  !  4-6
-              vis_t_p(i)                                                !  7
+            write(fu,'(7es15.5e3)')                                    &
+              wall_p(i), u_p(i),                                       &  ! 1-2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                           &  ! 3
+              uw_p(i), uw_mod_p(i), uw_p(i)+uw_mod_p(i),               &  ! 4-6
+              vis_t_p(i)                                                  ! 7
           end if
         end do
       end if
@@ -575,21 +575,21 @@
                      // '  5:t+  6:t2+  7:ut+  8:vt+  9:wt+'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(9es15.5e3)')                                  &
-              wall_p(i), u_p(i),                                     &  !  1-2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                         &  !  3
-              uw_p(i),                                               &  !  4
-              t_p(i), t2_p(i), ut_p(i), vt_p(i), wt_p(i)                !  5-9
+            write(fu,'(9es15.5e3)')                                     &
+              wall_p(i), u_p(i),                                        & !  1-2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                            & !  3
+              uw_p(i),                                                  & !  4
+              t_p(i), t2_p(i), ut_p(i), vt_p(i), wt_p(i)                  !  5-9
           end if
         end do
       else
         write(fu,'(a)') '#  1:y+  2:u+  3:kin_res+  4:uw_res+'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(4es15.5e3)')                                  &
-              wall_p(i), u_p(i),                                     &  !  1-2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                         &  !  3
-              uw_p(i)                                                   !  4
+            write(fu,'(4es15.5e3)')                                     &
+              wall_p(i), u_p(i),                                        & !  1-2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                            & !  3
+              uw_p(i)                                                     !  4
           end if
         end do
       end if
@@ -613,15 +613,15 @@
           end if
         end do
       else
-        write(fu,'(a)') '#  1:y+  2:u+  3:kin_res+  4:uw_res+'       &
+        write(fu,'(a)') '#  1:y+  2:u+  3:kin_res+  4:uw_res+'              &
                      // '  5:uw_mod+  6:uw_tot+  7:vis_t'
         do i = 1, n_prob
           if(n_count(i) .ne. 0) then
-            write(fu,'(7es15.5e3)')                                  &
-              wall_p(i), u_p(i),                                     &  !  1-2
-              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                         &  !  3
-              uw_p(i), uw_mod_p(i), uw_p(i)+uw_mod_p(i),             &  !  4-6
-              vis_t_p(i)                                                !  7
+            write(fu,'(7es15.5e3)')                                   &
+              wall_p(i), u_p(i),                                      &  !  1-2
+              0.5*(uu_p(i)+vv_p(i)+ww_p(i)),                          &  !  3
+              uw_p(i), uw_mod_p(i), uw_p(i)+uw_mod_p(i),              &  !  4-6
+              vis_t_p(i)                                                 !  7
           end if
         end do
       end if
