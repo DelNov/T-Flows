@@ -158,15 +158,19 @@
     ! Side is on the boundary
     else
 
-      ! On a PRESSURE boundary, p is Dirichlet, so pp shouldn't be pushed
-      ! away from zero there.  That's enforced through the extra diagonal
-      ! term "a12" below, not by ignoring this face's own contribution to
-      ! the cell's mass balance - c1 can have other faces (internal or
-      ! other boundaries) whose imbalance still needs to be corrected,
-      ! particularly at corners where multiple regions meet.
-      if(Grid % Bnd_Cond_Type(c2) .ne. PRESSURE) then
-        b(c1) = b(c1) - v_flux % n(s)
-      end if
+      ! A PRESSURE face's own flux used to be excluded here, on the
+      ! reasoning that p is Dirichlet there so pp shouldn't be pushed
+      ! away from zero by it.  But excluding it leaves c1's mass
+      ! imbalance to be resolved entirely through its other (internal)
+      ! faces, since this face is never touched by the local pp
+      ! correction either (Correct_Velocity only corrects c2 > 0
+      ! faces) - visible as an over-corrected ring of cells right next
+      ! to a PRESSURE opening (e.g. an eddy's radial velocity getting
+      ! clipped approaching a PRESSURE outlet, but not an OUTFLOW one).
+      ! OUTFLOW never excluded its own face here, so treat PRESSURE the
+      ! same way; pp is still kept near zero at the boundary through the
+      ! extra diagonal term "a12" below, not by discarding this term.
+      b(c1) = b(c1) - v_flux % n(s)
 
       if(Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
          Grid % Bnd_Cond_Type(c2) .eq. AMBIENT) then
@@ -176,23 +180,38 @@
     end if
   end do
 
+  ! While the pressure field is still building up towards the ambient
+  ! values prescribed in the control file, pull pp at cells next to an
+  ! AMBIENT boundary towards that prescribed value.  Accumulate into
+  ! b(c1) instead of overwriting it - c1 can have other faces (internal
+  ! or other boundaries) whose mass imbalance still needs to be
+  ! corrected, particularly at corners where multiple regions meet (see
+  ! the analogous fix for PRESSURE boundaries).  Once the ambient value
+  ! has been reached, stop forcing pp here so it can go back to being a
+  ! pure mass-conservation correction, consistent with how it is used
+  ! in the pressure update below.
+  if(Flow % has_ambient .and. .not. Flow % reached_ambient_pressure) then
+    do reg = Boundary_Regions()
+
+      if(Grid % region % type(reg) .eq. AMBIENT) then
+        do s = Faces_In_Region(reg)
+          c1 = Grid % faces_c(1,s)
+          c2 = Grid % faces_c(2,s)
+          a12   = A % fc(s) * M % v_m(c1)
+          b(c1) = b(c1) + a12 * pp % n(c2)
+        end do  ! faces
+      end if    ! ambient
+
+    end do      ! regions
+  end if
+
+  ! PENET_CONV-specific: the TOP boundary in the penetrative convection
+  ! cases (Deardorff) is a PRESSURE region but geometrically simple (no
+  ! multi-region corners like the ones that broke on the real garage
+  ! mesh), and is very sensitive to any pp leakage at that boundary.
+  ! Keep the original, more aggressive treatment there on purpose:
+  ! fully reset b(c1), not just this face's own contribution.
   do reg = Boundary_Regions()
-
-    if(Grid % region % type(reg) .eq. AMBIENT) then
-      do s = Faces_In_Region(reg)
-        c1 = Grid % faces_c(1,s)
-        c2 = Grid % faces_c(2,s)
-        a12   = A % fc(s) * M % v_m(c1)
-        b(c1) = a12 * pp % n(c2)
-      end do  ! faces
-    end if    ! ambient
-
-    ! PENET_CONV-specific: the TOP boundary in the penetrative convection
-    ! cases (Deardorff) is a PRESSURE region but geometrically simple (no
-    ! multi-region corners like the ones that broke on the real garage
-    ! mesh), and is very sensitive to any pp leakage at that boundary.
-    ! Keep the original, more aggressive treatment there on purpose:
-    ! fully reset b(c1), not just this face's own contribution.
     if(Grid % region % type(reg) .eq. PRESSURE .and.  &
        trim(Grid % region % name(reg)) .eq. 'TOP') then
       do s = Faces_In_Region(reg)
@@ -200,7 +219,6 @@
         b(c1) = 0.0
       end do  ! faces
     end if    ! pressure and top
-
   end do      ! regions
 
   ! Volume balance reporting
@@ -252,7 +270,10 @@
                         ' (solver for pressure)')
 
   ! Set singularity to the matrix
-  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
+  ! TEST: restored the "has_pressure" exclusion - a PRESSURE boundary
+  ! already pins pp via the a12 diagonal boost above, so the matrix
+  ! isn't singular and shouldn't need this regularization.
+  if(.not. Flow % has_ambient .and. .not. Flow % has_pressure) then
     call Sol % Set_Singular(pp)
   end if
 
@@ -260,7 +281,7 @@
   call Sol % Run(A, pp, b, norm = p_nor)
 
   ! Remove singularity from the matrix
-  if(.not. Flow % has_ambient) then  ! this used to check for "has_pressure" too
+  if(.not. Flow % has_ambient .and. .not. Flow % has_pressure) then
     call Sol % Remove_Singular(pp)
   end if
 

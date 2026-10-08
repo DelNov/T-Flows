@@ -39,7 +39,7 @@
 !                                                                              !
 !   Finaly C is :                                                              !
 !                                                                              !
-!   C = 0.5 * Lij:Mij / Mij:Mij                                                !
+!   C = -0.5 * Lij:Mij / Mij:Mij                                               !
 !                                                                              !
 !   aij : bij = a11 * b11 + a22 * b22 + a33 * b33                              !
 !             + 2.0 * a12 * b12 + 2.0 a13 * b13 + 2.0 * a23 * b23              !

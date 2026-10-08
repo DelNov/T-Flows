@@ -229,6 +229,7 @@
     ! Similar note is in Generate, also called Note #1
 
     call Grid(g) % Print_Grid_Statistics()
+    call Convert % Mesh_Report(Grid(g))
 
     !-------------------------------!
     !   Save files for processing   !

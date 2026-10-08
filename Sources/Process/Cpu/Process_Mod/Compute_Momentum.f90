@@ -296,6 +296,20 @@
           M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
           fi(c1) = fi(c1) + m12 * ui % n(c2)
 
+        ! Ambient or pressure, when it is inflow (see v_flux check):
+        ! mirrors the same bidirectional Dirichlet pattern already used
+        ! for these boundaries in Compute_Energy.f90/Compute_Scalar.f90/
+        ! Compute_Variable.f90/Compute_F22.f90 (commit 0848853f2), which
+        ! never got extended to the momentum matrix itself. Without it,
+        ! velocity had no diffusive coupling at all on a backflowing
+        ! PRESSURE/AMBIENT face, relying solely on the explicit
+        ! extrapolation done in Update_Boundary_Values.f90.
+        else if( (Grid % Bnd_Cond_Type(c2) .eq. AMBIENT  .or.  &
+                  Grid % Bnd_Cond_Type(c2) .eq. PRESSURE)      &
+                .and. v_flux % n(s) .lt. 0.0) then
+          M % val(M % dia(c1)) = M % val(M % dia(c1)) + m12
+          fi(c1) = fi(c1) + m12 * ui % b(c2)
+
         end if  ! boundary condition
       end if    ! c2 .lt. 0
     end do      ! through faces

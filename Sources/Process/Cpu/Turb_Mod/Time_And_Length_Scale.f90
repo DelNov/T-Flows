@@ -79,7 +79,7 @@
       eps_l(c) = eps % n(c) + TINY ! limited eps % n
 
       t_1(c) = kin % n(c) / eps_l(c)
-      t_3(c) = 0.6/(sqrt(6.0) * Turb % c_mu * Flow % shear(c) + TINY)
+      t_3(c) = 0.6/(sqrt(3.0) * Turb % c_mu * Flow % shear(c) + TINY)
       Turb % t_scale(c) =  min(t_1(c), t_3(c))
     end do
   end if

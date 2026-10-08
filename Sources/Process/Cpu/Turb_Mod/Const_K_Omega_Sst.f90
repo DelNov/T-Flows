@@ -66,7 +66,7 @@
   Turb % c_theta = 0.2
 
   ! Constants for AFM turbulent flux
-  Turb % afm_psi = 0.1
-  Turb % afm_eta = 0.1
+  Turb % afm_psi = 0.05
+  Turb % afm_eta = 0.05
 
   end subroutine Const_K_Omega_Sst

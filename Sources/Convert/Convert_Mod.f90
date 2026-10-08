@@ -48,6 +48,7 @@
       procedure          :: Load_Gmsh
       procedure          :: Load_Obj
       procedure          :: Logo_Con
+      procedure          :: Mesh_Report
       procedure, private :: N_Bnd_Cells_In_Region
       procedure, private :: N_Edges_In_Region
       procedure, private :: N_Nodes_At_Boundary
@@ -188,6 +189,7 @@
 #   include "Convert_Mod/Load_Gmsh.f90"
 #   include "Convert_Mod/Load_Obj.f90"
 #   include "Convert_Mod/Logo_Con.f90"
+#   include "Convert_Mod/Mesh_Report.f90"
 #   include "Convert_Mod/N_Bnd_Cells_In_Region.f90"
 #   include "Convert_Mod/N_Edges_In_Region.f90"
 #   include "Convert_Mod/N_Nodes_At_Boundary.f90"

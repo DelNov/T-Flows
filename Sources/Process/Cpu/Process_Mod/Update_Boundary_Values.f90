@@ -57,7 +57,7 @@
   type(Var_Type),  pointer :: uu, vv, ww, uv, uw, vw
   integer                  :: c0, c1, c2, i_fac, s, s1, sc, reg, c_cand
   real                     :: dt_dn
-  real                     :: nx, ny, nz, un
+  real                     :: nx, ny, nz, un, un_c1
   logical                  :: fit_ok
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Process)
@@ -109,11 +109,15 @@
           w % n(c2) = w % n(c1)
         end do  ! faces
 
-      ! Pressure: on outflow, extrapolate as usual.  On backflow, force
-      ! the velocity to be purely normal (inward), instead of whatever
-      ! direction the interior cell happens to extrapolate, since that
-      ! can carry a spurious tangential component - particularly bad on
-      ! skewed cells near domain corners/edges.
+      ! Pressure: on outflow, extrapolate as usual.  On backflow, correct
+      ! only the normal component of the extrapolated velocity to match
+      ! the actual volume flux, instead of whatever normal component the
+      ! interior cell happens to extrapolate, since that can be off on
+      ! skewed cells near domain corners/edges.  Keep the tangential part
+      ! from the extrapolation, though - forcing it fully to zero (as
+      ! before) also kills legitimate tangential/rotational motion, e.g.
+      ! of an eddy passing the boundary, making an open PRESSURE boundary
+      ! behave like a wall for it.
       else if(Grid % region % type(reg) .eq. PRESSURE) then
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
@@ -121,11 +125,12 @@
 
           if(Flow % v_flux % n(s) .lt. 0.0) then
             call Grid % Face_Normal(s, nx, ny, nz)
-            un = Flow % v_flux % n(s) / Grid % s(s)
+            un    = Flow % v_flux % n(s) / Grid % s(s)
+            un_c1 = u % n(c1) * nx + v % n(c1) * ny + w % n(c1) * nz
 
-            u % n(c2) = un * nx
-            v % n(c2) = un * ny
-            w % n(c2) = un * nz
+            u % n(c2) = u % n(c1) + (un - un_c1) * nx
+            v % n(c2) = v % n(c1) + (un - un_c1) * ny
+            w % n(c2) = w % n(c1) + (un - un_c1) * nz
           else
             u % n(c2) = u % n(c1)
             v % n(c2) = v % n(c1)

@@ -136,7 +136,7 @@
     phij = max( 0.0, min( (beta1-1.0)*rj, g_d + g_u*rj, beta2 ) )
 
   else if(phi % adv_scheme .eq. SUPERBEE) then
-    phij = 0.5 * max( 0.0, min( 2.0*rj,1.0 ), min( rj,2.0 ) )
+    phij = fj * max( 0.0, min( 2.0*rj,1.0 ), min( rj,2.0 ) )
 
   else if(phi % adv_scheme .eq. UPWIND) then
     phi_f = phi % n(c)  ! upwind value
@@ -151,7 +151,11 @@
     return
   end if
 
-  phi_f = phi % n(c) + phij * sgn * (phi % n(c2)-phi % n(c1))
+  ! For GAMMA, phij was never set above (its own branch computes
+  ! phi_f directly below), so skip this generic assembly for it.
+  if(phi % adv_scheme .ne. GAMMA) then
+    phi_f = phi % n(c) + phij * sgn * (phi % n(c2)-phi % n(c1))
+  end if
 
   if(phi % adv_scheme .eq. GAMMA) then
     beta = 0.1
