@@ -101,7 +101,7 @@
       else
         A % val(A % dia(c)) = A % val(A % dia(c))                        &
           + Flow % density(c)                                            &
-          * (kin % n(c)**1.5 / lf)  &
+          * (Turb % c_eps_sgs * kin % n(c)**1.5 / lf)                    &
           / (kin % n(c) + TINY) * Grid % vol(c)
       end if
     end do
