@@ -56,7 +56,10 @@
     ! For some cases, it is beneficial to start simulations with
     ! turbulent viscosity computed with k-eps.  Particularly for
     ! cases with mild pressure drops such as channel, pipe flows
-    if(Time % Curr_Dt() < 10) then
+    ! Hybrid LES/RANS does not take this start-up branch: Vis_T_K_Eps does
+    ! not set vis_t_eff, momentum would be left without turbulent viscosity
+    ! and k would run away when the simulation starts from time step zero
+    if(Time % Curr_Dt() < 10 .and. Turb % model .eq. K_EPS_ZETA_F) then
       call Turb % Vis_T_K_Eps()
     else
       call Turb % Vis_T_K_Eps_Zeta_F()
