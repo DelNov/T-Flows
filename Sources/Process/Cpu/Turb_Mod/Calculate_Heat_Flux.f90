@@ -46,14 +46,16 @@
   if(Turb % heat_flux_model .eq. SGDH) then
     do c = Cells_In_Domain_And_Buffers()
       pr_t = max(Turb % Prandtl_Turb(c), TINY)
-      ut % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
-      vt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
-      wt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
 
+      ! Hybrid LES/RANS: maximum of RANS and SGS viscosity in whole domain
       if(Turb % model .eq. HYBRID_LES_RANS) then
         ut % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % x(c)
         vt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % y(c)
         wt % n(c) = -Turb % vis_t_eff(c) / Flow % density(c) / pr_t * t % z(c)
+      else
+        ut % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % x(c)
+        vt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % y(c)
+        wt % n(c) = -Turb % vis_t(c) / Flow % density(c) / pr_t * t % z(c)
       end if
     end do
 

@@ -50,17 +50,21 @@
 
     do c = Cells_In_Domain_And_Buffers()
 
-      Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % x(c)
-      Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % y(c)
-      Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c) / sc_tf * phi % z(c)
-
+      ! Hybrid LES/RANS: maximum of RANS and SGS viscosity in whole domain
       if(Turb % model .eq. HYBRID_LES_RANS) then
-        Turb % uc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % x(c)
-        Turb % vc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % y(c)
-        Turb % wc(c) = -Turb % vis_t_eff(c) / Flow % density(c) &
-                                            / sc_t * phi % z(c)
+        Turb % uc(c) = -Turb % vis_t_eff(c) / Flow % density(c)  &
+                                            / sc_tf * phi % x(c)
+        Turb % vc(c) = -Turb % vis_t_eff(c) / Flow % density(c)  &
+                                            / sc_tf * phi % y(c)
+        Turb % wc(c) = -Turb % vis_t_eff(c) / Flow % density(c)  &
+                                            / sc_tf * phi % z(c)
+      else
+        Turb % uc(c) = -Turb % vis_t(c) / Flow % density(c)  &
+                                        / sc_tf * phi % x(c)
+        Turb % vc(c) = -Turb % vis_t(c) / Flow % density(c)  &
+                                        / sc_tf * phi % y(c)
+        Turb % wc(c) = -Turb % vis_t(c) / Flow % density(c)  &
+                                        / sc_tf * phi % z(c)
       end if
     end do
 

@@ -137,12 +137,6 @@
               + (1.0-Grid % fw(s)) * vis % n(c2) * Flow % density(c2))  &
               / sigma_eff
 
-
-    if(Turb % model .eq. HYBRID_LES_RANS) then
-      vis_eff = visc_f + (    Grid % fw(s)  * Turb % vis_t_eff(c1)   &
-                       + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2))  &
-                       / sigma_eff
-    end if
     phi_x_f = Grid % fw(s) * phi % x(c1) + (1.0-Grid % fw(s)) * phi % x(c2)
     phi_y_f = Grid % fw(s) * phi % y(c1) + (1.0-Grid % fw(s)) * phi % y(c2)
     phi_z_f = Grid % fw(s) * phi % z(c1) + (1.0-Grid % fw(s)) * phi % z(c2)

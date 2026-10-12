@@ -37,13 +37,17 @@
                         * Flow % shear(c)
   end do
 
+  !-------------------------------------------------!
+  !   Modification of turbulent viscosity due to    !
+  !   buoyancy according to Eidson, T., JFM, 1985   !
+  !-------------------------------------------------!
   if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
     do c = Cells_In_Domain_And_Buffers()
       nc2 = -Flow % beta * (  Flow % grav_x * t % x(c)   &
                             + Flow % grav_y * t % y(c)   &
                             + Flow % grav_z * t % z(c))
       Turb % vis_t_sgs(c) = Turb % vis_t_sgs(c)  &
-             * sqrt(max(1.0 - 2.5 * nc2 / (Flow % shear(c)**2 + TINY), 0.0))
+        * sqrt(max((1.0 - 2.5 * nc2 / (Flow % shear(c)**2 + TINY)), 0.0))
     end do
   end if
 

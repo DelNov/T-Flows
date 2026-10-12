@@ -102,6 +102,10 @@
     ! Non-dimensional distance
     real, allocatable :: y_plus(:)
 
+    ! Weight of the buoyant (natural convection) wall function in near-wall
+    ! cells: 0 where the standard one is used, 1 where the buoyant one is
+    real, allocatable :: w_nat(:)
+
     ! Production of turbulent kinetic energy and temperature fluctuations
     real, allocatable :: p_kin(:), p_t2(:) ! [m^2/s^3], [K^2/s]
 
