@@ -17,8 +17,7 @@
   type(Var_Type),   pointer :: phi
   integer                   :: c1, c2
   real                      :: dif_mol, dif_turb
-  real                      :: lf1, lf2, alpha_d1, alpha_d2
-  real                      :: sc_t1, sc_t2, sc_tf
+  real                      :: sc_tf, sc_t1, sc_t2, alpha_d
   real                      :: phix_f, phiy_f, phiz_f
   real                      :: uc_f, vc_f, wc_f
 !==============================================================================!
@@ -56,36 +55,27 @@
         + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_tf
   end if
 
+  ! Hybrid LES/RANS: maximum of RANS and SGS viscosity in whole domain,
+  ! with sc_t from the control file in the RANS zone, and the LES value
+  ! in the LES zone, by the same criterion which switches the model from
+  ! RANS to LES (the same is done for turbulent Prandtl number in
+  ! Face_Cond_And_Stress)
   if(Turb % model .eq. HYBRID_LES_RANS) then
-
-    ! Use the same local RANS/LES switching criterion as in
-    ! Vis_T_K_Eps_Zeta_F.  RANS cells use the prescribed turbulent
-    ! Schmidt number, while LES cells use Sc_t = 0.7.
-    lf1      = Grid % vol(c1)**ONE_THIRD
-    alpha_d1 = Turb % kappa * Grid % wall_dist(c1) / lf1
-
-    if(alpha_d1 > Turb % c_hyb) then
-      sc_t1 = 0.7
-    else
-      sc_t1 = sc_t
-    end if
-
+    sc_t1 = sc_t
+    sc_t2 = sc_t
+    alpha_d = Turb % kappa * Grid % wall_dist(c1) / Grid % vol(c1)**ONE_THIRD
+    if(alpha_d > Turb % c_hyb) sc_t1 = SC_T_LES
     if(c2 > 0) then
-      lf2      = Grid % vol(c2)**ONE_THIRD
-      alpha_d2 = Turb % kappa * Grid % wall_dist(c2) / lf2
-
-      if(alpha_d2 > Turb % c_hyb) then
-        sc_t2 = 0.7
-      else
-        sc_t2 = sc_t
-      end if
+      alpha_d = Turb % kappa * Grid % wall_dist(c2)  &
+              / Grid % vol(c2)**ONE_THIRD
+      if(alpha_d > Turb % c_hyb) sc_t2 = SC_T_LES
     else
-      sc_t2 = sc_t1
+      sc_t2 = sc_t1                       ! boundary face takes it from inside
     end if
+    sc_tf = Grid % fw(s) * sc_t1 + (1.0-Grid % fw(s)) * sc_t2
 
-    ! Turb % vis_t already contains the locally selected RANS/LES viscosity.
-    dif_turb = Grid % fw(s) * Turb % vis_t(c1) / sc_t1  &
-       + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_t2
+    dif_turb = Grid % fw(s)  * Turb % vis_t_eff(c1) / sc_tf  &
+        + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) / sc_tf
   end if
 
   !-----------------------------------!

@@ -15,9 +15,16 @@
   real                      :: u_tau, u_tan, nu
   real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
   real                      :: sc_tf
+  integer                   :: it
+  real                      :: a_mol, g_beta, d_t, t_c, y_x, th_x, th_log
+  real                      :: g_nor, g_tan, con_nat, xi, w_nat
 !------------------------------[Local parameters]------------------------------!
   real, parameter           :: A_POW = 8.3
   real, parameter           :: B_POW = 1.0/7.0
+  real, parameter           :: C_NAT = 0.427  ! Hoelling and Herwig, J. Fluid
+  real, parameter           :: D_NAT = 1.93   ! Mech., 541, pp. 383-397, 2005
+  real, parameter           :: XI_LO = 0.1    ! below it, log-law only
+  real, parameter           :: XI_HI = 0.2    ! above it, buoyant law only
 !==============================================================================!
 
   ! Take aliases
@@ -131,6 +138,95 @@
                            + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
           end if
 
+          !--------------------------------------------------------------!
+          !   Temperature wall function for natural convection, scaled   !
+          !   with buoyancy instead of friction velocity, according to:  !
+          !                                                              !
+          !     Hoelling, M. and Herwig, H., "Asymptotic analysis of     !
+          !     the near-wall region of turbulent natural convection     !
+          !     flows", J. Fluid Mech., vol. 541, pp. 383-397, 2005.     !
+          !                                                              !
+          !     theta_x = y_x                    in viscous sublayer     !
+          !     theta_x = C ln(y_x) + D          in overlap layer        !
+          !                                                              !
+          !   with: theta_x = (t_w - t) / t_c                            !
+          !         y_x     = y * (g * beta * t_c / a^2)^(1/3)           !
+          !                                                              !
+          !   The two are blended with exponent 3, and t_c follows       !
+          !   from temperature difference between wall and cell centre   !
+          !                                                              !
+          !   It is used only where buoyancy dominates over shear.  The  !
+          !   criterion is the ratio of the two wall length scales:      !
+          !                                                              !
+          !     xi = y_x / y+ = (nu / u_tau) / (a^2/(g beta t_c))^(1/3)  !
+          !                                                              !
+          !   whose cube is Richardson number based on wall quantities.  !
+          !   Below XI_LO standard wall function is kept, above XI_HI    !
+          !   the buoyant one is used, with linear blend in between.     !
+          !                                                              !
+          !   At the walls with stable stratification, only the          !
+          !   component of gravity tangential to the wall is used.       !
+          !--------------------------------------------------------------!
+          if(Turb % model .eq. HYBRID_LES_RANS    .and.  &
+             Flow % buoyancy .eq. THERMALLY_DRIVEN) then
+            a_mol  = Flow % conductivity(c1)  &
+                   / (Flow % density(c1) * Flow % capacity(c1))
+            d_t    = abs(t % n(c2) - t % n(c1))
+
+            ! Gravity; normal (positive out of the domain) and tangential
+            g_beta = sqrt(  Flow % grav_x**2  &
+                          + Flow % grav_y**2  &
+                          + Flow % grav_z**2)
+            g_nor  = (  Flow % grav_x * Grid % sx(s)  &
+                      + Flow % grav_y * Grid % sy(s)  &
+                      + Flow % grav_z * Grid % sz(s)) / Grid % s(s)
+            g_tan  = sqrt(max(g_beta**2 - g_nor**2, 0.0))
+
+            ! Stable stratification: warm wall above or cold wall below fluid
+            if(g_nor * (t % n(c2) - t % n(c1)) * Flow % beta < 0.0) then
+              g_beta = g_tan
+            end if
+            g_beta = abs(Flow % beta) * g_beta
+
+            !----------------------------------------------!
+            !   Natural convection part (buoyant scaling)  !
+            !----------------------------------------------!
+            con_nat = Flow % conductivity(c1)
+
+            if(d_t > TINY .and. g_beta > TINY) then
+
+              ! Initial guess from the linear profile
+              t_c = (a_mol**2 * (d_t / Grid % wall_dist(c1))**3 / g_beta)**0.25
+
+              do it = 1, 10
+                y_x    = Grid % wall_dist(c1)  &
+                       * (g_beta * t_c / a_mol**2)**ONE_THIRD
+                th_x   = y_x
+                th_log = C_NAT * log(y_x) + D_NAT
+                if(th_log > 0.0) then
+                  th_x = (1.0 / y_x**3 + 1.0 / th_log**3)**(-ONE_THIRD)
+                end if
+                t_c = d_t / th_x
+              end do
+
+              con_nat = Flow % conductivity(c1) * y_x / th_x
+            end if
+
+            !-----------------------------------------------------!
+            !   Blend with the standard wall function (in con_w)  !
+            !-----------------------------------------------------!
+            xi = 0.0
+            if(d_t > TINY .and. g_beta > TINY) then
+              xi = y_x / max(Turb % y_plus(c1), TINY)
+            end if
+            w_nat = (xi - XI_LO) / (XI_HI - XI_LO)
+            w_nat = max(0.0, min(1.0, w_nat))
+
+            Turb % con_w(c1) = (1.0 - w_nat) * Turb % con_w(c1)  &
+                             +        w_nat  * con_nat
+            Turb % w_nat(c1) = w_nat
+          end if
+
           if(Turb % monin_obukov) then
             Turb % con_w(c1) = pr_t * Turb % con_w(c1)                  &
                              * Turb % Monin_Obukov_Thermal(abs(u_tan),  &
@@ -179,6 +275,8 @@
     end if      ! Grid % region % type(reg) .eq. WALL
   end do
 
+  call Grid % Exchange_Cells_Real(Turb % y_plus)
+  call Grid % Exchange_Cells_Real(Turb % w_nat)
   call Grid % Exchange_Cells_Real(Turb % vis_w)
   if(Flow % n_scalars > 0) then
     call Grid % Exchange_Cells_Real(Turb % diff_w)

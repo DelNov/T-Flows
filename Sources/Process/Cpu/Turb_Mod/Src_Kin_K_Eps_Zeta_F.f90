@@ -69,6 +69,14 @@
                           + Flow % grav_z * wt % n(c) )  &
                         * Flow % density(c)
 
+      ! Heat fluxes hold max(RANS, SGS) viscosity (energy equation);
+      ! k equation in RANS zone takes the RANS part only
+      if(Turb % model .eq. HYBRID_LES_RANS .and.  &
+         Turb % heat_flux_model .eq. SGDH) then
+        Turb % g_buoy(c) = Turb % g_buoy(c)  &
+                         * Turb % vis_t(c) / (Turb % vis_t_eff(c) + TINY)
+      end if
+
        ! In general, this clipping should be avoided.
        ! if(Turb % g_buoy(c) + Turb % p_kin(c) < 0.0) then
        !   Turb % g_buoy(c) = 0.0

@@ -17,9 +17,13 @@
   type(Var_Type),   pointer :: ut, vt, wt
   integer                   :: c1, c2
   real                      :: pr_t1, pr_t2, pr_tf, con_mol, con_turb
-  real                      :: lf, l_sgs_d, l_rans_d, alpha_d
   real                      :: cap_dens_c1, cap_dens_c2, tx_f, ty_f, tz_f
   real                      :: ut_cap_dens, vt_cap_dens, wt_cap_dens
+  real                      :: con_t1, con_t2, w_geo
+  real                      :: alpha_d
+  logical                   :: near_wall
+!------------------------------[Local parameters]------------------------------!
+  real, parameter           :: Y_PLUS_GEOMETRIC = 5.0
 !==============================================================================!
 
   ! Take alias
@@ -43,11 +47,27 @@
      Turb % model .ne. LES_DYNAMIC         .and.  &
      Turb % model .ne. HYBRID_LES_PRANDTL  .and.  &
      Turb % model .ne. LES_WALE            .and.  &
-     Turb % model .ne. HYBRID_LES_RANS     .and.  &
      Turb % model .ne. NO_TURBULENCE_MODEL .and.  &
      Turb % model .ne. DNS) then
     pr_t1 = Turb % Prandtl_Turb(c1)
     pr_t2 = Turb % Prandtl_Turb(c2)
+
+    ! Hybrid LES/RANS: Kays and Crawford in the RANS zone, and the LES value
+    ! in the LES zone, by the same criterion which switches the model from
+    ! RANS to LES.  This is done for energy equation only, equations of the
+    ! RANS model keep the value from Prandtl_Turb in the whole domain
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      alpha_d = Turb % kappa * Grid % wall_dist(c1) / Grid % vol(c1)**ONE_THIRD
+      if(alpha_d > Turb % c_hyb) pr_t1 = PR_T_LES
+      if(c2 > 0) then
+        alpha_d = Turb % kappa * Grid % wall_dist(c2)  &
+                / Grid % vol(c2)**ONE_THIRD
+        if(alpha_d > Turb % c_hyb) pr_t2 = PR_T_LES
+      else
+        pr_t2 = pr_t1                     ! boundary face takes it from inside
+      end if
+    end if
+
     pr_tf = Grid % fw(s) * pr_t1 + (1.0-Grid % fw(s)) * pr_t2
   end if
 
@@ -55,35 +75,6 @@
   ! same one Prandtl_Turb returns for them (and wall functions use), rather
   ! than pr_t from the control file
   if(Turb % Les()) pr_tf = PR_T_LES
-
-  ! Hybrid LES/RANS: use RANS Pr_t in RANS cells and Pr_t = 0.4 in LES cells.
-  ! Re-evaluate the same local switching criterion used in Vis_T_K_Eps_Zeta_F.
-  if(Turb % model .eq. HYBRID_LES_RANS) then
-    lf       = Grid % vol(c1)**ONE_THIRD
-    l_sgs_d  = lf
-    l_rans_d = Turb % kappa * Grid % wall_dist(c1)
-    alpha_d  = l_rans_d / l_sgs_d
-    if(alpha_d > Turb % c_hyb) then
-      pr_t1 = 0.4
-    else
-      pr_t1 = Turb % Prandtl_Turb(c1)
-    end if
-
-    if(c2 > 0) then
-      lf       = Grid % vol(c2)**ONE_THIRD
-      l_sgs_d  = lf
-      l_rans_d = Turb % kappa * Grid % wall_dist(c2)
-      alpha_d  = l_rans_d / l_sgs_d
-      if(alpha_d > Turb % c_hyb) then
-        pr_t2 = 0.4
-      else
-        pr_t2 = Turb % Prandtl_Turb(c2)
-      end if
-    else
-      ! Boundary face: use the regime of the adjacent interior cell.
-      pr_t2 = pr_t1
-    end if
-  end if
 
   !------------------------------------------------------!
   !   Molecular conductivity (without turbulent parts)   !
@@ -102,14 +93,41 @@
   end if
 
   if(Turb % model .eq. HYBRID_LES_RANS) then
-    ! Sub-grid scale viscosity bounds turbulent conductivity from below, as
-    ! it bounds vis_t_eff in momentum, with Pr_t = 0.4 as in LES models
-    con_turb = Grid % fw(s) * Flow % capacity(c1)             &
-             * max(Turb % vis_t(c1) / pr_t1,                  &
-                   Turb % vis_t_sgs(c1) / PR_T_LES)           &
-             + (1.0-Grid % fw(s)) * Flow % capacity(c2)       &
-             * max(Turb % vis_t(c2) / pr_t2,                  &
-                   Turb % vis_t_sgs(c2) / PR_T_LES)
+    con_turb  = Grid % fw(s)* Flow % capacity(c1)*Turb % vis_t_eff(c1)/pr_tf  &
+         + (1.0-Grid % fw(s))*Flow % capacity(c2)*Turb % vis_t_eff(c2)/pr_tf
+
+    ! Turbulent viscosity rises steeply from the wall (as a power of wall
+    ! distance), and its linear interpolation over-estimates conductivity
+    ! at faces of coarse near-wall cells, while harmonic mean under-estimates
+    ! it; weighted geometric mean (linear interpolation of logarithms) is
+    ! used instead, but only at the faces of the near-wall cells which
+    ! are outside of the viscous sub-layer, and only to the extent to
+    ! which the buoyant wall function is used in them (see Wall_Function);
+    ! in forced convection turbulent viscosity rises linearly from the
+    ! wall and linear interpolation is kept
+    near_wall = .false.
+    w_geo     = 0.0
+    if(Grid % cell_near_wall(c1)) then
+      if(Turb % y_plus(c1) > Y_PLUS_GEOMETRIC) then
+        near_wall = .true.
+        w_geo     = max(w_geo, Turb % w_nat(c1))
+      end if
+    end if
+    if(c2 > 0) then
+      if(Grid % cell_near_wall(c2)) then
+        if(Turb % y_plus(c2) > Y_PLUS_GEOMETRIC) then
+          near_wall = .true.
+          w_geo     = max(w_geo, Turb % w_nat(c2))
+        end if
+      end if
+    end if
+    if(c2 > 0 .and. near_wall) then
+      con_t1 = Flow % capacity(c1) * Turb % vis_t_eff(c1) / pr_tf
+      con_t2 = Flow % capacity(c2) * Turb % vis_t_eff(c2) / pr_tf
+      con_turb = (1.0 - w_geo) * con_turb                                &
+               +        w_geo  * (con_t1 + TINY) **      Grid % fw(s)    &
+                               * (con_t2 + TINY) ** (1.0-Grid % fw(s))
+    end if
   end if
 
   !-----------------------------------!
