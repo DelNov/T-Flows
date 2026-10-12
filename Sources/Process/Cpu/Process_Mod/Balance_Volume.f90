@@ -154,9 +154,19 @@
       if(Grid % region % type(reg) .eq. OUTFLOW .or.  &
          Grid % region % type(reg) .eq. CONVECT .or.  &
          Grid % region % type(reg) .eq. PRESSURE) then
+        ! Only the faces through which fluid leaves are corrected below,
+        ! and what comes in through the others must leave through them
+        ! as well.  Hence, fluxes are sorted by their sign here too, or
+        ! the correction would not balance the volume when the flow
+        ! is locally reversed at these boundaries.
         do s = Faces_In_Region(reg)
-          bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
-          bulk % area_out = bulk % area_out + Grid % s(s)
+          if(v_flux % n(s) .gt. 0.0) then
+            bulk % area_out = bulk % area_out + Grid % s(s)
+            bulk % vol_out  = bulk % vol_out  + v_flux % n(s)
+          else
+            bulk % area_in = bulk % area_in + Grid % s(s)
+            bulk % vol_in  = bulk % vol_in  - v_flux % n(s)
+          end if
         end do
       else if(Grid % region % type(reg) .eq. AMBIENT) then
         do s = Faces_In_Region(reg)
