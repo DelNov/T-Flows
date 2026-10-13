@@ -327,7 +327,12 @@
       end if
     end if
   end do
-  call Numerics_Mod_Inertial_Term(t, cap_dens, A, b, dt)
+  ! Work arrays span the biggest of all the domains, pass the section
+  ! which belongs to this one, as the called procedure sizes it by the grid
+  call Numerics_Mod_Inertial_Term(                              &
+                 t,                                             &
+                 cap_dens(-Grid % n_bnd_cells:Grid % n_cells),  &
+                 A, b, dt)
 
   !--------------------!
   !                    !
