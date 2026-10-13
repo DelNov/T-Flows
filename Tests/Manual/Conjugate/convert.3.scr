@@ -4,11 +4,16 @@ cold_solid.msh
 # Dual grid?
 no
 
+# Boundary-layer regions (or skip)
+skip
+
 # Geometrical scaling
 skip
 
-# Periodicity
+# Boundary cell centers' positions
 2
+
+# Periodicity
 skip
 
 # Wall distance
