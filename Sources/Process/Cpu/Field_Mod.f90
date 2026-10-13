@@ -151,6 +151,14 @@
     ! Exponential extrapolation of temperature to the walls
     logical :: exp_temp_wall
 
+    ! Conjugate heat transfer; defined in boundary cells which are
+    ! in contact with another domain, see User_Mod_Interface_Exchange
+    real, allocatable :: cht_coef(:)     !! coefficient between cell and
+                                         !! the boundary on this side [W/K]
+    real, allocatable :: cht_coef_nb(:)  !! the same in the other domain [W/K]
+    real, allocatable :: cht_t_nb(:)     !! temperature in the cell on
+                                         !! the other side of contact [K]
+
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars  !! number of (passive) scalars
     type(Var_Type), allocatable :: scalar(:)  !! storage for scalars
