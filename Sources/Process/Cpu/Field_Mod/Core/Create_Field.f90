@@ -50,6 +50,9 @@
   if(Flow % heat_transfer) then
     allocate(Flow % capacity    (-nb:nc));  Flow % capacity(:)     = 0.0
     allocate(Flow % conductivity(-nb:nc));  Flow % conductivity(:) = 0.0
+    allocate(Flow % cht_coef    (-nb:nc));  Flow % cht_coef(:)     = 0.0
+    allocate(Flow % cht_coef_nb (-nb:nc));  Flow % cht_coef_nb(:)  = 0.0
+    allocate(Flow % cht_t_nb    (-nb:nc));  Flow % cht_t_nb(:)     = 0.0
   end if
   if(Flow % n_scalars .gt. 0) then
     allocate(Flow % diffusivity (-nb:nc));  Flow % diffusivity(:)  = 0.0

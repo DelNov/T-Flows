@@ -16,6 +16,22 @@
 !   * Application of buffered values to impose tailored boundary conditions    !
 !     within each domain, crucial for simulations with interactive domain      !
 !     behavior, like conjugate heat transfer.                                  !
+!                                                                              !
+!   Coupling of temperature                                                    !
+!                                                                              !
+!   * Each domain receives temperature of the cell on the other side of the    !
+!     contact, and the coefficient between that cell and the contact, the      !
+!     same one which energy equation uses at walls (it holds conductivity of   !
+!     the wall function in turbulent flows, and geometry of the face).         !
+!   * Compute_Energy couples the cell at the contact with the cell on the      !
+!     other side, through the two resistances in series.  The cell's own       !
+!     temperature is implicit in that, which converges much faster than        !
+!     imposing temperature of the contact computed from the old values.        !
+!   * Temperature of the contact, which follows from the equality of heat      !
+!     fluxes, is stored in the boundary cells.                                 !
+!   * Before energy equation was solved for the first time, coefficients       !
+!     are not known.  Temperature of the contact is then estimated from        !
+!     conductivities and wall distances, and imposed.                          !
 !------------------------------------------------------------------------------!
 !   Note                                                                       !
 !                                                                              !
@@ -35,7 +51,8 @@
 !------------------------------[Local parameters]------------------------------!
   integer, parameter :: T  = 1,  &  ! store temperature as the first ...
                         K  = 2,  &  ! ... conductivity as the second ...
-                        WD = 3      ! ... and wall distance as the third.
+                        WD = 3,  &  ! ... wall distance as the third ...
+                        CF = 4      ! ... and coefficient to contact as fourth
 !-----------------------------------[Locals]-----------------------------------!
   integer :: d1, d2     ! counters for domains 1 and 2
   integer :: n1, n2, n  ! local counters and number at interfaces 1 and 2
@@ -44,6 +61,7 @@
   real    :: t1, t2     ! temperatures in domains 1 and 2
   real    :: k1, k2     ! conductivities in domains 1 and 2
   real    :: wd1, wd2   ! wall distances in domains 1 and 2
+  real    :: a1, a2     ! coefficients to the contact in domains 1 and 2
 !==============================================================================!
 
   ! If there is only one domain, there is nothing to exchange
@@ -79,6 +97,14 @@
                                   Flow(d1) % pnt_grid % wall_dist,  &
                                   Flow(d2) % pnt_grid % wall_dist,  &
                                   WD)
+
+      ! Send coefficients between cells and the contact.  (They
+      ! are stored in boundary cells, hence boundary is true.)
+      call Interface_Mod_Exchange(inter(d1, d2),         &
+                                  Flow(d1) % cht_coef,   &
+                                  Flow(d2) % cht_coef,   &
+                                  CF,                    &
+                                  boundary = .true.)
     end do  ! d2
   end do    ! d1
 
@@ -114,13 +140,26 @@
         k2  = inter(d1, d2) % phi_2(n, K)           ! conductivity in dom 2
         wd2 = inter(d1, d2) % phi_2(n, WD)          ! wall distance in dom 2
 
+        ! Coefficients between cells and the contact, in both domains
+        a1 = Flow(d1) % cht_coef(bc1)
+        a2 = inter(d1, d2) % phi_2(n, CF)
+
         !---------------------------------------------!
         !   Implementation of your model comes here   !
         !---------------------------------------------!
 
-        ! Set temperature at the boundary of domain 1
-        Flow(d1) % t % n(bc1) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
-                              / (     k1 / wd1 +      k2 / wd2)
+        ! Coefficients are known: pass what Compute_Energy needs to couple
+        ! domain 1 with domain 2, and set temperature at the contact
+        if(a1 .gt. 0.0 .and. a2 .gt. 0.0) then
+          Flow(d1) % cht_coef_nb(bc1) = a2
+          Flow(d1) % cht_t_nb(bc1)    = t2
+          Flow(d1) % t % n(bc1) = (t1 * a1 + t2 * a2) / (a1 + a2)
+
+        ! Coefficients are not known yet: estimate temperature at the contact
+        else
+          Flow(d1) % t % n(bc1) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
+                                / (     k1 / wd1 +      k2 / wd2)
+        end if
 
       end do
 
@@ -146,13 +185,26 @@
         k1  = inter(d1, d2) % phi_1(n, K)           ! conductivity in dom 1
         wd1 = inter(d1, d2) % phi_1(n, WD)          ! wall distance in dom 1
 
+        ! Coefficients between cells and the contact, in both domains
+        a1 = inter(d1, d2) % phi_1(n, CF)
+        a2 = Flow(d2) % cht_coef(bc2)
+
         !---------------------------------------------!
         !   Implementation of your model comes here   !
         !---------------------------------------------!
 
-        ! Set temperature at the boundary of domain 2
-        Flow(d2) % t % n(bc2) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
-                              / (     k1 / wd1 +      k2 / wd2)
+        ! Coefficients are known: pass what Compute_Energy needs to couple
+        ! domain 2 with domain 1, and set temperature at the contact
+        if(a1 .gt. 0.0 .and. a2 .gt. 0.0) then
+          Flow(d2) % cht_coef_nb(bc2) = a1
+          Flow(d2) % cht_t_nb(bc2)    = t1
+          Flow(d2) % t % n(bc2) = (t1 * a1 + t2 * a2) / (a1 + a2)
+
+        ! Coefficients are not known yet: estimate temperature at the contact
+        else
+          Flow(d2) % t % n(bc2) = (t1 * k1 / wd1 + t2 * k2 / wd2)  &
+                                / (     k1 / wd1 +      k2 / wd2)
+        end if
 
       end do
     end do    ! d2

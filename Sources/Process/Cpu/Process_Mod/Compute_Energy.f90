@@ -249,12 +249,28 @@
       A % val(A % pos(2,s)) = A % val(A % pos(2,s)) - a21
     else if(c2 .lt. 0) then
 
+      ! Coefficient between the cell and the boundary.  It is stored for
+      ! the faces in contact with another domain, to which it is sent in
+      ! User_Mod_Interface_Exchange
+      Flow % cht_coef(c2) = con_eff * A % fc(s)
+
+      ! Face is in contact with another domain (conjugate heat transfer).
+      ! Resistances of the two cells which face each other act in series,
+      ! and the cell here is coupled with temperature in the cell on the
+      ! other side.  The same coefficient is used in the other domain,
+      ! hence the heat flux is the same on both sides of the contact
+      if(Flow % cht_coef_nb(c2) .gt. 0.0) then
+        a12 = Flow % cht_coef(c2) * Flow % cht_coef_nb(c2)  &
+            / (Flow % cht_coef(c2) + Flow % cht_coef_nb(c2))
+        A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
+        b(c1) = b(c1) + a12 * Flow % cht_t_nb(c2)
+
       ! Constant-temperature wall with the improved (exponential-fit)
       ! near-wall treatment: impose the flux already estimated in
       ! Update_Boundary_Values from the wall/c1/c0 temperature triplet,
       ! instead of closing the diffusion coefficient with a log-law
       ! based con_eff, which this method is meant to bypass
-      if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .and.  &
+      else if(Var_Mod_Bnd_Cond_Type(t, c2) .eq. WALL .and.  &
          Flow % exp_temp_wall) then
         b(c1) = b(c1) + Grid % s(s) * t % q(c2)
 

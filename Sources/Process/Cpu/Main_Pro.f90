@@ -297,10 +297,12 @@
 
     do while (Iter % Needs_More_Iterations(Flow, n_dom))
 
-      ! Exchange data between domains
-      call User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
-
       do d = 1, n_dom
+
+        ! Exchange data between domains.  It is done before each domain,
+        ! and not once per iteration, for the domain to get what the ones
+        ! before it have just computed; coupling converges faster that way
+        call User_Mod_Interface_Exchange(inter, Flow, Turb, Vof, Swarm, n_dom)
 
         call Control % Switch_To_Domain(d)
 
