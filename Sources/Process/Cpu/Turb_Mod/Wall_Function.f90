@@ -167,7 +167,8 @@
           !   At the walls with stable stratification, only the          !
           !   component of gravity tangential to the wall is used.       !
           !--------------------------------------------------------------!
-          if(Turb % model .eq. HYBRID_LES_RANS    .and.  &
+          if((Turb % model .eq. HYBRID_LES_RANS .or.   &
+              Turb % model .eq. K_EPS_ZETA_F)   .and.  &
              Flow % buoyancy .eq. THERMALLY_DRIVEN) then
             a_mol  = Flow % conductivity(c1)  &
                    / (Flow % density(c1) * Flow % capacity(c1))

@@ -63,6 +63,13 @@
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
           c2 = Grid % faces_c(2,s)
+
+          ! Convective condition carries what is inside out of the domain,
+          ! it makes no sense at faces through which fluid enters.  If used
+          ! there, it feeds the backflow and makes it grow in time, leave
+          ! velocities at such faces as they are
+          if(Flow % v_flux % n(s) .lt. 0.0) cycle
+
           call Grid % Face_Normal(s, nx, ny, nz)
 
           phi_n = u % x(c1) * nx + u % y(c1) * ny + u % z(c1) * nz
