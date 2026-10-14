@@ -152,9 +152,9 @@
     ! Initialize variables
     if(.not. read_backup(d)) then
       call Process % Initialize_Variables(Flow(d), Turb(d), Vof(d))
+      call User_Mod_Initialize_Variables(Flow(d), Turb(d),   &
+                                         Vof(d), Swarm(d), Sol(d))
     end if
-    call User_Mod_Initialize_Variables(Flow(d), Turb(d),   &
-                                       Vof(d), Swarm(d), Sol(d))
 
     if(Flow(d) % with_interface) then
       if (read_backup(d))  then
