@@ -97,6 +97,15 @@
   call Control % Choi_Correction(Flow % choi_correction, .false.)
   call Control % Gu_Correction  (Flow % gu_correction,   .false.)
 
+  ! Pressure gradients in balance with body forces (for stratified flows;
+  ! best combined with Gu's correction on non-orthogonal grids)
+  call Control % Balanced_Pressure_Gradient(Flow % balanced_p_grad,  &
+                                            .false., .false.)
+  if(Flow % balanced_p_grad .and. First_Proc()) then
+    print '(a)', ' # NOTE! Pressure gradients are balanced with body forces;'
+    print '(a)', ' #       least squares method is used for pressure'
+  end if
+
   ! Report volume balance (in a separate file)
   call Control % Report_Volume_Balance(Flow % rep_vol_balance, .false.)
 

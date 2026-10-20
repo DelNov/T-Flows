@@ -124,6 +124,7 @@
       procedure :: Gradient_Method_For_Vof
       procedure :: Gradient_Method_For_Wall_Distance
       procedure :: Gu_Correction
+      procedure :: Balanced_Pressure_Gradient
       procedure :: Max_Gauss_Gradients_Iterations
       procedure :: Max_Least_Squares_Gradients_Iterations
       procedure :: Max_Simple_Iterations
@@ -327,6 +328,7 @@
 #   include "Control_Mod/Numerics/Gradient_Method_For_Vof.f90"
 #   include "Control_Mod/Numerics/Gradient_Method_For_Wall_Distance.f90"
 #   include "Control_Mod/Numerics/Gu_Correction.f90"
+#   include "Control_Mod/Numerics/Balanced_Pressure_Gradient.f90"
 #   include "Control_Mod/Numerics/Max_Gauss_Gradients_Iterations.f90"
 #   include "Control_Mod/Numerics/Max_Least_Squares_Gradients_Iterations.f90"
 #   include "Control_Mod/Numerics/Max_Simple_Iterations.f90"
