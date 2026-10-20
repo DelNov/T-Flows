@@ -197,6 +197,9 @@
     ! For scale-resolving models
     real :: c_smag, c_wale, c_hyb, c_eps_sgs
 
+    ! Reduction of SGS viscosity in stable stratification (Eidson, 1985)
+    logical :: sgs_buoyancy_correction
+
     contains
       procedure :: Init_Turb
       procedure :: Main_Turb

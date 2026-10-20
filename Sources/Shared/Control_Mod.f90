@@ -171,6 +171,7 @@
       procedure :: Rough_Walls
       procedure :: Monin_Obukov
       procedure :: Smagorinsky_Constant
+      procedure :: Sgs_Buoyancy_Correction
       procedure :: Wale_Constant
       procedure :: Turbulence_Model
       procedure :: Turbulent_Prandtl_Number
@@ -388,6 +389,7 @@
 #   include "Control_Mod/Physics/Roughness_Coefficient.f90"
 #   include "Control_Mod/Physics/Rough_Walls.f90"
 #   include "Control_Mod/Physics/Smagorinsky_Constant.f90"
+#   include "Control_Mod/Physics/Sgs_Buoyancy_Correction.f90"
 #   include "Control_Mod/Physics/Wale_Constant.f90"
 #   include "Control_Mod/Physics/Turbulence_Model.f90"
 #   include "Control_Mod/Physics/Turbulent_Prandtl_Number.f90"

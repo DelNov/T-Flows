@@ -139,6 +139,7 @@
   ROUGH_WALLS                              |         no                    |   yes
   SATURATION_TEMPERATURE                   |       100.0                   |   depends on liquid and pressure
   SCALARS_DIFFUSIVITY                      |         1.0-6                 |   physical property, usually around 1.0e-9
+  SGS_BUOYANCY_CORRECTION                  |         yes                   |   no; Eidson's reduction of LES vis_t in stable stratification
   SMAGORINSKY_CONSTANT                     |         0.17                  |   from 0.06 to 0.23
   STARTING_TIME_STEP_FOR_SWARM_COMPUTATION |      1200                     |   any number > 0
   STARTING_TIME_STEP_FOR_SWARM_STATISTICS  |         huge_int              |   a large number, from 12000 at least

@@ -82,7 +82,8 @@
   !   Modification of turbulent viscosity due to    !
   !   buoyancy according to Eidson, T., JFM, 1985   !
   !-------------------------------------------------!
-  if(Flow % buoyancy .eq. THERMALLY_DRIVEN) then
+  if(Flow % buoyancy .eq. THERMALLY_DRIVEN .and.  &
+     Turb % sgs_buoyancy_correction) then
     do c = Cells_In_Domain_And_Buffers()
       nc2 = -Flow % beta * (  Flow % grav_x * t % x(c)   &
                             + Flow % grav_y * t % y(c)   &

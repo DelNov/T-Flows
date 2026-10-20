@@ -220,6 +220,8 @@
      Turb % model .eq. HYBRID_LES_PRANDTL) then
     call Control % Smagorinsky_Constant(Turb % c_smag, .true.)
   end if
+  call Control % Sgs_Buoyancy_Correction(Turb % sgs_buoyancy_correction,  &
+                                         .true.)
 
   if(Turb % model .eq. K_OMEGA_SST) then
     call Turb % Const_K_Omega_Sst()
