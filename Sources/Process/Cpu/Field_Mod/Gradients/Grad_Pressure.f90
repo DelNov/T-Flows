@@ -13,8 +13,10 @@
   type(Var_Type)    :: p     !! pressure or pressure correction
 !==============================================================================!
 
-  ! Branch into the method of choice for pressure
-  if(p % grad_method .eq. GAUSS_THEOREM) then
+  ! Branch into the method of choice for pressure.  (Pressure gradients
+  ! balanced with body forces are formulated for least squares only.)
+  if(p % grad_method .eq. GAUSS_THEOREM .and.  &
+     .not. (Flow % balanced_p_grad .and. p % name .eq. 'P')) then
     call Flow % Grad_Gauss_Pressure(p)
   else
     call Flow % Grad_Least_Pressure(p)

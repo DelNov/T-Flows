@@ -197,6 +197,9 @@
     logical :: inside_piso_loop
     logical :: choi_correction
     logical :: gu_correction
+
+    ! Compute cell-centered pressure gradients in balance with body forces
+    logical :: balanced_p_grad
     logical :: rep_vol_balance
 
     ! Maximum CFL and Pe numbers
