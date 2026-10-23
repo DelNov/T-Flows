@@ -72,8 +72,8 @@
   end if
 
   ! LES models: turbulent Prandtl number for sub-grid scale heat flux, the
-  ! same one Prandtl_Turb returns for them (and wall functions use), rather
-  ! than pr_t from the control file
+  ! same one Prandtl_Turb returns for them, rather than pr_t from the
+  ! control file (which wall functions use for them)
   if(Turb % Les()) pr_tf = PR_T_LES
 
   !------------------------------------------------------!
