@@ -23,6 +23,9 @@
   real, contiguous,  pointer :: m_11_f(:), m_22_f(:), m_33_f(:)
   real, contiguous,  pointer :: m_12_f(:), m_13_f(:), m_23_f(:)
   real, contiguous,  pointer :: shear_test(:)
+  real, contiguous,  pointer :: u_f_x(:), u_f_y(:), u_f_z(:)
+  real, contiguous,  pointer :: v_f_x(:), v_f_y(:), v_f_z(:)
+  real, contiguous,  pointer :: w_f_x(:), w_f_y(:), w_f_z(:)
 !------------------------------------------------------------------------------!
 !                                                                              !
 !   C is derived from:    Lij_res = Lij_mod                                    !
@@ -51,6 +54,9 @@
                                 m_11_f, m_22_f, m_33_f,              &
                                 m_12_f, m_13_f, m_23_f,              &
                                 shear_test)
+  call Work % Connect_Real_Cell(u_f_x, u_f_y, u_f_z,  &
+                                v_f_x, v_f_y, v_f_z,  &
+                                w_f_x, w_f_y, w_f_z)
 
   ! Set all helping arrays to zero (important here)
   u_f   (:) = 0.0;  v_f   (:) = 0.0;  w_f   (:) = 0.0
@@ -170,26 +176,29 @@
     m_23_f(c) = m_23_a / vol_e
   end do
 
-  call Flow % Grad(Grid, u_f(-nb:nc), u % x,  &  ! dU/dx
-                                      u % y,  &  ! dU/dy
-                                      u % z)     ! dU/dz
-  call Flow % Grad(Grid, v_f(-nb:nc), v % x,  &  ! dV/dx
-                                      v % y,  &  ! dV/dy
-                                      v % z)     ! dV/dz
-  call Flow % Grad(Grid, w_f(-nb:nc), w % x,  &  ! dW/dx
-                                      w % y,  &  ! dW/dy
-                                      w % z)     ! dW/dz
+  ! Gradients of the test-filtered velocity go to work arrays, not to
+  ! u % x ... w % z, because these keep the gradients of the resolved
+  ! velocity which Compute_Momentum uses in the first outer iteration
+  call Flow % Grad(Grid, u_f(-nb:nc), u_f_x(-nb:nc),  &  ! dU/dx
+                                      u_f_y(-nb:nc),  &  ! dU/dy
+                                      u_f_z(-nb:nc))     ! dU/dz
+  call Flow % Grad(Grid, v_f(-nb:nc), v_f_x(-nb:nc),  &  ! dV/dx
+                                      v_f_y(-nb:nc),  &  ! dV/dy
+                                      v_f_z(-nb:nc))     ! dV/dz
+  call Flow % Grad(Grid, w_f(-nb:nc), w_f_x(-nb:nc),  &  ! dW/dx
+                                      w_f_y(-nb:nc),  &  ! dW/dy
+                                      w_f_z(-nb:nc))     ! dW/dz
 
   do c = Cells_In_Domain_And_Buffers()
     l_g  = Grid % vol(c)**ONE_THIRD
     l_f  = 2.0 * l_g
 
-    shear_test(c) = sqrt(2.0*(  u % x(c)*u % x(c)                            &
-                              + v % y(c)*v % y(c)                            &
-                              + w % z(c)*w % z(c) +                          &
-                         0.5*(v % z(c) + w % y(c))*(v % z(c) + w % y(c)) +   &
-                         0.5*(u % z(c) + w % x(c))*(u % z(c) + w % x(c)) +   &
-                         0.5*(v % x(c) + u % y(c))*(v % x(c) + u % y(c))))
+    shear_test(c) = sqrt(2.0*(  u_f_x(c)*u_f_x(c)                            &
+                              + v_f_y(c)*v_f_y(c)                            &
+                              + w_f_z(c)*w_f_z(c) +                          &
+                         0.5*(v_f_z(c) + w_f_y(c))*(v_f_z(c) + w_f_y(c)) +   &
+                         0.5*(u_f_z(c) + w_f_x(c))*(u_f_z(c) + w_f_x(c)) +   &
+                         0.5*(v_f_x(c) + u_f_y(c))*(v_f_x(c) + u_f_y(c))))
 
     l_11 = uu_f(c) - u_f(c) * u_f(c)
     l_22 = vv_f(c) - v_f(c) * v_f(c)
@@ -198,13 +207,13 @@
     l_13 = uw_f(c) - u_f(c) * w_f(c)
     l_23 = vw_f(c) - v_f(c) * w_f(c)
 
-    m_11 = l_f**2 * shear_test(c) * u % x(c) - l_g**2 * m_11_f(c)
-    m_22 = l_f**2 * shear_test(c) * v % y(c) - l_g**2 * m_22_f(c)
-    m_33 = l_f**2 * shear_test(c) * w % z(c) - l_g**2 * m_33_f(c)
+    m_11 = l_f**2 * shear_test(c) * u_f_x(c) - l_g**2 * m_11_f(c)
+    m_22 = l_f**2 * shear_test(c) * v_f_y(c) - l_g**2 * m_22_f(c)
+    m_33 = l_f**2 * shear_test(c) * w_f_z(c) - l_g**2 * m_33_f(c)
 
-    m_12 = l_f**2 * shear_test(c) * .5*(u % y(c)+v % x(c)) - l_g**2 * m_12_f(c)
-    m_13 = l_f**2 * shear_test(c) * .5*(u % z(c)+w % x(c)) - l_g**2 * m_13_f(c)
-    m_23 = l_f**2 * shear_test(c) * .5*(v % z(c)+w % y(c)) - l_g**2 * m_23_f(c)
+    m_12 = l_f**2 * shear_test(c) * .5*(u_f_y(c)+v_f_x(c)) - l_g**2 * m_12_f(c)
+    m_13 = l_f**2 * shear_test(c) * .5*(u_f_z(c)+w_f_x(c)) - l_g**2 * m_13_f(c)
+    m_23 = l_f**2 * shear_test(c) * .5*(v_f_z(c)+w_f_y(c)) - l_g**2 * m_23_f(c)
 
     m_dot_m = m_11**2 + m_22**2 + m_33**2 + 2.0 * (m_12**2 + m_13**2 + m_23**2)
 
@@ -226,5 +235,8 @@
                                    m_11_f, m_22_f, m_33_f,              &
                                    m_12_f, m_13_f, m_23_f,              &
                                    shear_test)
+  call Work % Disconnect_Real_Cell(u_f_x, u_f_y, u_f_z,  &
+                                   v_f_x, v_f_y, v_f_z,  &
+                                   w_f_x, w_f_y, w_f_z)
 
   end subroutine
