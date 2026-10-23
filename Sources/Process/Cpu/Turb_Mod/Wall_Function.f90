@@ -13,8 +13,8 @@
   type(Var_Type),   pointer :: vis
   integer                   :: s, c1, c2, reg
   real                      :: u_tau, u_tan, nu
-  real                      :: beta, pr, ebf, u_plus, pr_t, sc, z_o, kin_vis
-  real                      :: sc_tf
+  real                      :: beta, pr, ebf, u_plus, sc, z_o, kin_vis
+  real                      :: pr_tf, sc_tf
   integer                   :: it
   real                      :: a_mol, g_beta, d_t, t_c, y_x, th_x, th_log
   real                      :: g_nor, g_tan, con_nat, xi, w_nat
@@ -112,9 +112,14 @@
         end if
 
         if(Flow % heat_transfer) then
-          pr_t = Turb % Prandtl_Turb(c1)
+          ! Turbulent Prandtl number.  For LES models Prandtl_Turb gives
+          ! the one for sub-grid scale fluxes, but the wall function
+          ! bridges the layer below the first cell centre, where the
+          ! log law holds, so pr_t from the control file is used for them
+          pr_tf = Turb % Prandtl_Turb(c1)
+          if(Turb % Les()) pr_tf = pr_t
           pr   = Flow % Prandtl_Numb(c1)          ! laminar Prandtl number
-          beta = Turb % Beta_Scalar(pr, pr_t)
+          beta = Turb % Beta_Scalar(pr, pr_tf)
           ! According to Toparlar et al. 2019 paper
           ! "CFD simulation of the near-neutral atmospheric boundary layer:
           ! New temperature inlet profile consistent with wall functions"
@@ -135,7 +140,7 @@
                                 * Flow % viscosity(c1)                      &
                                 * Flow % capacity(c1)                       &
                         / (  Turb % y_plus(c1) * pr * exp(-1.0 * ebf)       &
-                           + (u_plus + beta) * pr_t * exp(-1.0 / ebf) + TINY)
+                           + (u_plus + beta) * pr_tf * exp(-1.0 / ebf) + TINY)
           end if
 
           !--------------------------------------------------------------!
@@ -229,7 +234,7 @@
           end if
 
           if(Turb % monin_obukov) then
-            Turb % con_w(c1) = pr_t * Turb % con_w(c1)                  &
+            Turb % con_w(c1) = pr_tf * Turb % con_w(c1)                 &
                              * Turb % Monin_Obukov_Thermal(abs(u_tan),  &
                                Grid % wall_dist(c1), z_o, t % n(c1),    &
                                t % n(c2),                               &
@@ -240,10 +245,9 @@
         if(Flow % n_scalars > 0) then
           sc   = Flow % Schmidt_Numb(c1)          ! laminar Schmidt number
 
-          ! Turbulent Schmidt number; for LES models the one for
-          ! sub-grid scale fluxes, as Prandtl_Turb does for pr_t above
+          ! Turbulent Schmidt number from the control file, also for LES
+          ! models, for the same reason as pr_tf above
           sc_tf = sc_t
-          if(Turb % Les()) sc_tf = SC_T_LES
 
           beta = Turb % Beta_Scalar(sc, sc_tf)
           ! According to Toparlar et al. 2019 paper

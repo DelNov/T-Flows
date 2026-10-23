@@ -290,6 +290,7 @@
 
   ! Turbulent Prandtl and Schmidt numbers for LES models.  For sub-grid scale
   ! fluxes, these are used instead of pr_t and sc_t from the control file.
+  ! Wall functions keep pr_t and sc_t, which hold below the first cell.
   real, parameter :: PR_T_LES = 0.4
   real, parameter :: SC_T_LES = 0.7
 
