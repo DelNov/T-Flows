@@ -1,8 +1,9 @@
 !==============================================================================!
   subroutine Sgs_Buoyancy_Correction(Control, corr, verbose)
 !------------------------------------------------------------------------------!
-!>  Reads if the turbulent viscosity of LES models is reduced in stable
-!>  stratification, with sqrt(1 - Ri / Pr_t) after Eidson (JFM, 1985).
+!>  Reads if the turbulent viscosity of LES models (and of the LES part of
+!>  hybrid LES/RANS) is reduced in stable stratification, with
+!>  sqrt(1 - Ri / Pr_t) after Eidson (JFM, 1985).
 !------------------------------------------------------------------------------!
   implicit none
 !---------------------------------[Arguments]----------------------------------!
