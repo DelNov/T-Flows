@@ -288,6 +288,11 @@
   ! Turbulent Prandtl and Schmidt numbers
   real :: pr_t, sc_t
 
+  ! If true, turbulent Schmidt number of the scalars is taken equal to the
+  ! turbulent Prandtl number used in the energy equation, cell by cell
+  ! (control file: TURBULENT_SCHMIDT_FROM_PRANDTL yes)
+  logical :: sc_t_from_pr_t = .false.
+
   ! Turbulent Prandtl and Schmidt numbers for LES models.  For sub-grid scale
   ! fluxes, these are used instead of pr_t and sc_t from the control file.
   ! Wall functions keep pr_t and sc_t, which hold below the first cell.
