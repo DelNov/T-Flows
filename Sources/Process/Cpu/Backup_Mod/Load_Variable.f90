@@ -80,5 +80,6 @@
   var % n(:) = 0.0
   var % q(:) = 0.0
   var % o(:) = 0.0
+  if(allocated(var % oo)) var % oo(:) = 0.0
 
   end subroutine

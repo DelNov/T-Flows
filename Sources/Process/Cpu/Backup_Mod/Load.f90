@@ -19,6 +19,7 @@
   character(SL)            :: name_in, answer, name_mean
   integer                  :: vc, sc, ts
   integer(DP)              :: d
+  logical                  :: flux_saved   ! turbulent heat fluxes
   real                     :: st  ! saved time, simulation time
 !==============================================================================!
 
@@ -124,8 +125,9 @@
   call Flow % Grad_Pressure(Flow % pp)
 
   !-------------------!
-  !   Volume fluxes   ! -> don't use for the time being, too much trouble
+  !   Volume fluxes   ! (n, o and oo; needed for an exact restart)
   !-------------------!
+  call Backup % Load_Face_Fluxes(Flow, d, vc)
 
   !-------------------------!
   !   Does it have outlet   !
@@ -150,73 +152,6 @@
   !--------------!
   if(Flow % heat_transfer) then
     call Backup % Load_Variable(d, vc, 'temp', Flow, Flow % t)
-  end if
-
-  !--------------!
-  !              !
-  !  Multiphase  !
-  !              !
-  !--------------!
-  if(Flow % with_interface) then
-    call Backup % Load_Variable(d, vc, 'vof_fun', Flow, Vof % fun)
-  end if
-
-  !-----------------------!
-  !                       !
-  !   Turbulence models   !
-  !                       !
-  !-----------------------!
-
-  !-----------------!
-  !   K-eps model   !
-  !-----------------!
-  if(Turb % model .eq. K_EPS) then
-
-    ! K and epsilon
-    call Backup % Load_Variable(d, vc, 'kin', Flow, Turb % kin)
-    call Backup % Load_Variable(d, vc, 'eps', Flow, Turb % eps)
-
-    ! Other turbulent quantities
-    call Backup % Load_Cell_Real(Grid, d, vc, 'p_kin',  Turb % p_kin )
-    call Backup % Load_Cell_Real(Grid, d, vc, 'y_plus', Turb % y_plus)
-    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t',  Turb % vis_t )
-    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_w',  Turb % vis_w )
-
-    ! Turbulence quantities connected with heat transfer
-    if(Flow % heat_transfer) then
-      call Backup % Load_Variable(d, vc, 't2', Flow, Turb % t2)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
-      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
-    end if
-  end if
-
-  !------------------------!
-  !   K-eps-zeta-f model   !
-  !------------------------!
-  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
-     Turb % model .eq. HYBRID_LES_RANS) then
-
-    ! K, eps, zeta and f22
-    call Backup % Load_Variable(d, vc, 'kin',  Flow, Turb % kin)
-    call Backup % Load_Variable(d, vc, 'eps',  Flow, Turb % eps)
-    call Backup % Load_Variable(d, vc, 'zeta', Flow, Turb % zeta)
-    call Backup % Load_Variable(d, vc, 'f22',  Flow, Turb % f22)
-
-    ! Other turbulent quantities
-    call Backup % Load_Cell_Real(Grid, d, vc,'p_kin',   Turb % p_kin  )
-    call Backup % Load_Cell_Real(Grid, d, vc,'y_plus',  Turb % y_plus )
-    call Backup % Load_Cell_Real(Grid, d, vc,'vis_t',   Turb % vis_t  )
-    call Backup % Load_Cell_Real(Grid, d, vc,'vis_w',   Turb % vis_w  )
-    call Backup % Load_Cell_Real(Grid, d, vc,'t_scale', Turb % t_scale)
-    call Backup % Load_Cell_Real(Grid, d, vc,'l_scale', Turb % l_scale)
-
-    ! Turbulence quantities connected with heat transfer
-
-    if(Flow % heat_transfer) then
-      call Backup % Load_Variable(d, vc, 't2', Flow, Turb % t2)
-      call Backup % Load_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
-      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
-    end if
 
   end if
 

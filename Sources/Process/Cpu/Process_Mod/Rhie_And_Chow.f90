@@ -56,6 +56,7 @@
   real                       :: a12, px_f, py_f, pz_f, fs, sigma
   real                       :: w_o, w_oo, curv_f
   integer                    :: s, c1, c2, c
+  integer                    :: n_first         ! first time step with fluxes
   real, contiguous,  pointer :: u_c(:), v_c(:), w_c(:), v_m(:), t_m(:)
   real, contiguous,  pointer :: pst_x(:), pst_y(:), pst_z(:), pst_d(:)
   real, contiguous,  pointer :: u_f(:), v_f(:), w_f(:)
@@ -78,6 +79,11 @@
   v_m    => Nat % M % v_m
   sigma  =  Vof % surface_tension
   call Flow % Alias_Momentum(u, v, w)
+
+  ! First time step of this run.  With face fluxes read from the backup,
+  ! their old values (o and oo) exist already, as in the uninterrupted run
+  n_first = Time % First_Dt()
+  if(Flow % v_flux_restored) n_first = 0
 
   !------------------------------------------------------------------!
   !   Store pressure gradients in cells and differences over faces   !
@@ -139,7 +145,7 @@
   if(Flow % choi_correction) then
 
     ! To make sure that you have both o and oo values
-    if(Time % Curr_Dt() - Time % First_Dt() > 3) then
+    if(Time % Curr_Dt() - n_first > 3) then
 
       ! Weights of o and oo time step depending on the scheme used
       if(u % td_scheme == LINEAR) then
@@ -235,7 +241,7 @@
       if(Flow % choi_correction) then
 
         ! To make sure that you have both o and oo values
-        if(Time % Curr_Dt() - Time % First_Dt() > 3) then
+        if(Time % Curr_Dt() - n_first > 3) then
 
           v_flux % n(s) = v_flux % n(s)                        &
                         + (fs * t_m(c1) + (1.0-fs) * t_m(c2))  &

@@ -19,6 +19,7 @@
   character(SL)            :: name_out, name_mean
   integer                  :: vc, sc
   integer(DP)              :: d
+  logical                  :: flux_saved   ! turbulent heat fluxes
 !==============================================================================!
 
   call Profiler % Start('Backup_Mod_Save')
@@ -99,8 +100,9 @@
   call Backup % Save_Cell_Real(Grid, d, vc, 'press_corr', Flow % pp % n)
 
   !-------------------!
-  !   Volume fluxes   ! -> don't use for the time being, too much trouble
+  !   Volume fluxes   ! (n, o and oo; needed for an exact restart)
   !-------------------!
+  call Backup % Save_Face_Fluxes(Flow, d, vc)
 
   !-------------------------!
   !   Does it have outlet   !
@@ -125,44 +127,6 @@
   !--------------!
   if(Flow % heat_transfer) then
     call Backup % Save_Variable(d, vc, 'temp', Flow % t)
-  end if
-
-  !--------------!
-  !              !
-  !  Multiphase  !
-  !              !
-  !--------------!
-  if(Flow % with_interface) then
-    call Backup % Save_Variable(d, vc, 'vof_fun', Vof % fun)
-  end if
-
-  !-----------------------!
-  !                       !
-  !   Turbulence models   !
-  !                       !
-  !-----------------------!
-
-  !-----------------!
-  !   K-eps model   !
-  !-----------------!
-  if(Turb % model .eq. K_EPS) then
-
-    ! K and epsilon
-    call Backup % Save_Variable(d, vc, 'kin', Turb % kin)
-    call Backup % Save_Variable(d, vc, 'eps', Turb % eps)
-
-    ! Other turbulent quantities
-    call Backup % Save_Cell_Real(Grid, d, vc, 'p_kin',  Turb % p_kin )
-    call Backup % Save_Cell_Real(Grid, d, vc, 'y_plus', Turb % y_plus)
-    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_t',  Turb % vis_t )
-    call Backup % Save_Cell_Real(Grid, d, vc, 'vis_w',  Turb % vis_w )
-
-    ! Turbulence quantities connected with heat transfer
-    if(Flow % heat_transfer) then
-      call Backup % Save_Variable(d, vc, 't2',    Turb % t2)
-      call Backup % Save_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
-      call Backup % Save_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
-    end if
 
   end if
 
@@ -190,6 +154,18 @@
       call Backup % Save_Variable(d, vc, 't2',    Turb % t2)
       call Backup % Save_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
       call Backup % Save_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+
+      ! Turbulent heat fluxes (and effective viscosity in them) are
+      ! computed at the end of a time step and used in the buoyancy
+      ! production of the next one; needed for an exact restart
+      flux_saved = .true.
+      call Backup % Save_Log(Comm, d, vc, 'heat_flux_saved', flux_saved)
+      call Backup % Save_Cell_Real(Grid, d, vc, 'ut',  Turb % ut % n)
+      call Backup % Save_Cell_Real(Grid, d, vc, 'vt',  Turb % vt % n)
+      call Backup % Save_Cell_Real(Grid, d, vc, 'wt',  Turb % wt % n)
+      if(allocated(Turb % vis_t_eff))  &
+        call Backup % Save_Cell_Real(Grid, d, vc, 'vis_t_eff',  &
+                                     Turb % vis_t_eff)
     end if
 
   end if
