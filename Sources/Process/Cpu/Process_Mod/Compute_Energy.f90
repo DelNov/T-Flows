@@ -316,16 +316,18 @@
   !   Explicitly treated diffusion heat fluxes   !
   !   cross diffusion, and heat from interface   !
   !----------------------------------------------!
+  ! The whole explicit flux goes to the right hand side.  (Negative values
+  ! used to go to the diagonal as -q_exp / t, which keeps t positive but
+  ! is not conservative: when q_exp is large compared to the other terms,
+  ! the sink is only partly realised while the source on the other side
+  ! of the face is complete, and heat is created.  Temperature need not be
+  ! positive, so the conservative form is used)
   do c = Cells_In_Domain_And_Buffers()
 
     ! Total explicit heat flux
     q_exp = cross(c) + q_turb(c) + q_int(c)
 
-    if(q_exp >= 0) then
-      b(c)  = b(c) + q_exp
-    else
-      A % val(A % dia(c)) = A % val(A % dia(c)) - q_exp / (t % n(c) + MICRO)
-    end if
+    b(c) = b(c) + q_exp
   end do
 
   !--------------------!
