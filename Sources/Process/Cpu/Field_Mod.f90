@@ -162,6 +162,10 @@
 
     ! Scalars (like chemical species for example)
     integer                     :: n_scalars  !! number of (passive) scalars
+    !> If false, residuals of passive scalars are not considered in the
+    !> convergence of SIMPLE iterations, so that they don't affect the flow
+    !> (control file: SCALARS_IN_SIMPLE_RESIDUAL no)
+    logical                     :: scalars_in_residual = .true.
     type(Var_Type), allocatable :: scalar(:)  !! storage for scalars
 
     ! Bulk velocities, pressure drops, etc.

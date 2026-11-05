@@ -78,6 +78,42 @@
         + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) / sc_tf
   end if
 
+  ! Turbulent Schmidt number taken equal to the turbulent Prandtl number
+  ! of the energy equation (see Face_Cond_And_Stress): Kays and Crawford
+  ! for RANS models and in the RANS zone of hybrid LES/RANS, the LES value
+  ! for LES models and in the LES zone of hybrid LES/RANS
+  if(sc_t_from_pr_t .and. Turb % model .ne. NO_TURBULENCE_MODEL  &
+                    .and. Turb % model .ne. DNS) then
+    if(Turb % Les()) then
+      sc_t1 = PR_T_LES
+      sc_t2 = PR_T_LES
+    else
+      sc_t1 = Turb % Prandtl_Turb(c1)
+      sc_t2 = Turb % Prandtl_Turb(c2)
+      if(Turb % model .eq. HYBRID_LES_RANS) then
+        alpha_d = Turb % kappa * Grid % wall_dist(c1)  &
+                / Grid % vol(c1)**ONE_THIRD
+        if(alpha_d > Turb % c_hyb) sc_t1 = PR_T_LES
+        if(c2 > 0) then
+          alpha_d = Turb % kappa * Grid % wall_dist(c2)  &
+                  / Grid % vol(c2)**ONE_THIRD
+          if(alpha_d > Turb % c_hyb) sc_t2 = PR_T_LES
+        else
+          sc_t2 = sc_t1                   ! boundary face takes it from inside
+        end if
+      end if
+    end if
+    sc_tf = Grid % fw(s) * sc_t1 + (1.0-Grid % fw(s)) * sc_t2
+
+    if(Turb % model .eq. HYBRID_LES_RANS) then
+      dif_turb = Grid % fw(s)  * Turb % vis_t_eff(c1) / sc_tf  &
+          + (1.0-Grid % fw(s)) * Turb % vis_t_eff(c2) / sc_tf
+    else
+      dif_turb = Grid % fw(s)  * Turb % vis_t(c1) / sc_tf  &
+          + (1.0-Grid % fw(s)) * Turb % vis_t(c2) / sc_tf
+    end if
+  end if
+
   !-----------------------------------!
   !   Update effective diffusivity    !
   !-----------------------------------!

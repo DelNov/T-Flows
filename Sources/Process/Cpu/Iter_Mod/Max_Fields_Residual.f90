@@ -27,9 +27,11 @@
     if(Flow(d) % heat_transfer) then
       mr = max(mr, Flow(d) % t % res)
     end if
-    do sc = 1, Flow(d) % n_scalars
-      mr = max(mr, Flow(d) % scalar(sc) % res)
-    end do
+    if(Flow(d) % scalars_in_residual) then
+      do sc = 1, Flow(d) % n_scalars
+        mr = max(mr, Flow(d) % scalar(sc) % res)
+      end do
+    end if
   end do
 
   Max_Fields_Residual = mr

@@ -109,6 +109,18 @@
   call Control % Volume_Expansion_Coefficient(Flow % beta,     .true.)
   call Control % Turbulent_Prandtl_Number    (pr_t)  ! default is (0.9)
   call Control % Turbulent_Schmidt_Number    (sc_t)  ! default is (0.9)
+
+  ! Turbulent Schmidt number equal to turbulent Prandtl number of energy
+  call Control % Read_Char_Item('TURBULENT_SCHMIDT_FROM_PRANDTL', 'no',  &
+                                name, .false.)
+  call String % To_Upper_Case(name)
+  sc_t_from_pr_t = (name .eq. 'YES')
+
+  ! Don't let residuals of passive scalars steer the SIMPLE iterations
+  call Control % Read_Char_Item('SCALARS_IN_SIMPLE_RESIDUAL', 'yes',  &
+                                name, .false.)
+  call String % To_Upper_Case(name)
+  Flow % scalars_in_residual = (name .ne. 'NO')
   call Control % Extrapolate_Temperature_Exp (Flow % exp_temp_wall, .true.)
 
   !---------------------------!
