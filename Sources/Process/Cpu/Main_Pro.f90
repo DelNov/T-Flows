@@ -233,8 +233,13 @@
   ! This calls ONLY User_Mod_Profiles; it does not write VTU or backup.
   ! Change this value if another physical-time interval is desired.
   !---------------------------------------------------------------------!
+  ! The next time is a multiple of the interval, so that a restart writes
+  ! the profiles at the same time steps as the uninterrupted run (the
+  ! restart time, a sum of time steps, is not exactly a whole second)
   profile_save_interval  = 1.0
-  next_profile_save_time = Time % Get_Time() + profile_save_interval
+  next_profile_save_time = profile_save_interval                     &
+                         * (floor(Time % Get_Time() / profile_save_interval  &
+                                  + 1.0e-6) + 1)
 
   !-------------------------------------!
   !                                     !

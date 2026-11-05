@@ -84,6 +84,7 @@
 
     ! Volume flow rate through cell faces
     type(Face_Type) :: v_flux  !! volume flow rate [m^3/s]
+    logical :: v_flux_restored = .false.  !! v_flux (n, o, oo) read from backup
 
     ! Pressure and pressure correction
     type(Var_Type) :: p    !! pressure            [N/m^2] = [kg/m/s^2]

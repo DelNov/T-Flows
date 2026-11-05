@@ -19,6 +19,8 @@
   character(SL)            :: name_in, answer, name_mean
   integer                  :: vc, sc, ts
   integer(DP)              :: d
+  logical                  :: t_ref_saved  ! reference temperature profile
+  logical                  :: flux_saved   ! turbulent heat fluxes
   real                     :: st  ! saved time, simulation time
 !==============================================================================!
 
@@ -129,8 +131,9 @@
   call Flow % Grad_Pressure(Flow % pp)
 
   !-------------------!
-  !   Volume fluxes   ! -> don't use for the time being, too much trouble
+  !   Volume fluxes   ! (n, o and oo; needed for an exact restart)
   !-------------------!
+  call Backup % Load_Face_Fluxes(Flow, d, vc)
 
   !-------------------------!
   !   Does it have outlet   !
@@ -155,6 +158,21 @@
   !--------------!
   if(Flow % heat_transfer) then
     call Backup % Load_Variable(d, vc, 'temp', Flow, Flow % t)
+
+    ! Reference temperature profile; without it, Buoyancy_Forces would
+    ! capture it from the restart field instead of the initial one
+    if(Flow % t_ref_profile_on) then
+      call Backup % Load_Log(Comm, d, vc, 't_ref_prof_saved', t_ref_saved)
+      if(t_ref_saved) then
+        if(.not. allocated(Flow % t_ref_prof))  &
+          allocate(Flow % t_ref_prof(-Grid % n_bnd_cells:Grid % n_cells))
+        call Backup % Load_Cell_Real(Grid, d, vc, 't_ref_prof',  &
+                                     Flow % t_ref_prof)
+      else if(First_Proc()) then
+        print *, '# WARNING! Reference temperature profile not in the ',  &
+                 'backup; it will be taken from the restart field!'
+      end if
+    end if
   end if
 
   !--------------!
@@ -221,6 +239,19 @@
       call Backup % Load_Variable(d, vc, 't2', Flow, Turb % t2)
       call Backup % Load_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
       call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+
+      ! Turbulent heat fluxes (and effective viscosity in them), used in
+      ! the buoyancy production of the first time step (older backups
+      ! do not have them, leave them as they are then)
+      call Backup % Load_Log(Comm, d, vc, 'heat_flux_saved', flux_saved)
+      if(flux_saved) then
+        call Backup % Load_Cell_Real(Grid, d, vc, 'ut',  Turb % ut % n)
+        call Backup % Load_Cell_Real(Grid, d, vc, 'vt',  Turb % vt % n)
+        call Backup % Load_Cell_Real(Grid, d, vc, 'wt',  Turb % wt % n)
+        if(allocated(Turb % vis_t_eff))  &
+          call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t_eff',  &
+                                       Turb % vis_t_eff)
+      end if
     end if
 
   end if
