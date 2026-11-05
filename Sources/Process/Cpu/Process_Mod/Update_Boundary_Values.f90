@@ -394,12 +394,20 @@
            Turb % model .eq. DES_SPALART      .or.  &
            Turb % model .eq. K_OMEGA_SST      .or.  &
            Turb % model .eq. K_EPS) then
+          ! In the first BEGIN time steps the wall temperature from the
+          ! wall function can be wild (and through buoyancy in the first
+          ! cell spoil the start), hence the larger of the wall-function
+          ! and the molecular conductivity is used there, which gives the
+          ! smaller, tamer wall temperature: molecular on fine meshes,
+          ! where the two are close, and the wall function on coarse
+          ! (atmospheric) meshes, where molecular conductivity in a cell of
+          ! metres gives wall temperatures 1.0e4 K above the cell
           if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALLFL) then
             t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
                       / (Turb % con_w(c1) + TINY)
             if(Time % Curr_Dt() < BEGIN) then
               t % n(c2) = t % n(c1) + t % q(c2) * Grid % wall_dist(c1)  &
-                        / (Flow % conductivity(c1))
+                        / max(Turb % con_w(c1), Flow % conductivity(c1))
             end if
           else if(Var_Mod_Bnd_Cond_Type(t,c2) .eq. WALL) then
             t % q(c2) = ( t % n(c2) - t % n(c1) ) * Turb % con_w(c1)  &
