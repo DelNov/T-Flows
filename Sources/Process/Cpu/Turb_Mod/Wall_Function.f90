@@ -171,9 +171,18 @@
           !                                                              !
           !   At the walls with stable stratification, only the          !
           !   component of gravity tangential to the wall is used.       !
+          !                                                              !
+          !   It is used with LES models as well: there u_tau comes      !
+          !   from the velocity alone, so in a fluid at rest y+ is zero  !
+          !   and the standard law gives molecular conductivity, which   !
+          !   in cells of metres (atmospheric cases) puts the wall       !
+          !   temperature 1.0e4 K above the first cell                   !
           !--------------------------------------------------------------!
           if((Turb % model .eq. HYBRID_LES_RANS .or.   &
-              Turb % model .eq. K_EPS_ZETA_F)   .and.  &
+              Turb % model .eq. K_EPS_ZETA_F    .or.   &
+              Turb % model .eq. LES_DYNAMIC     .or.   &
+              Turb % model .eq. LES_SMAGORINSKY .or.   &
+              Turb % model .eq. LES_WALE)       .and.  &
              Flow % buoyancy .eq. THERMALLY_DRIVEN) then
             a_mol  = Flow % conductivity(c1)  &
                    / (Flow % density(c1) * Flow % capacity(c1))
