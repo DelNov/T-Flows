@@ -73,6 +73,8 @@
   integer, allocatable :: nodes_n(:,:)
   integer              :: m, j_nod, k_nod
   real, allocatable    :: z_new(:)
+  character(len=16)    :: env_val                 ! CITY_Z_SMOOTH_ITERS
+  integer              :: n_smooth, env_stat
 !------------------------[Avoid unused parent warning]-------------------------!
   Unused(Convert)
 !==============================================================================!
@@ -819,7 +821,13 @@
   !-------------------------------------!
   !   Smooth in the z direction a bit   !
   !-------------------------------------!
-  do iter = 1, ITERS
+  ! Number of iterations can be set with the environment variable
+  ! CITY_Z_SMOOTH_ITERS (0 keeps the z coordinates of the original grid)
+  n_smooth = ITERS
+  call get_environment_variable('CITY_Z_SMOOTH_ITERS', env_val, status=env_stat)
+  if(env_stat .eq. 0) read(env_val, *) n_smooth
+  print '(a,i4)', ' # Iterations of smoothing in z direction: ', n_smooth
+  do iter = 1, n_smooth
 
     ! Compute averaged z coordinate for each node
     do n = 1, Grid % n_nodes
