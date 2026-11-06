@@ -152,6 +152,86 @@
   !--------------!
   if(Flow % heat_transfer) then
     call Backup % Load_Variable(d, vc, 'temp', Flow, Flow % t)
+  end if
+
+  !--------------!
+  !              !
+  !  Multiphase  !
+  !              !
+  !--------------!
+  if(Flow % with_interface) then
+    call Backup % Load_Variable(d, vc, 'vof_fun', Flow, Vof % fun)
+  end if
+
+  !-----------------------!
+  !                       !
+  !   Turbulence models   !
+  !                       !
+  !-----------------------!
+
+  !-----------------!
+  !   K-eps model   !
+  !-----------------!
+  if(Turb % model .eq. K_EPS) then
+
+    ! K and epsilon
+    call Backup % Load_Variable(d, vc, 'kin', Flow, Turb % kin)
+    call Backup % Load_Variable(d, vc, 'eps', Flow, Turb % eps)
+
+    ! Other turbulent quantities
+    call Backup % Load_Cell_Real(Grid, d, vc, 'p_kin',  Turb % p_kin )
+    call Backup % Load_Cell_Real(Grid, d, vc, 'y_plus', Turb % y_plus)
+    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t',  Turb % vis_t )
+    call Backup % Load_Cell_Real(Grid, d, vc, 'vis_w',  Turb % vis_w )
+
+    ! Turbulence quantities connected with heat transfer
+    if(Flow % heat_transfer) then
+      call Backup % Load_Variable(d, vc, 't2', Flow, Turb % t2)
+      call Backup % Load_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
+      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+    end if
+  end if
+
+  !------------------------!
+  !   K-eps-zeta-f model   !
+  !------------------------!
+  if(Turb % model .eq. K_EPS_ZETA_F .or.  &
+     Turb % model .eq. HYBRID_LES_RANS) then
+
+    ! K, eps, zeta and f22
+    call Backup % Load_Variable(d, vc, 'kin',  Flow, Turb % kin)
+    call Backup % Load_Variable(d, vc, 'eps',  Flow, Turb % eps)
+    call Backup % Load_Variable(d, vc, 'zeta', Flow, Turb % zeta)
+    call Backup % Load_Variable(d, vc, 'f22',  Flow, Turb % f22)
+
+    ! Other turbulent quantities
+    call Backup % Load_Cell_Real(Grid, d, vc,'p_kin',   Turb % p_kin  )
+    call Backup % Load_Cell_Real(Grid, d, vc,'y_plus',  Turb % y_plus )
+    call Backup % Load_Cell_Real(Grid, d, vc,'vis_t',   Turb % vis_t  )
+    call Backup % Load_Cell_Real(Grid, d, vc,'vis_w',   Turb % vis_w  )
+    call Backup % Load_Cell_Real(Grid, d, vc,'t_scale', Turb % t_scale)
+    call Backup % Load_Cell_Real(Grid, d, vc,'l_scale', Turb % l_scale)
+
+    ! Turbulence quantities connected with heat transfer
+
+    if(Flow % heat_transfer) then
+      call Backup % Load_Variable(d, vc, 't2', Flow, Turb % t2)
+      call Backup % Load_Cell_Real(Grid, d, vc, 'p_t2',  Turb % p_t2 )
+      call Backup % Load_Cell_Real(Grid, d, vc, 'con_w', Turb % con_w)
+
+      ! Turbulent heat fluxes (and effective viscosity in them), used in
+      ! the buoyancy production of the first time step (older backups
+      ! do not have them, leave them as they are then)
+      call Backup % Load_Log(Comm, d, vc, 'heat_flux_saved', flux_saved)
+      if(flux_saved) then
+        call Backup % Load_Cell_Real(Grid, d, vc, 'ut',  Turb % ut % n)
+        call Backup % Load_Cell_Real(Grid, d, vc, 'vt',  Turb % vt % n)
+        call Backup % Load_Cell_Real(Grid, d, vc, 'wt',  Turb % wt % n)
+        if(allocated(Turb % vis_t_eff))  &
+          call Backup % Load_Cell_Real(Grid, d, vc, 'vis_t_eff',  &
+                                       Turb % vis_t_eff)
+      end if
+    end if
 
   end if
 
