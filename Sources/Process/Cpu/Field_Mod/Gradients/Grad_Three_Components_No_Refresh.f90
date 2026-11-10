@@ -53,6 +53,7 @@
         c2 = faces_c(2,s)
 
         dphi1 = phi(c2)-phi(c1)
+        if(Flow % least_weighted) dphi1 = dphi1 / Grid % d(s)**2
 
         phi_x(c1) = phi_x(c1)                                  &
                   + dphi1 * (  grad_c2c(MAP(1,1),c1) * dx(s)   &
@@ -80,7 +81,9 @@
     c2 = faces_c(2,s)
 
     dphi1 = phi(c2)-phi(c1)
+    if(Flow % least_weighted) dphi1 = dphi1 / Grid % d(s)**2
     dphi2 = phi(c2)-phi(c1)
+    if(Flow % least_weighted) dphi2 = dphi2 / Grid % d(s)**2
 
     phi_x(c1) = phi_x(c1)                                  &
               + dphi1 * (  grad_c2c(MAP(1,1),c1) * dx(s)   &
