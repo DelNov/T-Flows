@@ -77,6 +77,11 @@
       dx_c1 = Grid % dx(s)
       dy_c1 = Grid % dy(s)
       dz_c1 = Grid % dz(s)
+      if(Flow % least_weighted) then  ! weight 1/|d|^2
+        dx_c1 = dx_c1 / Grid % d(s)
+        dy_c1 = dy_c1 / Grid % d(s)
+        dz_c1 = dz_c1 / Grid % d(s)
+      end if
 
       Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1  ! 1,1
       Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1  ! 2,2
@@ -98,6 +103,14 @@
     dx_c2 = Grid % dx(s)
     dy_c2 = Grid % dy(s)
     dz_c2 = Grid % dz(s)
+    if(Flow % least_weighted) then  ! weight 1/|d|^2
+      dx_c1 = dx_c1 / Grid % d(s)
+      dy_c1 = dy_c1 / Grid % d(s)
+      dz_c1 = dz_c1 / Grid % d(s)
+      dx_c2 = dx_c2 / Grid % d(s)
+      dy_c2 = dy_c2 / Grid % d(s)
+      dz_c2 = dz_c2 / Grid % d(s)
+    end if
 
     Flow % grad_c2c(1,c1)=Flow % grad_c2c(1,c1) + dx_c1*dx_c1  ! 1,1
     Flow % grad_c2c(2,c1)=Flow % grad_c2c(2,c1) + dy_c1*dy_c1  ! 2,2

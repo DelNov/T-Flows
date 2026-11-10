@@ -224,6 +224,7 @@
     real    :: gauss_tol
     integer :: gauss_miter
     integer :: least_miter
+    logical :: least_weighted  !! least squares weights 1/|d|^2
     real    :: gauss_iters
     integer :: gauss_calls
 

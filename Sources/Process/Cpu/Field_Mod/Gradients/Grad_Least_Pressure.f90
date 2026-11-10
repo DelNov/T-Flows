@@ -224,7 +224,8 @@
         do s = Faces_In_Region(reg)
           c1 = Grid % faces_c(1,s)
           phii(c1) = phii(c1)                                  &
-                   + p_res(s) * (  g(MAP(i,1),c1) * Grid % dx(s)  &
+                   + p_res(s) * w(s)                           &
+                              * (  g(MAP(i,1),c1) * Grid % dx(s)  &
                                  + g(MAP(i,2),c1) * Grid % dy(s)  &
                                  + g(MAP(i,3),c1) * Grid % dz(s))
         end do
@@ -236,17 +237,34 @@
       c2 = Grid % faces_c(2,s)
 
       phii(c1) = phii(c1)                                  &
-               + p_res(s) * (  g(MAP(i,1),c1) * Grid % dx(s)  &
+               + p_res(s) * w(s)                           &
+                          * (  g(MAP(i,1),c1) * Grid % dx(s)  &
                              + g(MAP(i,2),c1) * Grid % dy(s)  &
                              + g(MAP(i,3),c1) * Grid % dz(s))
 
       phii(c2) = phii(c2)                                  &
-               + p_res(s) * (  g(MAP(i,1),c2) * Grid % dx(s)  &
+               + p_res(s) * w(s)                           &
+                          * (  g(MAP(i,1),c2) * Grid % dx(s)  &
                              + g(MAP(i,2),c2) * Grid % dy(s)  &
                              + g(MAP(i,3),c2) * Grid % dz(s))
     end do
 
     end subroutine
+
+  !============================================================================!
+    real function W(s)
+  !----------------------------------------------------------------------------!
+  !   Least squares weight of face s, as in Grad_Component_No_Refresh          !
+  !----------------------------------------------------------------------------!
+    implicit none
+  !--------------------------------[Arguments]---------------------------------!
+    integer, intent(in) :: s
+  !============================================================================!
+
+    W = 1.0
+    if(Flow % least_weighted) W = 1.0 / Grid % d(s)**2
+
+    end function
 
   !============================================================================!
     real function Balanced_Extrapolation(s, c1)
@@ -295,6 +313,9 @@
           dp = dp_b(s)
 
           p % n(c2) = p % n(c2) + dp
+
+          ! Least squares weight (in the gradient only)
+          dp = dp * w(s)
 
           if(Grid % region % type(reg) .ne. SYMMETRY) then
             p % x(c1) = p % x(c1) + dp * (  g(MAP(1,1),c1) * Grid % dx(s)  &

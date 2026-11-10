@@ -116,8 +116,30 @@
   ! Tolerance and max iterations for computation of gradients with Gauss method
   call Control % Tolerance_For_Gauss_Gradients (Flow % gauss_tol,   .false.)
   call Control % Max_Gauss_Gradients_Iterations(Flow % gauss_miter, .false.)
-  call Control % Max_Least_Squares_Gradients_Iterations(Flow % least_miter,  &
-                                                          .false.)
+  ! Weights of the least squares gradients: none (all neighbours with
+  ! weight 1) or inverse_distance_squared (weight 1/|d|^2, for strongly
+  ! stretched cells).  With the weights, the values extrapolated to walls
+  ! count more and converge slower, hence 12 iterations by default
+  call Control % Read_Char_Item('LEAST_SQUARES_GRADIENTS_WEIGHTING', 'none',  &
+                                name, .false.)
+  call String % To_Upper_Case(name)
+  select case(name)
+    case('NONE')
+      Flow % least_weighted = .false.
+    case('INVERSE_DISTANCE_SQUARED')
+      Flow % least_weighted = .true.
+    case default
+      call Message % Error(60,                                              &
+                 'Unknown least squares gradients weighting: '//trim(name)//  &
+                 '.  \n Exiting!')
+  end select
+  if(Flow % least_weighted) then
+    call Control % Read_Int_Item('MAX_LEAST_SQUARES_GRADIENTS_ITERATIONS', 12,  &
+                                 Flow % least_miter, .false.)
+  else
+    call Control % Max_Least_Squares_Gradients_Iterations(Flow % least_miter,  &
+                                                            .false.)
+  end if
   !-------------------------!
   !   Related to momentum   !
   !-------------------------!
