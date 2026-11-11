@@ -205,10 +205,11 @@
 
       ! Bidirectional boundaries (and INFLOW, which can locally reverse
       ! into suction): impose the Dirichlet value only when actually
-      ! flowing in (see the flux check)
-      else if( (Var_Mod_Bnd_Cond_Type(phi, c2) .eq. AMBIENT  .or.  &
-                Var_Mod_Bnd_Cond_Type(phi, c2) .eq. PRESSURE .or.  &
-                Var_Mod_Bnd_Cond_Type(phi, c2) .eq. INFLOW)        &
+      ! flowing in (see the flux check).  Boundary type of the grid, since
+      ! turbulent quantities have no boundary types of their own
+      else if( (Grid % Bnd_Cond_Type(c2) .eq. AMBIENT  .or.  &
+                Grid % Bnd_Cond_Type(c2) .eq. PRESSURE .or.  &
+                Grid % Bnd_Cond_Type(c2) .eq. INFLOW)        &
               .and. flux(s) .lt. 0.0) then
         A % val(A % dia(c1)) = A % val(A % dia(c1)) + a12
         ! Use phi % b(c2), not phi % n(c2): the latter may have been
