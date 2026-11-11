@@ -4,7 +4,7 @@
   KEYWORD                                  |   default value               |   other possible values
 ------------------------------------------------------------------------------------------------------------------------
   BACKUP_SAVE_INTERVAL                     |       120                     |   any integer > 0
-  LEAST_SQUARES_GRADIENTS_WEIGHTING        |         none                  |   inverse_distance_squared (stretched cells)
+  LEAST_SQUARES_GRADIENTS_WEIGHTING        |  inverse_distance_squared     |   none (unweighted, as before)
   LOAD_BACKUP_NAME                         |         skip                  |   name of existing backup file
   NUMBER_OF_MONITORING_POINTS              |         0                     |   any integer >= 0
     MONITORING_POINT_001                   |         0.0,  0.0,  0.0       |   any triplet of real numbers ...
