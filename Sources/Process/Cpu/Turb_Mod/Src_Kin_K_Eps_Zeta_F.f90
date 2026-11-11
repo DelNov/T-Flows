@@ -226,7 +226,10 @@
                          * Turb % c_mu_theta5                         &
                          * sqrt(abs(t2 % n(c1) * kin % n(c1))))
 
-          g_buoy_wall = - Flow % density(c1) * Flow % beta  &
+          ! The face normal points out of the domain (from c1 to c2), so the
+          ! wall heat flux into the fluid is along -n: + sign, as in the
+          ! interior g_buoy = -rho beta g . u'theta'
+          g_buoy_wall =   Flow % density(c1) * Flow % beta  &
                       * sign(1.0, q_wall)                   &
                       * g_dot_n                             &
                       * q_theta_wall
