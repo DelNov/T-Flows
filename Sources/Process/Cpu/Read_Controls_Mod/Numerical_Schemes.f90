@@ -116,12 +116,13 @@
   ! Tolerance and max iterations for computation of gradients with Gauss method
   call Control % Tolerance_For_Gauss_Gradients (Flow % gauss_tol,   .false.)
   call Control % Max_Gauss_Gradients_Iterations(Flow % gauss_miter, .false.)
-  ! Weights of the least squares gradients: none (all neighbours with
-  ! weight 1) or inverse_distance_squared (weight 1/|d|^2, for strongly
-  ! stretched cells).  With the weights, the values extrapolated to walls
-  ! count more and converge slower, hence 12 iterations by default
-  call Control % Read_Char_Item('LEAST_SQUARES_GRADIENTS_WEIGHTING', 'none',  &
-                                name, .false.)
+  ! Weights of the least squares gradients: inverse_distance_squared
+  ! (weight 1/|d|^2, default, robust on strongly stretched cells) or none
+  ! (all neighbours with weight 1).  With the weights, the values
+  ! extrapolated to walls count more and converge slower, hence 12
+  ! iterations by default
+  call Control % Read_Char_Item('LEAST_SQUARES_GRADIENTS_WEIGHTING',  &
+                                'inverse_distance_squared', name, .false.)
   call String % To_Upper_Case(name)
   select case(name)
     case('NONE')
